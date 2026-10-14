@@ -21,7 +21,8 @@ public final class AppController {
 		public final List<String> values, labels;
 		public final boolean bool, number;
 
-		InputField(String key, String label, String value, List<String> values, List<String> labels, boolean bool, boolean number) {
+		InputField(String key, String label, String value, List<String> values, List<String> labels, boolean bool,
+			boolean number) {
 			this.key = key;
 			this.label = label;
 			this.value = value;
@@ -63,7 +64,8 @@ public final class AppController {
 		return navigationRevision;
 	}
 
-	public void visualizations(ExerciseRoute route, java.util.function.Predicate<Exercise> policy, List<Exercise> available) {
+	public void visualizations(ExerciseRoute route, java.util.function.Predicate<Exercise> policy,
+		List<Exercise> available) {
 		visualizationRoute = route;
 		visualizationPolicy = policy;
 		animations = available;
@@ -92,14 +94,17 @@ public final class AppController {
 	}
 
 	public void requestExplanation() {
-		if (exercise == null) return;
+		if (exercise == null)
+			return;
 		if (explanationRoute == null)
 			error("La explicación guiada aún está pendiente. Puedes consultar la técnica escrita de este ejercicio.");
-		else explanationRoute.open(exercise, profile);
+		else
+			explanationRoute.open(exercise, profile);
 	}
 
 	public void requestVisualization() {
-		if (visualizationAvailable()) visualizationRoute.open(exercise, profile);
+		if (visualizationAvailable())
+			visualizationRoute.open(exercise, profile);
 	}
 
 	public AppController(AppStore store, CatalogRepository catalog) {
@@ -140,7 +145,8 @@ public final class AppController {
 	}
 
 	public void activate(String next) {
-		if (Objects.equals(owner, next)) return;
+		if (Objects.equals(owner, next))
+			return;
 		owner = next;
 		generation++;
 		navigationRevision++;
@@ -161,21 +167,25 @@ public final class AppController {
 		screen = Screen.HOME;
 		tab = Screen.HOME;
 		loading = false;
-		if (owner != null) reload();
-		else changed();
+		if (owner != null)
+			reload();
+		else
+			changed();
 	}
 
 	/**
 	 * Lectura con dos tokens: cambio de cuenta y una lectura posterior invalidan resultados anteriores.
 	 */
 	public void reload() {
-		if (owner == null) return;
+		if (owner == null)
+			return;
 		long token = generation, request = ++loadRequest;
 		loading = true;
 		changed();
 		store.load(new AppStore.Callback<AppStore.Snapshot>() {
 			public void success(AppStore.Snapshot snapshot) {
-				if (token != generation || request != loadRequest) return;
+				if (token != generation || request != loadRequest)
+					return;
 				loading = false;
 				profile = snapshot.profile;
 				history = snapshot.history;
@@ -189,7 +199,8 @@ public final class AppController {
 			}
 
 			public void failure(Exception e) {
-				if (token != generation || request != loadRequest) return;
+				if (token != generation || request != loadRequest)
+					return;
 				loading = false;
 				error(e.getMessage());
 			}
@@ -201,7 +212,8 @@ public final class AppController {
 		if (next == Screen.HOME || next == Screen.TRAINING || next == Screen.ASSISTANT || next == Screen.HISTORY) {
 			tab = next;
 			backStack.clear();
-		} else if (screen != next) backStack.push(screen);
+		} else if (screen != next)
+			backStack.push(screen);
 		screen = next;
 		changed();
 	}
@@ -223,13 +235,15 @@ public final class AppController {
 			return;
 		}
 		routines.create();
-		if (routines.preview != null) navigate(Screen.ROUTINE);
+		if (routines.preview != null)
+			navigate(Screen.ROUTINE);
 	}
 
 	public void startSession() {
 		if (sessions.session == null || sessions.session.getStatus() == Session.Status.FINISHED)
 			sessions.start(routines.accepted);
-		if (sessions.session != null) navigate(Screen.SESSION);
+		if (sessions.session != null)
+			navigate(Screen.SESSION);
 	}
 
 	public void resume(Session draft) {
@@ -241,8 +255,10 @@ public final class AppController {
 		profileDraft.put(key, value);
 		profileDirty = true;
 		if (key.equals("category")) {
-			if (value.equals("GYM")) profileDraft.put("environment", "GYM");
-			else if (!value.equals("SPORT")) profileDraft.put("environment", "HOME");
+			if (value.equals("GYM"))
+				profileDraft.put("environment", "GYM");
+			else if (!value.equals("SPORT"))
+				profileDraft.put("environment", "HOME");
 			changed();
 		}
 	}
@@ -255,20 +271,31 @@ public final class AppController {
 			navigate(Screen.ACCOUNT);
 			return;
 		}
-		if (profileSaving) return;
+		if (profileSaving)
+			return;
 		try {
 			Set<TrainingProfile.Resource> resources = EnumSet.noneOf(TrainingProfile.Resource.class);
 			for (TrainingProfile.Resource resource : TrainingProfile.Resource.values())
 				if (Boolean.parseBoolean(profileDraft.get("resource." + resource.name())))
 					resources.add(resource);
-			TrainingProfile p = new TrainingProfile.Builder().sportId(profileDraft.get("sportId")).goal(TrainingProfile.Goal.valueOf(profileDraft.get("goal"))).environment(TrainingProfile.Environment.valueOf(profileDraft.get("environment"))).focus(TrainingProfile.Focus.valueOf(profileDraft.get("focus"))).category(TrainingProfile.Category.valueOf(profileDraft.get("category"))).resources(resources).daysPerWeek(Integer.parseInt(profileDraft.get("daysPerWeek"))).durationMinutes(Integer.parseInt(profileDraft.get("durationMinutes"))).level(profileDraft.get("level")).experience(profileDraft.get("experience")).space(profileDraft.get("space")).preferences(profileDraft.get("preferences")).limitations(profileDraft.get("limitations")).historyConsent(Boolean.parseBoolean(profileDraft.get("historyConsent"))).build();
+			TrainingProfile p = new TrainingProfile.Builder().sportId(profileDraft.get("sportId"))
+				.goal(TrainingProfile.Goal.valueOf(profileDraft.get("goal")))
+				.environment(TrainingProfile.Environment.valueOf(profileDraft.get("environment")))
+				.focus(TrainingProfile.Focus.valueOf(profileDraft.get("focus")))
+				.category(TrainingProfile.Category.valueOf(profileDraft.get("category"))).resources(resources)
+				.daysPerWeek(Integer.parseInt(profileDraft.get("daysPerWeek")))
+				.durationMinutes(Integer.parseInt(profileDraft.get("durationMinutes"))).level(profileDraft.get("level"))
+				.experience(profileDraft.get("experience")).space(profileDraft.get("space"))
+				.preferences(profileDraft.get("preferences")).limitations(profileDraft.get("limitations"))
+				.historyConsent(Boolean.parseBoolean(profileDraft.get("historyConsent"))).build();
 			if (catalog.findSport(p.getSportId()) == null)
 				throw new IllegalArgumentException("Selecciona un deporte del catálogo.");
 			profileSaving = true;
 			long token = generation;
 			store.profile(p, new AppStore.Callback<Void>() {
 				public void success(Void ignored) {
-					if (token != generation) return;
+					if (token != generation)
+						return;
 					profileSaving = false;
 					profile = p;
 					profileDirty = false;
@@ -278,7 +305,8 @@ public final class AppController {
 				}
 
 				public void failure(Exception e) {
-					if (token != generation) return;
+					if (token != generation)
+						return;
 					profileSaving = false;
 					error(e.getMessage());
 				}
@@ -315,14 +343,16 @@ public final class AppController {
 		if (profileDraft.isEmpty())
 			fillProfile(profile == null ? new TrainingProfile.Builder().build() : profile);
 		List<InputField> f = new ArrayList<>();
-		f.add(choice("category", "Tipo de entrenamiento", "GYM,Gimnasio|HOME_EQUIPMENT,Casa con material|NO_EQUIPMENT,Sin equipamiento|SPORT,Deporte"));
+		f.add(choice("category", "Tipo de entrenamiento",
+			"GYM,Gimnasio|HOME_EQUIPMENT,Casa con material|NO_EQUIPMENT,Sin equipamiento|SPORT,Deporte"));
 		List<String> ids = new ArrayList<>(), names = new ArrayList<>();
 		for (Sport s : catalog.getSports()) {
 			ids.add(s.getId());
 			names.add(s.getName());
 		}
 		f.add(new InputField("sportId", "Disciplina", profileDraft.get("sportId"), ids, names, false, false));
-		f.add(choice("goal", "Objetivo", "STRENGTH,Fuerza|GENERAL_FITNESS,Condición general|ENDURANCE,Resistencia|MOBILITY,Movilidad|SPORT_PRACTICE,Práctica deportiva"));
+		f.add(choice("goal", "Objetivo",
+			"STRENGTH,Fuerza|GENERAL_FITNESS,Condición general|ENDURANCE,Resistencia|MOBILITY,Movilidad|SPORT_PRACTICE,Práctica deportiva"));
 		f.add(choice("environment", "Entorno real", "GYM,Gimnasio|HOME,Casa|OUTDOORS,Exterior|POOL,Piscina"));
 		f.add(choice("focus", "Cobertura", "SPECIFIC,Específica|COMPLEMENTARY,Preparación complementaria"));
 		f.add(field("daysPerWeek", "Días por semana (1–7)", false, true));
@@ -339,7 +369,8 @@ public final class AppController {
 	}
 
 	private InputField field(String k, String l, boolean b, boolean n) {
-		return new InputField(k, l, profileDraft.getOrDefault(k, ""), Collections.emptyList(), Collections.emptyList(), b, n);
+		return new InputField(k, l, profileDraft.getOrDefault(k, ""), Collections.emptyList(), Collections.emptyList(),
+			b, n);
 	}
 
 	private InputField choice(String k, String l, String options) {
@@ -363,12 +394,17 @@ public final class AppController {
 		if (profile == null)
 			return "Aún no has guardado tu perfil. Elige disciplina, objetivo, entorno y los recursos que realmente tienes.";
 		Sport s = catalog.findSport(profile.getSportId());
-		return label(profile.getCategory().name()) + " · " + (s == null ? profile.getSportId() : s.getName()) + "\n" + label(profile.getGoal().name()) + " · " + label(profile.getEnvironment().name()) + " · " + profile.getDurationMinutes() + " min · " + profile.getDaysPerWeek() + " días/semana\nRecursos: " + (profile.getResources().isEmpty() ? "ninguno" : labels(profile.getResources())) + "\n" + (s == null ? "" : s.getCoverageMessage(profile.getFocus()));
+		return label(profile.getCategory().name()) + " · " + (s == null ? profile.getSportId() : s.getName()) + "\n" +
+			label(profile.getGoal().name()) + " · " + label(profile.getEnvironment().name()) + " · " +
+			profile.getDurationMinutes() + " min · " + profile.getDaysPerWeek() + " días/semana\nRecursos: " +
+			(profile.getResources().isEmpty() ? "ninguno" : labels(profile.getResources())) + "\n" +
+			(s == null ? "" : s.getCoverageMessage(profile.getFocus()));
 	}
 
 	public static String labels(Collection<?> values) {
 		List<String> result = new ArrayList<>();
-		for (Object value : values) result.add(label(value.toString()));
+		for (Object value : values)
+			result.add(label(value.toString()));
 		return String.join(", ", result);
 	}
 
@@ -437,7 +473,11 @@ public final class AppController {
 	 * Etiquetas de propuesta separadas de las de resultado para no afirmar que un ejemplo ya se realizó.
 	 */
 	public static String prescription(MetricType type, Map<String, String> values) {
-		return metrics(type, values).replace("Series realizadas", "Series previstas").replace("Bloques realizados", "Bloques previstos").replace("Intervalos / bloques realizados", "Intervalos / bloques previstos").replace("Tiempo realizado", "Tiempo previsto").replace("Carga (kg; 0 = peso corporal)", "Carga de ejemplo (kg)");
+		return metrics(type, values).replace("Series realizadas", "Series previstas")
+			.replace("Bloques realizados", "Bloques previstos")
+			.replace("Intervalos / bloques realizados", "Intervalos / bloques previstos")
+			.replace("Tiempo realizado", "Tiempo previsto")
+			.replace("Carga (kg; 0 = peso corporal)", "Carga de ejemplo (kg)");
 	}
 }
 

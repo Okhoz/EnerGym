@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- API 26 ya usa iconos claros; el atributo de contraste existe desde API 27. -->
+	<style name="Base.Theme.EnerGym.SystemBars" parent="Theme.Material3.Dark.NoActionBar">
+		<item name="android:windowLightNavigationBar">false</item>
+	</style>
+</resources>

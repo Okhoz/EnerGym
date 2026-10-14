@@ -1,1 +1,4 @@
-<resources><style name="Theme.EnerGym" parent="Base.Theme.EnerGym" /></resources>
+<resources>
+
+	<style name="Theme.EnerGym" parent="Base.Theme.EnerGym" />
+</resources>

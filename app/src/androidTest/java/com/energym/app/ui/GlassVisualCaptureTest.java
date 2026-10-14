@@ -7,25 +7,33 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ScrollView;
+
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
+
 import com.energym.app.MainActivity;
 import com.energym.app.R;
 import com.energym.app.controller.AppController;
 import com.energym.app.ui.effects.GlassButton;
+
 import java.io.*;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import static org.junit.Assert.*;
 
-/** Capturas reproducibles de datos demo; todo ajuste global se restaura incluso si falla la prueba. */
+/**
+ * Capturas reproducibles de datos demo; todo ajuste global se restaura incluso si falla la prueba.
+ */
 @RunWith(AndroidJUnit4.class)
 public final class GlassVisualCaptureTest {
-	@Test public void normalFallbackAndLargeTextWithImeRemainUsable() throws Exception {
+	@Test
+	public void normalFallbackAndLargeTextWithImeRemainUsable() throws Exception {
 		String font = shell("settings get system font_scale").trim();
 		String animations = shell("settings get global animator_duration_scale").trim();
 		String keyboard = shell("settings get secure show_ime_with_hard_keyboard").trim();
@@ -50,7 +58,8 @@ public final class GlassVisualCaptureTest {
 				MainFlowTest.click(scenario, "Cuenta");
 				boolean[] demo = {false};
 				scenario.onActivity(a -> demo[0] = MainFlowTest.text(a.getWindow().getDecorView(), "Entrar en demo local") != null);
-				if (demo[0]) MainFlowTest.click(scenario, "Entrar en demo local");
+				if (demo[0])
+					MainFlowTest.click(scenario, "Entrar en demo local");
 				scenario.onActivity(a -> a.state().app.navigate(AppController.Screen.HOME));
 				MainFlowTest.await();
 				shell("settings put system font_scale 1.3");
@@ -106,20 +115,26 @@ public final class GlassVisualCaptureTest {
 	private static void restore(String table, String key, String value) throws IOException {
 		shell(value.equals("null") ? "settings delete " + table + " " + key : "settings put " + table + " " + key + " " + value);
 	}
+
 	private static String shell(String command) throws IOException {
 		android.os.ParcelFileDescriptor descriptor = InstrumentationRegistry.getInstrumentation().getUiAutomation().executeShellCommand(command);
 		try (InputStream in = new android.os.ParcelFileDescriptor.AutoCloseInputStream(descriptor); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			byte[] buffer = new byte[1024];
 			int count;
-			while ((count = in.read(buffer)) != -1) out.write(buffer, 0, count);
+			while ((count = in.read(buffer)) != -1)
+				out.write(buffer, 0, count);
 			return out.toString("UTF-8");
 		}
 	}
+
 	private static void capture(String name) throws IOException {
 		Bitmap bitmap = InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();
 		File folder = new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir(null), "task10-screens");
 		assertTrue(folder.isDirectory() || folder.mkdirs());
-		try (OutputStream out = new FileOutputStream(new File(folder, name + ".png"))) { assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)); }
-		finally { bitmap.recycle(); }
+		try (OutputStream out = new FileOutputStream(new File(folder, name + ".png"))) {
+			assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG, 100, out));
+		} finally {
+			bitmap.recycle();
+		}
 	}
 }

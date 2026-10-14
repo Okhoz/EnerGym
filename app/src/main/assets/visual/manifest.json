@@ -1,28 +1,56 @@
 {
-  "version": 1,
-  "resources": [{
-    "exerciseId": "standard-pushup",
-    "assetPath": "visual/push_up_native.glb",
-    "sha256": "80338cac3e52dd9b7d7676c83fda2c00158a5254ac91e930710c1497b67bfe3f",
-    "sourceSha256": "67bfd1bf9c9c679dfd81f34202c661f954ce0ec4b15baac56a5781a372d11326",
-    "adaptation": "Removed orphan Human weights animation: zero mesh morph targets. Mesh, rig and BIN unchanged.",
-    "binaryChunkSha256": "338f0a42938e2ee2de53d777bbc87c32f18101aeab82d813903c40437d39e97f",
-    "sourceUrl": "https://assiamahs.github.io/opengym3d/assets/push_up.glb",
-    "sourceRevision": "ea3a60130fdcfb3c4771e44d09f84ebab4ee9bae",
-    "sourceRevisionNote": "Revision of inspected pipeline/spec; mutable export is identified by SHA-256, deployment revision unproven.",
-    "license": "CC0-1.0",
-    "licenseFiles": ["visual/licenses/Mesh2Motion-CC0.md", "visual/licenses/CC0-1.0.txt"],
-    "creators": "OpenGym3D · Mesh2Motion · MakeHuman/MPFB core assets",
-    "reviewStatus": "TECHNICAL_PREVIEW_PROFESSIONAL_REVIEW_PENDING",
-    "professionallyReviewed": false,
-    "technicalEvidence": "Original rejected by Filament cgltf: orphan Human weights clip output18, input2, zero morph targets. Minimal CC0 derivative retains Human.rig with byte-identical BIN. Native runtime acceptance recorded separately in docs/resources.md.",
-    "capabilities": ["play", "pause", "speed", "view", "marker", "rotate", "zoom"],
-    "views": ["front", "side", "rear", "reset"],
-    "regions": [],
-    "clipNames": ["Human.rig"],
-    "durationSeconds": 1.533333,
-    "markers": {"initial": 0, "middle": 0.7666665, "final": 1.533333},
-    "markerMeaning": "Timeline samples of the inspected clips, not professionally approved movement phases; initial and final belong to a near-closed loop.",
-    "speeds": [0.25, 0.5, 1.0]
-  }]
+	"version": 1,
+	"resources": [
+		{
+			"exerciseId": "standard-pushup",
+			"assetPath": "visual/push_up_native.glb",
+			"sha256": "80338cac3e52dd9b7d7676c83fda2c00158a5254ac91e930710c1497b67bfe3f",
+			"sourceSha256": "67bfd1bf9c9c679dfd81f34202c661f954ce0ec4b15baac56a5781a372d11326",
+			"adaptation": "Removed orphan Human weights animation: zero mesh morph targets. Mesh, rig and BIN unchanged.",
+			"binaryChunkSha256": "338f0a42938e2ee2de53d777bbc87c32f18101aeab82d813903c40437d39e97f",
+			"sourceUrl": "https://assiamahs.github.io/opengym3d/assets/push_up.glb",
+			"sourceRevision": "ea3a60130fdcfb3c4771e44d09f84ebab4ee9bae",
+			"sourceRevisionNote": "Revision of inspected pipeline/spec; mutable export is identified by SHA-256, deployment revision unproven.",
+			"license": "CC0-1.0",
+			"licenseFiles": [
+				"visual/licenses/Mesh2Motion-CC0.md",
+				"visual/licenses/CC0-1.0.txt"
+			],
+			"creators": "OpenGym3D · Mesh2Motion · MakeHuman/MPFB core assets",
+			"reviewStatus": "TECHNICAL_PREVIEW_PROFESSIONAL_REVIEW_PENDING",
+			"professionallyReviewed": false,
+			"technicalEvidence": "Original rejected by Filament cgltf: orphan Human weights clip output18, input2, zero morph targets. Minimal CC0 derivative retains Human.rig with byte-identical BIN. Native runtime acceptance recorded separately in docs/resources.md.",
+			"capabilities": [
+				"play",
+				"pause",
+				"speed",
+				"view",
+				"marker",
+				"rotate",
+				"zoom"
+			],
+			"views": [
+				"front",
+				"side",
+				"rear",
+				"reset"
+			],
+			"regions": [],
+			"clipNames": [
+				"Human.rig"
+			],
+			"durationSeconds": 1.533333,
+			"markers": {
+				"initial": 0,
+				"middle": 0.7666665,
+				"final": 1.533333
+			},
+			"markerMeaning": "Timeline samples of the inspected clips, not professionally approved movement phases; initial and final belong to a near-closed loop.",
+			"speeds": [
+				0.25,
+				0.5,
+				1.0
+			]
+		}
+	]
 }

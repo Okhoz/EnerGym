@@ -63,10 +63,14 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 		liveActivities++;
 		counted = true;
 		setContentView(R.layout.activity_anatomy);
-		androidx.core.content.ContextCompat.registerReceiver(this, contextClose, new IntentFilter(ACTION_CLOSE), androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED);
+		ViewCompat.setAccessibilityHeading(findViewById(R.id.viewer_title), true);
+		ViewCompat.setAccessibilityHeading(findViewById(R.id.viewer_availability_title), true);
+		androidx.core.content.ContextCompat.registerReceiver(this, contextClose, new IntentFilter(ACTION_CLOSE),
+			androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED);
 		receiverRegistered = true;
 		ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.anatomy_root), (v, insets) -> {
-			androidx.core.graphics.Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+			androidx.core.graphics.Insets bars =
+				insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
 			v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
 			return WindowInsetsCompat.CONSUMED;
 		});
@@ -88,9 +92,13 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 			failure("Selecciona un ejercicio del catálogo para abrir su referencia.");
 			return;
 		}
-		if (!authorized()) return;
+		if (!authorized())
+			return;
 		if (saved != null && exerciseId.equals(saved.getString("exerciseId")))
-			restored = new ViewerState(false, false, saved.getBoolean("playing", true), false, saved.getFloat("playhead"), saved.getFloat("speed", 1), saved.getFloat("yaw", 90), saved.getFloat("pitch", 25), saved.getFloat("zoom", 1), "");
+			restored =
+				new ViewerState(false, false, saved.getBoolean("playing", true), false, saved.getFloat("playhead"),
+					saved.getFloat("speed", 1), saved.getFloat("yaw", 90), saved.getFloat("pitch", 25),
+					saved.getFloat("zoom", 1), "");
 		bindControls();
 		load();
 	}
@@ -104,10 +112,12 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 			try {
 				CatalogRepository catalog = CatalogRepository.load(getApplicationContext());
 				Exercise exercise = catalog.findExercise(exerciseId);
-				if (exercise == null) throw new IOException("Ejercicio fuera del catálogo local.");
+				if (exercise == null)
+					throw new IOException("Ejercicio fuera del catálogo local.");
 				// La referencia escrita no depende de que el archivo animado pase su hash o llegue a JNI.
 				main.post(() -> {
-					if (current(token)) showExercise(exercise);
+					if (current(token))
+						showExercise(exercise);
 				});
 				ResourceRepository repo = PackagedResources.load(getApplicationContext());
 				ResourceManifest resource = repo.forExercise(exerciseId);
@@ -120,36 +130,43 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 				}
 				byte[] bytes = repo.loadVerified(resource);
 				main.post(() -> {
-					if (!current(token)) return;
+					if (!current(token))
+						return;
 					manifest = resource;
 					controller = new ViewerController(manifest, this);
 					controller.restore(restored);
 					try {
-						renderer = new NativeAnimationRenderer(this, surface, controller, new NativeAnimationRenderer.Listener() {
-							public void progress(float value) {
-								if (!current(token)) return;
-								progress.setIndeterminate(false);
-								progress.setProgress(Math.round(value * 100));
-								loadMessage.setText("Cargando referencia local… " + Math.round(value * 100) + " %");
-							}
-
-							public void ready(String evidence) {
-								if (current(token)) {
-									controller.ready();
+						renderer = new NativeAnimationRenderer(this, surface, controller,
+							new NativeAnimationRenderer.Listener() {
+								public void progress(float value) {
+									if (!current(token))
+										return;
+									progress.setIndeterminate(false);
+									progress.setProgress(Math.round(value * 100));
+									loadMessage.setText("Cargando referencia local… " + Math.round(value * 100) + " %");
 								}
-							}
 
-							public void failure(String message) {
-								main.post(() -> {
-									if (current(token)) AnatomyActivity.this.failure(message);
-								});
-							}
-						});
+								public void ready(String evidence) {
+									if (current(token)) {
+										controller.ready();
+									}
+								}
+
+								public void failure(String message) {
+									main.post(() -> {
+										if (current(token))
+											AnatomyActivity.this.failure(message);
+									});
+								}
+							});
 						renderer.load(bytes, manifest);
-						if (resumed) renderer.resume();
+						if (resumed)
+							renderer.resume();
 					} catch (RuntimeException | LinkageError e) {
 						Log.e("EnerGymViewer", "Inicio nativo fallido", e);
-						failure(e instanceof UnsupportedOperationException ? "Este dispositivo no ofrece Vulkan 1.1 para el visor. Puedes consultar la referencia escrita." : "No se pudo abrir el visor nativo. Puedes consultar la referencia escrita.");
+						failure(e instanceof UnsupportedOperationException ?
+							"Este dispositivo no ofrece Vulkan 1.1 para el visor. Puedes consultar la referencia escrita." :
+							"No se pudo abrir el visor nativo. Puedes consultar la referencia escrita.");
 					}
 				});
 			} catch (IOException | RuntimeException e) {
@@ -168,19 +185,24 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 	}
 
 	private boolean authorized() {
-		if (ViewerLeaseProvider.valid(this, lease, exerciseId)) return true;
+		if (ViewerLeaseProvider.valid(this, lease, exerciseId))
+			return true;
 		contextCancelled = true;
 		finish();
 		return false;
 	}
+
 	private void showExercise(Exercise exercise) {
 		writtenReferenceAvailable = true;
 		((TextView) findViewById(R.id.viewer_title)).setText(exercise.getName());
-		((TextView) findViewById(R.id.viewer_written_reference)).setText("Referencia escrita · Sin revisión profesional\n" + exercise.getDescription());
+		((TextView) findViewById(R.id.viewer_written_reference)).setText(
+			"Referencia escrita · Sin revisión profesional\n" + exercise.getDescription());
 	}
 
 	private void bindControls() {
-		findViewById(R.id.viewer_play).setOnClickListener(v -> send(controller != null && controller.state().playing ? ViewerCommand.Action.PAUSE : ViewerCommand.Action.PLAY, "", 0, 0));
+		findViewById(R.id.viewer_play).setOnClickListener(v -> send(
+			controller != null && controller.state().playing ? ViewerCommand.Action.PAUSE : ViewerCommand.Action.PLAY,
+			"", 0, 0));
 		bind(R.id.viewer_speed_quarter, ViewerCommand.Action.SPEED, "", .25f);
 		bind(R.id.viewer_speed_half, ViewerCommand.Action.SPEED, "", .5f);
 		bind(R.id.viewer_speed_normal, ViewerCommand.Action.SPEED, "", 1);
@@ -194,13 +216,14 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 		bind(R.id.viewer_front, ViewerCommand.Action.VIEW, "front", 0);
 		bind(R.id.viewer_side, ViewerCommand.Action.VIEW, "side", 0);
 		bind(R.id.viewer_reset, ViewerCommand.Action.VIEW, "reset", 0);
-		ScaleGestureDetector scale = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
-			@Override
-			public boolean onScale(ScaleGestureDetector d) {
-				send(ViewerCommand.Action.ZOOM, "", Math.max(.5f, Math.min(2f, 1f / d.getScaleFactor())), 0);
-				return true;
-			}
-		});
+		ScaleGestureDetector scale =
+			new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+				@Override
+				public boolean onScale(ScaleGestureDetector d) {
+					send(ViewerCommand.Action.ZOOM, "", Math.max(.5f, Math.min(2f, 1f / d.getScaleFactor())), 0);
+					return true;
+				}
+			});
 		GestureDetector orbit = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
 			@Override
 			public boolean onDown(android.view.MotionEvent e) {
@@ -210,7 +233,8 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 			@Override
 			public boolean onScroll(android.view.MotionEvent a, android.view.MotionEvent b, float x, float y) {
 				if (!scale.isInProgress())
-					send(ViewerCommand.Action.ROTATE, "", Math.max(-180, Math.min(180, -x * .3f)), Math.max(-90, Math.min(90, y * .3f)));
+					send(ViewerCommand.Action.ROTATE, "", Math.max(-180, Math.min(180, -x * .3f)),
+						Math.max(-90, Math.min(90, y * .3f)));
 				return true;
 			}
 
@@ -225,7 +249,8 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 			orbit.onTouchEvent(event);
 			if (event.getActionMasked() == MotionEvent.ACTION_DOWN)
 				v.getParent().requestDisallowInterceptTouchEvent(true);
-			if (event.getActionMasked() == MotionEvent.ACTION_UP || event.getActionMasked() == MotionEvent.ACTION_CANCEL)
+			if (event.getActionMasked() == MotionEvent.ACTION_UP ||
+				event.getActionMasked() == MotionEvent.ACTION_CANCEL)
 				v.getParent().requestDisallowInterceptTouchEvent(false);
 			return true;
 		});
@@ -260,7 +285,8 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 		loading.setVisibility(state.ready ? android.view.View.GONE : android.view.View.VISIBLE);
 		((TextView) findViewById(R.id.viewer_play)).setText(state.playing ? "Pausar" : "Reproducir");
 		if (state.ready)
-			status.setText("Sin conexión · " + (state.playing ? "Reproduciendo" : "En pausa") + " · " + String.format(java.util.Locale.forLanguageTag("es"), "%.2f×", state.speed));
+			status.setText("Sin conexión · " + (state.playing ? "Reproduciendo" : "En pausa") + " · " +
+				String.format(java.util.Locale.forLanguageTag("es"), "%.2f×", state.speed));
 		findViewById(R.id.viewer_speed_quarter).setSelected(state.speed == .25f);
 		findViewById(R.id.viewer_speed_half).setSelected(state.speed == .5f);
 		findViewById(R.id.viewer_speed_normal).setSelected(state.speed == 1);
@@ -268,12 +294,14 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 
 	private void failure(String message) {
 		closeRenderer();
-		if (controller != null) controller.failure(message);
+		if (controller != null)
+			controller.failure(message);
 		progress.setVisibility(android.view.View.GONE);
 		loading.setVisibility(android.view.View.VISIBLE);
 		controls.setVisibility(android.view.View.GONE);
 		loadMessage.setText(message);
-		status.setText(writtenReferenceAvailable ? "Animación no disponible · La referencia escrita sigue accesible" : "Animación no disponible · Vuelve y selecciona un ejercicio del catálogo");
+		status.setText(writtenReferenceAvailable ? "Animación no disponible · La referencia escrita sigue accesible" :
+			"Animación no disponible · Vuelve y selecciona un ejercicio del catálogo");
 	}
 
 	private void closeRenderer() {
@@ -290,16 +318,19 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (!authorized()) return;
+		if (!authorized())
+			return;
 		resumed = true;
-		if (renderer != null) renderer.resume();
+		if (renderer != null)
+			renderer.resume();
 	}
 
 	@Override
 	protected void onPause() {
 		com.energym.app.ui.effects.MotionPreferences.cancelButtons(findViewById(R.id.anatomy_root));
 		resumed = false;
-		if (renderer != null) renderer.pause();
+		if (renderer != null)
+			renderer.pause();
 		super.onPause();
 	}
 
@@ -328,7 +359,8 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 	protected void onDestroy() {
 		destroyed = true;
 		generation++;
-		if (read != null) read.cancel(true);
+		if (read != null)
+			read.cancel(true);
 		io.shutdownNow();
 		main.removeCallbacksAndMessages(null);
 		if (receiverRegistered) {
@@ -336,7 +368,8 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 			receiverRegistered = false;
 		}
 		closeRenderer();
-		if (controller != null) controller.close();
+		if (controller != null)
+			controller.close();
 		if (counted) {
 			liveActivities--;
 			counted = false;
@@ -347,20 +380,24 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 		super.onDestroy();
 		// El driver retiene memoria aunque se libere Filament. Solo el proceso privado puede reclamarse.
 		// La recreación de configuración conserva el proceso; tampoco se corta otro visor aún vivo.
-		if (reclaim) new Handler(Looper.getMainLooper()).postDelayed(() -> {
-			if (liveActivities == 0 && expectedProcess.equals(processName(application))) {
-				Log.i("EnerGymViewer", "Private viewer process reclaimed after final close");
-				android.os.Process.killProcess(android.os.Process.myPid());
-			}
-		}, 200);
+		if (reclaim)
+			new Handler(Looper.getMainLooper()).postDelayed(() -> {
+				if (liveActivities == 0 && expectedProcess.equals(processName(application))) {
+					Log.i("EnerGymViewer", "Private viewer process reclaimed after final close");
+					android.os.Process.killProcess(android.os.Process.myPid());
+				}
+			}, 200);
 	}
 
 	private static String processName(Context application) {
-		if (Build.VERSION.SDK_INT >= 28) return Application.getProcessName();
+		if (Build.VERSION.SDK_INT >= 28)
+			return Application.getProcessName();
 		ActivityManager manager = (ActivityManager) application.getSystemService(Context.ACTIVITY_SERVICE);
 		java.util.List<ActivityManager.RunningAppProcessInfo> processes = manager.getRunningAppProcesses();
-		if (processes != null) for (ActivityManager.RunningAppProcessInfo p : processes)
-			if (p.pid == android.os.Process.myPid()) return p.processName;
+		if (processes != null)
+			for (ActivityManager.RunningAppProcessInfo p : processes)
+				if (p.pid == android.os.Process.myPid())
+					return p.processName;
 		return "";
 	}
 }

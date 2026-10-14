@@ -34,11 +34,14 @@ public final class ProposalController {
 	private final Map<String, String> fields = new LinkedHashMap<>();
 	private final int catalogVersion;
 
-	public ProposalController(AppStore app, ConversationStore conversations, ChatClient client, List<Exercise> catalog, Supplier<TrainingProfile> profile, Runnable changed, Consumer<Routine> accepted) {
+	public ProposalController(AppStore app, ConversationStore conversations, ChatClient client, List<Exercise> catalog,
+		Supplier<TrainingProfile> profile, Runnable changed, Consumer<Routine> accepted) {
 		this(app, conversations, client, catalog, 1, profile, changed, accepted);
 	}
 
-	public ProposalController(AppStore app, ConversationStore conversations, ChatClient client, List<Exercise> catalog, int version, Supplier<TrainingProfile> profile, Runnable changed, Consumer<Routine> accepted) {
+	public ProposalController(AppStore app, ConversationStore conversations, ChatClient client, List<Exercise> catalog,
+		int version, Supplier<TrainingProfile> profile, Runnable changed,
+		Consumer<Routine> accepted) {
 		store = app;
 		this.conversations = conversations;
 		this.client = client;
@@ -53,7 +56,8 @@ public final class ProposalController {
 	 * Cambiar cuenta revoca el token y descarta callbacks; cada cuenta recupera únicamente su conversación local.
 	 */
 	public void activate(String next) {
-		if (Objects.equals(owner, next)) return;
+		if (Objects.equals(owner, next))
+			return;
 		generation++;
 		client.disconnect();
 		owner = next;
@@ -83,7 +87,8 @@ public final class ProposalController {
 				exercise = s.exercise;
 			}
 			if (messages.isEmpty())
-				add("assistant", "Soy tu asistente guiado local gratuito, por reglas. Cuéntame tus días, tiempo, lugar, material y objetivo. Puedes revisar cada propuesta antes de guardarla.");
+				add("assistant",
+					"Soy tu asistente guiado local gratuito, por reglas. Cuéntame tus días, tiempo, lugar, material y objetivo. Puedes revisar cada propuesta antes de guardarla.");
 		}
 		changed.run();
 	}
@@ -136,7 +141,8 @@ public final class ProposalController {
 			changed.run();
 			return false;
 		}
-		if (busy) return false;
+		if (busy)
+			return false;
 		if (text == null || text.trim().isEmpty() || text.length() > 2000) {
 			status = "Escribe un mensaje de 1 a 2000 caracteres.";
 			changed.run();
@@ -150,7 +156,8 @@ public final class ProposalController {
 	private void add(String role, String text) {
 		messages.add(new ConversationStore.Message(role, text));
 		int size = 0;
-		for (ConversationStore.Message m : messages) size += m.text.length();
+		for (ConversationStore.Message m : messages)
+			size += m.text.length();
 		while (messages.size() > 48 || size > 16000) {
 			size -= messages.remove(0).text.length();
 		}
@@ -163,11 +170,13 @@ public final class ProposalController {
 
 	private void persist() {
 		if (owner != null)
-			conversations.save(owner, new ConversationStore.State(conversationId, messages, fields, preview, base, exercise, previewBase));
+			conversations.save(owner,
+				new ConversationStore.State(conversationId, messages, fields, preview, base, exercise, previewBase));
 	}
 
 	public void sendLocal(String raw) {
-		if (!ready(raw)) return;
+		if (!ready(raw))
+			return;
 		String text = normalize(raw);
 		add("user", raw.trim());
 		if (exercise != null && !text.contains("rutina") && !text.contains("plan") && !text.contains("entrenar")) {
@@ -183,7 +192,8 @@ public final class ProposalController {
 		if (fields.isEmpty() || !Objects.equals(base, current.get())) {
 			fields.clear();
 			base = current.get();
-			if (base != null) seed(base);
+			if (base != null)
+				seed(base);
 		}
 		String conflict = conflict(text);
 		if (!conflict.isEmpty()) {
@@ -200,13 +210,18 @@ public final class ProposalController {
 		parse(text);
 		List<String> missing = missing();
 		if (!missing.isEmpty()) {
-			add("assistant", "Para preparar la propuesta me falta: " + String.join(", ", missing) + ". Por ejemplo: fuerza y nivel principiante.");
+			add("assistant", "Para preparar la propuesta me falta: " + String.join(", ", missing) +
+				". Por ejemplo: fuerza y nivel principiante.");
 			clearPreview();
 		} else {
 			try {
 				TrainingProfile proposed = build();
 				setPreview(new RoutinePlanner().create(proposed, catalog), base);
-				add("assistant", preview.isEmpty() ? preview.getExplanation() : "He preparado una vista previa: " + proposed.getDaysPerWeek() + " días por semana, " + proposed.getDurationMinutes() + " min disponibles, " + AppController.label(proposed.getEnvironment().name()) + ". Revisa los ejercicios, el perfil y los recursos. Solo guardaré al aceptar. La rutina es un ejemplo por sesión; no crea un calendario semanal.");
+				add("assistant", preview.isEmpty() ? preview.getExplanation() :
+					"He preparado una vista previa: " + proposed.getDaysPerWeek() + " días por semana, " +
+						proposed.getDurationMinutes() + " min disponibles, " +
+						AppController.label(proposed.getEnvironment().name()) +
+						". Revisa los ejercicios, el perfil y los recursos. Solo guardaré al aceptar. La rutina es un ejemplo por sesión; no crea un calendario semanal.");
 			} catch (RuntimeException e) {
 				clearPreview();
 				status = "Revisa los días (1–7), tiempo (5–240 min) y el material disponible.";
@@ -225,7 +240,8 @@ public final class ProposalController {
 		fields.put("duration", String.valueOf(p.getDurationMinutes()));
 		fields.put("level", p.getLevel());
 		List<String> rs = new ArrayList<>();
-		for (TrainingProfile.Resource r : p.getResources()) rs.add(r.name());
+		for (TrainingProfile.Resource r : p.getResources())
+			rs.add(r.name());
 		fields.put("resources", String.join(",", rs));
 	}
 
@@ -237,8 +253,11 @@ public final class ProposalController {
 		if (text.contains("casa") && text.contains("gimnasio"))
 			return "Aclara el lugar: ¿entrenarás en casa o en el gimnasio?";
 		if (text.contains("sin material") || text.contains("sin equipo"))
-			for (String resource : Arrays.asList("mancuern", "barra", "banda", "esterilla", "banco", "silla", "pared", "maquina"))
-				if (text.contains(resource) && !Pattern.compile("(?:no (?:tengo|hay|uso|dispongo de)|sin)\\s+(?:\\w+\\s+){0,2}" + resource).matcher(text).find())
+			for (String resource : Arrays.asList("mancuern", "barra", "banda", "esterilla", "banco", "silla", "pared",
+				"maquina"))
+				if (text.contains(resource) &&
+					!Pattern.compile("(?:no (?:tengo|hay|uso|dispongo de)|sin)\\s+(?:\\w+\\s+){0,2}" + resource)
+						.matcher(text).find())
 					return "Aclara el material: indicas sin material y también un recurso. ¿Cuál estará disponible para esta rutina?";
 		return "";
 	}
@@ -249,10 +268,13 @@ public final class ProposalController {
 		for (int i = 0; i < words.length; i++)
 			t = t.replaceAll("\\b" + words[i] + "\\b", Integer.toString(i + 1));
 		Matcher days = Pattern.compile("\\b([0-9]{1,3})\\s*(?:dias?|veces)").matcher(t);
-		if (days.find()) fields.put("days", days.group(1));
+		if (days.find())
+			fields.put("days", days.group(1));
 		Matcher time = Pattern.compile("\\b([0-9]{1,3})\\s*(?:min(?:utos?)?)\\b").matcher(t);
-		if (time.find()) fields.put("duration", time.group(1));
-		if (t.contains("casa")) fields.put("environment", "HOME");
+		if (time.find())
+			fields.put("duration", time.group(1));
+		if (t.contains("casa"))
+			fields.put("environment", "HOME");
 		else if (t.contains("gimnasio")) {
 			fields.put("environment", "GYM");
 			fields.put("category", "GYM");
@@ -262,19 +284,27 @@ public final class ProposalController {
 			fields.put("category", "NO_EQUIPMENT");
 			fields.put("resources", "");
 		} else {
-			Map<String, String> names = StrictJson.map("mancuern", "DUMBBELLS", "barra", "BARBELL", "banda", "BANDS", "esterilla", "MAT", "banco", "BENCH", "silla", "CHAIR", "pared", "WALL", "maquina", "MACHINE");
+			Map<String, String> names =
+				StrictJson.map("mancuern", "DUMBBELLS", "barra", "BARBELL", "banda", "BANDS", "esterilla", "MAT",
+					"banco", "BENCH", "silla", "CHAIR", "pared", "WALL", "maquina", "MACHINE");
 			Set<String> rs = new LinkedHashSet<>();
 			boolean negative = false;
 			for (Map.Entry<String, String> r : names.entrySet())
 				if (t.contains(r.getKey())) {
-					boolean negated = Pattern.compile("(?:no (?:tengo|hay|uso|dispongo de)|sin)\\s+(?:\\w+\\s+){0,2}" + r.getKey()).matcher(t).find();
-					if (negated) negative = true;
-					else rs.add(r.getValue());
+					boolean negated =
+						Pattern.compile("(?:no (?:tengo|hay|uso|dispongo de)|sin)\\s+(?:\\w+\\s+){0,2}" + r.getKey())
+							.matcher(t).find();
+					if (negated)
+						negative = true;
+					else
+						rs.add(r.getValue());
 				}
 			if (!rs.isEmpty()) {
 				fields.put("resources", String.join(",", rs));
-				fields.put("category", fields.getOrDefault("environment", "HOME").equals("GYM") ? "GYM" : "HOME_EQUIPMENT");
-			} else if (negative) fields.remove("resources");
+				fields.put("category",
+					fields.getOrDefault("environment", "HOME").equals("GYM") ? "GYM" : "HOME_EQUIPMENT");
+			} else if (negative)
+				fields.remove("resources");
 		}
 		if (t.contains("fuerza")) {
 			fields.put("goal", "STRENGTH");
@@ -294,23 +324,35 @@ public final class ProposalController {
 		}
 		if (t.contains("principiante") || t.contains("empiezo"))
 			fields.put("level", "Principiante");
-		else if (t.contains("intermedio")) fields.put("level", "Intermedio");
-		else if (t.contains("avanzado")) fields.put("level", "Avanzado");
+		else if (t.contains("intermedio"))
+			fields.put("level", "Intermedio");
+		else if (t.contains("avanzado"))
+			fields.put("level", "Avanzado");
 	}
 
 	private List<String> missing() {
 		List<String> m = new ArrayList<>();
-		String[][] keys = {{"days", "días por semana"}, {"duration", "minutos por sesión"}, {"environment", "lugar"}, {"resources", "material (o sin material)"}, {"goal", "objetivo"}, {"level", "nivel"}};
-		for (String[] k : keys) if (!fields.containsKey(k[0])) m.add(k[1]);
+		String[][] keys = {{"days", "días por semana"}, {"duration", "minutos por sesión"}, {"environment", "lugar"},
+			{"resources", "material (o sin material)"}, {"goal", "objetivo"}, {"level", "nivel"}};
+		for (String[] k : keys)
+			if (!fields.containsKey(k[0]))
+				m.add(k[1]);
 		return m;
 	}
 
 	private TrainingProfile build() {
 		Set<TrainingProfile.Resource> rs = EnumSet.noneOf(TrainingProfile.Resource.class);
 		for (String r : fields.getOrDefault("resources", "").split(","))
-			if (!r.isEmpty()) rs.add(TrainingProfile.Resource.valueOf(r));
+			if (!r.isEmpty())
+				rs.add(TrainingProfile.Resource.valueOf(r));
 		TrainingProfile.Builder b = base == null ? new TrainingProfile.Builder() : base.toBuilder();
-		return b.sportId(fields.getOrDefault("sport", "strength")).goal(TrainingProfile.Goal.valueOf(fields.get("goal"))).environment(TrainingProfile.Environment.valueOf(fields.get("environment"))).category(TrainingProfile.Category.valueOf(fields.getOrDefault("category", "NO_EQUIPMENT"))).resources(rs).daysPerWeek(Integer.parseInt(fields.get("days"))).durationMinutes(Integer.parseInt(fields.get("duration"))).level(fields.get("level")).historyConsent(current.get() != null && current.get().isHistoryConsent()).build();
+		return b.sportId(fields.getOrDefault("sport", "strength"))
+			.goal(TrainingProfile.Goal.valueOf(fields.get("goal")))
+			.environment(TrainingProfile.Environment.valueOf(fields.get("environment")))
+			.category(TrainingProfile.Category.valueOf(fields.getOrDefault("category", "NO_EQUIPMENT"))).resources(rs)
+			.daysPerWeek(Integer.parseInt(fields.get("days"))).durationMinutes(Integer.parseInt(fields.get("duration")))
+			.level(fields.get("level")).historyConsent(current.get() != null && current.get().isHistoryConsent())
+			.build();
 	}
 
 	/**
@@ -318,21 +360,28 @@ public final class ProposalController {
 	 */
 	private Map<String, Object> partialProfile() {
 		Map<String, Object> data = new LinkedHashMap<>();
-		Map<String, String> mapping = StrictJson.map("days", "daysPerWeek", "duration", "durationMinutes", "environment", "environment", "category", "category", "goal", "goal", "level", "level", "sport", "sportId");
+		Map<String, String> mapping =
+			StrictJson.map("days", "daysPerWeek", "duration", "durationMinutes", "environment", "environment",
+				"category", "category", "goal", "goal", "level", "level", "sport", "sportId");
 		for (Map.Entry<String, String> k : mapping.entrySet())
 			if (fields.containsKey(k.getKey()))
-				data.put(k.getValue(), k.getKey().equals("days") || k.getKey().equals("duration") ? Integer.parseInt(fields.get(k.getKey())) : fields.get(k.getKey()));
+				data.put(k.getValue(), k.getKey().equals("days") || k.getKey().equals("duration") ?
+					Integer.parseInt(fields.get(k.getKey())) : fields.get(k.getKey()));
 		if (fields.containsKey("resources")) {
 			List<String> rs = new ArrayList<>();
 			for (String resource : fields.get("resources").split(","))
-				if (!resource.isEmpty()) rs.add(resource);
+				if (!resource.isEmpty())
+					rs.add(resource);
 			data.put("resources", Collections.unmodifiableList(rs));
 		}
 		return data;
 	}
 
 	private boolean sameExercise(Exercise a, Exercise b) {
-		return b != null && a.getName().equals(b.getName()) && a.getDescription().equals(b.getDescription()) && a.getMetricType() == b.getMetricType() && a.getRequiredResources().equals(b.getRequiredResources()) && a.getGoals().equals(b.getGoals()) && a.getEnvironments().equals(b.getEnvironments()) && a.getSportIds().equals(b.getSportIds()) && a.getCoverage() == b.getCoverage();
+		return b != null && a.getName().equals(b.getName()) && a.getDescription().equals(b.getDescription()) &&
+			a.getMetricType() == b.getMetricType() && a.getRequiredResources().equals(b.getRequiredResources()) &&
+			a.getGoals().equals(b.getGoals()) && a.getEnvironments().equals(b.getEnvironments()) &&
+			a.getSportIds().equals(b.getSportIds()) && a.getCoverage() == b.getCoverage();
 	}
 
 	/**
@@ -349,11 +398,14 @@ public final class ProposalController {
 	}
 
 	private String explanation(Exercise e) {
-		return "Técnica de " + e.getName() + "\n" + e.getDescription() + "\nMaterial de esta versión: " + (e.getRequiredResources().isEmpty() ? "ninguno" : AppController.labels(e.getRequiredResources())) + ". Practica con control; detente si aparece dolor. Es una explicación guiada por reglas del snapshot seleccionado.";
+		return "Técnica de " + e.getName() + "\n" + e.getDescription() + "\nMaterial de esta versión: " +
+			(e.getRequiredResources().isEmpty() ? "ninguno" : AppController.labels(e.getRequiredResources())) +
+			". Practica con control; detente si aparece dolor. Es una explicación guiada por reglas del snapshot seleccionado.";
 	}
 
 	public void reject() {
-		if (busy) return;
+		if (busy)
+			return;
 		clearPreview();
 		add("assistant", "Propuesta rechazada. Tu perfil, rutina aceptada y sesiones guardadas se conservan.");
 		persist();
@@ -364,7 +416,8 @@ public final class ProposalController {
 	 * Compara el perfil leído; el almacén repite la comparación dentro de su transacción.
 	 */
 	public void accept() {
-		if (busy || preview == null) return;
+		if (busy || preview == null)
+			return;
 		if (!Objects.equals(previewBase, current.get()) || !preview.isValidFor(preview.getProfile())) {
 			status = "El perfil o sus recursos cambiaron. Solicita una nueva propuesta antes de aceptar.";
 			changed.run();
@@ -377,21 +430,24 @@ public final class ProposalController {
 		changed.run();
 		store.acceptProposal(proposed, expected, new AppStore.Callback<Routine>() {
 			public void success(Routine r) {
-				if (token != generation) return;
+				if (token != generation)
+					return;
 				busy = false;
 				accepted = r;
 				clearPreview();
 				base = r.getProfile();
 				fields.clear();
 				seed(base);
-				add("assistant", "Perfil y propuesta aceptados. La nueva rutina está disponible en Entrenamiento; las sesiones anteriores conservan sus snapshots.");
+				add("assistant",
+					"Perfil y propuesta aceptados. La nueva rutina está disponible en Entrenamiento; las sesiones anteriores conservan sus snapshots.");
 				persist();
 				onAccepted.accept(r);
 				changed.run();
 			}
 
 			public void failure(Exception e) {
-				if (token != generation) return;
+				if (token != generation)
+					return;
 				busy = false;
 				status = "No se guardó la propuesta: " + e.getMessage();
 				changed.run();
@@ -408,13 +464,17 @@ public final class ProposalController {
 		}
 		RoutineItem first = preview.getItems().get(0);
 		Set<String> used = new HashSet<>();
-		for (RoutineItem i : preview.getItems()) used.add(i.getExercise().getId());
+		for (RoutineItem i : preview.getItems())
+			used.add(i.getExercise().getId());
 		for (Exercise e : new CompatibilityEngine().alternatives(first.getExercise(), preview.getProfile(), catalog))
 			if (!used.contains(e.getId())) {
 				List<RoutineItem> items = new ArrayList<>(preview.getItems());
-				items.set(0, new RoutineItem(e, first.getPrescription(), first.getEstimatedMinutes(), "Sustitución compatible del primer ejercicio; pendiente de aceptación."));
-				preview = new Routine(UUID.randomUUID().toString(), 0, preview.getTitle(), preview.getProfile(), items, preview.getExplanation());
-				add("assistant", "He sustituido " + first.getExercise().getName() + " por " + e.getName() + " en la vista previa.");
+				items.set(0, new RoutineItem(e, first.getPrescription(), first.getEstimatedMinutes(),
+					"Sustitución compatible del primer ejercicio; pendiente de aceptación."));
+				preview = new Routine(UUID.randomUUID().toString(), 0, preview.getTitle(), preview.getProfile(), items,
+					preview.getExplanation());
+				add("assistant",
+					"He sustituido " + first.getExercise().getName() + " por " + e.getName() + " en la vista previa.");
 				persist();
 				changed.run();
 				return;
@@ -430,14 +490,16 @@ public final class ProposalController {
 	}
 
 	public void sendExternal(String text) {
-		if (!ready(text)) return;
+		if (!ready(text))
+			return;
 		if (!client.connected()) {
 			status = "Conecta el servidor opcional primero o usa Enviar local.";
 			changed.run();
 			return;
 		}
 		if (exercise != null && !sameExercise(exercise, ChatProtocol.find(catalog, exercise.getId()))) {
-			status = "Esta versión histórica del ejercicio difiere del catálogo vigente del servidor. Consulta su explicación guiada original o selecciona un ejercicio actual antes de enviar a IA.";
+			status =
+				"Esta versión histórica del ejercicio difiere del catálogo vigente del servidor. Consulta su explicación guiada original o selecciona un ejercicio actual antes de enviar a IA.";
 			changed.run();
 			return;
 		}
@@ -445,7 +507,8 @@ public final class ProposalController {
 		if (fields.isEmpty() || !Objects.equals(base, observed)) {
 			fields.clear();
 			base = observed;
-			if (base != null) seed(base);
+			if (base != null)
+				seed(base);
 		}
 		String normalized = normalize(text);
 		String conflict = conflict(normalized);
@@ -459,7 +522,10 @@ public final class ProposalController {
 		final Map<String, Object> data;
 		try {
 			Map<String, Object> partial = partialProfile();
-			if ((partial.containsKey("daysPerWeek") && ((Integer) partial.get("daysPerWeek") < 1 || (Integer) partial.get("daysPerWeek") > 7)) || (partial.containsKey("durationMinutes") && ((Integer) partial.get("durationMinutes") < 5 || (Integer) partial.get("durationMinutes") > 240)))
+			if ((partial.containsKey("daysPerWeek") &&
+				((Integer) partial.get("daysPerWeek") < 1 || (Integer) partial.get("daysPerWeek") > 7)) ||
+				(partial.containsKey("durationMinutes") &&
+					((Integer) partial.get("durationMinutes") < 5 || (Integer) partial.get("durationMinutes") > 240)))
 				throw new IllegalArgumentException();
 			proposed = missing().isEmpty() ? build() : null;
 			data = proposed == null ? partial : ChatProtocol.profile(proposed);
@@ -470,12 +536,14 @@ public final class ProposalController {
 		}
 		List<ConversationStore.Message> h = new ArrayList<>();
 		boolean consent = observed != null && observed.isHistoryConsent();
-		if (consent) for (int i = Math.max(0, messages.size() - 12); i < messages.size(); i++) {
-			ConversationStore.Message m = messages.get(i);
-			h.add(new ConversationStore.Message(m.role, m.text.substring(0, Math.min(1000, m.text.length()))));
-		}
+		if (consent)
+			for (int i = Math.max(0, messages.size() - 12); i < messages.size(); i++) {
+				ConversationStore.Message m = messages.get(i);
+				h.add(new ConversationStore.Message(m.role, m.text.substring(0, Math.min(1000, m.text.length()))));
+			}
 		long requestOrigin = navigationOrigin.getAsLong();
-		ChatClient.Request request = new ChatClient.Request(conversationId, UUID.randomUUID().toString(), exercise == null ? null : exercise.getId(), text.trim(), proposed, data, consent, h);
+		ChatClient.Request request = new ChatClient.Request(conversationId, UUID.randomUUID().toString(),
+			exercise == null ? null : exercise.getId(), text.trim(), proposed, data, consent, h);
 		add("user", text.trim());
 		persist();
 		busy = true;
@@ -483,7 +551,8 @@ public final class ProposalController {
 		changed.run();
 		client.send(request, new ChatClient.Callback() {
 			private boolean live() {
-				return token == generation && (!request.historyConsent || (current.get() != null && current.get().isHistoryConsent()));
+				return token == generation &&
+					(!request.historyConsent || (current.get() != null && current.get().isHistoryConsent()));
 			}
 
 			public void success(String json) {
@@ -507,7 +576,8 @@ public final class ProposalController {
 					}
 					persist();
 					if (reply.open && exercise != null)
-						command.accept(new OpenExercise(exercise, request.conversationId, request.requestId, requestOrigin));
+						command.accept(
+							new OpenExercise(exercise, request.conversationId, request.requestId, requestOrigin));
 				} catch (RuntimeException e) {
 					status = "Respuesta inválida o desactualizada. No se ha guardado ni abierto ningún ejercicio.";
 				}
@@ -515,9 +585,13 @@ public final class ProposalController {
 			}
 
 			public void failure(String code) {
-				if (token != generation) return;
+				if (token != generation)
+					return;
 				busy = false;
-				status = code.equals("PROVIDER_NOT_CONFIGURED") ? "El conector opcional está desactivado. Puedes continuar con Enviar local: asistente guiado gratuito por reglas." : "No se pudo completar la consulta (" + code + "). Puedes continuar en local o reintentar manualmente.";
+				status = code.equals("PROVIDER_NOT_CONFIGURED") ?
+					"El conector opcional está desactivado. Puedes continuar con Enviar local: asistente guiado gratuito por reglas." :
+					"No se pudo completar la consulta (" + code +
+						"). Puedes continuar en local o reintentar manualmente.";
 				changed.run();
 			}
 		});
@@ -554,21 +628,25 @@ public final class ProposalController {
 	}
 
 	public void connect(String endpoint, String code) {
-		if (owner == null || busy) return;
+		if (owner == null || busy)
+			return;
 		this.endpoint = endpoint;
 		pairingCode = "";
 		busy = true;
 		long token = ++generation;
 		client.connect(endpoint, code, new ChatClient.Callback() {
 			public void success(String json) {
-				if (token != generation) return;
+				if (token != generation)
+					return;
 				busy = false;
-				status = "Servidor opcional emparejado. Enviar al servidor requiere una pulsación explícita; el modo local sigue disponible.";
+				status =
+					"Servidor opcional emparejado. Enviar al servidor requiere una pulsación explícita; el modo local sigue disponible.";
 				changed.run();
 			}
 
 			public void failure(String error) {
-				if (token != generation) return;
+				if (token != generation)
+					return;
 				busy = false;
 				status = "No se conectó: " + error + ". Continúa con el modo local.";
 				changed.run();

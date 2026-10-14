@@ -48,11 +48,11 @@ La dirección predeterminada es `127.0.0.1:8080`, HTTP permitido únicamente con
 
 Fuera de desarrollo o para enlace no loopback, configurar `ENERGYM_TLS_KEYSTORE` (PKCS12), `ENERGYM_TLS_PASSWORD` y certificado verificable por el cliente. TLS 1.2/1.3 directo. Cabeceras X-Forwarded-Proto no autorizan HTTP. No se ha desplegado ni probado un certificado real. Emparejamiento local no es autenticación de cuentas de producción.
 
-## Contrato HTTP v1 para Task6
+## Contrato HTTP v1 del cliente Android
 
 Todas las entradas/salidas son JSON UTF-8; POST exige Content-Type application/json. No hay CORS, query parameters ni campos desconocidos admitidos.
 
-- `GET /health` → 200 `{"status":"ok","catalogVersion":1}`. No devuelve clave, token, modelo ni código.
+- `GET /health` → 200 `{"status":"ok","catalogVersion":2}`. No devuelve clave, token, modelo ni código.
 - `POST /api/session`, sin Bearer, cuerpo exacto `{"pairingCode":"<codigo-privado>"}` → 201 `{"token":"<token-aleatorio>","expiresAtEpochSeconds":1790000000}`. El código configurado se consume una sola vez, incluso con solicitudes simultáneas; código inválido/usado o pairing deshabilitado → 401. Diez intentos globales/minuto → 429.
 - `DELETE /api/session` con Authorization Bearer → 200 `{"revoked":true}`; token ausente/expirado → 401.
 - `POST /api/chat` con `Authorization: Bearer <token>` y cuerpo con exactamente siete campos:
@@ -83,7 +83,7 @@ Todas las entradas/salidas son JSON UTF-8; POST exige Content-Type application/j
 }
 ```
 
-conversationId/requestId son identificadores de 1–80 caracteres ASCII letras/dígitos/guion/guion bajo. exerciseId es ID del catálogo v1 o null. message es texto no vacío de hasta 2000 caracteres. profile admite objeto parcial (incluso {}) para preguntas; una propuesta requiere los trece campos completos. No mandar `historyConsent` dentro de profile: es el campo raíz. Campos libres del perfil hasta 500 caracteres; level no vacío. durationMinutes entero 5–240; daysPerWeek entero 1–7.
+conversationId/requestId son identificadores de 1–80 caracteres ASCII letras/dígitos/guion/guion bajo. exerciseId es ID del catálogo v2 o null. message es texto no vacío de hasta 2000 caracteres. profile admite objeto parcial (incluso {}) para preguntas; una propuesta requiere los trece campos completos. No mandar `historyConsent` dentro de profile: es el campo raíz. Campos libres del perfil hasta 500 caracteres; level no vacío. durationMinutes entero 5–240; daysPerWeek entero 1–7.
 
 Enums idénticos al dominio Android:
 
@@ -94,7 +94,7 @@ Enums idénticos al dominio Android:
 | focus | SPECIFIC, COMPLEMENTARY |
 | category | GYM, HOME_EQUIPMENT, NO_EQUIPMENT, SPORT |
 | resources | DUMBBELLS, BARBELL, BANDS, MAT, BENCH, MACHINE, CHAIR, WALL, SUPPORT, BICYCLE, POOL |
-| sportId | IDs en catalog-v1.json: strength, calisthenics, running, cycling, swimming, football, basketball, other |
+| sportId | IDs en catalog-v2.json: strength, calisthenics, running, cycling, swimming, football, basketball, other |
 
 resources no admite repetidos; NO_EQUIPMENT exige resources vacío. history admite hasta 12 mensajes exactos `{"role":"user|assistant","text":"hasta 1000 caracteres no vacíos"}`. Se valida siempre y se elimina antes del proveedor si historyConsent=false. No enviar sesiones históricas, correo, UID Google ni datos cloud: el contrato solo admite mensajes explícitamente autorizados. Servidor sin almacenamiento de conversaciones; el cliente mantiene estado separado por usuario y borra/revalida consentimiento al cambiar de cuenta.
 
@@ -119,7 +119,7 @@ Respuesta 200:
     }]
   },
   "commands": [{"type":"OPEN_EXERCISE","exerciseId":"bodyweight-squat"}],
-  "catalogVersion": 1,
+  "catalogVersion": 2,
   "proposalNotice": "Ejemplo sin revisión profesional; requiere vista previa y aceptación local.",
   "conversationId": "conversation-1",
   "requestId": "request-1",
@@ -127,9 +127,9 @@ Respuesta 200:
 }
 ```
 
-proposal puede ser null; items 1–5, sin ejercicios duplicados; presupuesto total de estimatedMinutes ≤ duración del perfil. missingFields contiene solo claves de perfil (máximo trece sin repetidos). prescription es lista de pares key/value, que Task6 convierte a Map después de validar. El conjunto de campos depende de metricType: fuerza sets/repetitions/loadKg/restSeconds; isométrico sets/durationSeconds/restSeconds; resistencia timeMinutes/intervals (distanceKm opcional); movilidad durationSeconds/repetitions/side; práctica blocks/durationMinutes. Números finitos positivos, salvo carga/descanso/distancia que pueden ser cero; series/repeticiones/intervalos/bloques enteros. side: ambos/izquierdo/derecho. Se aceptan coma o punto decimal.
+proposal puede ser null; items 1–5, sin ejercicios duplicados; presupuesto total de estimatedMinutes ≤ duración del perfil. missingFields contiene solo claves de perfil (máximo trece sin repetidos). prescription es lista de pares key/value, que el cliente Android convierte a Map después de validar. El conjunto de campos depende de metricType: fuerza sets/repetitions/loadKg/restSeconds; isométrico sets/durationSeconds/restSeconds; resistencia timeMinutes/intervals (distanceKm opcional); movilidad durationSeconds/repetitions/side; práctica blocks/durationMinutes. Números finitos positivos, salvo carga/descanso/distancia que pueden ser cero; series/repeticiones/intervalos/bloques enteros. side: ambos/izquierdo/derecho. Se aceptan coma o punto decimal, con un máximo de dos decimales; loadKg solo pertenece a STRENGTH.
 
-El único comando permitido en v1 es OPEN_EXERCISE sobre el exerciseId actual. No admite reproducción, rotación, capas musculares, 3D ni movimientos. Task7 podrá ampliar capacidades solo con manifiestos validados. Task6 debe correlacionar los tres IDs y rechazar respuestas tardías tras cambiar de contexto, revalidar perfil/recursos al aceptar y no modificar sesiones pasadas. Una propuesta permanece pendiente hasta aceptación local explícita.
+El único comando HTTP permitido en v1 es OPEN_EXERCISE sobre el exerciseId actual. El cliente correlaciona los tres IDs, rechaza respuestas tardías tras cambiar de contexto y decide la disponibilidad del recurso nativo local para el snapshot seleccionado. El contrato HTTP no controla reproducción, giro, capas musculares ni movimientos del visor. La integración privada valida cuenta/contexto y capacidades del manifiesto. La aceptación revalida perfil y recursos sin modificar sesiones pasadas; una propuesta permanece pendiente hasta aceptación local explícita.
 
 Errores exactos: `{"error":"CODE","recoverable":true|false}`. Una solicitud válida añade conversationId/requestId/exerciseId a errores de proveedor/carga concurrente y respuestas 200; errores de autenticación/validación/tamaño pueden carecer de correlación.
 
@@ -147,7 +147,7 @@ Errores exactos: `{"error":"CODE","recoverable":true|false}`. Una solicitud vál
 | 504 | PROVIDER_TIMEOUT | true |
 | 500 | SERVER_ERROR | true |
 
-En 503 PROVIDER_NOT_CONFIGURED, Task6 debe explicar que el conector opcional está desactivado y permitir continuar en el asistente guiado local gratuito, sin llamarlo IA de modelo. No realizar reintentos automáticos al proveedor.
+En 503 PROVIDER_NOT_CONFIGURED, el cliente explica que el conector opcional está desactivado y permite continuar explícitamente en el asistente guiado local gratuito, sin llamarlo IA de modelo. No realiza reintentos automáticos al proveedor.
 
 ## Validación, privacidad y límites
 
@@ -165,4 +165,10 @@ Documentación oficial consultada antes de implementar: [Structured Outputs de G
 
 ## Verificación
 
-`mvnw.cmd "-Dmaven.repo.local=$PWD/.cache/m2" test package`: 38 pruebas, HTTP localhost incluido, jar ejecutable. Cubre autenticación/expiry/revocación/one-use, tamaño/esquema, rate limit, timeouts de cabeceras y cuerpo, default disabled aun con credenciales, selección explícita sin fallback, razonamiento low solo en el modelo compatible, consentimiento de historial, catálogo/material/cobertura/prescripción, propuestas tipadas, comandos correlacionados, refusals/payload estricto, cuota externa y descarga limitada. No incluye comprobación real de modelo/clave/cuota/billing/certificado ni servicio cloud. Los scripts tienen comprobación de sintaxis y el lanzador se verifica con credenciales ficticias, sin ejecutar el ayudante de captura de claves reales.
+`mvnw.cmd "-Dmaven.repo.local=$PWD/.cache/m2" test package`: 42 pruebas, HTTP localhost incluido, jar ejecutable. Cubre autenticación/expiry/revocación/one-use, tamaño/esquema, rate limit, timeouts de cabeceras y cuerpo, default disabled aun con credenciales, selección explícita sin fallback, razonamiento low solo en el modelo compatible, consentimiento de historial, catálogo/material/cobertura/prescripción, propuestas tipadas, comandos correlacionados, refusals/payload estricto, cuota externa y descarga limitada. No incluye comprobación real de modelo/clave/cuota/billing/certificado ni servicio cloud. Los scripts tienen comprobación de sintaxis y el lanzador se verifica con credenciales ficticias, sin ejecutar el ayudante de captura de claves reales.
+
+## Evidencia final de desarrollo y caché
+
+El 14-10-2026, el tercer recorrido Android real pasó una prueba en10.409s (runner13.704s) con gemini-3.5-flash-lite/catalog2: propuesta válida de tres ejercicios, sin campos faltantes ni comandos, SQLite intacta antes de aceptación explícita, y perfil/rutina exactos persistidos tras aceptar y recrear. Demo genérica/historyConsent=false; diagnóstico solo metadatos, sin claves ni contenido crudo. Los dos fallos previos se conservaron y llevaron a la corrección revisada de esquema/prompt. Esta evidencia no es un despliegue ni una promesa de cuota ilimitada.
+
+Offline (-o) requiere una caché Maven completa. En la verificación del proyecto real se usó la caché ya poblada de staging; la carpeta de caché propia del proyecto real no tenía maven-resources-plugin3.4.0. Indicar la ruta absoluta de la caché conocida o permitir descarga normal de dependencias públicas gratuitas; no asumir completitud por existencia de la carpeta.

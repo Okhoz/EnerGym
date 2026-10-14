@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * Read-only, versioned local catalog. Android JSON is confined to this boundary.
+ * Catálogo local versionado de solo lectura; JSON de Android queda limitado a esta frontera.
  */
 public final class CatalogRepository {
 	private final int version;
@@ -43,8 +43,9 @@ public final class CatalogRepository {
 				Sport sport = sportMap.get(sportId);
 				if (sport == null)
 					throw new IllegalArgumentException("Deporte desconocido: " + sportId);
-				Sport.CoverageStatus declared = exercise.getCoverage() == Exercise.Coverage.SPECIFIC
-					? sport.getSpecificCoverage() : sport.getComplementaryCoverage();
+				Sport.CoverageStatus declared =
+					exercise.getCoverage() == Exercise.Coverage.SPECIFIC ? sport.getSpecificCoverage() :
+						sport.getComplementaryCoverage();
 				if (declared == Sport.CoverageStatus.PENDING_VALIDATION)
 					throw new IllegalArgumentException("Cobertura pendiente con ejercicio publicado: " + sportId);
 			}
@@ -88,7 +89,8 @@ public final class CatalogRepository {
 
 	public static CatalogRepository load(Context context) throws IOException {
 		Objects.requireNonNull(context, "context");
-		try (InputStream input = context.getAssets().open("catalog.json"); ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
+		try (InputStream input = context.getAssets()
+			.open("catalog.json"); ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
 			byte[] buffer = new byte[4096];
 			int count;
 			while ((count = input.read(buffer)) != -1) {
@@ -132,13 +134,15 @@ public final class CatalogRepository {
 
 	private static List<String> strings(JSONArray array) throws JSONException {
 		List<String> values = new ArrayList<>();
-		for (int i = 0; i < array.length(); i++) values.add(array.getString(i));
+		for (int i = 0; i < array.length(); i++)
+			values.add(array.getString(i));
 		return values;
 	}
 
 	private static <T extends Enum<T>> Set<T> enumSet(JSONArray array, Class<T> type) throws JSONException {
 		Set<T> values = EnumSet.noneOf(type);
-		for (String value : strings(array)) values.add(Enum.valueOf(type, value));
+		for (String value : strings(array))
+			values.add(Enum.valueOf(type, value));
 		return values;
 	}
 }

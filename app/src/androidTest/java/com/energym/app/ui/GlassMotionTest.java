@@ -2,33 +2,44 @@ package com.energym.app.ui;
 
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+
 import com.energym.app.MainActivity;
 import com.energym.app.R;
 import com.energym.app.controller.AppController;
 import com.energym.app.ui.effects.GlassButton;
 import com.energym.app.ui.effects.GlassPerformancePolicy;
+
 import androidx.test.platform.app.InstrumentationRegistry;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import static org.junit.Assert.*;
 
-/** Regresión de presentación: límites reales, cancelación de resortes y navegación sin reanimar datos. */
+/**
+ * Regresión de presentación: límites reales, cancelación de resortes y navegación sin reanimar datos.
+ */
 @RunWith(AndroidJUnit4.class)
 public final class GlassMotionTest {
-	@Test public void backdropCollectorIsBoundedAndLifecycleUnregistersObservers() {
+	@Test
+	public void backdropCollectorIsBoundedAndLifecycleUnregistersObservers() {
 		Object[] controller = {null};
 		try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
 			MainFlowTest.await();
 			scenario.onActivity(a -> {
 				controller[0] = field(a, "backdrop");
-				GlassPerformancePolicy.FrameBudget budget = (GlassPerformancePolicy.FrameBudget) field(controller[0], "budget");
+				GlassPerformancePolicy.FrameBudget budget =
+					(GlassPerformancePolicy.FrameBudget) field(controller[0], "budget");
 				assertTrue(budget.sampleCount() <= 32);
 				assertEquals(true, field(controller[0], "observing"));
-				android.util.Log.i("EnerGymGlassTest", "collector samples=" + budget.sampleCount() + " fallback=" + field(controller[0], "memoryFallback") + " cachedEffect=" + (field(controller[0], "cachedEffect") != null));
+				android.util.Log.i("EnerGymGlassTest", "collector samples=" + budget.sampleCount() + " fallback=" +
+					field(controller[0], "memoryFallback") + " cachedEffect=" +
+					(field(controller[0], "cachedEffect") != null));
 			});
 			scenario.moveToState(Lifecycle.State.CREATED);
 			InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
@@ -56,16 +67,22 @@ public final class GlassMotionTest {
 			java.lang.reflect.Field value = target.getClass().getDeclaredField(name);
 			value.setAccessible(true);
 			return value.get(target);
-		} catch (ReflectiveOperationException e) { throw new AssertionError(e); }
+		} catch (ReflectiveOperationException e) {
+			throw new AssertionError(e);
+		}
 	}
-	@Test public void decorationIsBoundedAndPreviewRemainsExcludedThroughNavigation() {
+
+	@Test
+	public void decorationIsBoundedAndPreviewRemainsExcludedThroughNavigation() {
 		try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
 			MainFlowTest.await();
 			scenario.onActivity(a -> {
-				ViewGroup rows = a.getSupportFragmentManager().findFragmentById(R.id.content).getView().findViewById(R.id.rows);
+				ViewGroup rows =
+					a.getSupportFragmentManager().findFragmentById(R.id.content).getView().findViewById(R.id.rows);
 				assertTrue("Tarjetas runtime ausentes", rows.getChildCount() >= 3);
 				View card = rows.getChildAt(0);
-				assertTrue("Tarjeta sin medida: visibility=" + card.getVisibility() + " height=" + card.getHeight() + " measured=" + card.getMeasuredHeight(), card.getHeight() > 0);
+				assertTrue("Tarjeta sin medida: visibility=" + card.getVisibility() + " height=" + card.getHeight() +
+					" measured=" + card.getMeasuredHeight(), card.getHeight() > 0);
 				View decoration = a.findViewById(R.id.glass_decoration);
 				assertTrue(decoration.getWidth() <= 256);
 				assertTrue(decoration.getHeight() <= 512);
@@ -81,7 +98,8 @@ public final class GlassMotionTest {
 		}
 	}
 
-	@Test public void detachCancelsSpringAndClickSemanticsRemainIntact() {
+	@Test
+	public void detachCancelsSpringAndClickSemanticsRemainIntact() {
 		try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
 			MainFlowTest.await();
 			scenario.onActivity(a -> {
@@ -100,7 +118,8 @@ public final class GlassMotionTest {
 		}
 	}
 
-	@Test public void dataRenderDoesNotRestartNavigationTransitionAndPauseSettlesIt() {
+	@Test
+	public void dataRenderDoesNotRestartNavigationTransitionAndPauseSettlesIt() {
 		try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
 			MainFlowTest.await();
 			scenario.onActivity(a -> {
@@ -127,14 +146,16 @@ public final class GlassMotionTest {
 			MainFlowTest.await();
 			scenario.onActivity(a -> {
 				assertEquals(.4f, ((MotionLayout) a.findViewById(R.id.screen_motion)).getProgress(), .001f);
-				ViewGroup rows = a.getSupportFragmentManager().findFragmentById(R.id.content).getView().findViewById(R.id.rows);
+				ViewGroup rows =
+					a.getSupportFragmentManager().findFragmentById(R.id.content).getView().findViewById(R.id.rows);
 				assertTrue("Tarjetas ausentes después de actualizar datos", rows.getChildCount() >= 3);
 				assertTrue("Tarjeta actualizada sin medida", rows.getChildAt(0).getHeight() > 0);
 			});
 			scenario.moveToState(Lifecycle.State.CREATED);
 			scenario.moveToState(Lifecycle.State.RESUMED);
 			MainFlowTest.await();
-			scenario.onActivity(a -> assertEquals(1f, ((MotionLayout) a.findViewById(R.id.screen_motion)).getProgress(), 0f));
+			scenario.onActivity(
+				a -> assertEquals(1f, ((MotionLayout) a.findViewById(R.id.screen_motion)).getProgress(), 0f));
 			scenario.recreate();
 			MainFlowTest.await();
 			scenario.onActivity(a -> assertEquals(View.GONE, a.findViewById(R.id.home_preview).getVisibility()));

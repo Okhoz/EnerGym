@@ -16,13 +16,20 @@ public final class ExerciseFragment extends ScreenFragment {
 
 	protected void content() {
 		Exercise e = app.exercise;
-		heading("CONOCE EL MOVIMIENTO", e == null ? "Ejercicio" : e.getName(), "Lee la técnica antes de entrenar y ajusta la intensidad a tu situación.");
-		if (e == null) return;
+		heading("CONOCE EL MOVIMIENTO", e == null ? "Ejercicio" : e.getName(),
+			"Lee la técnica antes de entrenar y ajusta la intensidad a tu situación.");
+		if (e == null)
+			return;
 		card("Técnica y ejecución", e.getDescription());
-		card("Contexto del ejercicio", AppController.label(e.getMetricType().name()) + "\nRecursos necesarios: " + (e.getRequiredResources().isEmpty() ? "ninguno" : AppController.labels(e.getRequiredResources())) + "\n" + (e.isReviewed() ? "Contenido revisado." : "Ejemplo sin revisión profesional."));
-		LinearLayout help = card("Comprende cada paso", "Consulta la explicación guiada gratuita de esta versión del ejercicio.");
+		card("Contexto del ejercicio", AppController.label(e.getMetricType().name()) + "\nRecursos necesarios: " +
+			(e.getRequiredResources().isEmpty() ? "ninguno" : AppController.labels(e.getRequiredResources())) + "\n" +
+			(e.isReviewed() ? "Contenido revisado." : "Ejemplo sin revisión profesional."));
+		LinearLayout help =
+			card("Comprende cada paso", "Consulta la explicación guiada gratuita de esta versión del ejercicio.");
 		action(help, "Explicación guiada", app::requestExplanation);
-		LinearLayout movement = card("Referencia de movimiento", app.visualizationAvailable() ? "Animación local de esta variante. Vista previa técnica sin revisión profesional; no muestra anatomía ni medidas articulares." : "Esta versión no tiene una animación disponible. Conserva la técnica escrita y la explicación guiada de su propio ejercicio.");
+		LinearLayout movement = card("Referencia de movimiento", app.visualizationAvailable() ?
+			"Animación local de esta variante. Vista previa técnica sin revisión profesional; no muestra anatomía ni medidas articulares." :
+			"Esta versión no tiene una animación disponible. Conserva la técnica escrita y la explicación guiada de su propio ejercicio.");
 		action(movement, "Vista previa 3D", app.visualizationAvailable(), app::requestVisualization);
 	}
 }

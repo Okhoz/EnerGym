@@ -49,11 +49,13 @@ public final class AppState extends AndroidViewModel {
 
 	public void bindViewer(Consumer<VisualizationController.Request> launch) {
 		viewerLaunch = launch;
-		if (visualization != null) visualization.bind(launch);
+		if (visualization != null)
+			visualization.bind(launch);
 	}
 
 	public void unbindViewer(Consumer<VisualizationController.Request> launch) {
-		if (viewerLaunch == launch) bindViewer(null);
+		if (viewerLaunch == launch)
+			bindViewer(null);
 	}
 
 	private ConnectivityManager connectivity;
@@ -66,7 +68,8 @@ public final class AppState extends AndroidViewModel {
 			try {
 				CatalogRepository catalog = CatalogRepository.load(application);
 				main.execute(() -> {
-					if (!cleared) initialize(application, catalog);
+					if (!cleared)
+						initialize(application, catalog);
 				});
 			} catch (Exception e) {
 				main.execute(() -> {
@@ -79,21 +82,27 @@ public final class AppState extends AndroidViewModel {
 
 	private void initialize(Application context, CatalogRepository catalog) {
 		gateway = new GoogleAccountGateway(context, main);
-		sync = new SyncController(context, gateway, new FirebaseCloudGateway(gateway, worker), worker, main, (status, error) -> {
-			syncStatus = status;
-			syncError = error == null ? "" : error.getMessage();
-			if (app != null && status == SyncCoordinator.Status.SYNCED) app.reload();
-			changed();
-		});
+		sync = new SyncController(context, gateway, new FirebaseCloudGateway(gateway, worker), worker, main,
+			(status, error) -> {
+				syncStatus = status;
+				syncError = error == null ? "" : error.getMessage();
+				if (app != null && status == SyncCoordinator.Status.SYNCED)
+					app.reload();
+				changed();
+			});
 		AndroidAppStore store = new AndroidAppStore(sync);
 		app = new AppController(store, catalog);
-		assistant = new ProposalController(store, new LocalConversationStore(context, worker), new HttpChatClient(chatWorker, main, (context.getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0), catalog.getExercises(), catalog.getVersion(), () -> app.profile, this::changed, r -> {
+		assistant = new ProposalController(store, new LocalConversationStore(context, worker),
+			new HttpChatClient(chatWorker, main,
+				(context.getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0),
+			catalog.getExercises(), catalog.getVersion(), () -> app.profile, this::changed, r -> {
 			app.routines.accepted = r;
 			app.reload();
 		});
 		ExerciseResourcePolicy resourcePolicy;
 		try {
-			resourcePolicy = new ExerciseResourcePolicy(catalog, Collections.singletonList(PackagedResources.load(context).forExercise("standard-pushup")));
+			resourcePolicy = new ExerciseResourcePolicy(catalog,
+				Collections.singletonList(PackagedResources.load(context).forExercise("standard-pushup")));
 		} catch (Exception e) {
 			resourcePolicy = new ExerciseResourcePolicy(catalog, Collections.emptyList());
 		}
@@ -107,10 +116,13 @@ public final class AppState extends AndroidViewModel {
 			}
 		}, () -> context.sendBroadcast(new Intent(AnatomyActivity.ACTION_CLOSE).setPackage(context.getPackageName())));
 		visualization.bind(viewerLaunch);
-		app.visualizations((exercise, profile) -> visualization.open(exercise), resourcePolicy::available, resourcePolicy.available());
+		app.visualizations((exercise, profile) -> visualization.open(exercise), resourcePolicy::available,
+			resourcePolicy.available());
 		assistant.openCommands(app::navigationRevision, command -> {
-			if (!visualization.assistant(command.snapshot, assistant.exercise, command.conversationId, command.requestId, command.originRevision)) {
-				assistant.status = "Esta referencia no está disponible en el contexto actual. Consulta la explicación escrita del ejercicio seleccionado.";
+			if (!visualization.assistant(command.snapshot, assistant.exercise, command.conversationId,
+				command.requestId, command.originRevision)) {
+				assistant.status =
+					"Esta referencia no está disponible en el contexto actual. Consulta la explicación escrita del ejercicio seleccionado.";
 			}
 		});
 		app.explanations((exercise, profile) -> {
@@ -124,12 +136,15 @@ public final class AppState extends AndroidViewModel {
 		accounts = new AccountController(gateway, sync, main, (status, value, error) -> {
 			accountStatus = status;
 			user = value;
-			if (status == AccountController.Status.AUTHENTICATED || (status == AccountController.Status.ERROR && value != null))
+			if (status == AccountController.Status.AUTHENTICATED ||
+				(status == AccountController.Status.ERROR && value != null))
 				app.activate(value.getUid());
 			else if (status == AccountController.Status.DEMO_LOCAL)
 				app.activate(EnerGymDatabase.DEMO_OWNER_UID);
-			else if (status != AccountController.Status.ERROR) app.activate(null);
-			if (error != null) app.error("Cuenta: " + error.getMessage());
+			else if (status != AccountController.Status.ERROR)
+				app.activate(null);
+			if (error != null)
+				app.error("Cuenta: " + error.getMessage());
 			changed();
 		});
 		accounts.start();
@@ -154,7 +169,8 @@ public final class AppState extends AndroidViewModel {
 			return "Demo · solo en este dispositivo";
 		if (user != null)
 			return "Google · " + (user.getDisplayName().isEmpty() ? user.getEmail() : user.getDisplayName());
-		if (accountStatus == AccountController.Status.SIGNING_IN) return "Conectando con Google…";
+		if (accountStatus == AccountController.Status.SIGNING_IN)
+			return "Conectando con Google…";
 		return "Cuenta sin conectar";
 	}
 
@@ -195,7 +211,8 @@ public final class AppState extends AndroidViewModel {
 				if (disconnected) {
 					disconnected = false;
 					main.execute(() -> {
-						if (!cleared) sync.requestSync();
+						if (!cleared)
+							sync.requestSync();
 					});
 				}
 			}
@@ -210,16 +227,22 @@ public final class AppState extends AndroidViewModel {
 	@Override
 	protected void onCleared() {
 		cleared = true;
-		if (visualization != null) visualization.revoke();
+		if (visualization != null)
+			visualization.revoke();
 		viewerLaunch = null;
 		observer = () -> {
 		};
-		if (assistant != null) assistant.disconnect();
+		if (assistant != null)
+			assistant.disconnect();
 		chatWorker.shutdown();
-		if (app != null) app.observe(null);
-		if (networkCallback != null) connectivity.unregisterNetworkCallback(networkCallback);
-		if (accounts != null) accounts.close();
-		if (sync != null) sync.close();
+		if (app != null)
+			app.observe(null);
+		if (networkCallback != null)
+			connectivity.unregisterNetworkCallback(networkCallback);
+		if (accounts != null)
+			accounts.close();
+		if (sync != null)
+			sync.close();
 		worker.shutdown();
 	}
 }

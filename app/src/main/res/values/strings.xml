@@ -1,2 +1,11 @@
-<resources><string name="app_name">EnerGym</string><string name="account">Cuenta</string><string name="home">Inicio</string><string name="training">Entrenamiento</string><string name="assistant">Asistente</string><string name="history">Historial</string><string name="back">Volver</string><string name="logo_description">Logo de EnerGym: mancuerna y hoja</string></resources>
+<resources>
+	<string name="app_name">EnerGym</string>
+	<string name="account">Cuenta</string>
+	<string name="home">Inicio</string>
+	<string name="training">Entrenamiento</string>
+	<string name="assistant">Asistente</string>
+	<string name="history">Historial</string>
+	<string name="back">Volver</string>
+	<string name="logo_description">Logo de EnerGym: mancuerna y hoja</string>
+</resources>
 

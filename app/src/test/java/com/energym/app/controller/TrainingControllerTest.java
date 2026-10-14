@@ -1,44 +1,336 @@
 package com.energym.app.controller;
+
 import com.energym.app.domain.*;
 import com.energym.app.catalog.CatalogRepository;
+
 import org.junit.Test;
+
 import java.util.*;
+
 import static org.junit.Assert.*;
+
 public class TrainingControllerTest {
-    static class Store implements AppStore {
-        int accepts, saves, finishes; Callback<Routine> acceptance; Callback<Long> saving; Callback<Void> finishing; Callback<OpenDraft> opening;
-        public void load(Callback<Snapshot> c){} public void profile(TrainingProfile p,Callback<Void> c){}
-        public void accept(Routine r,Callback<Routine> c){accepts++;acceptance=c;}
-        public void draft(Session s,Callback<Long> c){saves++;saving=c;}
-        public void openDraft(String syncId,Callback<OpenDraft> c){opening=c;}
-        public void finish(long id,Callback<Void> c){finishes++;finishing=c;}
-    }
-    private Exercise exercise(){return new Exercise("squat","Sentadilla",MetricType.STRENGTH,EnumSet.of(TrainingProfile.Goal.STRENGTH),EnumSet.of(TrainingProfile.Environment.HOME),Collections.emptySet(),Collections.singleton("strength"),Exercise.Coverage.SPECIFIC,false,"Técnica",Collections.emptyList());}
-    private Routine routine(){return new RoutinePlanner().create(new TrainingProfile.Builder().build(),Collections.singletonList(exercise())).withVersionId(1);}
-    @Test public void rejectionNeverWritesOrChangesAcceptedRoutine(){Store s=new Store();RoutineController c=new RoutineController(s,()->new TrainingProfile.Builder().build(),Collections.singletonList(exercise()),()->{},e->{});c.accepted=routine();c.create();assertNotNull(c.preview);Routine old=c.accepted;c.reject();assertNull(c.preview);assertSame(old,c.accepted);assertEquals(0,s.accepts);}
-    @Test public void acceptanceRevalidatesChangedProfile(){Store s=new Store();TrainingProfile[] p={new TrainingProfile.Builder().build()};List<String> errors=new ArrayList<>();RoutineController c=new RoutineController(s,()->p[0],Collections.singletonList(exercise()),()->{},errors::add);c.create();p[0]=p[0].toBuilder().durationMinutes(10).build();c.accept();assertEquals(0,s.accepts);assertFalse(errors.isEmpty());}
-    @Test public void staleAccountAcceptanceCannotReplaceNewScope(){Store s=new Store();RoutineController c=new RoutineController(s,()->new TrainingProfile.Builder().build(),Collections.singletonList(exercise()),()->{},e->{});c.create();c.accept();assertNotNull(s.acceptance);AppStore.Callback<Routine> old=s.acceptance;c.reset();old.success(routine());assertNull(c.accepted);}
-    @Test public void emptySessionCannotFinalize(){Store s=new Store();List<String> errors=new ArrayList<>();SessionController c=new SessionController(s,()->{},errors::add,()->{});c.start(routine());assertNotNull(c.session);assertNotNull(s.saving);s.saving.success(7L);c.finish();assertEquals(0,s.finishes);assertFalse(errors.isEmpty());}
-    @Test public void finalizationCannotDuplicateWhilePendingOrAfterCompletion(){Store s=new Store();int[] done={0};SessionController c=new SessionController(s,()->{},e->{},()->done[0]++);c.start(routine());assertNotNull(s.saving);s.saving.success(7L);c.input("sets","2");c.input("repetitions","8");c.input("loadKg","0");c.input("restSeconds","30");c.record();s.saving.success(7L);c.finish();c.finish();assertEquals(1,s.finishes);s.finishing.success(null);c.finish();assertEquals(1,s.finishes);assertEquals(1,done[0]);}
-    @Test public void accountResetDiscardsLateSessionSave(){Store s=new Store();SessionController c=new SessionController(s,()->{},e->{},()->{});c.start(routine());assertNotNull(s.saving);AppStore.Callback<Long> old=s.saving;c.reset();old.success(9L);assertNull(c.session);assertFalse(c.busy);}
-    @Test public void finalizationRequiresSavingNewEditsAfterAnEarlierRecord(){Store s=new Store();List<String> errors=new ArrayList<>();SessionController c=new SessionController(s,()->{},errors::add,()->{});c.start(routine());s.saving.success(7L);c.input("sets","2");c.input("repetitions","8");c.input("loadKg","0");c.input("restSeconds","30");c.record();s.saving.success(7L);c.input("repetitions","9");c.finish();assertEquals(0,s.finishes);assertFalse(errors.isEmpty());}
-    static class PersistedStore extends Store {
-        Session stored;TrainingProfile profile;Routine accepted;
-        PersistedStore(Session draft){stored=draft;profile=draft.getRoutine().getProfile();accepted=draft.getRoutine();}
-        public void load(Callback<Snapshot> c){c.success(new Snapshot(profile,Collections.singletonList(accepted),Collections.singletonList(stored),Collections.emptyList()));}
-        public void draft(Session next,Callback<Long> c){saves++;stored=next;c.success(7L);}
-        public void openDraft(String syncId,Callback<OpenDraft> c){c.success(new OpenDraft(7,stored));}
-    }
-    private AppController app(PersistedStore store){CatalogRepository catalog=new CatalogRepository(1,Collections.singletonList(new Sport("strength","Fuerza",Sport.CoverageStatus.EXAMPLE_UNREVIEWED,Sport.CoverageStatus.PENDING_VALIDATION)),Collections.singletonList(exercise()));return new AppController(store,catalog);}
-    @Test public void cachedPendingReopenNeverOverwritesSavedMetrics(){
-        Session empty=new Session(routine());PersistedStore store=new PersistedStore(empty);AppController app=app(store);app.activate("uid");Session cached=app.pending.get(0);
-        app.resume(cached);app.sessions.input("sets","2");app.sessions.input("repetitions","8");app.sessions.input("loadKg","0");app.sessions.input("restSeconds","30");app.sessions.record();assertEquals("8",store.stored.getResults().get("squat").get("repetitions"));
-        app.navigate(AppController.Screen.TRAINING);app.resume(app.pending.get(0));assertEquals("No se debe reescribir el snapshot antiguo al abrir",1,store.stored.getResults().size());assertEquals("8",app.sessions.session.getResults().get("squat").get("repetitions"));assertEquals("Abrir es solo lectura",1,store.saves);
-    }
-    @Test public void reopeningSameDraftPreservesUnsavedInputs(){Session empty=new Session(routine());PersistedStore store=new PersistedStore(empty);AppController app=app(store);app.activate("uid");app.resume(app.pending.get(0));app.sessions.input("repetitions","9");app.navigate(AppController.Screen.TRAINING);app.resume(app.pending.get(0));assertEquals("9",app.sessions.inputs().get("repetitions"));assertEquals(0,store.saves);}
-    @Test public void firstResumeReadsLatestScopedSnapshotInsteadOfCachedDraft(){Session cached=new Session(routine());Map<String,String> result=new LinkedHashMap<>();result.put("sets","2");result.put("repetitions","8");result.put("loadKg","0");result.put("restSeconds","30");PersistedStore store=new PersistedStore(cached.withResult("squat",result));SessionController c=new SessionController(store,()->{},e->{},()->{});c.resume(cached);assertNotNull(c.session);assertNotNull("Debe leer los resultados actuales",c.session.getResults().get("squat"));assertEquals("8",c.session.getResults().get("squat").get("repetitions"));assertEquals(0,store.saves);}
-    @Test public void accountResetDiscardsLateDraftLookup(){Store s=new Store();SessionController c=new SessionController(s,()->{},e->{},()->{});Session draft=new Session(routine());c.resume(draft);assertNotNull(s.opening);AppStore.Callback<AppStore.OpenDraft> old=s.opening;c.reset();old.success(new AppStore.OpenDraft(7,draft));assertNull(c.session);assertFalse(c.busy);assertEquals(0,s.saves);}
-    @Test public void missingOrFinishedScopedDraftCannotReopenOrWrite(){for(boolean missing:new boolean[]{true,false}){Store s=new Store();List<String> errors=new ArrayList<>();SessionController c=new SessionController(s,()->{},errors::add,()->{});Session draft=new Session(routine());c.resume(draft);assertNotNull(s.opening);s.opening.success(missing?null:new AppStore.OpenDraft(7,draft.finishedAt(System.currentTimeMillis())));assertNull(c.session);assertFalse(c.busy);assertFalse(errors.isEmpty());assertEquals(0,s.saves);}}
-    @Test public void sameDraftReopenPreservesSelectedExerciseAndItsText(){Routine first=routine();Exercise other=new Exercise("lunge","Zancada",MetricType.STRENGTH,EnumSet.of(TrainingProfile.Goal.STRENGTH),EnumSet.of(TrainingProfile.Environment.HOME),Collections.emptySet(),Collections.singleton("strength"),Exercise.Coverage.SPECIFIC,false,"Técnica",Collections.emptyList());Routine r=new Routine(first.getProposalId(),1,first.getTitle(),first.getProfile(),Arrays.asList(first.getItems().get(0),new RoutineItem(other,first.getItems().get(0).getPrescription(),5,"Mismo objetivo")),first.getExplanation());Session cached=new Session(r);PersistedStore store=new PersistedStore(cached);SessionController c=new SessionController(store,()->{},e->{},()->{});c.resume(cached);c.select(1);c.input("repetitions","9");c.resume(cached);assertEquals(1,c.selected);assertEquals("9",c.inputs().get("repetitions"));assertEquals(0,store.saves);}
+	static class Store implements AppStore {
+		int accepts, saves, finishes;
+		Callback<Routine> acceptance;
+		Callback<Long> saving;
+		Callback<Void> finishing;
+		Callback<OpenDraft> opening;
+
+		public void load(Callback<Snapshot> c) {
+		}
+
+		public void profile(TrainingProfile p, Callback<Void> c) {
+		}
+
+		public void accept(Routine r, Callback<Routine> c) {
+			accepts++;
+			acceptance = c;
+		}
+
+		public void draft(Session s, Callback<Long> c) {
+			saves++;
+			saving = c;
+		}
+
+		public void openDraft(String syncId, Callback<OpenDraft> c) {
+			opening = c;
+		}
+
+		public void finish(long id, Callback<Void> c) {
+			finishes++;
+			finishing = c;
+		}
+	}
+
+	private Exercise exercise() {
+		return new Exercise("squat", "Sentadilla", MetricType.STRENGTH, EnumSet.of(TrainingProfile.Goal.STRENGTH),
+			EnumSet.of(TrainingProfile.Environment.HOME), Collections.emptySet(), Collections.singleton("strength"),
+			Exercise.Coverage.SPECIFIC, false, "Técnica", Collections.emptyList());
+	}
+
+	private Routine routine() {
+		return new RoutinePlanner().create(new TrainingProfile.Builder().build(), Collections.singletonList(exercise()))
+			.withVersionId(1);
+	}
+
+	@Test
+	public void rejectionNeverWritesOrChangesAcceptedRoutine() {
+		Store s = new Store();
+		RoutineController c =
+			new RoutineController(s, () -> new TrainingProfile.Builder().build(), Collections.singletonList(exercise()),
+				() -> {
+				}, e -> {
+			});
+		c.accepted = routine();
+		c.create();
+		assertNotNull(c.preview);
+		Routine old = c.accepted;
+		c.reject();
+		assertNull(c.preview);
+		assertSame(old, c.accepted);
+		assertEquals(0, s.accepts);
+	}
+
+	@Test
+	public void acceptanceRevalidatesChangedProfile() {
+		Store s = new Store();
+		TrainingProfile[] p = {new TrainingProfile.Builder().build()};
+		List<String> errors = new ArrayList<>();
+		RoutineController c = new RoutineController(s, () -> p[0], Collections.singletonList(exercise()), () -> {
+		}, errors::add);
+		c.create();
+		p[0] = p[0].toBuilder().durationMinutes(10).build();
+		c.accept();
+		assertEquals(0, s.accepts);
+		assertFalse(errors.isEmpty());
+	}
+
+	@Test
+	public void staleAccountAcceptanceCannotReplaceNewScope() {
+		Store s = new Store();
+		RoutineController c =
+			new RoutineController(s, () -> new TrainingProfile.Builder().build(), Collections.singletonList(exercise()),
+				() -> {
+				}, e -> {
+			});
+		c.create();
+		c.accept();
+		assertNotNull(s.acceptance);
+		AppStore.Callback<Routine> old = s.acceptance;
+		c.reset();
+		old.success(routine());
+		assertNull(c.accepted);
+	}
+
+	@Test
+	public void emptySessionCannotFinalize() {
+		Store s = new Store();
+		List<String> errors = new ArrayList<>();
+		SessionController c = new SessionController(s, () -> {
+		}, errors::add, () -> {
+		});
+		c.start(routine());
+		assertNotNull(c.session);
+		assertNotNull(s.saving);
+		s.saving.success(7L);
+		c.finish();
+		assertEquals(0, s.finishes);
+		assertFalse(errors.isEmpty());
+	}
+
+	@Test
+	public void finalizationCannotDuplicateWhilePendingOrAfterCompletion() {
+		Store s = new Store();
+		int[] done = {0};
+		SessionController c = new SessionController(s, () -> {
+		}, e -> {
+		}, () -> done[0]++);
+		c.start(routine());
+		assertNotNull(s.saving);
+		s.saving.success(7L);
+		c.input("sets", "2");
+		c.input("repetitions", "8");
+		c.input("loadKg", "0");
+		c.input("restSeconds", "30");
+		c.record();
+		s.saving.success(7L);
+		c.finish();
+		c.finish();
+		assertEquals(1, s.finishes);
+		s.finishing.success(null);
+		c.finish();
+		assertEquals(1, s.finishes);
+		assertEquals(1, done[0]);
+	}
+
+	@Test
+	public void accountResetDiscardsLateSessionSave() {
+		Store s = new Store();
+		SessionController c = new SessionController(s, () -> {
+		}, e -> {
+		}, () -> {
+		});
+		c.start(routine());
+		assertNotNull(s.saving);
+		AppStore.Callback<Long> old = s.saving;
+		c.reset();
+		old.success(9L);
+		assertNull(c.session);
+		assertFalse(c.busy);
+	}
+
+	@Test
+	public void finalizationRequiresSavingNewEditsAfterAnEarlierRecord() {
+		Store s = new Store();
+		List<String> errors = new ArrayList<>();
+		SessionController c = new SessionController(s, () -> {
+		}, errors::add, () -> {
+		});
+		c.start(routine());
+		s.saving.success(7L);
+		c.input("sets", "2");
+		c.input("repetitions", "8");
+		c.input("loadKg", "0");
+		c.input("restSeconds", "30");
+		c.record();
+		s.saving.success(7L);
+		c.input("repetitions", "9");
+		c.finish();
+		assertEquals(0, s.finishes);
+		assertFalse(errors.isEmpty());
+	}
+
+	static class PersistedStore extends Store {
+		Session stored;
+		TrainingProfile profile;
+		Routine accepted;
+
+		PersistedStore(Session draft) {
+			stored = draft;
+			profile = draft.getRoutine().getProfile();
+			accepted = draft.getRoutine();
+		}
+
+		public void load(Callback<Snapshot> c) {
+			c.success(new Snapshot(profile, Collections.singletonList(accepted), Collections.singletonList(stored),
+				Collections.emptyList()));
+		}
+
+		public void draft(Session next, Callback<Long> c) {
+			saves++;
+			stored = next;
+			c.success(7L);
+		}
+
+		public void openDraft(String syncId, Callback<OpenDraft> c) {
+			c.success(new OpenDraft(7, stored));
+		}
+	}
+
+	private AppController app(PersistedStore store) {
+		CatalogRepository catalog = new CatalogRepository(1, Collections.singletonList(
+			new Sport("strength", "Fuerza", Sport.CoverageStatus.EXAMPLE_UNREVIEWED,
+				Sport.CoverageStatus.PENDING_VALIDATION)), Collections.singletonList(exercise()));
+		return new AppController(store, catalog);
+	}
+
+	@Test
+	public void cachedPendingReopenNeverOverwritesSavedMetrics() {
+		Session empty = new Session(routine());
+		PersistedStore store = new PersistedStore(empty);
+		AppController app = app(store);
+		app.activate("uid");
+		Session cached = app.pending.get(0);
+		app.resume(cached);
+		app.sessions.input("sets", "2");
+		app.sessions.input("repetitions", "8");
+		app.sessions.input("loadKg", "0");
+		app.sessions.input("restSeconds", "30");
+		app.sessions.record();
+		assertEquals("8", store.stored.getResults().get("squat").get("repetitions"));
+		app.navigate(AppController.Screen.TRAINING);
+		app.resume(app.pending.get(0));
+		assertEquals("No se debe reescribir el snapshot antiguo al abrir", 1, store.stored.getResults().size());
+		assertEquals("8", app.sessions.session.getResults().get("squat").get("repetitions"));
+		assertEquals("Abrir es solo lectura", 1, store.saves);
+	}
+
+	@Test
+	public void reopeningSameDraftPreservesUnsavedInputs() {
+		Session empty = new Session(routine());
+		PersistedStore store = new PersistedStore(empty);
+		AppController app = app(store);
+		app.activate("uid");
+		app.resume(app.pending.get(0));
+		app.sessions.input("repetitions", "9");
+		app.navigate(AppController.Screen.TRAINING);
+		app.resume(app.pending.get(0));
+		assertEquals("9", app.sessions.inputs().get("repetitions"));
+		assertEquals(0, store.saves);
+	}
+
+	@Test
+	public void firstResumeReadsLatestScopedSnapshotInsteadOfCachedDraft() {
+		Session cached = new Session(routine());
+		Map<String, String> result = new LinkedHashMap<>();
+		result.put("sets", "2");
+		result.put("repetitions", "8");
+		result.put("loadKg", "0");
+		result.put("restSeconds", "30");
+		PersistedStore store = new PersistedStore(cached.withResult("squat", result));
+		SessionController c = new SessionController(store, () -> {
+		}, e -> {
+		}, () -> {
+		});
+		c.resume(cached);
+		assertNotNull(c.session);
+		assertNotNull("Debe leer los resultados actuales", c.session.getResults().get("squat"));
+		assertEquals("8", c.session.getResults().get("squat").get("repetitions"));
+		assertEquals(0, store.saves);
+	}
+
+	@Test
+	public void accountResetDiscardsLateDraftLookup() {
+		Store s = new Store();
+		SessionController c = new SessionController(s, () -> {
+		}, e -> {
+		}, () -> {
+		});
+		Session draft = new Session(routine());
+		c.resume(draft);
+		assertNotNull(s.opening);
+		AppStore.Callback<AppStore.OpenDraft> old = s.opening;
+		c.reset();
+		old.success(new AppStore.OpenDraft(7, draft));
+		assertNull(c.session);
+		assertFalse(c.busy);
+		assertEquals(0, s.saves);
+	}
+
+	@Test
+	public void missingOrFinishedScopedDraftCannotReopenOrWrite() {
+		for (boolean missing : new boolean[]{true, false}) {
+			Store s = new Store();
+			List<String> errors = new ArrayList<>();
+			SessionController c = new SessionController(s, () -> {
+			}, errors::add, () -> {
+			});
+			Session draft = new Session(routine());
+			c.resume(draft);
+			assertNotNull(s.opening);
+			s.opening.success(missing ? null : new AppStore.OpenDraft(7, draft.finishedAt(System.currentTimeMillis())));
+			assertNull(c.session);
+			assertFalse(c.busy);
+			assertFalse(errors.isEmpty());
+			assertEquals(0, s.saves);
+		}
+	}
+
+	@Test
+	public void sameDraftReopenPreservesSelectedExerciseAndItsText() {
+		Routine first = routine();
+		Exercise other =
+			new Exercise("lunge", "Zancada", MetricType.STRENGTH, EnumSet.of(TrainingProfile.Goal.STRENGTH),
+				EnumSet.of(TrainingProfile.Environment.HOME), Collections.emptySet(), Collections.singleton("strength"),
+				Exercise.Coverage.SPECIFIC, false, "Técnica", Collections.emptyList());
+		Routine r = new Routine(first.getProposalId(), 1, first.getTitle(), first.getProfile(),
+			Arrays.asList(first.getItems().get(0),
+				new RoutineItem(other, first.getItems().get(0).getPrescription(), 5, "Mismo objetivo")),
+			first.getExplanation());
+		Session cached = new Session(r);
+		PersistedStore store = new PersistedStore(cached);
+		SessionController c = new SessionController(store, () -> {
+		}, e -> {
+		}, () -> {
+		});
+		c.resume(cached);
+		c.select(1);
+		c.input("repetitions", "9");
+		c.resume(cached);
+		assertEquals(1, c.selected);
+		assertEquals("9", c.inputs().get("repetitions"));
+		assertEquals(0, store.saves);
+	}
 }
 

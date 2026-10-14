@@ -1,601 +1,601 @@
 {
-  "version": 2,
-  "notice": "Catálogo de ejemplos originales de producto. Ninguna entrada se declara revisada por profesionales.",
-  "sports": [
-    {
-      "id": "strength",
-      "name": "Fuerza",
-      "specificCoverage": "EXAMPLE_UNREVIEWED",
-      "complementaryCoverage": "PENDING_VALIDATION"
-    },
-    {
-      "id": "calisthenics",
-      "name": "Calistenia",
-      "specificCoverage": "EXAMPLE_UNREVIEWED",
-      "complementaryCoverage": "PENDING_VALIDATION"
-    },
-    {
-      "id": "running",
-      "name": "Carrera",
-      "specificCoverage": "EXAMPLE_UNREVIEWED",
-      "complementaryCoverage": "EXAMPLE_UNREVIEWED"
-    },
-    {
-      "id": "cycling",
-      "name": "Ciclismo",
-      "specificCoverage": "EXAMPLE_UNREVIEWED",
-      "complementaryCoverage": "EXAMPLE_UNREVIEWED"
-    },
-    {
-      "id": "swimming",
-      "name": "Natación",
-      "specificCoverage": "EXAMPLE_UNREVIEWED",
-      "complementaryCoverage": "EXAMPLE_UNREVIEWED"
-    },
-    {
-      "id": "football",
-      "name": "Fútbol",
-      "specificCoverage": "PENDING_VALIDATION",
-      "complementaryCoverage": "EXAMPLE_UNREVIEWED"
-    },
-    {
-      "id": "basketball",
-      "name": "Baloncesto",
-      "specificCoverage": "PENDING_VALIDATION",
-      "complementaryCoverage": "EXAMPLE_UNREVIEWED"
-    },
-    {
-      "id": "other",
-      "name": "Otra disciplina",
-      "specificCoverage": "PENDING_VALIDATION",
-      "complementaryCoverage": "EXAMPLE_UNREVIEWED"
-    }
-  ],
-  "exercises": [
-    {
-      "id": "bodyweight-squat",
-      "name": "Sentadilla sin accesorios",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM",
-        "OUTDOORS"
-      ],
-      "requiredResources": [],
-      "sportIds": [
-        "strength",
-        "calisthenics"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "De pie en una superficie estable, flexiona caderas y rodillas dentro de un recorrido cómodo y vuelve a incorporarte. No requiere silla, pared, apoyo ni esterilla. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "dumbbell-squat",
-        "chair-squat"
-      ]
-    },
-    {
-      "id": "bodyweight-lunge",
-      "name": "Zancada en el sitio",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM",
-        "OUTDOORS"
-      ],
-      "requiredResources": [],
-      "sportIds": [
-        "strength",
-        "calisthenics"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Da un paso y flexiona ambas piernas con control; vuelve al inicio y alterna lados. Utiliza solo un recorrido que puedas controlar sin apoyos. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "bodyweight-squat"
-      ]
-    },
-    {
-      "id": "knee-pushup",
-      "name": "Flexión con rodillas apoyadas",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM",
-        "OUTDOORS"
-      ],
-      "requiredResources": [],
-      "sportIds": [
-        "strength",
-        "calisthenics"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "En el suelo, apoya manos y rodillas; flexiona y extiende los codos con control. La superficie debe permitir un apoyo cómodo; una esterilla es opcional y no se presupone. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "dumbbell-floor-press"
-      ]
-    },
-    {
-      "id": "glute-bridge",
-      "name": "Puente de glúteos en el suelo",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM",
-        "OUTDOORS"
-      ],
-      "requiredResources": [],
-      "sportIds": [
-        "strength",
-        "calisthenics"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Tumbado boca arriba con pies apoyados, eleva y baja la pelvis con control. La superficie debe resultar cómoda; la esterilla es opcional. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": []
-    },
-    {
-      "id": "forearm-plank",
-      "name": "Plancha sobre antebrazos",
-      "metricType": "ISOMETRIC",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM",
-        "OUTDOORS"
-      ],
-      "requiredResources": [],
-      "sportIds": [
-        "strength",
-        "calisthenics"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Apoya antebrazos y puntas de los pies en una superficie adecuada. Mantén una posición que puedas controlar durante el tiempo elegido y descansa. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "wall-sit"
-      ]
-    },
-    {
-      "id": "standing-mobility",
-      "name": "Movilidad de hombros de pie",
-      "metricType": "MOBILITY",
-      "goals": [
-        "MOBILITY",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM",
-        "OUTDOORS"
-      ],
-      "requiredResources": [],
-      "sportIds": [
-        "strength",
-        "calisthenics"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "De pie, mueve los brazos lentamente dentro de un recorrido cómodo y alterna lados. No utiliza pared ni apoyos. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "mat-mobility"
-      ]
-    },
-    {
-      "id": "dumbbell-squat",
-      "name": "Sentadilla con mancuernas",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM"
-      ],
-      "requiredResources": [
-        "DUMBBELLS"
-      ],
-      "sportIds": [
-        "strength"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Sujeta mancuernas a los lados, realiza una sentadilla controlada y vuelve a incorporarte. Escoge una carga que puedas controlar. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "bodyweight-squat"
-      ]
-    },
-    {
-      "id": "dumbbell-row",
-      "name": "Remo inclinado con mancuernas",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM"
-      ],
-      "requiredResources": [
-        "DUMBBELLS"
-      ],
-      "sportIds": [
-        "strength"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Con una inclinación de tronco que puedas mantener, acerca las mancuernas al cuerpo y bájalas de forma controlada. Este ejemplo no utiliza banco ni apoyo. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "band-row"
-      ]
-    },
-    {
-      "id": "dumbbell-floor-press",
-      "name": "Press con mancuernas en el suelo",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM"
-      ],
-      "requiredResources": [
-        "DUMBBELLS"
-      ],
-      "sportIds": [
-        "strength"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Tumbado en una superficie adecuada, mueve las mancuernas con control desde los lados del torso. El suelo limita el descenso; no requiere banco. Esterilla opcional. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "knee-pushup"
-      ]
-    },
-    {
-      "id": "barbell-deadlift",
-      "name": "Peso muerto con barra",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "GYM"
-      ],
-      "requiredResources": [
-        "BARBELL"
-      ],
-      "sportIds": [
-        "strength"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Con la barra delante, prepara una posición estable, levántala y bájala con control. Antes de utilizar carga, solicita orientación técnica si no conoces el movimiento. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "dumbbell-squat"
-      ]
-    },
-    {
-      "id": "dumbbell-bench-press",
-      "name": "Press con mancuernas en banco",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "GYM",
-        "HOME"
-      ],
-      "requiredResources": [
-        "DUMBBELLS",
-        "BENCH"
-      ],
-      "sportIds": [
-        "strength"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Usa un banco estable y mancuernas; realiza el movimiento con control y una carga manejable. Este ejemplo requiere el banco declarado. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "dumbbell-floor-press"
-      ]
-    },
-    {
-      "id": "chair-squat",
-      "name": "Sentarse y levantarse de una silla",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM"
-      ],
-      "requiredResources": [
-        "CHAIR"
-      ],
-      "sportIds": [
-        "strength",
-        "calisthenics"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Con una silla estable, siéntate y levántate con control. No presupone que haya una silla disponible: debe marcarse en el perfil. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "bodyweight-squat"
-      ]
-    },
-    {
-      "id": "wall-sit",
-      "name": "Sentadilla isométrica contra pared",
-      "metricType": "ISOMETRIC",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM"
-      ],
-      "requiredResources": [
-        "WALL"
-      ],
-      "sportIds": [
-        "strength",
-        "calisthenics"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Apoya la espalda en una pared estable y mantén una flexión de piernas cómoda durante el tiempo elegido. La pared es un recurso obligatorio. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "forearm-plank"
-      ]
-    },
-    {
-      "id": "supported-calf-raise",
-      "name": "Elevación de talones con apoyo",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM"
-      ],
-      "requiredResources": [
-        "SUPPORT"
-      ],
-      "sportIds": [
-        "strength",
-        "calisthenics"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Usa un apoyo estable para equilibrarte, eleva los talones y desciende con control. El apoyo debe estar declarado. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": []
-    },
-    {
-      "id": "band-row",
-      "name": "Remo con banda bajo los pies",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM"
-      ],
-      "requiredResources": [
-        "BANDS"
-      ],
-      "sportIds": [
-        "strength"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Con una banda apta e íntegra bajo los pies, tira hacia el cuerpo de forma controlada sin soltarla de golpe. Sigue las indicaciones del fabricante. No requiere anclaje externo. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "dumbbell-row"
-      ]
-    },
-    {
-      "id": "mat-mobility",
-      "name": "Movilidad suave sobre esterilla",
-      "metricType": "MOBILITY",
-      "goals": [
-        "MOBILITY",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM"
-      ],
-      "requiredResources": [
-        "MAT"
-      ],
-      "sportIds": [
-        "strength",
-        "calisthenics"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Sobre una esterilla, realiza movimientos suaves alternando lados dentro de un recorrido cómodo. Esta variante exige esterilla; la alternativa de pie no. Ejemplo de producto sin revisión profesional.",
-      "alternativeIds": [
-        "standing-mobility"
-      ]
-    },
-    {
-      "id": "running-easy",
-      "name": "Carrera continua de ejemplo",
-      "metricType": "ENDURANCE",
-      "goals": [
-        "ENDURANCE",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "OUTDOORS"
-      ],
-      "requiredResources": [],
-      "sportIds": [
-        "running"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Bloque continuo al ritmo que permita mantener el control. Registra tiempo en minutos y distancia opcional en kilómetros. Es un ejemplo de registro, no un programa de carrera revisado.",
-      "alternativeIds": []
-    },
-    {
-      "id": "cycling-easy",
-      "name": "Salida continua en bicicleta de ejemplo",
-      "metricType": "ENDURANCE",
-      "goals": [
-        "ENDURANCE",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "OUTDOORS"
-      ],
-      "requiredResources": [
-        "BICYCLE"
-      ],
-      "sportIds": [
-        "cycling"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Salida continua en un entorno apropiado usando la bicicleta declarada. Registra tiempo en minutos, distancia en kilómetros e intervalos si los hay. Ejemplo sin revisión profesional.",
-      "alternativeIds": []
-    },
-    {
-      "id": "swimming-easy",
-      "name": "Nado continuo de ejemplo",
-      "metricType": "ENDURANCE",
-      "goals": [
-        "ENDURANCE",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "POOL"
-      ],
-      "requiredResources": [
-        "POOL"
-      ],
-      "sportIds": [
-        "swimming"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Bloque de nado en una piscina disponible y apta. Registra tiempo en minutos, distancia en kilómetros e intervalos si los hay. Requiere entorno y acceso a piscina explícitos. Ejemplo sin revisión profesional.",
-      "alternativeIds": []
-    },
-    {
-      "id": "sport-complementary-squat",
-      "name": "Sentadilla de preparación complementaria",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM",
-        "OUTDOORS"
-      ],
-      "requiredResources": [],
-      "sportIds": [
-        "football",
-        "basketball",
-        "other",
-        "running",
-        "cycling",
-        "swimming"
-      ],
-      "coverage": "COMPLEMENTARY",
-      "reviewed": false,
-      "description": "Ejemplo general de fuerza: flexiona caderas y rodillas y vuelve a incorporarte con control. Es preparación complementaria; no constituye entrenamiento específico del deporte ni un programa especializado revisado.",
-      "alternativeIds": []
-    },
-    {
-      "id": "sport-complementary-mobility",
-      "name": "Movilidad de preparación complementaria",
-      "metricType": "MOBILITY",
-      "goals": [
-        "MOBILITY",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM",
-        "OUTDOORS"
-      ],
-      "requiredResources": [],
-      "sportIds": [
-        "football",
-        "basketball",
-        "other",
-        "running",
-        "cycling",
-        "swimming"
-      ],
-      "coverage": "COMPLEMENTARY",
-      "reviewed": false,
-      "description": "Movimientos suaves de pie dentro de un recorrido cómodo. Es preparación complementaria general; el programa especializado del deporte puede seguir pendiente de validación.",
-      "alternativeIds": []
-    },
-    {
-      "id": "standard-pushup",
-      "name": "Flexión estándar",
-      "metricType": "STRENGTH",
-      "goals": [
-        "STRENGTH",
-        "GENERAL_FITNESS"
-      ],
-      "environments": [
-        "HOME",
-        "GYM",
-        "OUTDOORS"
-      ],
-      "requiredResources": [],
-      "sportIds": [
-        "strength",
-        "calisthenics"
-      ],
-      "coverage": "SPECIFIC",
-      "reviewed": false,
-      "description": "Ejemplo de producto de flexión con manos y puntas de los pies apoyadas. La referencia animada es una vista previa técnica pendiente de validación profesional y no evalúa tu ejecución. La esterilla es opcional y no se presupone.",
-      "alternativeIds": [
-        "knee-pushup",
-        "dumbbell-floor-press"
-      ]
-    }
-  ]
+	"version": 2,
+	"notice": "Catálogo de ejemplos originales de producto. Ninguna entrada se declara revisada por profesionales.",
+	"sports": [
+		{
+			"id": "strength",
+			"name": "Fuerza",
+			"specificCoverage": "EXAMPLE_UNREVIEWED",
+			"complementaryCoverage": "PENDING_VALIDATION"
+		},
+		{
+			"id": "calisthenics",
+			"name": "Calistenia",
+			"specificCoverage": "EXAMPLE_UNREVIEWED",
+			"complementaryCoverage": "PENDING_VALIDATION"
+		},
+		{
+			"id": "running",
+			"name": "Carrera",
+			"specificCoverage": "EXAMPLE_UNREVIEWED",
+			"complementaryCoverage": "EXAMPLE_UNREVIEWED"
+		},
+		{
+			"id": "cycling",
+			"name": "Ciclismo",
+			"specificCoverage": "EXAMPLE_UNREVIEWED",
+			"complementaryCoverage": "EXAMPLE_UNREVIEWED"
+		},
+		{
+			"id": "swimming",
+			"name": "Natación",
+			"specificCoverage": "EXAMPLE_UNREVIEWED",
+			"complementaryCoverage": "EXAMPLE_UNREVIEWED"
+		},
+		{
+			"id": "football",
+			"name": "Fútbol",
+			"specificCoverage": "PENDING_VALIDATION",
+			"complementaryCoverage": "EXAMPLE_UNREVIEWED"
+		},
+		{
+			"id": "basketball",
+			"name": "Baloncesto",
+			"specificCoverage": "PENDING_VALIDATION",
+			"complementaryCoverage": "EXAMPLE_UNREVIEWED"
+		},
+		{
+			"id": "other",
+			"name": "Otra disciplina",
+			"specificCoverage": "PENDING_VALIDATION",
+			"complementaryCoverage": "EXAMPLE_UNREVIEWED"
+		}
+	],
+	"exercises": [
+		{
+			"id": "bodyweight-squat",
+			"name": "Sentadilla sin accesorios",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "De pie en una superficie estable, flexiona caderas y rodillas dentro de un recorrido cómodo y vuelve a incorporarte. No requiere silla, pared, apoyo ni esterilla. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"dumbbell-squat",
+				"chair-squat"
+			]
+		},
+		{
+			"id": "bodyweight-lunge",
+			"name": "Zancada en el sitio",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Da un paso y flexiona ambas piernas con control; vuelve al inicio y alterna lados. Utiliza solo un recorrido que puedas controlar sin apoyos. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"bodyweight-squat"
+			]
+		},
+		{
+			"id": "knee-pushup",
+			"name": "Flexión con rodillas apoyadas",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "En el suelo, apoya manos y rodillas; flexiona y extiende los codos con control. La superficie debe permitir un apoyo cómodo; una esterilla es opcional y no se presupone. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"dumbbell-floor-press"
+			]
+		},
+		{
+			"id": "glute-bridge",
+			"name": "Puente de glúteos en el suelo",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tumbado boca arriba con pies apoyados, eleva y baja la pelvis con control. La superficie debe resultar cómoda; la esterilla es opcional. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": []
+		},
+		{
+			"id": "forearm-plank",
+			"name": "Plancha sobre antebrazos",
+			"metricType": "ISOMETRIC",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Apoya antebrazos y puntas de los pies en una superficie adecuada. Mantén una posición que puedas controlar durante el tiempo elegido y descansa. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"wall-sit"
+			]
+		},
+		{
+			"id": "standing-mobility",
+			"name": "Movilidad de hombros de pie",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "De pie, mueve los brazos lentamente dentro de un recorrido cómodo y alterna lados. No utiliza pared ni apoyos. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"mat-mobility"
+			]
+		},
+		{
+			"id": "dumbbell-squat",
+			"name": "Sentadilla con mancuernas",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sujeta mancuernas a los lados, realiza una sentadilla controlada y vuelve a incorporarte. Escoge una carga que puedas controlar. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"bodyweight-squat"
+			]
+		},
+		{
+			"id": "dumbbell-row",
+			"name": "Remo inclinado con mancuernas",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Con una inclinación de tronco que puedas mantener, acerca las mancuernas al cuerpo y bájalas de forma controlada. Este ejemplo no utiliza banco ni apoyo. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"band-row"
+			]
+		},
+		{
+			"id": "dumbbell-floor-press",
+			"name": "Press con mancuernas en el suelo",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tumbado en una superficie adecuada, mueve las mancuernas con control desde los lados del torso. El suelo limita el descenso; no requiere banco. Esterilla opcional. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"knee-pushup"
+			]
+		},
+		{
+			"id": "barbell-deadlift",
+			"name": "Peso muerto con barra",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Con la barra delante, prepara una posición estable, levántala y bájala con control. Antes de utilizar carga, solicita orientación técnica si no conoces el movimiento. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"dumbbell-squat"
+			]
+		},
+		{
+			"id": "dumbbell-bench-press",
+			"name": "Press con mancuernas en banco",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM",
+				"HOME"
+			],
+			"requiredResources": [
+				"DUMBBELLS",
+				"BENCH"
+			],
+			"sportIds": [
+				"strength"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Usa un banco estable y mancuernas; realiza el movimiento con control y una carga manejable. Este ejemplo requiere el banco declarado. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"dumbbell-floor-press"
+			]
+		},
+		{
+			"id": "chair-squat",
+			"name": "Sentarse y levantarse de una silla",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"CHAIR"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Con una silla estable, siéntate y levántate con control. No presupone que haya una silla disponible: debe marcarse en el perfil. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"bodyweight-squat"
+			]
+		},
+		{
+			"id": "wall-sit",
+			"name": "Sentadilla isométrica contra pared",
+			"metricType": "ISOMETRIC",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"WALL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Apoya la espalda en una pared estable y mantén una flexión de piernas cómoda durante el tiempo elegido. La pared es un recurso obligatorio. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"forearm-plank"
+			]
+		},
+		{
+			"id": "supported-calf-raise",
+			"name": "Elevación de talones con apoyo",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"SUPPORT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Usa un apoyo estable para equilibrarte, eleva los talones y desciende con control. El apoyo debe estar declarado. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": []
+		},
+		{
+			"id": "band-row",
+			"name": "Remo con banda bajo los pies",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"BANDS"
+			],
+			"sportIds": [
+				"strength"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Con una banda apta e íntegra bajo los pies, tira hacia el cuerpo de forma controlada sin soltarla de golpe. Sigue las indicaciones del fabricante. No requiere anclaje externo. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"dumbbell-row"
+			]
+		},
+		{
+			"id": "mat-mobility",
+			"name": "Movilidad suave sobre esterilla",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sobre una esterilla, realiza movimientos suaves alternando lados dentro de un recorrido cómodo. Esta variante exige esterilla; la alternativa de pie no. Ejemplo de producto sin revisión profesional.",
+			"alternativeIds": [
+				"standing-mobility"
+			]
+		},
+		{
+			"id": "running-easy",
+			"name": "Carrera continua de ejemplo",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"running"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Bloque continuo al ritmo que permita mantener el control. Registra tiempo en minutos y distancia opcional en kilómetros. Es un ejemplo de registro, no un programa de carrera revisado.",
+			"alternativeIds": []
+		},
+		{
+			"id": "cycling-easy",
+			"name": "Salida continua en bicicleta de ejemplo",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"OUTDOORS"
+			],
+			"requiredResources": [
+				"BICYCLE"
+			],
+			"sportIds": [
+				"cycling"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Salida continua en un entorno apropiado usando la bicicleta declarada. Registra tiempo en minutos, distancia en kilómetros e intervalos si los hay. Ejemplo sin revisión profesional.",
+			"alternativeIds": []
+		},
+		{
+			"id": "swimming-easy",
+			"name": "Nado continuo de ejemplo",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"POOL"
+			],
+			"requiredResources": [
+				"POOL"
+			],
+			"sportIds": [
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Bloque de nado en una piscina disponible y apta. Registra tiempo en minutos, distancia en kilómetros e intervalos si los hay. Requiere entorno y acceso a piscina explícitos. Ejemplo sin revisión profesional.",
+			"alternativeIds": []
+		},
+		{
+			"id": "sport-complementary-squat",
+			"name": "Sentadilla de preparación complementaria",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"football",
+				"basketball",
+				"other",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "COMPLEMENTARY",
+			"reviewed": false,
+			"description": "Ejemplo general de fuerza: flexiona caderas y rodillas y vuelve a incorporarte con control. Es preparación complementaria; no constituye entrenamiento específico del deporte ni un programa especializado revisado.",
+			"alternativeIds": []
+		},
+		{
+			"id": "sport-complementary-mobility",
+			"name": "Movilidad de preparación complementaria",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"football",
+				"basketball",
+				"other",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "COMPLEMENTARY",
+			"reviewed": false,
+			"description": "Movimientos suaves de pie dentro de un recorrido cómodo. Es preparación complementaria general; el programa especializado del deporte puede seguir pendiente de validación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "standard-pushup",
+			"name": "Flexión estándar",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Ejemplo de producto de flexión con manos y puntas de los pies apoyadas. La referencia animada es una vista previa técnica pendiente de validación profesional y no evalúa tu ejecución. La esterilla es opcional y no se presupone.",
+			"alternativeIds": [
+				"knee-pushup",
+				"dumbbell-floor-press"
+			]
+		}
+	]
 }

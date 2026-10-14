@@ -1,25 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:saveEnabled="false" android:background="@android:color/transparent" android:clipToPadding="false" tools:context=".MainActivity">
-	<LinearLayout android:id="@+id/screen_body" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="24dp" android:paddingTop="28dp" android:paddingBottom="40dp">
-		<TextView android:id="@+id/eyebrow" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.Eyebrow" tools:text="LO QUE HAS HECHO" />
-		<TextView android:id="@+id/screen_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.ScreenTitle" tools:text="Tu historial" />
-		<TextView android:id="@+id/screen_subtitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:layout_marginBottom="28dp" style="@style/EnerGym.Body" tools:text="Resultados realizados, con el perfil y los ejercicios de aquel entrenamiento." />
-		<LinearLayout android:id="@+id/rows" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-			<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" tools:visibility="visible" android:importantForAccessibility="noHideDescendants">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:fillViewport="true"
+	android:saveEnabled="false"
+	android:background="@android:color/transparent"
+	android:clipToPadding="false"
+	tools:context=".MainActivity">
+
+	<LinearLayout
+		android:id="@+id/screen_body"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:paddingHorizontal="24dp"
+		android:paddingTop="28dp"
+		android:paddingBottom="40dp">
+
+		<TextView
+			android:id="@+id/eyebrow"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			style="@style/EnerGym.Eyebrow"
+			tools:text="LO QUE HAS HECHO" />
+
+		<TextView
+			android:id="@+id/screen_title"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="12dp"
+			style="@style/EnerGym.ScreenTitle"
+			tools:text="Tu historial" />
+
+		<TextView
+			android:id="@+id/screen_subtitle"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="12dp"
+			android:layout_marginBottom="28dp"
+			style="@style/EnerGym.Body"
+			tools:text="Resultados realizados, con el perfil y los ejercicios de aquel entrenamiento." />
+
+		<LinearLayout
+			android:id="@+id/rows"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical">
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical"
+				android:visibility="gone"
+				tools:visibility="visible"
+				android:importantForAccessibility="noHideDescendants">
 				<!-- Solo editor: GONE en ejecución; ScreenFragment.render elimina estas filas. -->
-				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" style="@style/EnerGym.GlassCard">
-					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp" android:background="@drawable/glass_panel">
-						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Sesión finalizada" />
-						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Ejemplo de diseño · fecha del entrenamiento&#10;Perfil conservado de aquella sesión&#10;&#10;Ejercicio de ejemplo&#10;Aquí se muestran los valores realizados, no la prescripción." />
-						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp" />
+				<com.google.android.material.card.MaterialCardView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="24dp"
+					style="@style/EnerGym.GlassCard">
+
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="vertical"
+						android:padding="24dp"
+						android:background="@drawable/glass_panel">
+
+						<TextView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							style="@style/EnerGym.CardTitle"
+							tools:text="Sesión finalizada" />
+
+						<TextView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginTop="12dp"
+							style="@style/EnerGym.Body"
+							tools:text="Ejemplo de diseño · fecha del entrenamiento&#10;Perfil conservado de aquella sesión&#10;&#10;Ejercicio de ejemplo&#10;Aquí se muestran los valores realizados, no la prescripción." />
+
+						<LinearLayout
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:orientation="vertical"
+							android:layout_marginTop="12dp" />
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>
-				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" style="@style/EnerGym.GlassCard">
-					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp" android:background="@drawable/glass_panel">
-						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Borrador pendiente" />
-						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Ejemplo de diseño · rutina con ejercicios pendientes" />
-						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp">
-							<com.energym.app.ui.effects.GlassButton style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="12dp" android:layout_marginBottom="4dp" android:textSize="16sp" tools:text="Continuar borrador" />
+
+				<com.google.android.material.card.MaterialCardView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="24dp"
+					style="@style/EnerGym.GlassCard">
+
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="vertical"
+						android:padding="24dp"
+						android:background="@drawable/glass_panel">
+
+						<TextView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							style="@style/EnerGym.CardTitle"
+							tools:text="Borrador pendiente" />
+
+						<TextView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginTop="12dp"
+							style="@style/EnerGym.Body"
+							tools:text="Ejemplo de diseño · rutina con ejercicios pendientes" />
+
+						<LinearLayout
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:orientation="vertical"
+							android:layout_marginTop="12dp">
+
+							<com.energym.app.ui.effects.GlassButton
+								style="@style/EnerGym.Button"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:minHeight="56dp"
+								android:layout_marginTop="12dp"
+								android:layout_marginBottom="4dp"
+								android:textSize="16sp"
+								tools:text="Continuar borrador" />
 						</LinearLayout>
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>

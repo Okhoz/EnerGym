@@ -1,41 +1,59 @@
 # EnerGym
 
-Aplicación Android con lógica en Java y pantallas XML. Namespace e ID: `com.energym.app`.
+Aplicación Android Java/XML para crear rutinas, conservar versiones y registrar sesiones. ID: `com.energym.app`. Tema negro/blanco/dorado, logo verde transparente, paneles tintados y movimiento acotado.
 
-## Entorno
+## Funciones y arquitectura
 
-- Android Studio con Android SDK Platform 37 (`android-37.0`), Platform Tools y Build Tools 36.1.0 instalados.
-- Dispositivo o emulador Android 8.0 (API 26) o superior; compileSdk y targetSdk: 37.
-- Gradle Wrapper 9.6.0 y Android Gradle Plugin 9.4.1, incluidos en el proyecto.
-- La compilación de base se ha verificado con el JBR de Android Studio, OpenJDK 25.0.3. Java 11 es la compatibilidad del código fuente/bytecode; no identifica el JDK que ejecuta Gradle.
+El perfil declara objetivo, lugar, recursos, días y duración. Las propuestas siguen siendo provisionales hasta «Guardar perfil y aceptar»; rechazar no escribe. La aceptación compara el perfil vigente y guarda perfil/rutina en una transacción. Sesiones e históricos conservan snapshots y métricas de su versión. Datos locales y conversación se separan por propietario.
 
-Configura el SDK desde Android Studio o mediante `sdk.dir` en tu `local.properties` local. No publiques ese archivo. En Android Studio selecciona el JBR incluido como Gradle JDK.
+MVC: domain/catalog/data contienen modelos, compatibilidad, validación y persistencia; controller y los controladores del asistente coordinan acciones mediante interfaces comprobables en JVM; Activities, Fragments y XML presentan datos y remiten eventos. Las vistas no ejecutan SQL ni deciden compatibilidad.
 
-## Compilar y comprobar (PowerShell)
+El guiado local gratuito se identifica como conversación por reglas. La IA necesita conexión al backend y envío externo explícito. Las claves del proveedor permanecen en el servidor; el token Android vive en memoria. El consentimiento solo autoriza historial acotado; revocarlo elimina el payload e invalida respuestas pendientes consentidas. No hay cambio automático de proveedor/modelo ni respuesta local presentada como IA.
 
-Desde la carpeta del proyecto, usando el JBR instalado en esta máquina:
+El catálogo v2 añade Flexión estándar (`standard-pushup`), distinta de `knee-pushup`. Su vista previa técnica nativa permite reproducción, pausa, velocidad, marcadores, giro, zoom y vistas. Para otros recursos/dispositivos incompatibles conserva referencia escrita. No hay capas musculares, evaluación personal con cámara ni revisión profesional. Consulta [recursos](docs/resources.md) y [licencias](THIRD_PARTY_NOTICES.md).
+
+## Compilar y ejecutar
+
+Android Studio, SDK Platform37 y Build Tools36.1.0; Android API26+, compileSdk/targetSdk37. El visor requiere Vulkan1.1. Gradle Wrapper9.6.0/AGP9.4.1, fuentes Java11; JBR25.0.3 ejecuta Gradle. Backend Java17+; pruebas verificadas con Java21. Configura sdk.dir en local.properties y selecciona JBR como Gradle JDK; no publiques esa configuración local.
+
+Desde la raíz del proyecto, PowerShell:
 
 ```powershell
 $env:JAVA_HOME = 'C:\Program Files\Android\Android Studio\jbr'
-.\gradlew.bat :app:assembleDebug :app:testDebugUnitTest
+.\gradlew.bat :app:testDebugUnitTest :app:assembleDebug :app:lintDebug :app:assembleRelease
+$mavenCache = Join-Path $PWD 'backend/.cache/m2'
+.\backend\mvnw.cmd -f backend/pom.xml "-Dmaven.repo.local=$mavenCache" test package
 ```
 
-El APK se genera en `app\build\outputs\apk\debug\app-debug.apk`. Ajusta la ruta de `JAVA_HOME` si Android Studio está instalado en otro lugar.
+El primer acceso puede descargar dependencias públicas gratuitas. Para -o/--offline, la caché indicada debe contener todas las dependencias: su existencia como carpeta no garantiza completitud. La verificación del proyecto real utilizó la caché ya poblada de staging; su caché propia no tenía maven-resources-plugin3.4.0. Ajusta la ruta a una caché conocida o permite resolución pública normal.
 
-## Ejecutar
+APK debug: app/build/outputs/apk/debug/app-debug.apk; JAR: backend/target/energym-backend-1.0.0.jar. Release necesita firma propia para distribución. Abre el proyecto y ejecuta app sobre un dispositivo; reutiliza un emulador abierto. Pruebas instrumentales: `.\gradlew.bat :app:connectedDebugAndroidTest` con dispositivo conectado y coordinado. Estas pruebas no llaman a Gemini salvo parámetros opt-in explícitos del fixture real.
 
-Abre el proyecto en Android Studio, selecciona un dispositivo en ejecución y pulsa Run en el módulo `app`. También puedes iniciar el AVD local y ejecutar desde PowerShell (ajusta la ruta del SDK y el nombre del AVD según tu equipo):
+## Conectar Gemini en desarrollo
+
+[backend/README.md](backend/README.md) detalla configuración y privacidad. La clave Windows ya configurada se usa solo en el servidor. Desde backend en **PowerShell7**, genera un código privado nuevo para el emparejamiento y cópialo sin registrarlo en logs:
 
 ```powershell
-$sdkPath = "$env:LOCALAPPDATA\Android\Sdk"
-Start-Process -FilePath "$sdkPath\emulator\emulator.exe" -ArgumentList '-avd', 'Medium_Phone_API_37.0' -WindowStyle Hidden
-& "$sdkPath\platform-tools\adb.exe" wait-for-device
-& "$sdkPath\platform-tools\adb.exe" install -r '.\app\build\outputs\apk\debug\app-debug.apk'
-& "$sdkPath\platform-tools\adb.exe" shell am start -n 'com.energym.app/.MainActivity'
+$env:ENERGYM_PAIRING_CODE = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(16))
+Set-Clipboard $env:ENERGYM_PAIRING_CODE
+.\start-server.ps1 -Provider Gemini -CheckConfiguration
+.\start-server.ps1 -Provider Gemini
 ```
 
-Espera a que el emulador termine de arrancar antes de instalar. Si hay varios dispositivos, selecciona uno mediante `adb -s <serial>`. En la revisión del entorno existe el AVD `Medium_Phone_API_37.0`; no había dispositivos conectados.
+En otra terminal, con adb del SDK disponible: `adb reverse tcp:8080 tcp:8080`. En la app debug introduce http://127.0.0.1:8080 y pega el código en conexión privada. El código se consume una vez; genera otro para un nuevo emparejamiento. HTTP loopback solo debug; release exige HTTPS. No hay servidor público/certificado real comprobado ni facturación autorizada.
 
-## Coste y credenciales
+**Gemini real comprobado:** el tercer recorrido Android del 14-10-2026 pasó 1 prueba en10.409s con gemini-3.5-flash-lite y catálogo2. Recibió una propuesta válida de tres ejercicios, sin prescripciones faltantes; SQLite permaneció intacta antes de aceptar. La aceptación creó la versión con perfil/rutina exactos y persistió tras recrear. Se usó una demo genérica con historyConsent=false. Dos intentos anteriores fallidos motivaron la corrección revisada schema/prompt; backend final42pruebas verdes. Una prueba anterior de backend recibió HTTP200 en2067ms.
 
-El desarrollo debe usar únicamente recursos gratuitos: sin llamadas a APIs de pago ni assets de pago. La integración con OpenAI es opcional y debe permanecer desactivada mientras no haya acceso a una API financiada y autorización explícita para usarla. No incluyas claves ni otros secretos en Java, XML, recursos, configuración empaquetada o APK; cualquier integración futura necesita un backend que mantenga las credenciales fuera de la aplicación.
+Gemini3.8 sigue siendo opción explícita, pero superó los plazos en las pruebas. La cuota gratuita es para desarrollo y tiene límites/condiciones; no se promete uso ilimitado. Según los términos oficiales enlazados en backend, ofrecer clientes API a usuarios del EEE/Suiza/Reino Unido exige Paid Services. No se ha autorizado ese despliegue.
+
+Google Authentication/Firestore tienen adaptadores y pruebas locales; **Firebase real sigue sin configurar**. Login remoto y restauración tras reinstalar no están comprobados.
+
+## XML y rendimiento
+
+En Android Studio abre app/src/main/res/layout/activity_main.xml, fragment_*.xml o row_*.xml y selecciona **Design** o **Split**. Las muestras tools/GONE se inflan y luego las filas de ejemplo se retiran al renderizar; no se afirma coste cero. La revisión comprobó XML y empaquetado de19layouts, no píxeles del editor. La animación nativa se muestra al ejecutar.
+
+El movimiento solo se inicia al cambiar ruta y se cancela al pausar/detach. RenderEffect se limita a decoración estática acotada y tiene fallback por API, memoria, energía, animación deshabilitada y visor. El AVD192MB utilizó fallback; RenderEffect habilitado y rendimiento físico no están medidos. No hay blur de controles, texto, cámara ni SurfaceView. La memoria del visor se recupera al cerrar su proceso privado; conserva principal y recreaciones.
+
+[docs/acceptance.md](docs/acceptance.md) registra pruebas, artefactos y límites. El formato Task8 no modifica comportamiento ni añade cambios de diseño.
+
+Verificación fresca de staging tras Task8:107JVM sin fallos, debug/release correctos y lint0errores/91avisos (tres SuspiciousIndentation eliminados al corregir formato); backend42pruebas y empaquetado correctos. Los avisos restantes siguen pendientes. Root verifica después el proyecto real y el recorrido Android, sin confundir esta evidencia staging con instalación nueva.

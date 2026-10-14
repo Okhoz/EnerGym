@@ -1,2 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:gravity="center_vertical" android:paddingHorizontal="16dp" android:paddingVertical="16dp" android:background="@color/surface_card" android:textColor="@color/white" android:textSize="16sp" tools:text="Opción de ejemplo" tools:context=".MainActivity" />
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:minHeight="56dp"
+	android:gravity="center_vertical"
+	android:paddingHorizontal="16dp"
+	android:paddingVertical="16dp"
+	android:background="@color/surface_card"
+	android:textColor="@color/white"
+	android:textSize="16sp"
+	tools:text="Opción de ejemplo"
+	tools:context=".MainActivity" />

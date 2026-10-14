@@ -1,5 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Decoración estática; nunca incluye texto, controles, cámara ni contenido del usuario. -->
+<?xml version="1.0" encoding="utf-8"?><!-- Decoración estática; nunca incluye texto, controles, cámara ni contenido del usuario. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-	<gradient android:type="radial" android:gradientRadius="128px" android:centerX="0.6" android:centerY="0.2" android:startColor="#32D3B16B" android:endColor="#00D3B16B" />
+	<gradient
+		android:type="radial"
+		android:gradientRadius="128px"
+		android:centerX="0.6"
+		android:centerY="0.2"
+		android:startColor="#32D3B16B"
+		android:endColor="#00D3B16B" />
 </shape>

@@ -1,7 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Ajuste XML sin recortar ni reescribir el PNG. El margen protege la marca dentro de la máscara adaptativa. -->
+<?xml version="1.0" encoding="utf-8"?><!-- Ajuste XML sin recortar ni reescribir el PNG. El margen protege la marca dentro de la máscara adaptativa. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:width="72dp" android:height="72dp" android:gravity="center">
-        <bitmap android:src="@drawable/energym_logo" android:gravity="fill" android:filter="true" />
-    </item>
+	<item
+		android:width="72dp"
+		android:height="72dp"
+		android:gravity="center">
+		<bitmap
+			android:src="@drawable/energym_logo"
+			android:gravity="fill"
+			android:filter="true" />
+	</item>
 </layer-list>

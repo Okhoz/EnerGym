@@ -1,42 +1,48 @@
 rules_version = '2';
 service cloud.firestore {
-  match /databases/{database}/documents {
-    function owns(uid) { return request.auth != null && request.auth.uid == uid; }
-    function valid(uid, kind, syncId) {
-      let d = request.resource.data;
-      return d.keys().hasAll(['schemaVersion','ownerUid','kind','syncId','payload','revision','updatedAt','cloudVersion','identity','terminal'])
-        && d.keys().hasOnly(['schemaVersion','ownerUid','kind','syncId','payload','revision','updatedAt','cloudVersion','identity','terminal'])
-        && d.schemaVersion == 1 && d.ownerUid == uid && d.kind == kind && d.syncId == syncId
-        && d.syncId is string && d.syncId.matches('[A-Za-z0-9_-]{1,128}')
-        && d.payload is string && d.payload.toUtf8().size() > 0 && d.payload.toUtf8().size() <= 600000
-        && d.revision is int && d.revision > 0 && d.updatedAt is int && d.updatedAt > 0
-        && d.cloudVersion is int && d.cloudVersion > 0 && d.identity is string && d.terminal is bool
-        && ((kind == 'PROFILE' && d.identity == '' && d.terminal == false)
-          || (kind == 'ROUTINE' && d.identity.matches('[a-f0-9]{64}') && d.terminal == true)
-          || (kind == 'SESSION' && d.identity.matches('[a-f0-9]{64}')));
-    }
-    function nextVersion() {
-      return request.resource.data.cloudVersion == resource.data.cloudVersion + 1
-        && request.resource.data.updatedAt > resource.data.updatedAt;
-    }
-    match /users/{uid}/profile/current {
-      allow read: if owns(uid);
-      allow create: if owns(uid) && valid(uid,'PROFILE','profile') && request.resource.data.cloudVersion == 1;
-      allow update: if owns(uid) && valid(uid,'PROFILE','profile') && nextVersion();
-      allow delete: if false; // Borrar copia local no borra ni crea tombstones en nube.
-    }
-    match /users/{uid}/routines/{id} {
-      allow read: if owns(uid);
-      allow create: if owns(uid) && valid(uid,'ROUTINE',id) && request.resource.data.cloudVersion == 1;
-      allow update, delete: if false; // Una aceptación es una versión histórica inmutable.
-    }
-    match /users/{uid}/sessions/{id} {
-      allow read: if owns(uid);
-      allow create: if owns(uid) && valid(uid,'SESSION',id) && request.resource.data.cloudVersion == 1;
-      allow update: if owns(uid) && valid(uid,'SESSION',id) && nextVersion()
-        && request.resource.data.identity == resource.data.identity && resource.data.terminal == false;
-      allow delete: if false;
-    }
-    match /{document=**} { allow read, write: if false; }
-  }
+	match /databases/{database}/documents {
+		function owns(uid) {
+			return request.auth != null && request.auth.uid == uid;
+		}
+		function valid(uid, kind, syncId) {
+			let d = request.resource.data;
+			return d.keys().hasAll(['schemaVersion', 'ownerUid', 'kind', 'syncId', 'payload', 'revision', 'updatedAt', 'cloudVersion', 'identity', 'terminal'])
+				&& d.keys().hasOnly(['schemaVersion', 'ownerUid', 'kind', 'syncId', 'payload', 'revision', 'updatedAt', 'cloudVersion', 'identity', 'terminal'])
+				&& d.schemaVersion == 1 && d.ownerUid == uid && d.kind == kind && d.syncId == syncId
+				&& d.syncId is string && d.syncId.matches('[A-Za-z0-9_-]{1,128}')
+				&& d.payload is string && d.payload.toUtf8().size() > 0 && d.payload.toUtf8().size() <= 600000
+				&& d.revision is int && d.revision > 0 && d.updatedAt is int && d.updatedAt > 0
+				&& d.cloudVersion is int && d.cloudVersion > 0 && d.identity is string && d.terminal is bool
+				&& ((kind == 'PROFILE' && d.identity == '' && d.terminal == false)
+				|| (kind == 'ROUTINE' && d.identity.matches('[a-f0-9]{64}') && d.terminal == true)
+				|| (kind == 'SESSION' && d.identity.matches('[a-f0-9]{64}')));
+		}
+		function nextVersion() {
+			return request.resource.data.cloudVersion == resource.data.cloudVersion + 1
+				&& request.resource.data.updatedAt > resource.data.updatedAt;
+		}
+		match /users/{uid}/profile/current {
+			allow read: if owns(uid);
+			allow create: if owns(uid) && valid(uid, 'PROFILE', 'profile') && request.resource.data.cloudVersion == 1;
+			allow update: if owns(uid) && valid(uid, 'PROFILE', 'profile') && nextVersion();
+			allow delete: if false;
+			// Borrar copia local no borra ni crea tombstones en nube.
+		}
+		match /users/{uid}/routines/{id} {
+			allow read: if owns(uid);
+			allow create: if owns(uid) && valid(uid, 'ROUTINE', id) && request.resource.data.cloudVersion == 1;
+			allow update, delete: if false;
+			// Una aceptación es una versión histórica inmutable.
+		}
+		match /users/{uid}/sessions/{id} {
+			allow read: if owns(uid);
+			allow create: if owns(uid) && valid(uid, 'SESSION', id) && request.resource.data.cloudVersion == 1;
+			allow update: if owns(uid) && valid(uid, 'SESSION', id) && nextVersion()
+				&& request.resource.data.identity == resource.data.identity && resource.data.terminal == false;
+			allow delete: if false;
+		}
+		match /{document=**} {
+			allow read, write: if false;
+		}
+	}
 }

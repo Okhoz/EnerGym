@@ -1,0 +1,20 @@
+root = true
+
+[*]
+charset = utf-8
+indent_style = tab
+indent_size = 4
+tab_width = 4
+insert_final_newline = true
+ij_continuation_indent_size = 4
+ij_smart_tabs = false
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{java,xml,json,gradle,kts,py,ps1,js,rules,properties}]
+trim_trailing_whitespace = true
+
+[*.ps1]
+# Windows PowerShell 5.1 necesita BOM para reconocer correctamente los textos españoles.
+charset = utf-8-bom

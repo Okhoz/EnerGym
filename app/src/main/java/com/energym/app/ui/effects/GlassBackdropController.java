@@ -19,9 +19,12 @@ import android.view.FrameMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+
 import androidx.core.content.ContextCompat;
 
-/** Solo desenfoca una decoración estática acotada: nunca captura ni procesa vistas de usuario. */
+/**
+ * Solo desenfoca una decoración estática acotada: nunca captura ni procesa vistas de usuario.
+ */
 public final class GlassBackdropController implements AutoCloseable {
 	private final Activity activity;
 	private final View decoration;
@@ -31,18 +34,26 @@ public final class GlassBackdropController implements AutoCloseable {
 	private RenderEffect cachedEffect;
 	private boolean resumed, listening, observing, memoryFallback, closed;
 	private final Window.OnFrameMetricsAvailableListener frames = (window, metrics, dropped) -> {
-		if (!resumed || !listening) return;
+		if (!resumed || !listening)
+			return;
 		if (budget.record(metrics.getMetric(FrameMetrics.TOTAL_DURATION))) {
 			memoryFallback = true;
 			disableBlur();
 		}
-		if (budget.complete()) stopFrames();
+		if (budget.complete())
+			stopFrames();
 	};
 	private final BroadcastReceiver powerChanges = new BroadcastReceiver() {
-		@Override public void onReceive(Context context, Intent intent) { refresh(); }
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			refresh();
+		}
 	};
 	private final ContentObserver animationChanges = new ContentObserver(main) {
-		@Override public void onChange(boolean selfChange) { refresh(); }
+		@Override
+		public void onChange(boolean selfChange) {
+			refresh();
+		}
 	};
 
 	public GlassBackdropController(Activity activity, View decoration, boolean nativeViewer) {
@@ -57,11 +68,15 @@ public final class GlassBackdropController implements AutoCloseable {
 	}
 
 	public void resume() {
-		if (closed) return;
+		if (closed)
+			return;
 		resumed = true;
 		if (!observing) {
-			ContextCompat.registerReceiver(activity, powerChanges, new IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED), ContextCompat.RECEIVER_NOT_EXPORTED);
-			activity.getContentResolver().registerContentObserver(Settings.Global.getUriFor(Settings.Global.ANIMATOR_DURATION_SCALE), false, animationChanges);
+			ContextCompat.registerReceiver(activity, powerChanges,
+				new IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED), ContextCompat.RECEIVER_NOT_EXPORTED);
+			activity.getContentResolver()
+				.registerContentObserver(Settings.Global.getUriFor(Settings.Global.ANIMATOR_DURATION_SCALE), false,
+					animationChanges);
 			observing = true;
 		}
 		// La vista ya está adjunta cuando se evalúa la aceleración por hardware.
@@ -69,18 +84,26 @@ public final class GlassBackdropController implements AutoCloseable {
 	}
 
 	private final Runnable refreshAfterAttach = this::refresh;
+
 	private void refresh() {
-		if (!resumed || closed) return;
+		if (!resumed || closed)
+			return;
 		ActivityManager manager = (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
 		PowerManager power = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
 		ActivityManager.MemoryInfo memory = new ActivityManager.MemoryInfo();
-		if (manager != null) manager.getMemoryInfo(memory);
-		boolean allowed = manager != null && GlassPerformancePolicy.allowBlur(Build.VERSION.SDK_INT,
-				decoration.isHardwareAccelerated(), manager.isLowRamDevice(), memory.lowMemory || memoryFallback,
-				manager.getMemoryClass(), power != null && power.isPowerSaveMode(), ValueAnimator.areAnimatorsEnabled(), nativeViewer);
-		if (!allowed) { disableBlur(); return; }
+		if (manager != null)
+			manager.getMemoryInfo(memory);
+		boolean allowed = manager != null &&
+			GlassPerformancePolicy.allowBlur(Build.VERSION.SDK_INT, decoration.isHardwareAccelerated(),
+				manager.isLowRamDevice(), memory.lowMemory || memoryFallback, manager.getMemoryClass(),
+				power != null && power.isPowerSaveMode(), ValueAnimator.areAnimatorsEnabled(), nativeViewer);
+		if (!allowed) {
+			disableBlur();
+			return;
+		}
 		if (Build.VERSION.SDK_INT >= 31) {
-			if (cachedEffect == null) cachedEffect = RenderEffect.createBlurEffect(GlassPerformancePolicy.BLUR_RADIUS_PX,
+			if (cachedEffect == null)
+				cachedEffect = RenderEffect.createBlurEffect(GlassPerformancePolicy.BLUR_RADIUS_PX,
 					GlassPerformancePolicy.BLUR_RADIUS_PX, Shader.TileMode.CLAMP);
 			decoration.setRenderEffect(cachedEffect);
 		}
@@ -97,12 +120,14 @@ public final class GlassBackdropController implements AutoCloseable {
 	}
 
 	private void disableBlur() {
-		if (Build.VERSION.SDK_INT >= 31) decoration.setRenderEffect(null);
+		if (Build.VERSION.SDK_INT >= 31)
+			decoration.setRenderEffect(null);
 		stopFrames();
 	}
 
 	private void stopFrames() {
-		if (listening) activity.getWindow().removeOnFrameMetricsAvailableListener(frames);
+		if (listening)
+			activity.getWindow().removeOnFrameMetricsAvailableListener(frames);
 		listening = false;
 	}
 
@@ -117,7 +142,8 @@ public final class GlassBackdropController implements AutoCloseable {
 		}
 	}
 
-	@Override public void close() {
+	@Override
+	public void close() {
 		pause();
 		cachedEffect = null;
 		closed = true;
