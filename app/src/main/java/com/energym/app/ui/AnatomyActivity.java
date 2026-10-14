@@ -297,6 +297,7 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 
 	@Override
 	protected void onPause() {
+		com.energym.app.ui.effects.MotionPreferences.cancelButtons(findViewById(R.id.anatomy_root));
 		resumed = false;
 		if (renderer != null) renderer.pause();
 		super.onPause();

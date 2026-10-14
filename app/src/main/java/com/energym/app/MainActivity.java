@@ -22,6 +22,9 @@ import com.energym.app.controller.*;
 import com.energym.app.ui.*;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import androidx.constraintlayout.motion.widget.MotionLayout;
+import com.energym.app.ui.effects.GlassBackdropController;
+import com.energym.app.ui.effects.MotionPreferences;
 
 /**
  * VISTA raíz MVC: aplica insets, muestra fragmentos y remite navegación. Nunca ejecuta SQL ni crea planes.
@@ -35,6 +38,8 @@ public final class MainActivity extends AppCompatActivity {
 		viewer.launch(new Intent(this,AnatomyActivity.class).putExtra(AnatomyActivity.EXTRA_EXERCISE_ID,request.exerciseId).putExtra(AnatomyActivity.EXTRA_LEASE,request.lease));
 	};
     private boolean rendering;
+	private GlassBackdropController backdrop;
+	private MotionLayout screenMotion;
 
     public AppState state() {
         return state;
@@ -45,6 +50,8 @@ public final class MainActivity extends AppCompatActivity {
         super.onCreate(saved);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+		screenMotion = findViewById(R.id.screen_motion);
+		backdrop = new GlassBackdropController(this, findViewById(R.id.glass_decoration), false);
         // El diseño es oscuro también con el sistema en modo claro: iconos blancos en ambas barras.
         androidx.core.view.WindowInsetsControllerCompat barsController = new androidx.core.view.WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
         barsController.setAppearanceLightStatusBars(false);
@@ -110,7 +117,14 @@ public final class MainActivity extends AppCompatActivity {
             Fragment current = getSupportFragmentManager().findFragmentById(R.id.content);
             String tag = app.screen.name();
             if (current == null || !tag.equals(current.getTag())) {
+				// Solo un cambio de ruta inicia movimiento; los datos, teclado y red no lo reinician.
+				boolean animate = current != null && MotionPreferences.enabled(this);
+				screenMotion.setProgress(1f);
                 getSupportFragmentManager().beginTransaction().replace(R.id.content, fragment(app.screen), tag).commitNow();
+				if (animate) {
+					screenMotion.setProgress(0f);
+					screenMotion.transitionToEnd();
+				}
             } else if (current instanceof ScreenFragment) ((ScreenFragment) current).render();
             if (!app.error.isEmpty()) {
                 String error = app.error;
@@ -148,12 +162,30 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+		if (backdrop != null) backdrop.resume();
         render();
     }
 
     @Override protected void onSaveInstanceState(Bundle out){out.putString("viewerLease",launchedLease);super.onSaveInstanceState(out);}
+	@Override protected void onPause() {
+		MotionPreferences.cancelButtons(findViewById(R.id.main));
+		if (backdrop != null) backdrop.pause();
+		if (screenMotion != null) screenMotion.setProgress(1f);
+		super.onPause();
+	}
+	@Override public void onLowMemory() {
+		if (backdrop != null) backdrop.lowMemory();
+		super.onLowMemory();
+	}
+	@Override public void onTrimMemory(int level) {
+		if (backdrop != null && (level == android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW
+				|| level == android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL
+				|| level >= android.content.ComponentCallbacks2.TRIM_MEMORY_BACKGROUND)) backdrop.lowMemory();
+		super.onTrimMemory(level);
+	}
     @Override
     protected void onDestroy() {
+		if (backdrop != null) backdrop.close();
         state.unbindViewer(viewerLaunch);state.observe(null);
         super.onDestroy();
     }

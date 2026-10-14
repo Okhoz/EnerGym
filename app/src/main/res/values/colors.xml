@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- El verde queda reservado al logo original. -->
-    <color name="surface">#080A09</color><color name="surface_card">#111412</color>
+    <color name="surface">#080A09</color><color name="surface_card">#D91B1D1B</color>
+    <color name="glass_highlight">#38FFFFFF</color>
+    <color name="glass_field">#A6191C19</color>
+    <color name="glass_button">#801F231F</color>
+    <color name="glass_gold_outline">#80D3B16B</color>
     <color name="surface_selected">#29251B</color><color name="gold">#D3B16B</color>
     <color name="white">#FFFFFF</color><color name="text_primary">#FFFFFF</color>
     <color name="text_secondary">#D8DAD9</color><color name="outline">#D3B16B</color>
