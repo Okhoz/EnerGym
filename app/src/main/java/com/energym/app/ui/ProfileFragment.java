@@ -6,8 +6,16 @@ import android.widget.LinearLayout;
 public final class ProfileFragment extends ScreenFragment {
     public ProfileFragment(){super(R.layout.fragment_profile);}
     protected void content(){heading("PERSONALIZA","Tu perfil","Elige lo que tienes y el tiempo disponible. Tus textos se guardan, pero el plan local aún no los interpreta.");
-        LinearLayout fields=card("Preferencias y contexto","Los recursos son independientes del lugar. Selecciona solo los disponibles.");
-        for(InputField f:app.profileFields())if(f.bool)check(fields,f);else if(!f.values.isEmpty())choice(fields,f.key,f.label,f.values,f.labels,f.value,v->app.profileInput(f.key,v));else textField(fields,f.key,f.label,f.value,f.number,f.number,v->app.profileInput(f.key,v));
+        LinearLayout fields=card("Tu entrenamiento","Elige la actividad, el objetivo y el entorno.");
+        boolean resources=false;
+        // Secciones de presentación: conservan el orden y los eventos de todos los campos del controlador.
+        for(InputField f:app.profileFields()){
+            if(f.key.equals("daysPerWeek"))fields=card("Tu disponibilidad","Organiza el tiempo que puedes dedicar.");
+            else if(f.key.equals("level"))fields=card("Tu contexto","Añade tu experiencia, preferencias y limitaciones.");
+            else if(f.key.startsWith("resource.")&&!resources){fields=card("Material disponible","Los recursos son independientes del lugar. Selecciona solo los disponibles.");resources=true;}
+            else if(f.key.equals("historyConsent"))fields=card("Personalización y privacidad","Puedes cambiar este permiso en cualquier momento. Esta versión no envía datos a IA.");
+            if(f.bool)check(fields,f);else if(!f.values.isEmpty())choice(fields,f.key,f.label,f.values,f.labels,f.value,v->app.profileInput(f.key,v));else textField(fields,f.key,f.label,f.value,f.number,f.number,v->app.profileInput(f.key,v));
+        }
         action(rows,"Guardar perfil",!app.profileSaving(),app::saveProfile);
     }
 }

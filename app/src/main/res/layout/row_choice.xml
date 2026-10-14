@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="14dp">
-    <TextView android:id="@+id/choice_label" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="@color/text_secondary" android:labelFor="@id/choice_input" />
-    <Spinner android:id="@+id/choice_input" android:layout_width="match_parent" android:layout_height="56dp" android:spinnerMode="dropdown" android:backgroundTint="@color/green" android:saveEnabled="false" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="20dp">
+    <TextView android:id="@+id/choice_label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" style="@style/EnerGym.FieldCaption" android:labelFor="@id/choice_input" />
+    <!-- Selector nativo: la flecha comunica que abre opciones. -->
+    <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/choice_outline">
+        <Spinner android:id="@+id/choice_input" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="60dp" android:paddingEnd="40dp" android:spinnerMode="dropdown" android:background="@null" android:popupBackground="@drawable/choice_outline" android:saveEnabled="false" />
+        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="end|center_vertical" android:layout_marginEnd="12dp" android:src="@drawable/ic_expand" android:importantForAccessibility="no" />
+    </FrameLayout>
 </LinearLayout>
+

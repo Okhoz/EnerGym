@@ -19,7 +19,11 @@ public final class MainActivity extends AppCompatActivity {
     private AppState state;private boolean rendering;
     public AppState state(){return state;}
     @Override protected void onCreate(Bundle saved){super.onCreate(saved);EdgeToEdge.enable(this);setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main),(view,insets)->{Insets bars=insets.getInsets(WindowInsetsCompat.Type.systemBars()|WindowInsetsCompat.Type.ime());view.setPadding(bars.left,bars.top,bars.right,bars.bottom);return insets;});
+        // El diseño es oscuro también con el sistema en modo claro: iconos blancos en ambas barras.
+        androidx.core.view.WindowInsetsControllerCompat barsController=new androidx.core.view.WindowInsetsControllerCompat(getWindow(),getWindow().getDecorView());
+        barsController.setAppearanceLightStatusBars(false);barsController.setAppearanceLightNavigationBars(false);
+        // La raíz aplica todos los márgenes: consumir evita que Material vuelva a añadir IME a la navegación.
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main),(view,insets)->{Insets bars=insets.getInsets(WindowInsetsCompat.Type.systemBars()|WindowInsetsCompat.Type.ime());view.setPadding(bars.left,bars.top,bars.right,bars.bottom);return WindowInsetsCompat.CONSUMED;});
         state=new ViewModelProvider(this).get(AppState.class);
         findViewById(R.id.account).setOnClickListener(v->{if(state.app!=null)state.app.navigate(AppController.Screen.ACCOUNT);});
         findViewById(R.id.back).setOnClickListener(v->{if(state.app!=null)state.app.back();});
