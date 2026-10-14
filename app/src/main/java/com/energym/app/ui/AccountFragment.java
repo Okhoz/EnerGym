@@ -7,7 +7,7 @@ import com.energym.app.controller.AccountController;
 import android.widget.LinearLayout;
 
 /**
- * VISTA de identidad y respaldo: entrada demo y Google siempre se muestran con alcance explícito.
+ * VISTA de identidad y respaldo: la política de build limita la demo al desarrollo.
  */
 public final class AccountFragment extends ScreenFragment {
 	public AccountFragment() {
@@ -16,31 +16,31 @@ public final class AccountFragment extends ScreenFragment {
 
 	protected void content() {
 		heading("CUENTA Y AJUSTES", "Tus datos, contigo",
-			"Conecta Google para activar el respaldo Firebase. La demo permanece solo en este dispositivo.");
+			getString(R.string.account_intro));
 		AccountUser user = state.user;
-		LinearLayout account = card(state.accountText(), user == null ? "Elige cómo quieres entrar." : user.getEmail());
+		LinearLayout account = card(state.accountText(), user == null ? getString(R.string.account_signed_out) : user.getEmail());
 		boolean signing = state.accountStatus == AccountController.Status.SIGNING_IN || state.deletingLocalData;
 		if (state.accountStatus == AccountController.Status.CONFIGURATION_NEEDED)
 			card("Google: configuración pendiente",
 				"Falta la configuración Firebase de esta instalación. No se puede iniciar sesión ni respaldar datos en la nube todavía.");
 		action(account, "Conectar con Google", !signing,
 			() -> state.accounts.signInWithGoogle(requireActivity(), false));
-		if (app.owner() == null)
+		if (app.owner() == null && state.accounts.isDemoEnabled())
 			action(account, "Entrar en demo local", !signing, () -> {
 				state.accounts.enterDemo();
 				app.back();
 			});
-		else
-			action(account, "Salir de la cuenta / demo", !signing, state.accounts::signOut);
+		else if (app.owner() != null)
+			action(account, getString(R.string.account_sign_out), !signing, state.accounts::signOut);
 		LinearLayout backup =
 			card("Respaldo", state.syncText() + (state.syncError.isEmpty() ? "" : "\n" + state.syncError));
 		action(backup, "Reintentar sincronización", user != null && !signing, state.sync::requestSync);
 		card("Separación de cuentas",
-			"Cada cuenta conserva su propio perfil, rutinas y sesiones. La demo no se copia automáticamente a Google. Cerrar sesión oculta los datos locales de esa cuenta.");
+			getString(R.string.account_separation));
 		card("Historial y personalización",
 			"Enviar local usa reglas en este dispositivo. Enviar externo envía tu mensaje y el perfil de la conversación al servidor y su proveedor de IA, solo cuando lo pulsas. Los mensajes anteriores se envían únicamente con tu consentimiento en Tu perfil. Ese permiso es independiente del respaldo Firebase.");
 		LinearLayout local = card("Datos de este dispositivo",
-			"Borrar elimina el perfil, las rutinas, las sesiones, la conversación y las propuestas locales de la cuenta o demo actual, y cierra su sesión. No borra otras cuentas ni datos de Firebase. Si vuelves a conectar Google, se restaurarán los datos ya confirmados en Firebase; los pendientes solo locales se perderán.");
+			getString(R.string.account_local_data));
 		action(local, "Borrar datos locales", app.owner() != null && !signing, () -> {
 			if (getParentFragmentManager().findFragmentByTag("delete-local-confirmation") != null)
 				return;

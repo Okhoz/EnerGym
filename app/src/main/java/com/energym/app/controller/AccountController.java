@@ -1,6 +1,7 @@
 package com.energym.app.controller;
 
 import com.energym.app.auth.*;
+import com.energym.app.BuildConfig;
 
 import android.app.Activity;
 
@@ -29,16 +30,27 @@ public final class AccountController {
 	private final SessionTarget target;
 	private final Executor delivery;
 	private final Listener listener;
+	private final boolean demoEnabled;
 	private AccountGateway.Subscription subscription;
 	private long generation;
 	private boolean closed, demo, applied;
 	private String scope;
 
 	public AccountController(AccountGateway gateway, SessionTarget target, Executor delivery, Listener listener) {
+		this(gateway, target, delivery, listener, true);
+	}
+
+	AccountController(AccountGateway gateway, SessionTarget target, Executor delivery, Listener listener,
+		boolean allowDemo) {
 		this.gateway = Objects.requireNonNull(gateway);
 		this.target = Objects.requireNonNull(target);
 		this.delivery = Objects.requireNonNull(delivery);
 		this.listener = Objects.requireNonNull(listener);
+		demoEnabled = BuildConfig.DEMO_ENABLED && allowDemo;
+	}
+
+	public boolean isDemoEnabled() {
+		return demoEnabled;
 	}
 
 	/**
@@ -182,6 +194,14 @@ public final class AccountController {
 	public synchronized void enterDemo() {
 		if (closed)
 			return;
+		if (!demoEnabled) {
+			// Rechazar la entrada no cierra Google ni sustituye el dueño actual por un fixture.
+			if (!gateway.isConfigured())
+				emit(Status.CONFIGURATION_NEEDED, null, null);
+			else
+				apply(gateway.getCurrentUser());
+			return;
+		}
 		generation++;
 		demo = true;
 		applied = true;

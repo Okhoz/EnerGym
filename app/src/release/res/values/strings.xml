@@ -1,0 +1,9 @@
+<resources>
+	<string name="home_account_prompt">Conecta tu cuenta Google para empezar y conservar tus datos por cuenta.</string>
+	<string name="home_choose_account">Conectar cuenta Google</string>
+	<string name="account_intro">Necesitas una cuenta Google para guardar tu actividad y respaldarla con Firebase.</string>
+	<string name="account_signed_out">Conecta tu cuenta Google para continuar.</string>
+	<string name="account_sign_out">Salir de la cuenta</string>
+	<string name="account_separation">Cada cuenta Google conserva su propio perfil, rutinas y sesiones. Cerrar sesión oculta sus datos locales. Un fallo de conexión no cambia de cuenta.</string>
+	<string name="account_local_data">Borrar elimina el perfil, las rutinas, las sesiones, la conversación y las propuestas locales de la cuenta actual, y cierra su sesión. No borra otras cuentas ni datos de Firebase. Si vuelves a conectar Google, se restaurarán los datos ya confirmados en Firebase; los pendientes solo locales se perderán.</string>
+</resources>

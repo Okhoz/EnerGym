@@ -20,6 +20,47 @@ public class AccountControllerTest {
 	}
 
 	@Test
+	public void productionPolicyRejectsDirectDemoWhenFirebaseIsMissing() {
+		gateway.configured = false;
+		AccountController c = productionController();
+		c.start();
+		c.enterDemo();
+		assertNull(target.scope);
+		assertFalse(statuses.contains(AccountController.Status.DEMO_LOCAL));
+		assertEquals(AccountController.Status.CONFIGURATION_NEEDED, statuses.get(statuses.size() - 1));
+	}
+
+	@Test
+	public void rejectedDemoPreservesAuthenticatedOwnerAndGoogleSession() {
+		gateway.user = new AccountUser("alice", "", "");
+		AccountController c = productionController();
+		c.start();
+		c.enterDemo();
+		assertEquals("alice", target.scope);
+		assertNotNull(gateway.user);
+		assertEquals(AccountController.Status.AUTHENTICATED, statuses.get(statuses.size() - 1));
+		assertFalse(statuses.contains(AccountController.Status.DEMO_LOCAL));
+	}
+
+	@Test
+	public void productionGoogleFailureAndSignOutNeverChooseFictitiousOwner() {
+		AccountController c = productionController();
+		c.start();
+		c.signInWithGoogleIdToken("token");
+		gateway.callback.onFailure(new Exception("Proveedor no disponible"));
+		assertNull(target.scope);
+		c.enterDemo();
+		c.signOut();
+		assertNull(target.scope);
+		assertFalse(statuses.contains(AccountController.Status.DEMO_LOCAL));
+		assertEquals(AccountController.Status.SIGNED_OUT, statuses.get(statuses.size() - 1));
+	}
+
+	private AccountController productionController() {
+		return new AccountController(gateway, target, Runnable::run, (s, u, e) -> statuses.add(s), false);
+	}
+
+	@Test
 	public void unconfiguredIsExplicitAndDemoRemainsLocal() {
 		gateway.configured = false;
 		AccountController c = controller();

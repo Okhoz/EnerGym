@@ -20,16 +20,18 @@ Desde la raíz del proyecto, PowerShell:
 
 ```powershell
 $env:JAVA_HOME = 'C:\Program Files\Android\Android Studio\jbr'
-.\gradlew.bat :app:testDebugUnitTest :app:assembleDebug :app:lintDebug :app:assembleRelease
+.\gradlew.bat :app:testDebugUnitTest :app:assembleDebug :app:lintDebug
 $mavenCache = Join-Path $PWD 'backend/.cache/m2'
 .\backend\mvnw.cmd -f backend/pom.xml "-Dmaven.repo.local=$mavenCache" test package
 ```
 
 El primer acceso puede descargar dependencias públicas gratuitas. Para -o/--offline, la caché indicada debe contener todas las dependencias: su existencia como carpeta no garantiza completitud. La verificación del proyecto real utilizó la caché ya poblada de staging; su caché propia no tenía maven-resources-plugin3.4.0. Ajusta la ruta a una caché conocida o permite resolución pública normal.
 
-APK debug: app/build/outputs/apk/debug/app-debug.apk; JAR: backend/target/energym-backend-1.0.0.jar. Release necesita firma propia para distribución. Abre el proyecto y ejecuta app sobre un dispositivo; reutiliza un emulador abierto. Pruebas instrumentales: `.\gradlew.bat :app:connectedDebugAndroidTest` con dispositivo conectado y coordinado. Estas pruebas no llaman a Gemini salvo parámetros opt-in explícitos del fixture real.
+APK debug: app/build/outputs/apk/debug/app-debug.apk; JAR: backend/target/energym-backend-1.0.0.jar. Debug conserva la demo local para desarrollo y pruebas. Release oculta esa entrada y el controlador también la rechaza, conservando la identidad Google vigente. Abre el proyecto y ejecuta app sobre un dispositivo; reutiliza un emulador abierto. Pruebas instrumentales: `.\gradlew.bat :app:connectedDebugAndroidTest` con dispositivo conectado y coordinado. Estas pruebas no llaman a Gemini salvo parámetros opt-in explícitos del fixture real.
 
-## Conectar Gemini en desarrollo
+Release está bloqueada si faltan las entradas privadas Firebase, origen HTTPS y firma. [Preparación de release](docs/production-release.md) explica las variables, validación local y artefactos. Esa validación no demuestra Google/Firebase, restauración remota, servidor real ni permiso para distribuir Gemini gratuito en España. La conexión automática autenticada del asistente sigue pendiente de Task16.
+
+## Gemini legado en desarrollo
 
 [backend/README.md](backend/README.md) detalla configuración y privacidad. La clave Windows ya configurada se usa solo en el servidor. Desde backend en **PowerShell7**, genera un código privado nuevo para el emparejamiento y cópialo sin registrarlo en logs:
 
@@ -44,7 +46,7 @@ En otra terminal, con adb del SDK disponible: `adb reverse tcp:8080 tcp:8080`. E
 
 **Gemini real comprobado:** el tercer recorrido Android del 14-10-2026 pasó 1 prueba en10.409s con gemini-3.5-flash-lite y catálogo2. Recibió una propuesta válida de tres ejercicios, sin prescripciones faltantes; SQLite permaneció intacta antes de aceptar. La aceptación creó la versión con perfil/rutina exactos y persistió tras recrear. Se usó una demo genérica con historyConsent=false. Dos intentos anteriores fallidos motivaron la corrección revisada schema/prompt; backend final42pruebas verdes. Una prueba anterior de backend recibió HTTP200 en2067ms.
 
-Gemini3.8 sigue siendo opción explícita, pero superó los plazos en las pruebas. La cuota gratuita es para desarrollo y tiene límites/condiciones; no se promete uso ilimitado. Según los términos oficiales enlazados en backend, ofrecer clientes API a usuarios del EEE/Suiza/Reino Unido exige Paid Services. No se ha autorizado ese despliegue.
+Gemini3.8 fue una opción de desarrollo, pero superó los plazos en las pruebas. La cuota gratuita tiene límites/condiciones; no se promete uso ilimitado. Según los términos oficiales enlazados en backend, ofrecer clientes API Gemini a usuarios del EEE/Suiza/Reino Unido exige Paid Services. Gemini queda como proveedor legado: la solicitud vigente exige una IA gratuita sin activar pagos y la alternativa de producción está pendiente de selección y verificación. No se ha autorizado un despliegue de pago.
 
 Google Authentication/Firestore tienen adaptadores y pruebas locales; **Firebase real sigue sin configurar**. Login remoto y restauración tras reinstalar no están comprobados.
 
@@ -56,4 +58,4 @@ El movimiento solo se inicia al cambiar ruta y se cancela al pausar/detach. Rend
 
 [docs/acceptance.md](docs/acceptance.md) registra pruebas, artefactos y límites. El formato Task8 no modifica comportamiento ni añade cambios de diseño.
 
-Verificación fresca de staging tras Task8:107JVM sin fallos, debug/release correctos y lint0errores/91avisos (tres SuspiciousIndentation eliminados al corregir formato); backend42pruebas y empaquetado correctos. Los avisos restantes siguen pendientes. Root verifica después el proyecto real y el recorrido Android, sin confundir esta evidencia staging con instalación nueva.
+Evidencia histórica de staging tras Task8:107JVM sin fallos, debug/release correctos y lint0errores/91avisos. Desde Task14, un release sin las entradas privadas exigidas falla expresamente; aquel build anterior no acreditaba una app operativa en producción. Root verifica el proyecto real y el recorrido Android, sin confundir la evidencia staging con una instalación nueva.
