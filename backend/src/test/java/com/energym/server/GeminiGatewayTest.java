@@ -60,6 +60,17 @@ class GeminiGatewayTest {
    assertFalse(payload.has("tools"));assertFalse(payload.path("store").asBoolean(true));
   }
  }
+	@Test void completedWithNonemptyOrMalformedErrorsIsRejected() throws Exception {
+		for(String errors:List.of("[{\"code\":\"BLOCKED\",\"message\":\"fixture fault\"}]","[{}]","[null]","null","{}","\"fault\"","1","true")){
+			ObjectNode out=envelope(ChatServiceTest.answer());
+			out.set("errors",Json.parse(errors.getBytes(StandardCharsets.UTF_8)));
+			assertThrows(IllegalArgumentException.class,()->GeminiGateway.parseResponse(out),errors);
+		}
+	}
+	@Test void completedWithEmptyErrorsRetainsValidTypedOutput() throws Exception {
+		ObjectNode out=envelope(ChatServiceTest.answer());out.putArray("errors");
+		assertEquals(ChatServiceTest.answer(),assertDoesNotThrow(()->GeminiGateway.parseResponse(out)));
+	}
  @Test void completedDocumentedThoughtIsIgnoredAndOneFinalTextIsRequired() throws Exception {
   ObjectNode out=envelope(ChatServiceTest.answer());
   out.withArray("steps").insert(0,Json.object().put("type","thought").put("signature","fixture-signature"));

@@ -64,6 +64,8 @@ public final class GeminiGateway implements Provider {
   if(envelope==null||!envelope.isObject())throw new IllegalArgumentException("Envoltorio inválido");
   Json.choice(envelope.get("status"),"completed");
   if(envelope.hasNonNull("error")||envelope.hasNonNull("continuation_token"))throw new IllegalArgumentException("Resultado fallido o parcial");
+		// Los fallos documentados invalidan incluso una interacción marcada completed.
+		if(envelope.has("errors"))Json.array(envelope.get("errors"),0);
   JsonNode steps=envelope.get("steps");Json.array(steps,20);String text=null;
   for(JsonNode step:steps){
    if(!step.isObject())throw new IllegalArgumentException("Paso inválido");String type=Json.text(step.get("type"),40,false);

@@ -46,7 +46,7 @@ try {
             throw 'Falta una clave válida del proveedor seleccionado. Gemini: ejecuta configurar-gemini.ps1 personalmente.'
         }
         if ([string]::IsNullOrWhiteSpace($Model)) { $Model = Get-TaskEnvironmentValue ($taskPrefix + '_MODEL') }
-        if ($Provider -eq 'Gemini' -and [string]::IsNullOrWhiteSpace($Model)) { $Model = 'gemini-3.8-flash' }
+        if ($Provider -eq 'Gemini' -and [string]::IsNullOrWhiteSpace($Model)) { $Model = 'gemini-3.5-flash-lite' }
         $taskModelPattern = if ($Provider -eq 'Gemini') { '^[A-Za-z0-9._-]{1,100}$' } else { '^[A-Za-z0-9._:/-]{1,100}$' }
         if ([string]::IsNullOrWhiteSpace($Model) -or $Model -cnotmatch $taskModelPattern) {
             throw 'Indica un modelo válido mediante -Model o la variable del proveedor.'
