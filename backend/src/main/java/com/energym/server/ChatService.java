@@ -21,7 +21,8 @@ public final class ChatService {
    validator.validateResponse(out,request);
    ObjectNode result=out.deepCopy();result.put("catalogVersion",validator.catalogVersion());result.put("proposalNotice","Ejemplo sin revisión profesional; requiere vista previa y aceptación local.");
    return correlated(new Result(200,result),request);
-  }catch(HttpTimeoutException|TimeoutException e){return correlated(error(504,"PROVIDER_TIMEOUT",true),request);}
+  }catch(ProviderFailure e){return correlated(error(e.status(),e.code(),true),request);}
+   catch(HttpTimeoutException|TimeoutException e){return correlated(error(504,"PROVIDER_TIMEOUT",true),request);}
    catch(InterruptedException e){Thread.currentThread().interrupt();return correlated(error(503,"PROVIDER_UNAVAILABLE",true),request);}
    catch(IllegalArgumentException e){return correlated(error(502,"INVALID_PROVIDER_RESPONSE",true),request);}
    catch(Exception e){return correlated(error(502,"PROVIDER_UNAVAILABLE",true),request);}

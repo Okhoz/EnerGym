@@ -97,7 +97,7 @@ public final class Server implements AutoCloseable {
   try{
    Map<String,String> env=System.getenv();
    SessionTokenStore tokens=new SessionTokenStore(env.get("ENERGYM_PAIRING_CODE"),Clock.systemUTC(),Duration.ofHours(1),10);
-   ChatService service=new ChatService(tokens,OpenAiGateway.fromEnvironment(env),new ProposalValidator());
+   ChatService service=new ChatService(tokens,ProviderFactory.fromEnvironment(env),new ProposalValidator());
    Server server=configured(env,service,tokens);Runtime.getRuntime().addShutdownHook(new Thread(server::close));server.start();
    System.out.println("EnerGym backend iniciado; proveedor opcional desactivado salvo configuración explícita.");
   }catch(Exception e){System.err.println("Configuración del backend inválida. Revisa README y variables sin publicar secretos.");System.exit(1);}
