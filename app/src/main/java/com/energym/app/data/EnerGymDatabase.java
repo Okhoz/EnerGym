@@ -165,7 +165,10 @@ public final class EnerGymDatabase extends SQLiteOpenHelper {
                 break;
             case SESSION:
                 Session session = SnapshotCodec.decodeSession(r.getPayload());
-                if (!r.getSyncId().equals(session.getSyncId()) || session.getRoutine().getVersionId() <= 0
+                // versionId=0 es el marcador portátil de nube, nunca una prueba de aceptación local.
+                // planImports resuelve/materializa la versión aceptada por proposalId y comprueba su snapshot;
+                // SessionRepository exige el ID SQLite real cuando el borrador restaurado se vuelve a guardar.
+                if (!r.getSyncId().equals(session.getSyncId())
                         || !session.getRoutine().isValidFor(session.getRoutine().getProfile()))
                     throw new IllegalArgumentException("Snapshot de sesión inválido");
                 break;

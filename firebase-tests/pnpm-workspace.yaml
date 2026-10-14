@@ -1,0 +1,5 @@
+allowBuilds:
+  # Estas pruebas no requieren scripts postinstall/nativos. Evitar permisos implícitos de instalación.
+  '@firebase/util': false
+  protobufjs: false
+  re2: false

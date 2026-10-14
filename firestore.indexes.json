@@ -1,0 +1,8 @@
+{
+  "indexes": [],
+  "fieldOverrides": [
+    { "collectionGroup": "profile", "fieldPath": "payload", "indexes": [] },
+    { "collectionGroup": "routines", "fieldPath": "payload", "indexes": [] },
+    { "collectionGroup": "sessions", "fieldPath": "payload", "indexes": [] }
+  ]
+}
