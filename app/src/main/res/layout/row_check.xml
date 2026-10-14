@@ -1,3 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.checkbox.MaterialCheckBox xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/check" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:textColor="@color/white" android:buttonTint="@color/gold" android:paddingVertical="10dp" android:textSize="16sp" android:saveEnabled="false" />
-
+<com.google.android.material.checkbox.MaterialCheckBox xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:id="@+id/check" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:textColor="@color/white" android:buttonTint="@color/gold" android:paddingVertical="10dp" android:textSize="16sp" android:saveEnabled="false" tools:text="Opción de ejemplo" tools:context=".MainActivity" />

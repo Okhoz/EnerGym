@@ -5,6 +5,7 @@ import java.net.http.HttpTimeoutException;
 import java.util.concurrent.*;
 /** Controlador de aplicación: autentica, limita, elimina historial sin consentimiento y valida el resultado del modelo. */
 public final class ChatService {
+ public int catalogVersion(){return validator.catalogVersion();}
  public record Result(int status,JsonNode body){}
  private final SessionTokenStore tokens;private final Provider provider;private final ProposalValidator validator;
  private final Semaphore inFlight=new Semaphore(2);

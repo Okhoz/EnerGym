@@ -38,6 +38,9 @@ android {
 }
 
 dependencies {
+    // Visor Java/JNI nativo; versiones iguales, fuente propia Java 11.
+    implementation("com.google.android.filament:filament-android:1.77.3")
+    implementation("com.google.android.filament:gltfio-android:1.77.3")
     implementation(platform("com.google.firebase:firebase-bom:35.0.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")

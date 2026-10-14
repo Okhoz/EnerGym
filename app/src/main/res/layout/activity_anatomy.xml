@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:id="@+id/anatomy_root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@color/surface" tools:context=".ui.AnatomyActivity">
+	<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="76dp" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:paddingVertical="12dp">
+		<com.google.android.material.button.MaterialButton android:id="@+id/viewer_back" style="@style/EnerGym.Button" android:layout_width="48dp" android:layout_height="48dp" android:layout_marginEnd="8dp" android:padding="0dp" android:text="‹" android:textSize="28sp" android:contentDescription="@string/back" />
+		<ImageView android:layout_width="40dp" android:layout_height="40dp" android:layout_marginEnd="10dp" android:src="@drawable/energym_logo" android:scaleType="fitCenter" android:contentDescription="@string/logo_description" />
+		<TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/app_name" android:textSize="22sp" android:textStyle="bold" android:textColor="@color/white" />
+	</LinearLayout>
+	<View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/disabled_outline" />
+	<ScrollView android:id="@+id/viewer_scroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false">
+		<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="24dp" android:paddingTop="28dp" android:paddingBottom="40dp">
+			<TextView style="@style/EnerGym.Eyebrow" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="MOVIMIENTO · 3D" />
+			<TextView android:id="@+id/viewer_title" style="@style/EnerGym.ScreenTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Referencia de movimiento" />
+			<TextView style="@style/EnerGym.Body" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Vista previa técnica · Validación profesional pendiente" />
+			<TextView style="@style/EnerGym.FieldCaption" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Referencia, no evaluación personal. No utiliza cámara ni analiza tu cuerpo." />
+			<FrameLayout android:layout_width="match_parent" android:layout_height="300dp" android:layout_marginTop="24dp" android:background="#000000">
+				<SurfaceView android:id="@+id/viewer_surface" android:layout_width="match_parent" android:layout_height="match_parent" android:contentDescription="Referencia animada 3D; usa los controles accesibles para girar o ampliar" />
+				<LinearLayout android:id="@+id/viewer_loading" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center" android:padding="24dp" android:background="#000000" tools:visibility="gone">
+					<ProgressBar android:id="@+id/viewer_progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:indeterminate="true" android:progressTint="@color/gold" android:indeterminateTint="@color/gold" />
+					<TextView android:id="@+id/viewer_load_message" style="@style/EnerGym.Body" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:gravity="center" android:accessibilityLiveRegion="polite" android:text="Comprobando recurso local…" />
+				</LinearLayout>
+				<LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center" android:padding="24dp" android:visibility="gone" tools:visibility="visible" android:importantForAccessibility="noHideDescendants">
+					<ImageView android:layout_width="80dp" android:layout_height="80dp" android:src="@drawable/energym_logo" android:scaleType="fitCenter" android:contentDescription="@string/logo_description" />
+					<TextView style="@style/EnerGym.Body" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:gravity="center" tools:text="Recurso 3D local&#10;La animación se muestra al ejecutar la app." />
+				</LinearLayout>
+			</FrameLayout>
+			<TextView android:id="@+id/viewer_status" style="@style/EnerGym.FieldCaption" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:accessibilityLiveRegion="polite" android:text="Disponible sin conexión · Animación de referencia" />
+			<LinearLayout android:id="@+id/viewer_controls" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" tools:visibility="visible">
+				<com.google.android.material.button.MaterialButton android:id="@+id/viewer_play" style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:layout_marginTop="16dp" android:text="Pausar" />
+				<TextView style="@style/EnerGym.FieldCaption" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="Velocidad de reproducción" />
+				<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp">
+					<com.google.android.material.button.MaterialButton android:backgroundTint="@color/viewer_control_surface" android:id="@+id/viewer_speed_quarter" style="@style/EnerGym.Button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="48dp" android:text="0,25×" />
+					<com.google.android.material.button.MaterialButton android:backgroundTint="@color/viewer_control_surface" android:id="@+id/viewer_speed_half" style="@style/EnerGym.Button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginHorizontal="8dp" android:minHeight="48dp" android:text="0,5×" />
+					<com.google.android.material.button.MaterialButton android:backgroundTint="@color/viewer_control_surface" android:id="@+id/viewer_speed_normal" style="@style/EnerGym.Button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="48dp" android:text="1×" />
+				</LinearLayout>
+				<TextView style="@style/EnerGym.FieldCaption" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="Fotogramas del clip · No son fases técnicas validadas" />
+				<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp">
+					<com.google.android.material.button.MaterialButton android:id="@+id/viewer_initial" style="@style/EnerGym.Button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="48dp" android:paddingHorizontal="8dp" android:text="Inicial" />
+					<com.google.android.material.button.MaterialButton android:id="@+id/viewer_middle" style="@style/EnerGym.Button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginHorizontal="8dp" android:minHeight="48dp" android:paddingHorizontal="8dp" android:text="Medio" />
+					<com.google.android.material.button.MaterialButton android:id="@+id/viewer_final" style="@style/EnerGym.Button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="48dp" android:paddingHorizontal="8dp" android:text="Final" />
+				</LinearLayout>
+				<TextView style="@style/EnerGym.FieldCaption" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="Cámara · Gira y amplía con botones o gestos" />
+				<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp">
+					<com.google.android.material.button.MaterialButton android:id="@+id/viewer_rotate_left" style="@style/EnerGym.Button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Girar ←" />
+					<com.google.android.material.button.MaterialButton android:id="@+id/viewer_rotate_right" style="@style/EnerGym.Button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:minHeight="48dp" android:text="Girar →" />
+				</LinearLayout>
+				<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp">
+					<com.google.android.material.button.MaterialButton android:id="@+id/viewer_zoom_in" style="@style/EnerGym.Button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Acercar +" />
+					<com.google.android.material.button.MaterialButton android:id="@+id/viewer_zoom_out" style="@style/EnerGym.Button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:minHeight="48dp" android:text="Alejar −" />
+				</LinearLayout>
+				<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp">
+					<com.google.android.material.button.MaterialButton android:id="@+id/viewer_front" style="@style/EnerGym.Button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Frente" />
+					<com.google.android.material.button.MaterialButton android:id="@+id/viewer_side" style="@style/EnerGym.Button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:minHeight="48dp" android:text="Lateral" />
+				</LinearLayout>
+				<com.google.android.material.button.MaterialButton android:id="@+id/viewer_reset" style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:minHeight="48dp" android:text="Restablecer cámara" />
+			</LinearLayout>
+			<TextView style="@style/EnerGym.CardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="28dp" android:text="Disponibilidad" />
+			<com.google.android.material.button.MaterialButton style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:enabled="false" android:text="Capas de músculos · No disponibles" />
+			<TextView style="@style/EnerGym.Body" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Sin capas anatómicas separadas, activación muscular ni medidas de articulaciones. Los colores del modelo no indican esfuerzo muscular. La demostración profesional verificada aún no está disponible." />
+			<TextView android:id="@+id/viewer_written_reference" style="@style/EnerGym.Body" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" tools:text="Referencia escrita de la variante seleccionada · ejemplo de diseño" />
+			<TextView android:id="@+id/viewer_credits" style="@style/EnerGym.FieldCaption" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="Recurso: OpenGym3D · Mesh2Motion · MakeHuman/MPFB\nArte y movimiento CC0 1.0 · Filament Apache 2.0\nArchivo local, sin cuenta ni descargas durante el uso" />
+		</LinearLayout>
+	</ScrollView>
+</LinearLayout>

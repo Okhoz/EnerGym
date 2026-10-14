@@ -6,7 +6,7 @@ import java.util.*;
 /** Modelo: catálogo versionado propio y reglas compatibles con el dominio Android; no confía en IDs del cliente/proveedor. */
 public final class ProposalValidator {
  private static final Set<String> PROFILE=Set.of("sportId","goal","environment","focus","category","resources","daysPerWeek","durationMinutes","level","experience","space","preferences","limitations");
- private final JsonNode catalog=Json.resource("catalog-v1.json");
+ private final JsonNode catalog=Json.resource("catalog-v2.json");
  private final Map<String,JsonNode> exercises=new HashMap<>(),sports=new HashMap<>();
  public ProposalValidator(){for(JsonNode e:catalog.path("exercises"))exercises.put(e.path("id").asText(),e);for(JsonNode s:catalog.path("sports"))sports.put(s.path("id").asText(),s);}
  public int catalogVersion(){return catalog.path("version").asInt();}

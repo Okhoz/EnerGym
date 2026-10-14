@@ -51,7 +51,7 @@ public final class Server implements AutoCloseable {
    if(exchange.getRequestURI().getRawQuery()!=null){send(exchange,ChatService.error(400,"INVALID_REQUEST",false));return;}
    if(path.equals("/health")){
     if(!method.equals("GET")){send(exchange,ChatService.error(405,"METHOD_NOT_ALLOWED",false));return;}
-    send(exchange,new ChatService.Result(200,Json.object().put("status","ok").put("catalogVersion",1)));return;
+    send(exchange,new ChatService.Result(200,Json.object().put("status","ok").put("catalogVersion",service.catalogVersion())));return;
    }
    if(!Set.of("/api/session","/api/chat").contains(path)){send(exchange,ChatService.error(404,"NOT_FOUND",false));return;}
    String token=bearer(exchange);

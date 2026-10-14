@@ -158,7 +158,7 @@ class GeminiGatewayTest {
    GeminiGateway provider=gateway(fixture.uri(),Duration.ofSeconds(2));
    ChatService.Result result=chat(provider,ChatServiceTest.request());assertEquals(200,result.status());
    assertEquals("bodyweight-squat",result.body().path("proposal").path("items").get(0).path("exerciseId").asText());
-   assertEquals(1,result.body().path("catalogVersion").asInt());
+   assertEquals(new ProposalValidator().catalogVersion(),result.body().path("catalogVersion").asInt());
    ((ObjectNode)answer.path("proposal").path("items").get(0).path("prescription").get(2)).put("value","10");
    assertEquals("INVALID_PROVIDER_RESPONSE",chat(provider,ChatServiceTest.request()).body().path("error").asText());
   }

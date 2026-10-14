@@ -1,13 +1,28 @@
 package com.energym.app.ui;
+
 import com.energym.app.R;
 import com.energym.app.controller.AppController;
 import com.energym.app.domain.Exercise;
+
 import android.widget.LinearLayout;
-/** VISTA de técnica; las rutas de explicación y visualización se conectarán al módulo correspondiente. */
+
+/**
+ * VISTA de técnica; las rutas de explicación y visualización se conectarán al módulo correspondiente.
+ */
 public final class ExerciseFragment extends ScreenFragment {
-    public ExerciseFragment(){super(R.layout.fragment_exercise);}
-    protected void content(){Exercise e=app.exercise;heading("CONOCE EL MOVIMIENTO",e==null?"Ejercicio":e.getName(),"Lee la técnica antes de entrenar y ajusta la intensidad a tu situación.");if(e==null)return;
-        card("Técnica y ejecución",e.getDescription());card("Contexto del ejercicio",AppController.label(e.getMetricType().name())+"\nRecursos necesarios: "+(e.getRequiredResources().isEmpty()?"ninguno":AppController.labels(e.getRequiredResources()))+"\n"+(e.isReviewed()?"Contenido revisado.":"Ejemplo sin revisión profesional."));
-        LinearLayout help=card("Comprende cada paso","Consulta la explicación guiada gratuita de esta versión del ejercicio.");action(help,"Explicación guiada",app::requestExplanation);action(help,"Vista 3D · pendiente",app.visualizationAvailable(),app::requestVisualization);
-    }
+	public ExerciseFragment() {
+		super(R.layout.fragment_exercise);
+	}
+
+	protected void content() {
+		Exercise e = app.exercise;
+		heading("CONOCE EL MOVIMIENTO", e == null ? "Ejercicio" : e.getName(), "Lee la técnica antes de entrenar y ajusta la intensidad a tu situación.");
+		if (e == null) return;
+		card("Técnica y ejecución", e.getDescription());
+		card("Contexto del ejercicio", AppController.label(e.getMetricType().name()) + "\nRecursos necesarios: " + (e.getRequiredResources().isEmpty() ? "ninguno" : AppController.labels(e.getRequiredResources())) + "\n" + (e.isReviewed() ? "Contenido revisado." : "Ejemplo sin revisión profesional."));
+		LinearLayout help = card("Comprende cada paso", "Consulta la explicación guiada gratuita de esta versión del ejercicio.");
+		action(help, "Explicación guiada", app::requestExplanation);
+		LinearLayout movement = card("Referencia de movimiento", app.visualizationAvailable() ? "Animación local de esta variante. Vista previa técnica sin revisión profesional; no muestra anatomía ni medidas articulares." : "Esta versión no tiene una animación disponible. Conserva la técnica escrita y la explicación guiada de su propio ejercicio.");
+		action(movement, "Vista previa 3D", app.visualizationAvailable(), app::requestVisualization);
+	}
 }

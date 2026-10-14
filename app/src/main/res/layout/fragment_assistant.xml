@@ -1,13 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- La conversación, el compositor y la propuesta reutilizan filas con el tema compartido. -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:saveEnabled="false" android:background="@color/surface" android:clipToPadding="false">
-    <LinearLayout android:id="@+id/screen_body" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="24dp" android:paddingTop="28dp" android:paddingBottom="40dp">
-        <TextView android:id="@+id/eyebrow" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.Eyebrow" />
-        <TextView android:id="@+id/screen_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.ScreenTitle" />
-        <TextView android:id="@+id/screen_subtitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:layout_marginBottom="28dp" style="@style/EnerGym.Body" />
-        <LinearLayout android:id="@+id/rows" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
-    </LinearLayout>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:saveEnabled="false" android:background="@color/surface" android:clipToPadding="false" tools:context=".MainActivity">
+	<LinearLayout android:id="@+id/screen_body" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="24dp" android:paddingTop="28dp" android:paddingBottom="40dp">
+		<TextView android:id="@+id/eyebrow" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.Eyebrow" tools:text="APRENDE Y AJUSTA" />
+		<TextView android:id="@+id/screen_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.ScreenTitle" tools:text="Asistente" />
+		<TextView android:id="@+id/screen_subtitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:layout_marginBottom="28dp" style="@style/EnerGym.Body" tools:text="Guiado local · gratuito&#10;Conversación por reglas para preparar rutinas y explicar tu ejercicio." />
+		<LinearLayout android:id="@+id/rows" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+			<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" tools:visibility="visible" android:importantForAccessibility="noHideDescendants">
+				<!-- Solo editor: GONE en ejecución; ScreenFragment.render elimina estas filas. -->
+				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" app:cardBackgroundColor="@color/surface_card" app:cardCornerRadius="16dp" app:strokeColor="@color/outline" app:strokeWidth="1dp" app:cardElevation="0dp">
+					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Tu mensaje" />
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Ejemplo: tres días en casa, sin material, 30 min. Después indica el objetivo y tu nivel." />
+						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp">
+							<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="20dp">
+								<TextView style="@style/EnerGym.FieldCaption" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" tools:text="Mensaje" />
+								<com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content" app:hintEnabled="false" app:boxBackgroundColor="@color/surface_card" app:boxStrokeColor="@color/field_outline" app:boxStrokeWidth="1dp" app:boxStrokeWidthFocused="2dp" app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp" app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+									<com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="60dp" android:paddingHorizontal="16dp" android:paddingVertical="16dp" android:inputType="textCapSentences" android:textColor="@color/white" android:textSize="16sp" android:saveEnabled="false" tools:text="Ejemplo de diseño: preparar una rutina" />
+								</com.google.android.material.textfield.TextInputLayout>
+							</LinearLayout>
+							<com.google.android.material.button.MaterialButton style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="12dp" android:layout_marginBottom="4dp" android:textSize="16sp" tools:text="Enviar local" />
+						</LinearLayout>
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" app:cardBackgroundColor="@color/surface_card" app:cardCornerRadius="16dp" app:strokeColor="@color/outline" app:strokeWidth="1dp" app:cardElevation="0dp">
+					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Asistente guiado" />
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Ejemplo de diseño · la conversación se carga al abrir la app." />
+						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp" />
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" app:cardBackgroundColor="@color/surface_card" app:cardCornerRadius="16dp" app:strokeColor="@color/outline" app:strokeWidth="1dp" app:cardElevation="0dp">
+					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Vista previa · sin guardar" />
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Ejemplo de propuesta · perfil provisional y tiempo estimado" />
+						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp" />
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" app:cardBackgroundColor="@color/surface_card" app:cardCornerRadius="16dp" app:strokeColor="@color/outline" app:strokeWidth="1dp" app:cardElevation="0dp">
+					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Ejercicio de ejemplo" />
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Prescripción orientativa y justificación." />
+						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp">
+							<com.google.android.material.button.MaterialButton style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="12dp" android:layout_marginBottom="4dp" android:textSize="16sp" tools:text="Consultar técnica" />
+						</LinearLayout>
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" app:cardBackgroundColor="@color/surface_card" app:cardCornerRadius="16dp" app:strokeColor="@color/outline" app:strokeWidth="1dp" app:cardElevation="0dp">
+					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Revisa y decide" />
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Aceptar guarda el perfil mostrado y una nueva versión de rutina. Rechazar conserva los datos actuales y las sesiones anteriores." />
+						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp">
+							<com.google.android.material.button.MaterialButton style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="12dp" android:layout_marginBottom="4dp" android:textSize="16sp" tools:text="Guardar perfil y aceptar" />
+							<com.google.android.material.button.MaterialButton style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="12dp" android:layout_marginBottom="4dp" android:textSize="16sp" tools:text="Rechazar propuesta" />
+							<com.google.android.material.button.MaterialButton style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="12dp" android:layout_marginBottom="4dp" android:textSize="16sp" tools:text="Reducir 5 minutos" />
+							<com.google.android.material.button.MaterialButton style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="12dp" android:layout_marginBottom="4dp" android:textSize="16sp" tools:text="Sustituir primer ejercicio" />
+						</LinearLayout>
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" app:cardBackgroundColor="@color/surface_card" app:cardCornerRadius="16dp" app:strokeColor="@color/outline" app:strokeWidth="1dp" app:cardElevation="0dp">
+					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Conversación local" />
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Mensajes conservados en este dispositivo. El servidor recibe como máximo 12 mensajes solo con el permiso de tu perfil; las sesiones históricas no se envían." />
+						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp">
+							<com.google.android.material.button.MaterialButton style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="12dp" android:layout_marginBottom="4dp" android:textSize="16sp" tools:text="Ver conversación" />
+						</LinearLayout>
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" app:cardBackgroundColor="@color/surface_card" app:cardCornerRadius="16dp" app:strokeColor="@color/outline" app:strokeWidth="1dp" app:cardElevation="0dp">
+					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Servidor opcional de IA" />
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Desactivado por defecto. El modo guiado local funciona sin esta conexión." />
+						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp">
+							<com.google.android.material.button.MaterialButton style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="12dp" android:layout_marginBottom="4dp" android:textSize="16sp" tools:text="Ocultar conexión" />
+							<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="20dp">
+								<TextView style="@style/EnerGym.FieldCaption" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" tools:text="URL del servidor (HTTPS)" />
+								<com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content" app:hintEnabled="false" app:boxBackgroundColor="@color/surface_card" app:boxStrokeColor="@color/field_outline" app:boxStrokeWidth="1dp" app:boxStrokeWidthFocused="2dp" app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp" app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+									<com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="60dp" android:paddingHorizontal="16dp" android:paddingVertical="16dp" android:inputType="textCapSentences" android:textColor="@color/white" android:textSize="16sp" android:saveEnabled="false" tools:text="Introduce la URL de tu servidor" />
+								</com.google.android.material.textfield.TextInputLayout>
+							</LinearLayout>
+							<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="20dp">
+								<TextView style="@style/EnerGym.FieldCaption" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" tools:text="Código privado de emparejamiento" />
+								<com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content" app:hintEnabled="false" app:boxBackgroundColor="@color/surface_card" app:boxStrokeColor="@color/field_outline" app:boxStrokeWidth="1dp" app:boxStrokeWidthFocused="2dp" app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp" app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+									<com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="60dp" android:paddingHorizontal="16dp" android:paddingVertical="16dp" android:inputType="textCapSentences" android:textColor="@color/white" android:textSize="16sp" android:saveEnabled="false" tools:text="Introduce tu código privado" />
+								</com.google.android.material.textfield.TextInputLayout>
+							</LinearLayout>
+							<com.google.android.material.button.MaterialButton style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="12dp" android:layout_marginBottom="4dp" android:textSize="16sp" tools:text="Conectar servidor" />
+						</LinearLayout>
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" app:cardBackgroundColor="@color/surface_card" app:cardCornerRadius="16dp" app:strokeColor="@color/outline" app:strokeWidth="1dp" app:cardElevation="0dp">
+					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Qué compartirás" />
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Al pulsar Enviar al servidor se envían tu mensaje, el perfil actual y el ID de ejercicio. Los mensajes anteriores se adjuntan solo con el consentimiento opcional del perfil." />
+						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp" />
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+			</LinearLayout>
+		</LinearLayout>
+	</LinearLayout>
 </ScrollView>
-
-
-

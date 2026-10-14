@@ -1,11 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:saveEnabled="false" android:background="@color/surface" android:clipToPadding="false">
-    <LinearLayout android:id="@+id/screen_body" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="24dp" android:paddingTop="28dp" android:paddingBottom="40dp">
-        <TextView android:id="@+id/eyebrow" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.Eyebrow" />
-        <TextView android:id="@+id/screen_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.ScreenTitle" />
-        <TextView android:id="@+id/screen_subtitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:layout_marginBottom="28dp" style="@style/EnerGym.Body" />
-        <LinearLayout android:id="@+id/rows" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
-    </LinearLayout>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:saveEnabled="false" android:background="@color/surface" android:clipToPadding="false" tools:context=".MainActivity">
+	<LinearLayout android:id="@+id/screen_body" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="24dp" android:paddingTop="28dp" android:paddingBottom="40dp">
+		<TextView android:id="@+id/eyebrow" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.Eyebrow" tools:text="CONOCE EL MOVIMIENTO" />
+		<TextView android:id="@+id/screen_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.ScreenTitle" tools:text="Ejercicio de ejemplo" />
+		<TextView android:id="@+id/screen_subtitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:layout_marginBottom="28dp" style="@style/EnerGym.Body" tools:text="Lee la técnica antes de entrenar y ajusta la intensidad a tu situación." />
+		<LinearLayout android:id="@+id/rows" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+			<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" tools:visibility="visible" android:importantForAccessibility="noHideDescendants">
+				<!-- Solo editor: GONE en ejecución; ScreenFragment.render elimina estas filas. -->
+				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" app:cardBackgroundColor="@color/surface_card" app:cardCornerRadius="16dp" app:strokeColor="@color/outline" app:strokeWidth="1dp" app:cardElevation="0dp">
+					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Técnica y ejecución" />
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Ejemplo de diseño · aquí se muestra la descripción escrita de la variante seleccionada." />
+						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp" />
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" app:cardBackgroundColor="@color/surface_card" app:cardCornerRadius="16dp" app:strokeColor="@color/outline" app:strokeWidth="1dp" app:cardElevation="0dp">
+					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Contexto del ejercicio" />
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Tipo de métrica&#10;Recursos necesarios&#10;Estado de revisión del contenido" />
+						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp" />
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" app:cardBackgroundColor="@color/surface_card" app:cardCornerRadius="16dp" app:strokeColor="@color/outline" app:strokeWidth="1dp" app:cardElevation="0dp">
+					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Comprende cada paso" />
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Consulta la explicación guiada gratuita de esta versión del ejercicio." />
+						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp">
+							<com.google.android.material.button.MaterialButton style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="12dp" android:layout_marginBottom="4dp" android:textSize="16sp" tools:text="Explicación guiada" />
+						</LinearLayout>
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+				<com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" app:cardBackgroundColor="@color/surface_card" app:cardCornerRadius="16dp" app:strokeColor="@color/outline" app:strokeWidth="1dp" app:cardElevation="0dp">
+					<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/EnerGym.CardTitle" tools:text="Referencia de movimiento" />
+						<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" style="@style/EnerGym.Body" tools:text="Animación local de esta variante. Vista previa técnica sin revisión profesional; no muestra anatomía ni medidas articulares." />
+						<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp">
+							<com.google.android.material.button.MaterialButton style="@style/EnerGym.Button" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="12dp" android:layout_marginBottom="4dp" android:textSize="16sp" tools:text="Vista previa 3D" />
+						</LinearLayout>
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+			</LinearLayout>
+		</LinearLayout>
+	</LinearLayout>
 </ScrollView>
-
-

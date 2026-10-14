@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "notice": "Catálogo de ejemplos originales de producto. Ninguna entrada se declara revisada por profesionales.",
   "sports": [
     {
@@ -570,6 +570,32 @@
       "reviewed": false,
       "description": "Movimientos suaves de pie dentro de un recorrido cómodo. Es preparación complementaria general; el programa especializado del deporte puede seguir pendiente de validación.",
       "alternativeIds": []
+    },
+    {
+      "id": "standard-pushup",
+      "name": "Flexión estándar",
+      "metricType": "STRENGTH",
+      "goals": [
+        "STRENGTH",
+        "GENERAL_FITNESS"
+      ],
+      "environments": [
+        "HOME",
+        "GYM",
+        "OUTDOORS"
+      ],
+      "requiredResources": [],
+      "sportIds": [
+        "strength",
+        "calisthenics"
+      ],
+      "coverage": "SPECIFIC",
+      "reviewed": false,
+      "description": "Ejemplo de producto de flexión con manos y puntas de los pies apoyadas. La referencia animada es una vista previa técnica pendiente de validación profesional y no evalúa tu ejecución. La esterilla es opcional y no se presupone.",
+      "alternativeIds": [
+        "knee-pushup",
+        "dumbbell-floor-press"
+      ]
     }
   ]
 }
