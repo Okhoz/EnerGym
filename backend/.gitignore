@@ -1,0 +1,9 @@
+.cache/
+target/
+.env
+.env.*
+!.env.example
+*.p12
+*.pfx
+*.jks
+*.log

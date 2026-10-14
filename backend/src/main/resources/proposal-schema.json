@@ -1,0 +1,134 @@
+{
+  "type": "object",
+  "properties": {
+    "text": {
+      "type": "string"
+    },
+    "missingFields": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "sportId",
+          "goal",
+          "environment",
+          "focus",
+          "category",
+          "resources",
+          "daysPerWeek",
+          "durationMinutes",
+          "level",
+          "experience",
+          "space",
+          "preferences",
+          "limitations"
+        ]
+      }
+    },
+    "proposal": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "exerciseId": {
+                    "type": "string"
+                  },
+                  "estimatedMinutes": {
+                    "type": "integer"
+                  },
+                  "prescription": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "enum": [
+                            "sets",
+                            "repetitions",
+                            "loadKg",
+                            "restSeconds",
+                            "durationSeconds",
+                            "timeMinutes",
+                            "intervals",
+                            "distanceKm",
+                            "side",
+                            "blocks",
+                            "durationMinutes"
+                          ]
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "value"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "justification": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "exerciseId",
+                  "estimatedMinutes",
+                  "prescription",
+                  "justification"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "title",
+            "items"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "OPEN_EXERCISE"
+            ]
+          },
+          "exerciseId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "exerciseId"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "text",
+    "missingFields",
+    "proposal",
+    "commands"
+  ],
+  "additionalProperties": false
+}
