@@ -1,5 +1,5 @@
 ﻿param(
-	[ValidateSet('None', 'Gemini', 'OpenAI')][string]$Provider = 'None',
+	[ValidateSet('None', 'Groq', 'Gemini', 'OpenAI')][string]$Provider = 'None',
 	[string]$Model = '',
 	[string]$JavaExecutable = '',
 	[switch]$CheckConfiguration
@@ -42,20 +42,24 @@ $taskStart.ArgumentList.Add($taskJar)
 $taskStart.Environment['ENERGYM_AI_PROVIDER'] = 'none'
 $taskStart.Environment['GEMINI_ENABLED'] = 'false'
 $taskStart.Environment['OPENAI_ENABLED'] = 'false'
+$taskStart.Environment['GROQ_ENABLED'] = 'false'
 $taskStart.Environment.Remove('GEMINI_API_KEY') | Out-Null
 $taskStart.Environment.Remove('OPENAI_API_KEY') | Out-Null
+$taskStart.Environment.Remove('GROQ_API_KEY') | Out-Null
 $taskStart.Environment['ENERGYM_PAIRING_CODE'] = $taskPairing
 $taskPlainKey = $null
 try {
 	if ($Provider -ne 'None') {
 		$taskPrefix = if ($Provider -eq 'Gemini') {
 			'GEMINI'
+		} elseif ($Provider -eq 'Groq') {
+			'GROQ'
 		} else {
 			'OPENAI'
 		}
 		$taskPlainKey = Get-TaskEnvironmentValue ($taskPrefix + '_API_KEY')
 		if ([string]::IsNullOrWhiteSpace($taskPlainKey) -or $taskPlainKey.Length -gt 1024 -or $taskPlainKey -match '[\x00-\x20\x7f]') {
-			throw 'Falta una clave válida del proveedor seleccionado. Gemini: ejecuta configurar-gemini.ps1 personalmente.'
+			throw 'Falta una clave válida del proveedor seleccionado. Groq: ejecuta tools/configurar-groq.ps1 personalmente desde la raíz del proyecto.'
 		}
 		if ([string]::IsNullOrWhiteSpace($Model)) {
 			$Model = Get-TaskEnvironmentValue ($taskPrefix + '_MODEL')
@@ -70,6 +74,9 @@ try {
 		}
 		if ([string]::IsNullOrWhiteSpace($Model) -or $Model -cnotmatch $taskModelPattern) {
 			throw 'Indica un modelo válido mediante -Model o la variable del proveedor.'
+		}
+		if ($Provider -eq 'Groq' -and @('openai/gpt-oss-120b', 'openai/gpt-oss-20b') -cnotcontains $Model) {
+			throw 'Groq requiere un modelo Free documentado explícito: openai/gpt-oss-120b u openai/gpt-oss-20b. Revisa el plan Free en la consola antes de activar.'
 		}
 		$taskStart.Environment['ENERGYM_AI_PROVIDER'] = $Provider.ToLowerInvariant()
 		$taskStart.Environment[$taskPrefix + '_ENABLED'] = 'true'
@@ -96,4 +103,5 @@ try {
 	$taskPlainKey = $null
 	$taskStart.Environment.Remove('GEMINI_API_KEY') | Out-Null
 	$taskStart.Environment.Remove('OPENAI_API_KEY') | Out-Null
+	$taskStart.Environment.Remove('GROQ_API_KEY') | Out-Null
 }

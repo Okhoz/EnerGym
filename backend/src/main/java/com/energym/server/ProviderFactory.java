@@ -11,6 +11,7 @@ public final class ProviderFactory {
 
 	public static Provider fromEnvironment(Map<String, String> env) {
 		return switch (env.getOrDefault("ENERGYM_AI_PROVIDER", "none")) {
+			case "groq" -> GroqGateway.fromEnvironment(env);
 			case "gemini" -> GeminiGateway.fromEnvironment(env);
 			case "openai" -> OpenAiGateway.fromEnvironment(env);
 			default -> disabled();
