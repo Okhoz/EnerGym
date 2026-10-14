@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:saveEnabled="false">
+    <LinearLayout android:id="@+id/screen_body" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="24dp" android:paddingTop="20dp" android:paddingBottom="32dp">
+        <TextView android:id="@+id/eyebrow" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/green" android:textSize="12sp" android:textStyle="bold" android:letterSpacing="0.1" />
+        <TextView android:id="@+id/screen_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="30sp" android:textStyle="bold" android:textColor="@color/text_primary" android:accessibilityHeading="true" />
+        <TextView android:id="@+id/screen_subtitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:layout_marginBottom="20dp" android:textSize="15sp" android:lineSpacingExtra="4dp" android:textColor="@color/text_secondary" />
+        <LinearLayout android:id="@+id/rows" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+    </LinearLayout>
+</ScrollView>

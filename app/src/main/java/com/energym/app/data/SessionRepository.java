@@ -26,6 +26,9 @@ public final class SessionRepository {
         });
     }
     public Session load(long id) { EnerGymDatabase.Row row = database.find(SyncRecord.Kind.SESSION,id); return row == null ? null : decode(row); }
+    /** Consulta de identidad local, siempre filtrada por dueño. Cero indica ausente.
+     * Abrir un borrador no debe llamar saveDraft: no genera revisiones ni reemplaza resultados existentes. */
+    public long findIdBySyncId(String syncId) { EnerGymDatabase.Row row=database.find(SyncRecord.Kind.SESSION,Objects.requireNonNull(syncId,"syncId"));return row==null?0:row.id; }
     /** Repetir finalizar conserva el instante original y produce una sola entrada de historial. */
     public void finish(long id) {
         database.transaction(() -> {

@@ -1,0 +1,21 @@
+package com.energym.app.ui;
+import com.energym.app.R;
+import com.energym.app.controller.AppController;
+import com.energym.app.domain.*;
+import android.widget.LinearLayout;
+import java.util.*;
+/** VISTA de registro: el esquema viene de MetricValidator; no asume kg/repeticiones para todas las actividades. */
+public final class SessionFragment extends ScreenFragment {
+    public SessionFragment(){super(R.layout.fragment_session);}
+    protected void content(){heading("REGISTRA LO REAL","Tu sesión","Escribe lo que has realizado. Los números de la propuesta son ejemplos, no resultados.");if(app.sessions.session==null){card(app.sessions.busy?"Abriendo borrador…":"Sin sesión",app.sessions.busy?"Consultando sus valores guardados.":"Acepta una rutina desde Entrenamiento.");return;}if(app.sessions.session.getStatus()==Session.Status.FINISHED){card("Sesión finalizada","Consulta sus valores en Historial.");return;}
+        List<String> ids=new ArrayList<>(),names=new ArrayList<>();int i=0;for(RoutineItem item:app.sessions.session.getRoutine().getItems()){ids.add(Integer.toString(i++));names.add(item.getExercise().getName());}
+        choice(rows,"selectedExercise","Ejercicio de la sesión",ids,names,Integer.toString(app.sessions.selected),value->app.sessions.select(Integer.parseInt(value)));
+        RoutineItem item=app.sessions.item();Exercise e=item.getExercise();LinearLayout context=card(e.getName(),"Propuesta orientativa:\n"+AppController.prescription(e.getMetricType(),item.getPrescription())+"\n\n"+(app.sessions.session.getResults().containsKey(e.getId())?"Valores guardados. Puedes actualizarlos antes de finalizar.":"Todavía sin valores guardados."));action(context,"Ver técnica: "+e.getName(),()->app.openExercise(e));
+        LinearLayout fields=card("Valores realizados",AppController.label(e.getMetricType().name())+" · unidades explícitas\nCarga cero significa peso corporal. El esfuerzo es opcional.");Map<String,String> inputs=app.sessions.inputs();
+        for(MetricValidator.Field f:new MetricValidator().fields(e.getMetricType()))if(f.choices.isEmpty())textField(fields,f.key,f.label,inputs.getOrDefault(f.key,""),true,f.integer,v->app.sessions.input(f.key,v));else choice(fields,f.key,f.label,f.choices,f.choices,inputs.getOrDefault(f.key,""),v->app.sessions.input(f.key,v));
+        action(rows,"Guardar ejercicio",!app.sessions.busy,app.sessions::record);
+        if(app.sessions.selected+1<ids.size())action(rows,"Siguiente ejercicio",!app.sessions.busy,()->app.sessions.select(app.sessions.selected+1));
+        LinearLayout finish=card("Cerrar el entrenamiento",app.sessions.session.getResults().size()+" de "+ids.size()+" ejercicios registrados. Guarda todos antes de finalizar.");action(finish,"Finalizar sesión",!app.sessions.busy,app.sessions::finish);
+    }
+}
+
