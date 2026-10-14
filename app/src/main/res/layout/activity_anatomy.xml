@@ -110,6 +110,7 @@
 					android:id="@+id/viewer_surface"
 					android:layout_width="match_parent"
 					android:layout_height="match_parent"
+					tools:visibility="gone"
 					android:contentDescription="Referencia animada 3D; usa los controles accesibles para girar o ampliar" />
 
 				<LinearLayout
@@ -142,6 +143,7 @@
 						android:text="Comprobando recurso local…" />
 				</LinearLayout>
 
+				<!-- Marcador exclusivo del editor: el visor real conserva su fondo negro. -->
 				<LinearLayout
 					android:layout_width="match_parent"
 					android:layout_height="match_parent"
@@ -150,6 +152,7 @@
 					android:padding="@dimen/card_padding"
 					android:visibility="gone"
 					tools:visibility="visible"
+					tools:background="@drawable/viewer_editor_preview"
 					android:importantForAccessibility="noHideDescendants">
 
 					<ImageView
@@ -160,12 +163,22 @@
 						android:contentDescription="@string/logo_description" />
 
 					<TextView
+						style="@style/EnerGym.CardTitle"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_marginTop="@dimen/control_gap_vertical"
+						android:gravity="center"
+						tools:textColor="@color/white"
+						tools:text="Recurso 3D local" />
+
+					<TextView
 						style="@style/EnerGym.Body"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:layout_marginTop="@dimen/control_gap_vertical"
 						android:gravity="center"
-						tools:text="Recurso 3D local&#xA;La animación se muestra al ejecutar la app." />
+						tools:textColor="@color/text_secondary"
+						tools:text="La animación se muestra al ejecutar la app." />
 				</LinearLayout>
 			</FrameLayout>
 
