@@ -15,9 +15,9 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="vertical"
-		android:paddingHorizontal="24dp"
-		android:paddingTop="28dp"
-		android:paddingBottom="40dp">
+		android:paddingHorizontal="@dimen/screen_gutter"
+		android:paddingTop="@dimen/section_gap"
+		android:paddingBottom="@dimen/content_bottom">
 
 		<TextView
 			android:id="@+id/eyebrow"
@@ -30,7 +30,7 @@
 			android:id="@+id/screen_title"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="12dp"
+			android:layout_marginTop="@dimen/space_inline"
 			style="@style/EnerGym.ScreenTitle"
 			tools:text="Tus datos, contigo" />
 
@@ -38,8 +38,8 @@
 			android:id="@+id/screen_subtitle"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="12dp"
-			android:layout_marginBottom="28dp"
+			android:layout_marginTop="@dimen/space_inline"
+			android:layout_marginBottom="@dimen/section_gap"
 			style="@style/EnerGym.Body"
 			tools:text="Conecta Google para activar el respaldo Firebase. La demo permanece solo en este dispositivo." />
 
@@ -60,14 +60,14 @@
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -79,7 +79,7 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
 							tools:text="Elige cómo quieres entrar." />
 
@@ -87,15 +87,15 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp">
+							android:layout_marginTop="@dimen/space_inline">
 
 							<com.energym.app.ui.effects.GlassButton
 								style="@style/EnerGym.Button"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
-								android:layout_marginTop="12dp"
-								android:layout_marginBottom="4dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginTop="@dimen/action_gap"
+								android:layout_marginBottom="0dp"
 								android:textSize="16sp"
 								tools:text="Conectar con Google" />
 
@@ -103,9 +103,9 @@
 								style="@style/EnerGym.Button"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
-								android:layout_marginTop="12dp"
-								android:layout_marginBottom="4dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginTop="@dimen/action_gap"
+								android:layout_marginBottom="0dp"
 								android:textSize="16sp"
 								tools:text="Entrar en demo local" />
 						</LinearLayout>
@@ -115,14 +115,14 @@
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -134,7 +134,7 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
 							tools:text="Falta la configuración Firebase de esta instalación. No se puede iniciar sesión ni respaldar datos en la nube todavía." />
 
@@ -142,21 +142,21 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp" />
+							android:layout_marginTop="@dimen/space_inline" />
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>
 
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -168,7 +168,7 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
 							tools:text="Ejemplo de diseño · estado de sincronización" />
 
@@ -176,15 +176,15 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp">
+							android:layout_marginTop="@dimen/space_inline">
 
 							<com.energym.app.ui.effects.GlassButton
 								style="@style/EnerGym.Button"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
-								android:layout_marginTop="12dp"
-								android:layout_marginBottom="4dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginTop="@dimen/action_gap"
+								android:layout_marginBottom="0dp"
 								android:textSize="16sp"
 								tools:text="Reintentar sincronización" />
 						</LinearLayout>
@@ -194,14 +194,14 @@
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -213,7 +213,7 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
 							tools:text="Cada cuenta conserva su propio perfil, rutinas y sesiones. La demo no se copia automáticamente a Google. Cerrar sesión oculta los datos locales de esa cuenta." />
 
@@ -221,21 +221,21 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp" />
+							android:layout_marginTop="@dimen/space_inline" />
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>
 
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -247,7 +247,7 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
 							tools:text="El consentimiento para usar historial con IA es independiente del respaldo Google. Puedes cambiarlo en Tu perfil." />
 
@@ -255,7 +255,7 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp" />
+							android:layout_marginTop="@dimen/space_inline" />
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>
 			</LinearLayout>

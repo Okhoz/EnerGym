@@ -4,7 +4,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
-	android:layout_marginBottom="24dp"
+	android:layout_marginBottom="@dimen/section_gap"
 	style="@style/EnerGym.GlassCard"
 	tools:context=".MainActivity">
 
@@ -13,7 +13,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="vertical"
-		android:padding="24dp"
+		android:padding="@dimen/card_padding"
 		android:background="@drawable/glass_panel">
 
 		<TextView
@@ -27,7 +27,7 @@
 			android:id="@+id/card_body"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="12dp"
+			android:layout_marginTop="@dimen/space_inline"
 			style="@style/EnerGym.Body"
 			tools:text="Contenido de ejemplo · solo en el editor" />
 
@@ -36,6 +36,6 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
-			android:layout_marginTop="12dp" />
+			android:layout_marginTop="@dimen/space_inline" />
 	</LinearLayout>
 </com.google.android.material.card.MaterialCardView>

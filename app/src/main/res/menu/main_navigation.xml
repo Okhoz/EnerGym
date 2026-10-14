@@ -1,11 +1,13 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<item
 		android:id="@+id/tab_home"
 		android:title="@string/home"
 		android:icon="@drawable/ic_home" />
 	<item
 		android:id="@+id/tab_training"
-		android:title="@string/training"
+		android:title="@string/training_navigation"
+		app:contentDescription="@string/training"
 		android:icon="@drawable/ic_training" />
 	<item
 		android:id="@+id/tab_assistant"

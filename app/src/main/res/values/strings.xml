@@ -3,6 +3,7 @@
 	<string name="account">Cuenta</string>
 	<string name="home">Inicio</string>
 	<string name="training">Entrenamiento</string>
+	<string name="training_navigation">Entreno</string>
 	<string name="assistant">Asistente</string>
 	<string name="history">Historial</string>
 	<string name="back">Volver</string>

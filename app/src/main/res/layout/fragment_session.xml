@@ -15,9 +15,9 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="vertical"
-		android:paddingHorizontal="24dp"
-		android:paddingTop="28dp"
-		android:paddingBottom="40dp">
+		android:paddingHorizontal="@dimen/screen_gutter"
+		android:paddingTop="@dimen/section_gap"
+		android:paddingBottom="@dimen/content_bottom">
 
 		<TextView
 			android:id="@+id/eyebrow"
@@ -30,7 +30,7 @@
 			android:id="@+id/screen_title"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="12dp"
+			android:layout_marginTop="@dimen/space_inline"
 			style="@style/EnerGym.ScreenTitle"
 			tools:text="Tu sesión" />
 
@@ -38,8 +38,8 @@
 			android:id="@+id/screen_subtitle"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="12dp"
-			android:layout_marginBottom="28dp"
+			android:layout_marginTop="@dimen/space_inline"
+			android:layout_marginBottom="@dimen/section_gap"
 			style="@style/EnerGym.Body"
 			tools:text="Escribe lo que has realizado. Los números de la propuesta son ejemplos, no resultados." />
 
@@ -61,12 +61,12 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:orientation="vertical"
-					android:layout_marginBottom="20dp">
+					android:layout_marginBottom="@dimen/field_gap">
 
 					<TextView
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:layout_marginBottom="8dp"
+						android:layout_marginBottom="@dimen/label_gap"
 						style="@style/EnerGym.FieldCaption"
 						tools:text="Ejercicio de la sesión" />
 
@@ -114,14 +114,14 @@
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -133,23 +133,23 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
-							tools:text="Propuesta orientativa&#10;Ejemplo de diseño · todavía sin valores guardados." />
+							tools:text="Propuesta orientativa&#xA;Ejemplo de diseño · todavía sin valores guardados." />
 
 						<LinearLayout
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp">
+							android:layout_marginTop="@dimen/space_inline">
 
 							<com.energym.app.ui.effects.GlassButton
 								style="@style/EnerGym.Button"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
-								android:layout_marginTop="12dp"
-								android:layout_marginBottom="4dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginTop="@dimen/action_gap"
+								android:layout_marginBottom="0dp"
 								android:textSize="16sp"
 								tools:text="Ver técnica: ejercicio de ejemplo" />
 						</LinearLayout>
@@ -159,14 +159,14 @@
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -178,27 +178,27 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
-							tools:text="Fuerza · unidades explícitas&#10;Carga cero significa peso corporal. El esfuerzo es opcional." />
+							tools:text="Fuerza · unidades explícitas&#xA;Carga cero significa peso corporal. El esfuerzo es opcional." />
 
 						<LinearLayout
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp">
+							android:layout_marginTop="@dimen/space_inline">
 
 							<LinearLayout
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									style="@style/EnerGym.FieldCaption"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									tools:text="Series realizadas" />
 
 								<com.google.android.material.textfield.TextInputLayout
@@ -233,13 +233,13 @@
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									style="@style/EnerGym.FieldCaption"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									tools:text="Repeticiones por serie" />
 
 								<com.google.android.material.textfield.TextInputLayout
@@ -274,13 +274,13 @@
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									style="@style/EnerGym.FieldCaption"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									tools:text="Carga (kg; 0 = peso corporal)" />
 
 								<com.google.android.material.textfield.TextInputLayout
@@ -315,13 +315,13 @@
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									style="@style/EnerGym.FieldCaption"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									tools:text="Descanso entre series (s)" />
 
 								<com.google.android.material.textfield.TextInputLayout
@@ -356,13 +356,13 @@
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									style="@style/EnerGym.FieldCaption"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									tools:text="Esfuerzo percibido (0–10; opcional)" />
 
 								<com.google.android.material.textfield.TextInputLayout
@@ -400,9 +400,9 @@
 					style="@style/EnerGym.Button"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:minHeight="56dp"
-					android:layout_marginTop="12dp"
-					android:layout_marginBottom="4dp"
+					android:minHeight="@dimen/primary_touch_target"
+					android:layout_marginTop="@dimen/action_gap"
+					android:layout_marginBottom="0dp"
 					android:textSize="16sp"
 					tools:text="Guardar ejercicio" />
 
@@ -410,23 +410,23 @@
 					style="@style/EnerGym.Button"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:minHeight="56dp"
-					android:layout_marginTop="12dp"
-					android:layout_marginBottom="4dp"
+					android:minHeight="@dimen/primary_touch_target"
+					android:layout_marginTop="@dimen/action_gap"
+					android:layout_marginBottom="0dp"
 					android:textSize="16sp"
 					tools:text="Siguiente ejercicio" />
 
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -438,7 +438,7 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
 							tools:text="Ejemplo de diseño · guarda todos los ejercicios antes de finalizar." />
 
@@ -446,15 +446,15 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp">
+							android:layout_marginTop="@dimen/space_inline">
 
 							<com.energym.app.ui.effects.GlassButton
 								style="@style/EnerGym.Button"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
-								android:layout_marginTop="12dp"
-								android:layout_marginBottom="4dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginTop="@dimen/action_gap"
+								android:layout_marginBottom="0dp"
 								android:textSize="16sp"
 								tools:text="Finalizar sesión" />
 						</LinearLayout>

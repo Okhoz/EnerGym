@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:id="@+id/anatomy_root"
 	android:layout_width="match_parent"
@@ -11,29 +12,30 @@
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:minHeight="76dp"
+		android:minHeight="72dp"
 		android:background="@drawable/glass_chrome"
 		android:layout_marginHorizontal="12dp"
 		android:layout_marginTop="8dp"
 		android:gravity="center_vertical"
-		android:paddingHorizontal="20dp"
-		android:paddingVertical="12dp">
+		android:paddingHorizontal="@dimen/chrome_padding"
+		android:paddingVertical="@dimen/space_inline">
 
 		<com.energym.app.ui.effects.GlassButton
 			android:id="@+id/viewer_back"
 			style="@style/EnerGym.Button"
 			android:layout_width="48dp"
-			android:layout_height="48dp"
-			android:layout_marginEnd="8dp"
+			android:layout_height="wrap_content"
+			android:layout_marginEnd="@dimen/space_inline"
 			android:padding="0dp"
 			android:text="‹"
 			android:textSize="28sp"
-			android:contentDescription="@string/back" />
+			android:contentDescription="@string/back"
+			android:minHeight="@dimen/touch_target" />
 
 		<ImageView
-			android:layout_width="40dp"
-			android:layout_height="40dp"
-			android:layout_marginEnd="10dp"
+			android:layout_width="32dp"
+			android:layout_height="32dp"
+			android:layout_marginEnd="@dimen/space_inline"
 			android:src="@drawable/energym_logo"
 			android:scaleType="fitCenter"
 			android:contentDescription="@string/logo_description" />
@@ -43,9 +45,10 @@
 			android:layout_weight="1"
 			android:layout_height="wrap_content"
 			android:text="@string/app_name"
-			android:textSize="22sp"
+			android:textSize="20sp"
 			android:textStyle="bold"
-			android:textColor="@color/white" />
+			android:textColor="@color/white"
+			android:layout_marginEnd="@dimen/space_inline" />
 	</LinearLayout>
 
 	<View
@@ -65,9 +68,9 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
-			android:paddingHorizontal="24dp"
-			android:paddingTop="28dp"
-			android:paddingBottom="40dp">
+			android:paddingHorizontal="@dimen/screen_gutter"
+			android:paddingTop="@dimen/section_gap"
+			android:paddingBottom="@dimen/content_bottom">
 
 			<TextView
 				style="@style/EnerGym.Eyebrow"
@@ -80,14 +83,14 @@
 				style="@style/EnerGym.ScreenTitle"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="12dp"
+				android:layout_marginTop="@dimen/space_inline"
 				android:text="Referencia de movimiento" />
 
 			<TextView
 				style="@style/EnerGym.Body"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="12dp"
+				android:layout_marginTop="@dimen/space_inline"
 				android:text="Vista previa técnica · Validación profesional pendiente" />
 
 			<TextView
@@ -100,7 +103,7 @@
 			<FrameLayout
 				android:layout_width="match_parent"
 				android:layout_height="300dp"
-				android:layout_marginTop="24dp"
+				android:layout_marginTop="@dimen/group_gap"
 				android:background="#000000">
 				<!-- Visor nativo: sin RenderEffect, captura ni desenfoque para priorizar el renderizador. -->
 				<SurfaceView
@@ -115,7 +118,7 @@
 					android:layout_height="match_parent"
 					android:orientation="vertical"
 					android:gravity="center"
-					android:padding="24dp"
+					android:padding="@dimen/card_padding"
 					android:background="#000000"
 					tools:visibility="gone">
 
@@ -133,7 +136,7 @@
 						style="@style/EnerGym.Body"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:layout_marginTop="16dp"
+						android:layout_marginTop="@dimen/control_gap_vertical"
 						android:gravity="center"
 						android:accessibilityLiveRegion="polite"
 						android:text="Comprobando recurso local…" />
@@ -144,7 +147,7 @@
 					android:layout_height="match_parent"
 					android:orientation="vertical"
 					android:gravity="center"
-					android:padding="24dp"
+					android:padding="@dimen/card_padding"
 					android:visibility="gone"
 					tools:visibility="visible"
 					android:importantForAccessibility="noHideDescendants">
@@ -160,9 +163,9 @@
 						style="@style/EnerGym.Body"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:layout_marginTop="16dp"
+						android:layout_marginTop="@dimen/control_gap_vertical"
 						android:gravity="center"
-						tools:text="Recurso 3D local&#10;La animación se muestra al ejecutar la app." />
+						tools:text="Recurso 3D local&#xA;La animación se muestra al ejecutar la app." />
 				</LinearLayout>
 			</FrameLayout>
 
@@ -171,7 +174,7 @@
 				style="@style/EnerGym.FieldCaption"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="12dp"
+				android:layout_marginTop="@dimen/space_inline"
 				android:accessibilityLiveRegion="polite"
 				android:text="Disponible sin conexión · Animación de referencia" />
 
@@ -188,187 +191,232 @@
 					style="@style/EnerGym.Button"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:minHeight="48dp"
-					android:layout_marginTop="16dp"
+					android:minHeight="@dimen/touch_target"
+					android:layout_marginTop="@dimen/control_gap_vertical"
 					android:text="Pausar" />
 
 				<TextView
 					style="@style/EnerGym.FieldCaption"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginTop="20dp"
+					android:layout_marginTop="@dimen/group_gap"
 					android:text="Velocidad de reproducción" />
 
-				<LinearLayout
+				<androidx.constraintlayout.widget.ConstraintLayout
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginTop="8dp">
+					android:layout_marginTop="@dimen/control_gap_vertical">
 
 					<com.energym.app.ui.effects.GlassButton
 						android:backgroundTint="@color/viewer_control_surface"
 						android:id="@+id/viewer_speed_quarter"
-						style="@style/EnerGym.Button"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						style="@style/EnerGym.ViewerButton"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:minHeight="48dp"
+						android:minHeight="@dimen/touch_target"
 						android:text="0,25×" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:backgroundTint="@color/viewer_control_surface"
 						android:id="@+id/viewer_speed_half"
-						style="@style/EnerGym.Button"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						style="@style/EnerGym.ViewerButton"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:layout_marginHorizontal="8dp"
-						android:minHeight="48dp"
+						android:minHeight="@dimen/touch_target"
 						android:text="0,5×" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:backgroundTint="@color/viewer_control_surface"
 						android:id="@+id/viewer_speed_normal"
-						style="@style/EnerGym.Button"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						style="@style/EnerGym.ViewerButton"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:minHeight="48dp"
+						android:minHeight="@dimen/touch_target"
 						android:text="1×" />
-				</LinearLayout>
+
+					<androidx.constraintlayout.helper.widget.Flow
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						app:layout_constraintTop_toTopOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:constraint_referenced_ids="viewer_speed_quarter,viewer_speed_half,viewer_speed_normal"
+						app:flow_wrapMode="chain"
+						app:flow_horizontalStyle="packed"
+						app:flow_horizontalBias="0"
+						app:flow_horizontalGap="@dimen/control_gap_horizontal"
+						app:flow_verticalGap="@dimen/control_gap_vertical" />
+				</androidx.constraintlayout.widget.ConstraintLayout>
 
 				<TextView
 					style="@style/EnerGym.FieldCaption"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginTop="20dp"
+					android:layout_marginTop="@dimen/group_gap"
 					android:text="Fotogramas del clip · No son fases técnicas validadas" />
 
-				<LinearLayout
+				<androidx.constraintlayout.widget.ConstraintLayout
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginTop="8dp">
+					android:layout_marginTop="@dimen/control_gap_vertical">
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_initial"
-						style="@style/EnerGym.Button"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						style="@style/EnerGym.ViewerButton"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:minHeight="48dp"
-						android:paddingHorizontal="8dp"
+						android:minHeight="@dimen/touch_target"
 						android:text="Inicial" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_middle"
-						style="@style/EnerGym.Button"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						style="@style/EnerGym.ViewerButton"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:layout_marginHorizontal="8dp"
-						android:minHeight="48dp"
-						android:paddingHorizontal="8dp"
+						android:minHeight="@dimen/touch_target"
 						android:text="Medio" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_final"
-						style="@style/EnerGym.Button"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						style="@style/EnerGym.ViewerButton"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:minHeight="48dp"
-						android:paddingHorizontal="8dp"
+						android:minHeight="@dimen/touch_target"
 						android:text="Final" />
-				</LinearLayout>
+
+					<androidx.constraintlayout.helper.widget.Flow
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						app:layout_constraintTop_toTopOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:constraint_referenced_ids="viewer_initial,viewer_middle,viewer_final"
+						app:flow_wrapMode="chain"
+						app:flow_horizontalStyle="packed"
+						app:flow_horizontalBias="0"
+						app:flow_horizontalGap="@dimen/control_gap_horizontal"
+						app:flow_verticalGap="@dimen/control_gap_vertical" />
+				</androidx.constraintlayout.widget.ConstraintLayout>
 
 				<TextView
 					style="@style/EnerGym.FieldCaption"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginTop="20dp"
+					android:layout_marginTop="@dimen/group_gap"
 					android:text="Cámara · Gira y amplía con botones o gestos" />
 
-				<LinearLayout
+				<androidx.constraintlayout.widget.ConstraintLayout
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginTop="8dp">
+					android:layout_marginTop="@dimen/control_gap_vertical">
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_rotate_left"
-						style="@style/EnerGym.Button"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						style="@style/EnerGym.ViewerCameraButton"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:minHeight="48dp"
+						android:minHeight="@dimen/touch_target"
 						android:text="Girar ←" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_rotate_right"
-						style="@style/EnerGym.Button"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						style="@style/EnerGym.ViewerCameraButton"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:layout_marginStart="8dp"
-						android:minHeight="48dp"
+						android:minHeight="@dimen/touch_target"
 						android:text="Girar →" />
-				</LinearLayout>
 
-				<LinearLayout
+					<androidx.constraintlayout.helper.widget.Flow
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						app:layout_constraintTop_toTopOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:constraint_referenced_ids="viewer_rotate_left,viewer_rotate_right"
+						app:flow_wrapMode="chain"
+						app:flow_horizontalStyle="packed"
+						app:flow_horizontalBias="0"
+						app:flow_horizontalGap="@dimen/control_gap_horizontal"
+						app:flow_verticalGap="@dimen/control_gap_vertical" />
+				</androidx.constraintlayout.widget.ConstraintLayout>
+
+				<androidx.constraintlayout.widget.ConstraintLayout
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginTop="8dp">
+					android:layout_marginTop="@dimen/control_gap_vertical">
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_zoom_in"
-						style="@style/EnerGym.Button"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						style="@style/EnerGym.ViewerCameraButton"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:minHeight="48dp"
+						android:minHeight="@dimen/touch_target"
 						android:text="Acercar +" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_zoom_out"
-						style="@style/EnerGym.Button"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						style="@style/EnerGym.ViewerCameraButton"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:layout_marginStart="8dp"
-						android:minHeight="48dp"
+						android:minHeight="@dimen/touch_target"
 						android:text="Alejar −" />
-				</LinearLayout>
 
-				<LinearLayout
+					<androidx.constraintlayout.helper.widget.Flow
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						app:layout_constraintTop_toTopOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:constraint_referenced_ids="viewer_zoom_in,viewer_zoom_out"
+						app:flow_wrapMode="chain"
+						app:flow_horizontalStyle="packed"
+						app:flow_horizontalBias="0"
+						app:flow_horizontalGap="@dimen/control_gap_horizontal"
+						app:flow_verticalGap="@dimen/control_gap_vertical" />
+				</androidx.constraintlayout.widget.ConstraintLayout>
+
+				<androidx.constraintlayout.widget.ConstraintLayout
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginTop="8dp">
+					android:layout_marginTop="@dimen/control_gap_vertical">
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_front"
-						style="@style/EnerGym.Button"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						style="@style/EnerGym.ViewerCameraButton"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:minHeight="48dp"
+						android:minHeight="@dimen/touch_target"
 						android:text="Frente" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_side"
-						style="@style/EnerGym.Button"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						style="@style/EnerGym.ViewerCameraButton"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:layout_marginStart="8dp"
-						android:minHeight="48dp"
+						android:minHeight="@dimen/touch_target"
 						android:text="Lateral" />
-				</LinearLayout>
+
+					<androidx.constraintlayout.helper.widget.Flow
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						app:layout_constraintTop_toTopOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:constraint_referenced_ids="viewer_front,viewer_side"
+						app:flow_wrapMode="chain"
+						app:flow_horizontalStyle="packed"
+						app:flow_horizontalBias="0"
+						app:flow_horizontalGap="@dimen/control_gap_horizontal"
+						app:flow_verticalGap="@dimen/control_gap_vertical" />
+				</androidx.constraintlayout.widget.ConstraintLayout>
 
 				<com.energym.app.ui.effects.GlassButton
 					android:id="@+id/viewer_reset"
 					style="@style/EnerGym.Button"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginTop="8dp"
-					android:minHeight="48dp"
+					android:layout_marginTop="@dimen/control_gap_vertical"
+					android:minHeight="@dimen/touch_target"
 					android:text="Restablecer cámara" />
 			</LinearLayout>
 
@@ -377,14 +425,14 @@
 				style="@style/EnerGym.CardTitle"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="28dp"
+				android:layout_marginTop="@dimen/section_gap"
 				android:text="Disponibilidad" />
 
 			<com.energym.app.ui.effects.GlassButton
 				style="@style/EnerGym.Button"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="12dp"
+				android:layout_marginTop="@dimen/space_inline"
 				android:enabled="false"
 				android:text="Capas de músculos · No disponibles" />
 
@@ -392,7 +440,7 @@
 				style="@style/EnerGym.Body"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="12dp"
+				android:layout_marginTop="@dimen/space_inline"
 				android:text="Sin capas anatómicas separadas, activación muscular ni medidas de articulaciones. Los colores del modelo no indican esfuerzo muscular. La demostración profesional verificada aún no está disponible." />
 
 			<TextView
@@ -400,7 +448,7 @@
 				style="@style/EnerGym.Body"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="20dp"
+				android:layout_marginTop="@dimen/group_gap"
 				tools:text="Referencia escrita de la variante seleccionada · ejemplo de diseño" />
 
 			<TextView
@@ -408,7 +456,7 @@
 				style="@style/EnerGym.FieldCaption"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="24dp"
+				android:layout_marginTop="@dimen/group_gap"
 				android:text="Recurso: OpenGym3D · Mesh2Motion · MakeHuman/MPFB\nArte y movimiento CC0 1.0 · Filament Apache 2.0\nArchivo local, sin cuenta ni descargas durante el uso" />
 		</LinearLayout>
 	</ScrollView>

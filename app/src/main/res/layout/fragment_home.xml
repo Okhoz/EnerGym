@@ -15,9 +15,9 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="vertical"
-		android:paddingHorizontal="24dp"
-		android:paddingTop="28dp"
-		android:paddingBottom="40dp">
+		android:paddingHorizontal="@dimen/screen_gutter"
+		android:paddingTop="@dimen/section_gap"
+		android:paddingBottom="@dimen/content_bottom">
 
 		<TextView
 			android:id="@+id/eyebrow"
@@ -30,7 +30,7 @@
 			android:id="@+id/screen_title"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="12dp"
+			android:layout_marginTop="@dimen/space_inline"
 			style="@style/EnerGym.ScreenTitle"
 			tools:text="Hoy empieza contigo" />
 
@@ -38,8 +38,8 @@
 			android:id="@+id/screen_subtitle"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="12dp"
-			android:layout_marginBottom="28dp"
+			android:layout_marginTop="@dimen/space_inline"
+			android:layout_marginBottom="@dimen/section_gap"
 			style="@style/EnerGym.Body"
 			tools:text="Una propuesta según tu entorno. Un registro de lo que realmente haces." />
 
@@ -60,14 +60,14 @@
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -79,7 +79,7 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
 							tools:text="Conecta tu cuenta Google o entra en la demo local para preparar tu primer entrenamiento." />
 
@@ -87,15 +87,15 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp">
+							android:layout_marginTop="@dimen/space_inline">
 
 							<com.energym.app.ui.effects.GlassButton
 								style="@style/EnerGym.Button"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
-								android:layout_marginTop="12dp"
-								android:layout_marginBottom="4dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginTop="@dimen/action_gap"
+								android:layout_marginBottom="0dp"
 								android:textSize="16sp"
 								tools:text="Elegir cuenta o demo" />
 						</LinearLayout>
@@ -105,14 +105,14 @@
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -124,23 +124,23 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
-							tools:text="Gimnasio · casa con material · sin equipamiento · deporte&#10;Declara tus recursos: el lugar no los añade automáticamente." />
+							tools:text="Gimnasio · casa con material · sin equipamiento · deporte&#xA;Declara tus recursos: el lugar no los añade automáticamente." />
 
 						<LinearLayout
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp">
+							android:layout_marginTop="@dimen/space_inline">
 
 							<com.energym.app.ui.effects.GlassButton
 								style="@style/EnerGym.Button"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
-								android:layout_marginTop="12dp"
-								android:layout_marginBottom="4dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginTop="@dimen/action_gap"
+								android:layout_marginBottom="0dp"
 								android:textSize="16sp"
 								tools:text="Ver entrenamiento" />
 						</LinearLayout>
@@ -150,14 +150,14 @@
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -169,15 +169,15 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
-							tools:text="Sesiones finalizadas y borradores guardados&#10;Ejemplo de diseño · los datos reales se cargan al abrir la app." />
+							tools:text="Sesiones finalizadas y borradores guardados&#xA;Ejemplo de diseño · los datos reales se cargan al abrir la app." />
 
 						<LinearLayout
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp" />
+							android:layout_marginTop="@dimen/space_inline" />
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>
 			</LinearLayout>

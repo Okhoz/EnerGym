@@ -48,6 +48,24 @@
 		<item name="android:color">@color/surface_selected</item>
 	</style>
 
+	<style name="EnerGym.NavigationLabel" parent="TextAppearance.Material3.LabelMedium">
+		<item name="android:textSize">12sp</item>
+		<item name="android:textStyle">normal</item>
+		<item name="android:letterSpacing">0</item>
+	</style>
+
+	<style name="EnerGym.ViewerButton" parent="EnerGym.Button">
+		<item name="android:minWidth">88dp</item>
+		<item name="android:minHeight">@dimen/touch_target</item>
+		<item name="android:textSize">14sp</item>
+		<item name="android:paddingLeft">12dp</item>
+		<item name="android:paddingRight">12dp</item>
+	</style>
+
+	<style name="EnerGym.ViewerCameraButton" parent="EnerGym.ViewerButton">
+		<item name="android:minWidth">120dp</item>
+	</style>
+
 	<style name="EnerGym.GlassCard" parent="Widget.Material3.CardView.Filled">
 		<item name="cardBackgroundColor">@color/surface_card</item>
 		<item name="cardCornerRadius">24dp</item>

@@ -5,7 +5,7 @@
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
 	android:orientation="vertical"
-	android:layout_marginBottom="20dp"
+	android:layout_marginBottom="@dimen/field_gap"
 	tools:context=".MainActivity">
 
 	<TextView
@@ -13,7 +13,7 @@
 		style="@style/EnerGym.FieldCaption"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginBottom="8dp"
+		android:layout_marginBottom="@dimen/label_gap"
 		android:labelFor="@id/field_input"
 		tools:text="Etiqueta del campo" />
 

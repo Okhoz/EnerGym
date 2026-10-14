@@ -12,30 +12,31 @@
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:minHeight="76dp"
+		android:minHeight="72dp"
 		android:background="@drawable/glass_chrome"
 		android:layout_marginHorizontal="12dp"
 		android:layout_marginTop="8dp"
 		android:gravity="center_vertical"
-		android:paddingHorizontal="20dp"
-		android:paddingVertical="12dp">
+		android:paddingHorizontal="@dimen/chrome_padding"
+		android:paddingVertical="@dimen/space_inline">
 
 		<com.energym.app.ui.effects.GlassButton
 			android:id="@+id/back"
 			style="@style/EnerGym.Button"
 			android:layout_width="48dp"
-			android:layout_height="48dp"
-			android:layout_marginEnd="8dp"
+			android:layout_height="wrap_content"
+			android:layout_marginEnd="@dimen/space_inline"
 			android:padding="0dp"
 			android:text="‹"
 			android:textSize="28sp"
 			android:contentDescription="@string/back"
-			android:visibility="gone" />
+			android:visibility="gone"
+			android:minHeight="@dimen/touch_target" />
 
 		<ImageView
-			android:layout_width="40dp"
-			android:layout_height="40dp"
-			android:layout_marginEnd="10dp"
+			android:layout_width="32dp"
+			android:layout_height="32dp"
+			android:layout_marginEnd="@dimen/space_inline"
 			android:src="@drawable/energym_logo"
 			android:scaleType="fitCenter"
 			android:contentDescription="@string/logo_description" />
@@ -45,35 +46,42 @@
 			android:layout_weight="1"
 			android:layout_height="wrap_content"
 			android:text="@string/app_name"
-			android:textSize="22sp"
+			android:textSize="20sp"
 			android:textStyle="bold"
 			android:fontFamily="sans-serif-medium"
-			android:textColor="@color/white" />
+			android:textColor="@color/white"
+			android:layout_marginEnd="@dimen/space_inline" />
 
 		<com.energym.app.ui.effects.GlassButton
 			android:id="@+id/account"
 			style="@style/EnerGym.Button"
-			android:layout_width="wrap_content"
+			android:layout_width="@dimen/touch_target"
 			android:layout_height="wrap_content"
-			android:minHeight="48dp"
-			android:minWidth="72dp"
+			android:minHeight="@dimen/touch_target"
+			android:minWidth="@dimen/touch_target"
 			android:paddingHorizontal="12dp"
-			android:paddingVertical="10dp"
+			android:paddingVertical="12dp"
 			android:textSize="14sp"
-			android:text="@string/account" />
+			android:contentDescription="@string/account"
+			android:tooltipText="@string/account"
+			app:icon="@drawable/ic_account"
+			app:iconSize="24dp"
+			app:iconPadding="0dp"
+			app:iconGravity="textStart" />
 	</LinearLayout>
 
 	<TextView
 		android:id="@+id/status"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:paddingHorizontal="24dp"
+		android:paddingHorizontal="@dimen/screen_gutter"
 		android:paddingBottom="16dp"
 		android:textSize="12sp"
 		android:lineSpacingExtra="3dp"
 		android:textColor="@color/text_secondary"
 		android:accessibilityLiveRegion="polite"
-		tools:text="Sin cuenta · almacenamiento local" />
+		tools:text="Sin cuenta · almacenamiento local"
+		android:paddingTop="@dimen/label_gap" />
 
 	<View
 		android:layout_width="match_parent"
@@ -133,11 +141,15 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginHorizontal="12dp"
-		android:layout_marginBottom="8dp"
+		android:layout_marginBottom="@dimen/label_gap"
 		android:background="@drawable/glass_chrome"
 		app:menu="@menu/main_navigation"
 		app:labelVisibilityMode="labeled"
 		app:itemIconTint="@color/nav_colors"
 		app:itemTextColor="@color/button_text"
-		app:itemActiveIndicatorStyle="@style/EnerGym.NavigationIndicator" />
+		app:itemActiveIndicatorStyle="@style/EnerGym.NavigationIndicator"
+		app:itemHorizontalTranslationEnabled="false"
+		app:itemTextAppearanceActive="@style/EnerGym.NavigationLabel"
+		app:itemTextAppearanceInactive="@style/EnerGym.NavigationLabel"
+		app:itemTextAppearanceActiveBoldEnabled="false" />
 </LinearLayout>

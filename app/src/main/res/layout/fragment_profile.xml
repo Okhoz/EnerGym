@@ -15,9 +15,9 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="vertical"
-		android:paddingHorizontal="24dp"
-		android:paddingTop="28dp"
-		android:paddingBottom="40dp">
+		android:paddingHorizontal="@dimen/screen_gutter"
+		android:paddingTop="@dimen/section_gap"
+		android:paddingBottom="@dimen/content_bottom">
 
 		<TextView
 			android:id="@+id/eyebrow"
@@ -30,7 +30,7 @@
 			android:id="@+id/screen_title"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="12dp"
+			android:layout_marginTop="@dimen/space_inline"
 			style="@style/EnerGym.ScreenTitle"
 			tools:text="Tu perfil" />
 
@@ -38,8 +38,8 @@
 			android:id="@+id/screen_subtitle"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="12dp"
-			android:layout_marginBottom="28dp"
+			android:layout_marginTop="@dimen/space_inline"
+			android:layout_marginBottom="@dimen/section_gap"
 			style="@style/EnerGym.Body"
 			tools:text="Elige lo que tienes y el tiempo disponible. Tus textos se guardan, pero el plan local aún no los interpreta." />
 
@@ -60,14 +60,14 @@
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -79,7 +79,7 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
 							tools:text="Elige la actividad, el objetivo y el entorno." />
 
@@ -87,18 +87,18 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp">
+							android:layout_marginTop="@dimen/space_inline">
 
 							<LinearLayout
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									style="@style/EnerGym.FieldCaption"
 									tools:text="Tipo de entrenamiento" />
 
@@ -147,12 +147,12 @@
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									style="@style/EnerGym.FieldCaption"
 									tools:text="Disciplina" />
 
@@ -201,12 +201,12 @@
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									style="@style/EnerGym.FieldCaption"
 									tools:text="Objetivo" />
 
@@ -255,12 +255,12 @@
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									style="@style/EnerGym.FieldCaption"
 									tools:text="Entorno real" />
 
@@ -309,12 +309,12 @@
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									style="@style/EnerGym.FieldCaption"
 									tools:text="Cobertura" />
 
@@ -365,14 +365,14 @@
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -384,7 +384,7 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
 							tools:text="Organiza el tiempo que puedes dedicar." />
 
@@ -392,19 +392,19 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp">
+							android:layout_marginTop="@dimen/space_inline">
 
 							<LinearLayout
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									style="@style/EnerGym.FieldCaption"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									tools:text="Días por semana (1–7)" />
 
 								<com.google.android.material.textfield.TextInputLayout
@@ -439,13 +439,13 @@
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									style="@style/EnerGym.FieldCaption"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									tools:text="Tiempo disponible (5–240 min)" />
 
 								<com.google.android.material.textfield.TextInputLayout
@@ -482,14 +482,14 @@
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -501,7 +501,7 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
 							tools:text="Añade tu experiencia, preferencias y limitaciones." />
 
@@ -509,19 +509,19 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp">
+							android:layout_marginTop="@dimen/space_inline">
 
 							<LinearLayout
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									style="@style/EnerGym.FieldCaption"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									tools:text="Nivel" />
 
 								<com.google.android.material.textfield.TextInputLayout
@@ -556,13 +556,13 @@
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									style="@style/EnerGym.FieldCaption"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									tools:text="Experiencia previa" />
 
 								<com.google.android.material.textfield.TextInputLayout
@@ -597,13 +597,13 @@
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									style="@style/EnerGym.FieldCaption"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									tools:text="Espacio disponible" />
 
 								<com.google.android.material.textfield.TextInputLayout
@@ -638,13 +638,13 @@
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									style="@style/EnerGym.FieldCaption"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									tools:text="Preferencias" />
 
 								<com.google.android.material.textfield.TextInputLayout
@@ -679,13 +679,13 @@
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:orientation="vertical"
-								android:layout_marginBottom="20dp">
+								android:layout_marginBottom="@dimen/field_gap">
 
 								<TextView
 									style="@style/EnerGym.FieldCaption"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:layout_marginBottom="8dp"
+									android:layout_marginBottom="@dimen/label_gap"
 									tools:text="Limitaciones que quieras declarar" />
 
 								<com.google.android.material.textfield.TextInputLayout
@@ -722,14 +722,14 @@
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -741,7 +741,7 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
 							tools:text="Los recursos son independientes del lugar. Selecciona solo los disponibles." />
 
@@ -749,12 +749,13 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp">
+							android:layout_marginTop="@dimen/space_inline">
 
 							<com.google.android.material.checkbox.MaterialCheckBox
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginBottom="@dimen/control_gap_vertical"
 								android:textColor="@color/white"
 								android:buttonTint="@color/gold"
 								android:paddingVertical="10dp"
@@ -765,7 +766,8 @@
 							<com.google.android.material.checkbox.MaterialCheckBox
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginBottom="@dimen/control_gap_vertical"
 								android:textColor="@color/white"
 								android:buttonTint="@color/gold"
 								android:paddingVertical="10dp"
@@ -776,7 +778,8 @@
 							<com.google.android.material.checkbox.MaterialCheckBox
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginBottom="@dimen/control_gap_vertical"
 								android:textColor="@color/white"
 								android:buttonTint="@color/gold"
 								android:paddingVertical="10dp"
@@ -787,7 +790,8 @@
 							<com.google.android.material.checkbox.MaterialCheckBox
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginBottom="@dimen/control_gap_vertical"
 								android:textColor="@color/white"
 								android:buttonTint="@color/gold"
 								android:paddingVertical="10dp"
@@ -798,7 +802,8 @@
 							<com.google.android.material.checkbox.MaterialCheckBox
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginBottom="@dimen/control_gap_vertical"
 								android:textColor="@color/white"
 								android:buttonTint="@color/gold"
 								android:paddingVertical="10dp"
@@ -809,7 +814,8 @@
 							<com.google.android.material.checkbox.MaterialCheckBox
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginBottom="@dimen/control_gap_vertical"
 								android:textColor="@color/white"
 								android:buttonTint="@color/gold"
 								android:paddingVertical="10dp"
@@ -820,7 +826,8 @@
 							<com.google.android.material.checkbox.MaterialCheckBox
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginBottom="@dimen/control_gap_vertical"
 								android:textColor="@color/white"
 								android:buttonTint="@color/gold"
 								android:paddingVertical="10dp"
@@ -831,7 +838,8 @@
 							<com.google.android.material.checkbox.MaterialCheckBox
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginBottom="@dimen/control_gap_vertical"
 								android:textColor="@color/white"
 								android:buttonTint="@color/gold"
 								android:paddingVertical="10dp"
@@ -842,7 +850,8 @@
 							<com.google.android.material.checkbox.MaterialCheckBox
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginBottom="@dimen/control_gap_vertical"
 								android:textColor="@color/white"
 								android:buttonTint="@color/gold"
 								android:paddingVertical="10dp"
@@ -853,7 +862,8 @@
 							<com.google.android.material.checkbox.MaterialCheckBox
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginBottom="@dimen/control_gap_vertical"
 								android:textColor="@color/white"
 								android:buttonTint="@color/gold"
 								android:paddingVertical="10dp"
@@ -864,7 +874,8 @@
 							<com.google.android.material.checkbox.MaterialCheckBox
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginBottom="@dimen/control_gap_vertical"
 								android:textColor="@color/white"
 								android:buttonTint="@color/gold"
 								android:paddingVertical="10dp"
@@ -878,14 +889,14 @@
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="24dp"
+					android:layout_marginBottom="@dimen/section_gap"
 					style="@style/EnerGym.GlassCard">
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:padding="24dp"
+						android:padding="@dimen/card_padding"
 						android:background="@drawable/glass_panel">
 
 						<TextView
@@ -897,7 +908,7 @@
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
+							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
 							tools:text="Permiso opcional para enviar hasta 12 mensajes anteriores al servidor que conectes en Asistente. Solo se envían al pulsar Enviar al servidor; las sesiones históricas no se adjuntan. Puedes revocarlo aquí. El modo guiado local no envía datos." />
 
@@ -905,12 +916,13 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="12dp">
+							android:layout_marginTop="@dimen/space_inline">
 
 							<com.google.android.material.checkbox.MaterialCheckBox
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:minHeight="56dp"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginBottom="@dimen/control_gap_vertical"
 								android:textColor="@color/white"
 								android:buttonTint="@color/gold"
 								android:paddingVertical="10dp"
@@ -925,9 +937,9 @@
 					style="@style/EnerGym.Button"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:minHeight="56dp"
-					android:layout_marginTop="12dp"
-					android:layout_marginBottom="4dp"
+					android:minHeight="@dimen/primary_touch_target"
+					android:layout_marginTop="@dimen/action_gap"
+					android:layout_marginBottom="0dp"
 					android:textSize="16sp"
 					tools:text="Guardar perfil" />
 			</LinearLayout>
