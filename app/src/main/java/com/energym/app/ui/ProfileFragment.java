@@ -13,7 +13,7 @@ public final class ProfileFragment extends ScreenFragment {
             if(f.key.equals("daysPerWeek"))fields=card("Tu disponibilidad","Organiza el tiempo que puedes dedicar.");
             else if(f.key.equals("level"))fields=card("Tu contexto","Añade tu experiencia, preferencias y limitaciones.");
             else if(f.key.startsWith("resource.")&&!resources){fields=card("Material disponible","Los recursos son independientes del lugar. Selecciona solo los disponibles.");resources=true;}
-            else if(f.key.equals("historyConsent"))fields=card("Personalización y privacidad","Puedes cambiar este permiso en cualquier momento. Esta versión no envía datos a IA.");
+            else if(f.key.equals("historyConsent"))fields=card("Personalización y privacidad","Permiso opcional para enviar hasta 12 mensajes anteriores al servidor que conectes en Asistente. Solo se envían al pulsar Enviar al servidor; las sesiones históricas no se adjuntan. Puedes revocarlo aquí. El modo guiado local no envía datos.");
             if(f.bool)check(fields,f);else if(!f.values.isEmpty())choice(fields,f.key,f.label,f.values,f.labels,f.value,v->app.profileInput(f.key,v));else textField(fields,f.key,f.label,f.value,f.number,f.number,v->app.profileInput(f.key,v));
         }
         action(rows,"Guardar perfil",!app.profileSaving(),app::saveProfile);

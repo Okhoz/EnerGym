@@ -32,7 +32,7 @@ public final class RoutinePlanner {
                 ? "No hay ejercicios compatibles con este objetivo, entorno, recursos y cobertura. Ajusta el perfil; "
                     + "el contenido especializado puede estar pendiente de validación."
                 : "Propuesta local por reglas. Ejemplos sin revisión profesional; adapta la intensidad a tu situación. "
-                    + "No utiliza OpenAI. La duración estimada incluye descansos y transiciones.";
+                    + "No utiliza modelos de IA ni requiere conexión. La duración estimada incluye descansos y transiciones.";
         return new Routine(UUID.randomUUID().toString(), 0, "Propuesta de entrenamiento", profile, items, explanation);
     }
 
@@ -57,3 +57,4 @@ public final class RoutinePlanner {
         return values;
     }
 }
+

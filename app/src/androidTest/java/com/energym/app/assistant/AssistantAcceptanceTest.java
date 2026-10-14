@@ -1,0 +1,31 @@
+package com.energym.app.assistant;
+import android.content.Context;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import com.energym.app.catalog.CatalogRepository;
+import com.energym.app.data.*;
+import com.energym.app.domain.*;
+import com.energym.app.controller.AppStore;
+import java.util.*;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import static org.junit.Assert.*;
+/** Pruebas de la frontera SQLite real: comparar y escribir perfil/rutina debe ser una única transacción. */
+@RunWith(AndroidJUnit4.class)
+public class AssistantAcceptanceTest {
+    private Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();
+    private Routine routine(TrainingProfile p)throws Exception{return new RoutinePlanner().create(p,CatalogRepository.load(context).getExercises());}
+    @Test public void staleProfileCannotSaveEitherProfileOrRoutine()throws Exception{try(EnerGymDatabase db=new EnerGymDatabase(context,"test:assistant-cas")){db.clearLocalData();TrainingProfile old=new TrainingProfile.Builder().build();db.saveProfile(old);Routine preview=routine(old);TrainingProfile changed=old.withResources(java.util.EnumSet.of(TrainingProfile.Resource.BANDS));db.saveProfile(changed);try{new RoutineRepository(db).acceptProposal(preview,old);fail();}catch(IllegalArgumentException expected){}assertEquals(changed,db.loadProfile());assertTrue(new RoutineRepository(db).versions().isEmpty());}}
+    @Test public void failedImmutableVersionWriteRollsBackProposedProfile()throws Exception{try(EnerGymDatabase db=new EnerGymDatabase(context,"test:assistant-rollback")){db.clearLocalData();TrainingProfile old=new TrainingProfile.Builder().build();db.saveProfile(old);RoutineRepository repo=new RoutineRepository(db);Routine first=routine(old);long id=repo.saveAccepted(first);SessionRepository sessions=new SessionRepository(db);sessions.saveDraft(new Session(first.withVersionId(id)));TrainingProfile changed=old.toBuilder().durationMinutes(25).build();Routine other=routine(changed);Routine collision=new Routine(first.getProposalId(),0,"Otro título",changed,other.getItems(),other.getExplanation());try{repo.acceptProposal(collision,old);fail();}catch(IllegalArgumentException expected){}assertEquals(old,db.loadProfile());assertEquals(1,repo.versions().size());assertEquals(old,sessions.pending().get(0).getRoutine().getProfile());assertEquals(first.getTitle(),repo.load(id).getTitle());}}
+    /** El controlador debe conservar el CAS de su propuesta, incluso si el diálogo se vuelve a sembrar desde otro perfil. */
+    @Test public void dialogueRebaseCannotRestoreRemovedResourcesInSqlite()throws Exception{for(int path=0;path<4;path++)try(EnerGymDatabase db=new EnerGymDatabase(context,"test:assistant-rebase-"+path)){
+        db.clearLocalData();TrainingProfile a=new TrainingProfile.Builder().category(TrainingProfile.Category.HOME_EQUIPMENT).resources(EnumSet.of(TrainingProfile.Resource.DUMBBELLS)).build();db.saveProfile(a);RoutineRepository repo=new RoutineRepository(db);Routine first=routine(a);Routine old=repo.load(repo.saveAccepted(first));SessionRepository sessions=new SessionRepository(db);sessions.saveDraft(new Session(old));String sessionBefore=SnapshotCodec.encodeSession(sessions.pending().get(0));String routineBefore=SnapshotCodec.encodeRoutine(old);String owner=db.getOwnerUid();
+        ChatFake client=new ChatFake();LocalConversationStore conversations=new LocalConversationStore(context,Runnable::run);AppStore store=new AppStore(){public void load(Callback<Snapshot> c){}public void profile(TrainingProfile p,Callback<Void> c){fail("Escritura separada de perfil");}public void accept(Routine r,Callback<Routine> c){throw new AssertionError("Debe usar CAS");}public void acceptProposal(Routine r,TrainingProfile expected,Callback<Routine> c){try{c.success(repo.acceptProposal(r,expected));}catch(Exception error){c.failure(error);}}public void draft(Session s,Callback<Long> c){}public void openDraft(String id,Callback<OpenDraft> c){}public void finish(long id,Callback<Void> c){}};
+        List<Exercise> catalog=CatalogRepository.load(context).getExercises();ProposalController controller=new ProposalController(store,conversations,client,catalog,db::loadProfile,()->{},r->{});controller.activate(owner);controller.sendLocal("Prepara rutina de fuerza");assertNotNull(controller.preview);assertTrue(controller.preview.getProfile().getResources().contains(TrainingProfile.Resource.DUMBBELLS));TrainingProfile b=a.toBuilder().category(TrainingProfile.Category.NO_EQUIPMENT).resources(Collections.emptySet()).build();db.saveProfile(b);
+        if(path==3){controller.activate("test:another-account");controller=new ProposalController(store,new LocalConversationStore(context,Runnable::run),client,catalog,db::loadProfile,()->{},r->{});controller.activate(owner);assertNotNull("Preview restaurada ausente",controller.preview);}
+        if(path==2)controller.sendLocal("Sustituir primer ejercicio");else{controller.sendExternal("Ayuda");assertNotNull(client.callback);if(path==1)client.callback.success(textReply(client.request));else client.callback.failure("PROVIDER_NOT_CONFIGURED");}controller.accept();
+        assertEquals("El perfil B debe conservarse en camino "+path,b,db.loadProfile());assertEquals(1,repo.versions().size());assertEquals(routineBefore,SnapshotCodec.encodeRoutine(repo.load(old.getVersionId())));assertEquals(sessionBefore,SnapshotCodec.encodeSession(sessions.pending().get(0)));
+    }}
+    static class ChatFake implements ChatClient {Request request;Callback callback;public void send(Request r,Callback c){request=r;callback=c;}public void connect(String e,String p,Callback c){}public void disconnect(){}public boolean connected(){return true;}}
+    private static String textReply(ChatClient.Request r){Map<String,Object> result=new LinkedHashMap<>();result.put("text","Respuesta sin propuesta");result.put("missingFields",Collections.emptyList());result.put("proposal",null);result.put("commands",Collections.emptyList());result.put("catalogVersion",1);result.put("proposalNotice","Ejemplo sin revisión profesional");result.put("conversationId",r.conversationId);result.put("requestId",r.requestId);result.put("exerciseId",r.exerciseId);return StrictJson.write(result);}
+}

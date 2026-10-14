@@ -7,15 +7,18 @@ import com.energym.app.auth.*;
 import com.energym.app.catalog.CatalogRepository;
 import com.energym.app.data.EnerGymDatabase;
 import com.energym.app.sync.*;
+import com.energym.app.assistant.*;
 import java.util.concurrent.*;
 /** Propietario Android del ciclo de vida, no ViewModel de negocio: conserva los controladores MVC al rotar.
  * Un único worker serializa SQLite/cloud; todos los eventos que renderizan se entregan en main. */
 public final class AppState extends AndroidViewModel {
-    public AppController app;public AccountController accounts;public SyncController sync;
+    public AppController app;public AccountController accounts;public SyncController sync;public ProposalController assistant;
     public AccountController.Status accountStatus=AccountController.Status.CONFIGURATION_NEEDED;
     public SyncCoordinator.Status syncStatus=SyncCoordinator.Status.SIGNED_OUT;
     public AccountUser user;public String fatal="",syncError="";
     private final ExecutorService worker=Executors.newSingleThreadExecutor();private final Executor main;
+    // Una consulta HTTP lenta no debe bloquear guardar perfiles/sesiones en el worker SQLite/cloud.
+    private final ExecutorService chatWorker=Executors.newSingleThreadExecutor();
     private GoogleAccountGateway gateway;private Runnable observer=()->{};private boolean cleared;
     private ConnectivityManager connectivity;private ConnectivityManager.NetworkCallback networkCallback;
     public AppState(Application application){super(application);main=ContextCompat.getMainExecutor(application);
@@ -24,7 +27,10 @@ public final class AppState extends AndroidViewModel {
     private void initialize(Application context,CatalogRepository catalog){
         gateway=new GoogleAccountGateway(context,main);
         sync=new SyncController(context,gateway,new FirebaseCloudGateway(gateway,worker),worker,main,(status,error)->{syncStatus=status;syncError=error==null?"":error.getMessage();if(app!=null&&status==SyncCoordinator.Status.SYNCED)app.reload();changed();});
-        app=new AppController(new AndroidAppStore(sync),catalog);app.observe(this::changed);
+        AndroidAppStore store=new AndroidAppStore(sync);app=new AppController(store,catalog);
+        assistant=new ProposalController(store,new LocalConversationStore(context,worker),new HttpChatClient(chatWorker,main,(context.getApplicationInfo().flags&android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)!=0),catalog.getExercises(),catalog.getVersion(),()->app.profile,this::changed,r->{app.routines.accepted=r;app.reload();});
+        app.explanations((exercise,profile)->{assistant.explain(exercise);app.navigate(AppController.Screen.ASSISTANT);});
+        app.observe(()->{assistant.activate(app.owner());changed();});
         accounts=new AccountController(gateway,sync,main,(status,value,error)->{accountStatus=status;user=value;
             if(status==AccountController.Status.AUTHENTICATED||(status==AccountController.Status.ERROR&&value!=null))app.activate(value.getUid());
             else if(status==AccountController.Status.DEMO_LOCAL)app.activate(EnerGymDatabase.DEMO_OWNER_UID);
@@ -41,6 +47,6 @@ public final class AppState extends AndroidViewModel {
         @Override public void onLost(Network network){disconnected=true;}
         @Override public void onAvailable(Network network){if(disconnected){disconnected=false;main.execute(()->{if(!cleared)sync.requestSync();});}}
     };try{connectivity.registerDefaultNetworkCallback(networkCallback);}catch(RuntimeException e){networkCallback=null;}}
-    @Override protected void onCleared(){cleared=true;observer=()->{};if(app!=null)app.observe(null);if(networkCallback!=null)connectivity.unregisterNetworkCallback(networkCallback);if(accounts!=null)accounts.close();if(sync!=null)sync.close();worker.shutdown();}
+    @Override protected void onCleared(){cleared=true;observer=()->{};if(assistant!=null)assistant.disconnect();chatWorker.shutdown();if(app!=null)app.observe(null);if(networkCallback!=null)connectivity.unregisterNetworkCallback(networkCallback);if(accounts!=null)accounts.close();if(sync!=null)sync.close();worker.shutdown();}
 }
 

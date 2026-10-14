@@ -9,6 +9,7 @@ public final class AndroidAppStore implements AppStore {
     public void load(Callback<Snapshot> c){sync.withDatabase(db->new Snapshot(db.loadProfile(),new RoutineRepository(db).versions(),new SessionRepository(db).pending(),new SessionRepository(db).history()),callback(c,false));}
     public void profile(TrainingProfile p,Callback<Void> c){sync.withDatabase(db->{db.saveProfile(p);return null;},callback(c,true));}
     public void accept(Routine r,Callback<Routine> c){sync.withDatabase(db->{RoutineRepository repo=new RoutineRepository(db);return repo.load(repo.saveAccepted(r));},callback(c,true));}
+    public void acceptProposal(Routine r,TrainingProfile expected,Callback<Routine> c){sync.withDatabase(db->new RoutineRepository(db).acceptProposal(r,expected),callback(c,true));}
     public void draft(Session s,Callback<Long> c){sync.withDatabase(db->new SessionRepository(db).saveDraft(s),callback(c,true));}
     /** Dos lecturas serializadas en el worker del scope; jamás convierte abrir en una mutación/sync pendiente. */
     public void openDraft(String syncId,Callback<OpenDraft> c){sync.withDatabase(db->{SessionRepository repo=new SessionRepository(db);long id=repo.findIdBySyncId(syncId);Session current=id==0?null:repo.load(id);return current==null?null:new OpenDraft(id,current);},callback(c,false));}

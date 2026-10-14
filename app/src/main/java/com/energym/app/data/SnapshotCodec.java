@@ -8,6 +8,9 @@ import org.json.*;
 /** Frontera JSON Android: conserva el perfil completo y ejercicios originales sin consultar el catálogo. */
 public final class SnapshotCodec {
     private SnapshotCodec() { }
+    /** Serializa el snapshot exacto para el contexto conversacional local, sin buscar el ID en el catálogo. */
+    public static String encodeExercise(Exercise e){try{return exercise(e).toString();}catch(JSONException error){throw invalid(error);}}
+    public static Exercise decodeExercise(String json){try{return exercise(new JSONObject(json));}catch(JSONException error){throw invalid(error);}}
     public static String encodeProfile(TrainingProfile p) {
         try { return profile(p).toString(); } catch (JSONException e) { throw invalid(e); }
     }

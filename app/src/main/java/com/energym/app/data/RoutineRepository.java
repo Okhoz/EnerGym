@@ -23,6 +23,11 @@ public final class RoutineRepository {
         });
     }
     public Routine load(long id) { EnerGymDatabase.Row row = database.find(SyncRecord.Kind.ROUTINE, id); return row == null ? null : decode(row); }
+    /** Compara recursos/consentimiento dentro de SQLite; ningún fallo deja el perfil parcialmente guardado. */
+    public Routine acceptProposal(Routine routine,TrainingProfile expected){return database.transaction(()->{
+        if(!Objects.equals(database.loadProfile(),expected)||!routine.isValidFor(routine.getProfile()))throw new IllegalArgumentException("El perfil cambió. Revisa una nueva propuesta.");
+        database.saveProfile(routine.getProfile());return load(saveAccepted(routine));
+    });}
     public List<Routine> versions() {
         List<Routine> result = new ArrayList<>(); for (EnerGymDatabase.Row row : database.rows(SyncRecord.Kind.ROUTINE, null)) result.add(decode(row));
         return Collections.unmodifiableList(result);

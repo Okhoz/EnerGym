@@ -16,6 +16,8 @@ public interface AppStore {
     void load(Callback<Snapshot> callback);
     void profile(TrainingProfile value,Callback<Void> callback);
     void accept(Routine value,Callback<Routine> callback);
+    /** Aceptación explícita de perfil propuesto y rutina juntos, comparando el perfil vigente. */
+    default void acceptProposal(Routine value,TrainingProfile expected,Callback<Routine> callback){if(!Objects.equals(value.getProfile(),expected)){callback.failure(new IllegalArgumentException("Almacén sin aceptación conjunta"));return;}accept(value,callback);}
     void draft(Session value,Callback<Long> callback);
     void openDraft(String syncId,Callback<OpenDraft> callback);
     void finish(long id,Callback<Void> callback);

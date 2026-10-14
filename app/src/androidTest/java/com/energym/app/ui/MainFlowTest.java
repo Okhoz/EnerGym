@@ -41,7 +41,7 @@ public class MainFlowTest {
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
             await();click(scenario,"Cuenta");scenario.onActivity(a->assertNotNull(text(a.getWindow().getDecorView(),"Google: configuración pendiente")));
             click(scenario,"Entrar en demo local");scenario.recreate();await();scenario.onActivity(a->{assertEquals(EnerGymDatabase.DEMO_OWNER_UID,a.state().app.owner());assertTrue(a.state().syncText().contains("demo local"));});
-            scenario.onActivity(a->((com.google.android.material.bottomnavigation.BottomNavigationView)a.findViewById(R.id.navigation)).setSelectedItemId(R.id.tab_assistant));await();capture("assistant");scenario.onActivity(a->assertNotNull(text(a.getWindow().getDecorView(),"Integración pendiente")));
+            scenario.onActivity(a->((com.google.android.material.bottomnavigation.BottomNavigationView)a.findViewById(R.id.navigation)).setSelectedItemId(R.id.tab_assistant));await();capture("assistant");scenario.onActivity(a->{assertNotNull(text(a.getWindow().getDecorView(),"Enviar local"));assertTrue(textContaining(a.getWindow().getDecorView(),"Guiado local · gratuito"));});
         }
     }
     @Test public void reopeningCachedDraftRetainsSavedResultsAndUnsavedText() throws Exception {
