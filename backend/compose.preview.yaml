@@ -1,0 +1,33 @@
+# Vista privada: misma red del contenedor para respetar HTTP sólo loopback.
+name: energym-preview
+services:
+  backend:
+    image: energym-backend:local
+    build:
+      context: .
+      args:
+        BUILD_IMAGE: ${ENERGYM_BUILD_IMAGE:?Imagen JDK oficial con digest obligatoria}
+        RUNTIME_IMAGE: ${ENERGYM_RUNTIME_IMAGE:?Imagen JRE oficial con digest obligatoria}
+        MAVEN_DISTRIBUTION_SHA256: ${ENERGYM_MAVEN_SHA256:?Checksum SHA256 distribución Maven obligatorio}
+    init: true
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1770"]
+    mem_limit: 512m
+    cpus: 1.0
+    pids_limit: 128
+    environment:
+      ENERGYM_HOST: 127.0.0.1
+      ENERGYM_PORT: "8080"
+      ENERGYM_DEV_MODE: "true"
+      ENERGYM_AI_PROVIDER: none
+      GEMINI_ENABLED: "false"
+      OPENAI_ENABLED: "false"
+    restart: "no"
+    stop_grace_period: 30s
+    logging:
+      driver: local
+      options: {max-size: "5m", max-file: "2"}
+# No ports: usar healthcheck o docker compose exec, sin publicar HTTP ni alterar Server.

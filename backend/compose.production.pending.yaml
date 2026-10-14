@@ -1,0 +1,86 @@
+# PENDIENTE Task16: autenticación, token proxy, cuotas durables y pruebas reales.
+# Sólo preview HTTPS loopback. No utilizar como publicación de producción.
+name: energym-tls-preview
+services:
+  backend:
+    image: energym-backend:local
+    build:
+      context: .
+      args:
+        BUILD_IMAGE: ${ENERGYM_BUILD_IMAGE:?Imagen JDK oficial con digest obligatoria}
+        RUNTIME_IMAGE: ${ENERGYM_RUNTIME_IMAGE:?Imagen JRE oficial con digest obligatoria}
+        MAVEN_DISTRIBUTION_SHA256: ${ENERGYM_MAVEN_SHA256:?Checksum SHA256 distribución Maven obligatorio}
+    init: true
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1770"]
+    mem_limit: 512m
+    cpus: 1.0
+    pids_limit: 128
+    networks: [backend_link, backend_egress]
+    environment:
+      ENERGYM_HOST: 0.0.0.0
+      ENERGYM_PORT: "8080"
+      ENERGYM_DEV_MODE: "false"
+      ENERGYM_TLS_KEYSTORE: /run/secrets/backend_tls
+      ENERGYM_TLS_PASSWORD_FILE: /run/secrets/backend_tls_password
+      ENERGYM_PROXY_TOKEN_FILE: /run/secrets/proxy_token
+      ENERGYM_HEALTH_URL: https://backend:8080/health
+      ENERGYM_HEALTH_TRUSTSTORE: /run/secrets/backend_truststore
+      ENERGYM_HEALTH_TRUSTSTORE_PASSWORD_FILE: /run/secrets/backend_truststore_password
+      ENERGYM_AI_PROVIDER: none
+      GEMINI_ENABLED: "false"
+      OPENAI_ENABLED: "false"
+    secrets: [backend_tls, backend_tls_password, proxy_token, backend_truststore, backend_truststore_password]
+    restart: "no"
+    stop_grace_period: 30s
+    logging:
+      driver: local
+      options: {max-size: "5m", max-file: "2"}
+  proxy:
+    image: ${ENERGYM_PROXY_IMAGE:?Imagen nginx oficial Alpine con digest obligatoria}
+    user: "10001:10001"
+    entrypoint: ["/bin/sh", "/opt/energym/nginx-entrypoint.sh"]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1770"]
+    mem_limit: 128m
+    cpus: 0.5
+    pids_limit: 64
+    ports: ["127.0.0.1:8443:8443"]
+    networks: [frontend, backend_link]
+    depends_on:
+      backend: {condition: service_healthy}
+    volumes:
+      - ./deploy/nginx-entrypoint.sh:/opt/energym/nginx-entrypoint.sh:ro
+      - ./deploy/nginx.conf.template:/opt/energym/nginx.conf.template:ro
+    secrets: [frontend_cert, frontend_key, backend_ca, proxy_token]
+    restart: "no"
+    stop_grace_period: 30s
+    logging:
+      driver: local
+      options: {max-size: "5m", max-file: "2"}
+networks:
+  frontend: {}
+  backend_link: {internal: true}
+  backend_egress: {}
+secrets:
+  backend_tls:
+    file: ${ENERGYM_BACKEND_TLS_FILE:?PKCS12 privado con SAN backend obligatorio}
+  backend_tls_password:
+    file: ${ENERGYM_BACKEND_TLS_PASSWORD_FILE:?Archivo contraseña PKCS12 obligatorio}
+  proxy_token:
+    file: ${ENERGYM_PROXY_TOKEN_FILE:?Archivo secreto salto proxy obligatorio}
+  backend_truststore:
+    file: ${ENERGYM_BACKEND_TRUSTSTORE_FILE:?PKCS12 CA privada para sonda obligatorio}
+  backend_truststore_password:
+    file: ${ENERGYM_BACKEND_TRUSTSTORE_PASSWORD_FILE:?Archivo contraseña truststore obligatorio}
+  frontend_cert:
+    file: ${ENERGYM_FRONTEND_CERT_FILE:?Cadena certificado público obligatorio}
+  frontend_key:
+    file: ${ENERGYM_FRONTEND_KEY_FILE:?Clave privada certificado público obligatoria}
+  backend_ca:
+    file: ${ENERGYM_BACKEND_CA_FILE:?CA PEM backend obligatoria}

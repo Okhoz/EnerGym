@@ -1,0 +1,26 @@
+# Contexto por lista positiva: jamás copia .env, certificados, datos ni target local.
+**
+!Dockerfile
+!pom.xml
+!mvnw
+!.mvn/
+!.mvn/wrapper/
+!.mvn/wrapper/maven-wrapper.properties
+!src/
+!src/main/
+!src/main/**
+!src/test/
+!src/test/**
+!deploy/
+!deploy/entrypoint.sh
+# Defensa adicional por si alguien guarda secretos dentro del árbol fuente.
+**/.env*
+**/*secret*
+**/*credential*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.jks
+**/google-services.json
+**/*service-account*
+**/*firebase-admin*
