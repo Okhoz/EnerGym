@@ -31,7 +31,8 @@ public final class SyncController implements AccountController.SessionTarget, Au
 	private EnerGymDatabase database;
 	private volatile long generation;
 
-	public SyncController(Context context, AccountGateway accounts, CloudSyncGateway cloud, Executor worker, Executor delivery, SyncCoordinator.Listener listener) {
+	public SyncController(Context context, AccountGateway accounts, CloudSyncGateway cloud, Executor worker,
+		Executor delivery, SyncCoordinator.Listener listener) {
 		this.context = context.getApplicationContext();
 		this.accounts = Objects.requireNonNull(accounts);
 		this.worker = Objects.requireNonNull(worker);
@@ -131,6 +132,31 @@ public final class SyncController implements AccountController.SessionTarget, Au
 	 */
 	public void requestSync() {
 		coordinator.sync();
+	}
+
+	/**
+	 * Invalida restauración y datos pendientes antes de borrar solo el propietario capturado.
+	 */
+	public synchronized void clearLocalData(DataCallback<Void> callback) {
+		EnerGymDatabase target = database;
+		if (target == null) {
+			callback.onFailure(new IllegalStateException("Selecciona cuenta o demo"));
+			return;
+		}
+		generation++;
+		database = null;
+		// La cola serial pone el borrado antes del cierre de SQLite; el monitor bloquea callbacks concurrentes.
+		worker.execute(() -> {
+			synchronized (SyncController.this) {
+				try {
+					target.clearLocalData();
+					delivery.execute(() -> callback.onSuccess(null));
+				} catch (Exception e) {
+					delivery.execute(() -> callback.onFailure(e));
+				}
+			}
+		});
+		coordinator.close();
 	}
 
 	public synchronized void close() {

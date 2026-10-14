@@ -193,8 +193,7 @@ public final class AppController {
 				versions = snapshot.routines;
 				if (!profileDirty)
 					fillProfile(profile == null ? new TrainingProfile.Builder().build() : profile);
-				if (routines.accepted == null && !versions.isEmpty())
-					routines.accepted = versions.get(0);
+				routines.accepted = versions.isEmpty() ? null : versions.get(0);
 				changed();
 			}
 

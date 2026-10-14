@@ -111,6 +111,16 @@ public final class ProposalController {
 	}
 
 	/**
+	 * El borrado local revoca primero el contexto para que ninguna respuesta repueble la conversación.
+	 */
+	public void clearLocalData() {
+		String previous = owner;
+		activate(null);
+		if (previous != null)
+			conversations.clear(previous);
+	}
+
+	/**
 	 * Eventos de edición sin render por tecla: el compositor conserva foco e IME.
 	 */
 	public void messageInput(String text) {

@@ -25,7 +25,8 @@ public final class SyncCoordinator {
 	private long generation;
 	private boolean busy, repeat;
 
-	public SyncCoordinator(CloudSyncGateway cloud, Supplier<String> authenticatedUid, Executor worker, Listener listener) {
+	public SyncCoordinator(CloudSyncGateway cloud, Supplier<String> authenticatedUid, Executor worker,
+		Listener listener) {
 		this.cloud = Objects.requireNonNull(cloud);
 		this.authenticatedUid = Objects.requireNonNull(authenticatedUid);
 		this.worker = Objects.requireNonNull(worker);
@@ -83,15 +84,16 @@ public final class SyncCoordinator {
 				if (!current(token, target))
 					return;
 				try {
-					cloud.restore(target.ownerUid(), new CloudSyncGateway.Callback<List<CloudSyncGateway.RemoteRecord>>() {
-						public void onSuccess(List<CloudSyncGateway.RemoteRecord> remote) {
-							worker.execute(() -> restored(token, target, remote));
-						}
+					cloud.restore(target.ownerUid(),
+						new CloudSyncGateway.Callback<List<CloudSyncGateway.RemoteRecord>>() {
+							public void onSuccess(List<CloudSyncGateway.RemoteRecord> remote) {
+								schedule(token, target, () -> restored(token, target, remote));
+							}
 
-						public void onFailure(Exception e) {
-							worker.execute(() -> failed(token, target, e));
-						}
-					});
+							public void onFailure(Exception e) {
+								schedule(token, target, () -> failed(token, target, e));
+							}
+						});
 				} catch (Exception e) {
 					failed(token, target, e);
 				}
@@ -119,7 +121,8 @@ public final class SyncCoordinator {
 		}
 	}
 
-	private synchronized void uploadNext(long token, LocalSyncStore target, List<SyncRecord> pending, Map<String, Long> versions, int index, boolean conflict) {
+	private synchronized void uploadNext(long token, LocalSyncStore target, List<SyncRecord> pending,
+		Map<String, Long> versions, int index, boolean conflict) {
 		if (!current(token, target))
 			return;
 		if (index == pending.size()) {
@@ -135,27 +138,29 @@ public final class SyncCoordinator {
 			return;
 		}
 		try {
-			cloud.upload(record, versions.getOrDefault(key(record), 0L), new CloudSyncGateway.Callback<CloudSyncGateway.UploadResult>() {
-				public void onSuccess(CloudSyncGateway.UploadResult result) {
-					worker.execute(() -> {
-						synchronized (SyncCoordinator.this) {
-							if (!current(token, target))
-								return;
-							try {
-								if (result.accepted)
-									target.acknowledge(record); // Confirma exclusivamente la revisión enviada.
-								uploadNext(token, target, pending, versions, index + 1, conflict || !result.accepted);
-							} catch (Exception e) {
-								failed(token, target, e);
+			cloud.upload(record, versions.getOrDefault(key(record), 0L),
+				new CloudSyncGateway.Callback<CloudSyncGateway.UploadResult>() {
+					public void onSuccess(CloudSyncGateway.UploadResult result) {
+						schedule(token, target, () -> {
+							synchronized (SyncCoordinator.this) {
+								if (!current(token, target))
+									return;
+								try {
+									if (result.accepted)
+										target.acknowledge(record); // Confirma exclusivamente la revisión enviada.
+									uploadNext(token, target, pending, versions, index + 1,
+										conflict || !result.accepted);
+								} catch (Exception e) {
+									failed(token, target, e);
+								}
 							}
-						}
-					});
-				}
+						});
+					}
 
-				public void onFailure(Exception e) {
-					worker.execute(() -> failed(token, target, e));
-				}
-			});
+					public void onFailure(Exception e) {
+						schedule(token, target, () -> failed(token, target, e));
+					}
+				});
 		} catch (Exception e) {
 			failed(token, target, e);
 		}
@@ -173,6 +178,14 @@ public final class SyncCoordinator {
 		repeat = false;
 		status(availableStatus(), null);
 		return false;
+	}
+
+	/**
+	 * Descarta callbacks invalidados antes de tocar un worker que puede haber finalizado.
+	 */
+	private synchronized void schedule(long token, LocalSyncStore target, Runnable callback) {
+		if (current(token, target))
+			worker.execute(callback);
 	}
 
 	private synchronized void failed(long token, LocalSyncStore target, Exception e) {

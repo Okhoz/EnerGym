@@ -292,6 +292,10 @@ public final class EnerGymDatabase extends SQLiteOpenHelper {
 		getWritableDatabase().execSQL("UPDATE revision_clock SET value=? WHERE singleton=1", new Object[]{revision});
 		long updated = old == null ? System.currentTimeMillis() :
 			Math.max(System.currentTimeMillis(), Math.addExact(old.record.getUpdatedAt(), 1));
+		// La aceptación nueva queda después de las anteriores incluso si el reloj retrocede o empata.
+		if (kind == SyncRecord.Kind.ROUTINE && old == null)
+			for (Row accepted : rows(SyncRecord.Kind.ROUTINE, null))
+				updated = Math.max(updated, Math.addExact(accepted.record.getUpdatedAt(), 1));
 		ContentValues values = values(kind, syncId, payload, revision, updated, SyncRecord.State.PENDING);
 		if (old == null)
 			return getWritableDatabase().insertOrThrow("records", null, values);

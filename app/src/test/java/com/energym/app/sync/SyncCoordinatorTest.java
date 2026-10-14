@@ -12,6 +12,28 @@ import static org.junit.Assert.*;
  * Pruebas de contrato con almacén en memoria y transporte diferido: ninguna llamada a nube real.
  */
 public class SyncCoordinatorTest {
+	@Test
+	public void retainedRestoreAfterCloseNeverSchedulesOnShutdownWorker() throws Exception {
+		java.util.concurrent.ExecutorService worker = java.util.concurrent.Executors.newSingleThreadExecutor();
+		SyncCoordinator c = new SyncCoordinator(cloud, () -> uid, worker, (s, e) -> statuses.add(s));
+		Store store = new Store("alice");
+		c.activate(store);
+		c.sync();
+		worker.submit(() -> {
+		}).get();
+		assertNotNull(cloud.download);
+		c.close();
+		worker.shutdown();
+		assertTrue(worker.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS));
+		int count = statuses.size();
+		cloud.download.onSuccess(
+			Collections.singletonList(new CloudSyncGateway.RemoteRecord(record("alice", 1, "late"), 1)));
+		cloud.download.onFailure(new IllegalStateException("late"));
+		assertNull(store.value);
+		assertTrue(store.closed);
+		assertEquals(count, statuses.size());
+	}
+
 	private String uid = "alice";
 	private final Transport cloud = new Transport();
 	private final List<SyncCoordinator.Status> statuses = new ArrayList<>();
@@ -21,7 +43,8 @@ public class SyncCoordinatorTest {
 	}
 
 	private SyncRecord record(String owner, long revision, String payload) {
-		return new SyncRecord(SyncRecord.Kind.PROFILE, "profile", owner, payload, revision, revision, SyncRecord.State.PENDING);
+		return new SyncRecord(SyncRecord.Kind.PROFILE, "profile", owner, payload, revision, revision,
+			SyncRecord.State.PENDING);
 	}
 
 	@Test
@@ -62,7 +85,8 @@ public class SyncCoordinatorTest {
 		c.activate(s);
 		c.sync();
 		assertNotNull(cloud.download);
-		cloud.download.onSuccess(Collections.singletonList(new CloudSyncGateway.RemoteRecord(record("alice", 1, "remote"), 7)));
+		cloud.download.onSuccess(
+			Collections.singletonList(new CloudSyncGateway.RemoteRecord(record("alice", 1, "remote"), 7)));
 		assertEquals("local", s.value.getPayload());
 		assertEquals("local", cloud.sent.getPayload());
 		assertEquals(7, cloud.expected);
@@ -81,7 +105,8 @@ public class SyncCoordinatorTest {
 		cloud.upload.onSuccess(new CloudSyncGateway.UploadResult(true, 1));
 		assertEquals(SyncRecord.State.PENDING, s.value.getState());
 		assertEquals("edited", s.value.getPayload());
-		assertFalse("No declarar respaldo completo mientras queda una edición nueva", statuses.contains(SyncCoordinator.Status.SYNCED));
+		assertFalse("No declarar respaldo completo mientras queda una edición nueva",
+			statuses.contains(SyncCoordinator.Status.SYNCED));
 	}
 
 	@Test
@@ -112,7 +137,8 @@ public class SyncCoordinatorTest {
 		cloud.upload.onSuccess(new CloudSyncGateway.UploadResult(true, 1));
 		c.sync();
 		assertNotNull(cloud.download);
-		cloud.download.onSuccess(Collections.singletonList(new CloudSyncGateway.RemoteRecord(record("alice", 1, "local"), 1)));
+		cloud.download.onSuccess(
+			Collections.singletonList(new CloudSyncGateway.RemoteRecord(record("alice", 1, "local"), 1)));
 		assertEquals(1, cloud.uploads);
 		assertEquals(SyncCoordinator.Status.SYNCED, statuses.get(statuses.size() - 1));
 	}
@@ -142,7 +168,8 @@ public class SyncCoordinatorTest {
 		c.activate(s);
 		c.sync();
 		assertNotNull(cloud.download);
-		cloud.download.onSuccess(Collections.singletonList(new CloudSyncGateway.RemoteRecord(record("bob", 1, "foreign"), 1)));
+		cloud.download.onSuccess(
+			Collections.singletonList(new CloudSyncGateway.RemoteRecord(record("bob", 1, "foreign"), 1)));
 		assertNull(s.value);
 		assertEquals(SyncCoordinator.Status.ERROR, statuses.get(statuses.size() - 1));
 	}
@@ -235,18 +262,22 @@ public class SyncCoordinatorTest {
 		}
 
 		public List<SyncRecord> pending() {
-			return value != null && value.getState() == SyncRecord.State.PENDING ? Collections.singletonList(value) : Collections.emptyList();
+			return value != null && value.getState() == SyncRecord.State.PENDING ? Collections.singletonList(value) :
+				Collections.emptyList();
 		}
 
 		public void importRecords(List<SyncRecord> rs) {
 			if (value == null || value.getState() != SyncRecord.State.PENDING)
 				for (SyncRecord r : rs)
-					value = new SyncRecord(r.getKind(), r.getSyncId(), r.getOwnerUid(), r.getPayload(), r.getRevision(), r.getUpdatedAt(), SyncRecord.State.CLEAN);
+					value = new SyncRecord(r.getKind(), r.getSyncId(), r.getOwnerUid(), r.getPayload(), r.getRevision(),
+						r.getUpdatedAt(), SyncRecord.State.CLEAN);
 		}
 
 		public boolean acknowledge(SyncRecord r) {
 			if (value != null && value.getRevision() == r.getRevision()) {
-				value = new SyncRecord(value.getKind(), value.getSyncId(), owner, value.getPayload(), value.getRevision(), value.getUpdatedAt(), SyncRecord.State.CLEAN);
+				value =
+					new SyncRecord(value.getKind(), value.getSyncId(), owner, value.getPayload(), value.getRevision(),
+						value.getUpdatedAt(), SyncRecord.State.CLEAN);
 				return true;
 			}
 			return false;

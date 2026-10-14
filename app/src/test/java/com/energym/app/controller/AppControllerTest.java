@@ -10,6 +10,24 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 public class AppControllerTest {
+	@Test
+	public void restoredSelectionReplacesPreviouslyLoadedRoutineAndStartsIt() {
+		Store s = new Store();
+		AppController c = new AppController(s, catalog());
+		TrainingProfile p = new TrainingProfile.Builder().build();
+		Routine old = new Routine("z-old", 99, "Anterior", p, Collections.emptyList(), "fixture");
+		Routine current = new Routine("a-new", 2, "Vigente", p, Collections.emptyList(), "fixture");
+		c.activate("owner");
+		s.loading.success(
+			new AppStore.Snapshot(p, Collections.singletonList(old), Collections.emptyList(), Collections.emptyList()));
+		c.reload();
+		s.loading.success(
+			new AppStore.Snapshot(p, Arrays.asList(current, old), Collections.emptyList(), Collections.emptyList()));
+		c.startSession();
+		assertEquals("a-new", c.sessions.session.getRoutine().getProposalId());
+		assertEquals(2, c.versions.size());
+	}
+
 	static class Store extends TrainingControllerTest.Store {
 		Callback<Snapshot> loading;
 

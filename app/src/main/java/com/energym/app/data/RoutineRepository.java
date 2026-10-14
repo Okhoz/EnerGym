@@ -23,7 +23,8 @@ public final class RoutineRepository {
 			EnerGymDatabase.Row old = database.find(SyncRecord.Kind.ROUTINE, routine.getProposalId());
 			String payload = SnapshotCodec.encodeRoutine(routine.withVersionId(0));
 			if (old != null) {
-				if (!SnapshotCodec.encodeRoutine(SnapshotCodec.decodeRoutine(old.record.getPayload()).withVersionId(0)).equals(payload))
+				if (!SnapshotCodec.encodeRoutine(SnapshotCodec.decodeRoutine(old.record.getPayload()).withVersionId(0))
+					.equals(payload))
 					throw new IllegalArgumentException("Una versión aceptada no se puede modificar");
 				return old.id;
 			}
@@ -53,7 +54,12 @@ public final class RoutineRepository {
 
 	public List<Routine> versions() {
 		List<Routine> result = new ArrayList<>();
-		for (EnerGymDatabase.Row row : database.rows(SyncRecord.Kind.ROUTINE, null))
+		List<EnerGymDatabase.Row> rows = database.rows(SyncRecord.Kind.ROUTINE, null);
+		// Una rutina nunca se edita: updatedAt es su aceptación durable, no el instante de sincronización.
+		// El empate entre dispositivos se resuelve por UUID ascendente, nunca por el ID SQLite regenerado.
+		rows.sort(Comparator.<EnerGymDatabase.Row>comparingLong(row -> row.record.getUpdatedAt()).reversed()
+			.thenComparing(row -> row.record.getSyncId()));
+		for (EnerGymDatabase.Row row : rows)
 			result.add(decode(row));
 		return Collections.unmodifiableList(result);
 	}

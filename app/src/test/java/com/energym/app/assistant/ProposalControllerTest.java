@@ -10,6 +10,25 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 public class ProposalControllerTest {
+	@Test
+	public void localEraseClearsPreviewConversationAndRejectsRetainedReplyOnlyForSelectedOwner() {
+		ProposalController c = controller();
+		propose(c);
+		assertNotNull(c.preview);
+		ConversationStore.State own = memory.load("uid-a");
+		memory.save("uid-b", own);
+		c.sendExternal("ayuda");
+		ChatClient.Callback late = client.callback;
+		assertNotNull(late);
+		c.clearLocalData();
+		late.success(validReply(client.request));
+		assertNull(c.preview);
+		assertNull(c.accepted);
+		assertTrue(c.messages.isEmpty());
+		assertNull(memory.load("uid-a"));
+		assertSame(own, memory.load("uid-b"));
+	}
+
 	static Exercise exercise(String id, String description) {
 		return new Exercise(id, "Sentadilla", MetricType.STRENGTH, EnumSet.of(TrainingProfile.Goal.STRENGTH),
 			EnumSet.of(TrainingProfile.Environment.HOME), Collections.emptySet(), Collections.singleton("strength"),
@@ -56,6 +75,10 @@ public class ProposalControllerTest {
 
 		public void save(String o, State s) {
 			states.put(o, s);
+		}
+
+		public void clear(String o) {
+			states.remove(o);
 		}
 	}
 

@@ -37,6 +37,7 @@ public final class AppState extends AndroidViewModel {
 	public AccountUser user;
 	public String fatal = "", syncError = "";
 	private final ExecutorService worker = Executors.newSingleThreadExecutor();
+	private final CallbackExecutor cloudCallbacks = new CallbackExecutor(worker);
 	private final Executor main;
 	// Una consulta HTTP lenta no debe bloquear guardar perfiles/sesiones en el worker SQLite/cloud.
 	private final ExecutorService chatWorker = Executors.newSingleThreadExecutor();
@@ -44,6 +45,7 @@ public final class AppState extends AndroidViewModel {
 	private Runnable observer = () -> {
 	};
 	private boolean cleared;
+	public boolean deletingLocalData;
 	public VisualizationController visualization;
 	private Consumer<VisualizationController.Request> viewerLaunch;
 
@@ -82,7 +84,7 @@ public final class AppState extends AndroidViewModel {
 
 	private void initialize(Application context, CatalogRepository catalog) {
 		gateway = new GoogleAccountGateway(context, main);
-		sync = new SyncController(context, gateway, new FirebaseCloudGateway(gateway, worker), worker, main,
+		sync = new SyncController(context, gateway, new FirebaseCloudGateway(gateway, cloudCallbacks), worker, main,
 			(status, error) -> {
 				syncStatus = status;
 				syncError = error == null ? "" : error.getMessage();
@@ -174,6 +176,37 @@ public final class AppState extends AndroidViewModel {
 		return "Cuenta sin conectar";
 	}
 
+	/**
+	 * Solo se llama después de confirmar en Cuenta. Salir impide restaurar Firebase hasta otra entrada.
+	 */
+	public void clearLocalData(String expectedOwner) {
+		if (cleared || deletingLocalData || app == null || expectedOwner == null || !expectedOwner.equals(app.owner()))
+			return;
+		deletingLocalData = true;
+		assistant.clearLocalData();
+		if (visualization != null)
+			visualization.revoke();
+		app.activate(null);
+		sync.clearLocalData(new SyncController.DataCallback<Void>() {
+			public void onSuccess(Void ignored) {
+				deletingLocalData = false;
+				if (!cleared) {
+					app.notice =
+						"Datos locales borrados. Al conectar Google de nuevo se restaurarán los datos confirmados en Firebase.";
+					app.navigate(AppController.Screen.ACCOUNT);
+				}
+			}
+
+			public void onFailure(Exception error) {
+				deletingLocalData = false;
+				if (!cleared)
+					app.error("No se pudo completar el borrado local: " + error.getMessage());
+			}
+		});
+		accounts.signOut();
+		changed();
+	}
+
 	public String syncText() {
 		if (app != null && EnerGymDatabase.DEMO_OWNER_UID.equals(app.owner()))
 			return "Sin respaldo cloud · demo local";
@@ -227,6 +260,7 @@ public final class AppState extends AndroidViewModel {
 	@Override
 	protected void onCleared() {
 		cleared = true;
+		cloudCallbacks.close();
 		if (visualization != null)
 			visualization.revoke();
 		viewerLaunch = null;

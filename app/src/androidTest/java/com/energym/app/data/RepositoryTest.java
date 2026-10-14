@@ -18,6 +18,63 @@ import static com.energym.app.domain.TrainingProfile.*;
 
 @RunWith(AndroidJUnit4.class)
 public class RepositoryTest {
+	@Test
+	public void durableAcceptanceSurvivesSyncRetryTiesAndClockRollback() throws Exception {
+		Routine template = proposal();
+		List<SyncRecord> records = new ArrayList<>();
+		long future = System.currentTimeMillis() + 86400000L;
+		for (String id : Arrays.asList("z-tie", "a-tie")) {
+			Routine routine =
+				new Routine(id, 0, id, template.getProfile(), template.getItems(), template.getExplanation());
+			records.add(
+				new SyncRecord(SyncRecord.Kind.ROUTINE, id, uid, SnapshotCodec.encodeRoutine(routine), 1, future,
+					SyncRecord.State.CLEAN));
+		}
+		com.energym.app.sync.SqliteSyncStore sync = new com.energym.app.sync.SqliteSyncStore(db);
+		for (int order = 0; order < 2; order++) {
+			db.clearLocalData();
+			sync.importRecords(records);
+			sync.importRecords(records);
+			assertEquals("a-tie", routines.versions().get(0).getProposalId());
+			assertEquals(future, db.find(SyncRecord.Kind.ROUTINE, "a-tie").record.getUpdatedAt());
+			Collections.reverse(records);
+		}
+		Routine next = proposal();
+		routines.saveAccepted(next);
+		SyncRecord accepted = db.find(SyncRecord.Kind.ROUTINE, next.getProposalId()).record;
+		assertEquals(future + 1, accepted.getUpdatedAt());
+		routines.saveAccepted(next);
+		assertEquals(future + 1, db.find(SyncRecord.Kind.ROUTINE, next.getProposalId()).record.getUpdatedAt());
+		SyncRecord roundtrip =
+			com.energym.app.sync.CloudDocumentCodec.decode(uid, accepted.getKind(), accepted.getSyncId(),
+				com.energym.app.sync.CloudDocumentCodec.encode(accepted, 1)).record;
+		assertEquals(future + 1, roundtrip.getUpdatedAt());
+		db.acknowledge(accepted.getKind(), accepted.getSyncId(), accepted.getRevision());
+		sync.importRecords(Collections.singletonList(roundtrip));
+		assertEquals(next.getProposalId(), routines.versions().get(0).getProposalId());
+		assertEquals(future + 1, db.find(SyncRecord.Kind.ROUTINE, next.getProposalId()).record.getUpdatedAt());
+	}
+
+	@Test
+	public void restoredCurrentRoutineUsesAcceptanceTimeNotImportIdsInEitherOrder() throws Exception {
+		Routine template = proposal();
+		List<SyncRecord> records = new ArrayList<>();
+		for (String id : Arrays.asList("a-new", "z-old")) {
+			Routine routine =
+				new Routine(id, 0, id, template.getProfile(), template.getItems(), template.getExplanation());
+			records.add(new SyncRecord(SyncRecord.Kind.ROUTINE, id, uid, SnapshotCodec.encodeRoutine(routine), 1,
+				id.equals("a-new") ? 200 : 100, SyncRecord.State.CLEAN));
+		}
+		for (int order = 0; order < 2; order++) {
+			db.clearLocalData();
+			db.importSyncRecords(records);
+			assertEquals("a-new", routines.versions().get(0).getProposalId());
+			assertEquals("a-new", new Session(routines.versions().get(0)).getRoutine().getProposalId());
+			assertEquals(2, routines.versions().size());
+			Collections.reverse(records);
+		}
+	}
+
 	private Context context;
 	private EnerGymDatabase db;
 	private RoutineRepository routines;

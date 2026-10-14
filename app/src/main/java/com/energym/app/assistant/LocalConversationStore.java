@@ -19,6 +19,7 @@ public final class LocalConversationStore implements ConversationStore {
 	private final File folder;
 	private final Executor worker;
 	private final Map<String, State> cache = new HashMap<>();
+	private final Map<String, Long> generations = new HashMap<>();
 
 	public LocalConversationStore(Context context, Executor worker) {
 		folder = new File(context.getNoBackupFilesDir(), "conversations");
@@ -75,6 +76,7 @@ public final class LocalConversationStore implements ConversationStore {
 	}
 
 	public synchronized void save(String owner, State state) {
+		long generation = generations.getOrDefault(owner, 0L);
 		cache.put(owner, state);
 		Map<String, Object> root = new LinkedHashMap<>();
 		root.put("conversationId", state.conversationId);
@@ -89,19 +91,32 @@ public final class LocalConversationStore implements ConversationStore {
 		root.put("exercise", state.exercise == null ? null : SnapshotCodec.encodeExercise(state.exercise));
 		byte[] bytes = StrictJson.write(root).getBytes(StandardCharsets.UTF_8);
 		worker.execute(() -> {
-			AtomicFile f = file(owner);
-			FileOutputStream out = null;
-			try {
-				if (!folder.isDirectory() && !folder.mkdirs())
-					throw new IOException();
-				out = f.startWrite();
-				out.write(bytes);
-				f.finishWrite(out);
-			} catch (IOException e) {
-				if (out != null)
-					f.failWrite(out);
+			synchronized (LocalConversationStore.this) {
+				if (generation != generations.getOrDefault(owner, 0L))
+					return;
+				AtomicFile f = file(owner);
+				FileOutputStream out = null;
+				try {
+					if (!folder.isDirectory() && !folder.mkdirs())
+						throw new IOException();
+					out = f.startWrite();
+					out.write(bytes);
+					f.finishWrite(out);
+				} catch (IOException e) {
+					if (out != null)
+						f.failWrite(out);
+				}
 			}
 		});
+	}
+
+	/**
+	 * Invalida escrituras encoladas antes de eliminar también el archivo atómico y su copia auxiliar.
+	 */
+	public synchronized void clear(String owner) {
+		generations.put(owner, generations.getOrDefault(owner, 0L) + 1);
+		cache.remove(owner);
+		file(owner).delete();
 	}
 }
 
