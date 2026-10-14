@@ -8,5 +8,24 @@
 	<string name="history">Historial</string>
 	<string name="back">Volver</string>
 	<string name="logo_description">Logo de EnerGym: mancuerna y hoja</string>
+	<string name="home_sessions_label">Sesiones finalizadas</string>
+	<string name="home_drafts_label">Borradores guardados</string>
+	<string name="profile_shortcut">Perfil</string>
+	<string name="profile_shortcut_description">Perfil deportivo</string>
+	<string name="profile_shortcut_signed_out">Abrir cuenta para configurar tu perfil</string>
+	<string name="home_eyebrow">TU ACTIVIDAD</string>
+	<string name="home_title">Tu día, a tu ritmo</string>
+	<string name="home_next_step">Tu próximo paso</string>
+	<string name="home_account_prompt">Entra con tu cuenta o prueba la demo local para empezar.</string>
+	<string name="home_profile_prompt">Prepara tu perfil: objetivo, entorno y material disponible.</string>
+	<string name="home_choose_account">Elegir cuenta o demo</string>
+	<string name="home_configure_profile">Configurar mi perfil</string>
+	<string name="home_edit_profile">Editar mi perfil</string>
+	<string name="home_training_title">Entrenamiento a tu medida</string>
+	<string name="home_training_body">Prepara tu rutina con el tiempo y los recursos que tienes.</string>
+	<string name="home_view_training">Ver entrenamiento</string>
+	<string name="home_record_title">Tu registro</string>
+	<string name="home_view_history">Ver historial</string>
+	<string name="home_last_action">Última acción</string>
 </resources>
 

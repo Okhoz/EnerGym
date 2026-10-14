@@ -60,14 +60,18 @@ public abstract class ScreenFragment extends Fragment {
 		((TextView) getView().findViewById(R.id.eyebrow)).setText(eyebrow);
 		ViewCompat.setAccessibilityHeading(getView().findViewById(R.id.screen_title), true);
 		((TextView) getView().findViewById(R.id.screen_title)).setText(title);
-		((TextView) getView().findViewById(R.id.screen_subtitle)).setText(subtitle);
+		TextView description = getView().findViewById(R.id.screen_subtitle);
+		description.setText(subtitle);
+		description.setVisibility(subtitle.isEmpty() ? View.GONE : View.VISIBLE);
 	}
 
 	protected LinearLayout card(String title, String body) {
 		View view = getLayoutInflater().inflate(R.layout.row_card, rows, false);
 		ViewCompat.setAccessibilityHeading(view.findViewById(R.id.card_title), true);
 		((TextView) view.findViewById(R.id.card_title)).setText(title);
-		((TextView) view.findViewById(R.id.card_body)).setText(body);
+		TextView description = view.findViewById(R.id.card_body);
+		description.setText(body);
+		description.setVisibility(body.isEmpty() ? View.GONE : View.VISIBLE);
 		rows.addView(view);
 		return view.findViewById(R.id.card_actions);
 	}
@@ -85,7 +89,8 @@ public abstract class ScreenFragment extends Fragment {
 		action(target, label, true, event);
 	}
 
-	protected void textField(LinearLayout target, String key, String label, String value, boolean number, boolean integer, Consumer<String> event) {
+	protected void textField(LinearLayout target, String key, String label, String value, boolean number,
+		boolean integer, Consumer<String> event) {
 		View row = getLayoutInflater().inflate(R.layout.row_field, target, false);
 		TextInputLayout field = row.findViewById(R.id.field_label);
 		TextView caption = row.findViewById(R.id.field_caption);
@@ -95,7 +100,9 @@ public abstract class ScreenFragment extends Fragment {
 		edit.setTag(key);
 		caption.setLabelFor(edit.getId());
 		if (number)
-			edit.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED | (integer ? 0 : android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL));
+			edit.setInputType(
+				android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED |
+					(integer ? 0 : android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL));
 		edit.setText(value);
 		edit.addTextChangedListener(new TextWatcher() {
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -111,7 +118,8 @@ public abstract class ScreenFragment extends Fragment {
 		target.addView(row);
 	}
 
-	protected void choice(LinearLayout target, String key, String label, List<String> values, List<String> labels, String value, Consumer<String> event) {
+	protected void choice(LinearLayout target, String key, String label, List<String> values, List<String> labels,
+		String value, Consumer<String> event) {
 		View field = getLayoutInflater().inflate(R.layout.row_choice, target, false);
 		TextView text = field.findViewById(R.id.choice_label);
 		text.setText(label);

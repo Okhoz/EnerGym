@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	android:layout_marginTop="@dimen/group_gap"
+	android:layout_marginBottom="@dimen/section_gap">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:baselineAligned="false">
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:paddingStart="0dp"
+			android:paddingEnd="@dimen/control_gap_horizontal"
+			android:orientation="vertical">
+
+			<TextView
+				android:id="@+id/home_sessions"
+				style="@style/EnerGym.StatValue"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				tools:text="0" />
+
+			<TextView
+				style="@style/EnerGym.FieldCaption"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="4dp"
+				android:text="@string/home_sessions_label" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:paddingStart="0dp"
+			android:paddingEnd="@dimen/control_gap_horizontal"
+			android:orientation="vertical">
+
+			<TextView
+				android:id="@+id/home_drafts"
+				style="@style/EnerGym.StatValue"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				tools:text="0" />
+
+			<TextView
+				style="@style/EnerGym.FieldCaption"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="4dp"
+				android:text="@string/home_drafts_label" />
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<View
+		android:layout_width="match_parent"
+		android:layout_height="1dp"
+		android:layout_marginVertical="@dimen/group_gap"
+		android:background="@color/glass_highlight" />
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:baselineAligned="false"
+		android:orientation="horizontal">
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:gravity="center_horizontal"
+			android:orientation="vertical">
+
+			<com.energym.app.ui.effects.GlassButton
+				android:id="@+id/quick_profile"
+				style="@style/EnerGym.IconButton"
+				android:layout_width="56dp"
+				android:layout_height="56dp"
+				android:minWidth="48dp"
+				android:minHeight="48dp"
+				android:contentDescription="@string/profile_shortcut_description"
+				app:icon="@drawable/ic_account" />
+
+			<TextView
+				style="@style/EnerGym.QuickLabel"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="@dimen/label_gap"
+				android:text="@string/profile_shortcut"
+				android:importantForAccessibility="no" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:gravity="center_horizontal"
+			android:orientation="vertical">
+
+			<com.energym.app.ui.effects.GlassButton
+				android:id="@+id/quick_training"
+				style="@style/EnerGym.IconButton"
+				android:layout_width="56dp"
+				android:layout_height="56dp"
+				android:minWidth="48dp"
+				android:minHeight="48dp"
+				android:contentDescription="@string/training"
+				app:icon="@drawable/ic_training" />
+
+			<TextView
+				style="@style/EnerGym.QuickLabel"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="@dimen/label_gap"
+				android:text="@string/training_navigation"
+				android:importantForAccessibility="no" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:gravity="center_horizontal"
+			android:orientation="vertical">
+
+			<com.energym.app.ui.effects.GlassButton
+				android:id="@+id/quick_assistant"
+				style="@style/EnerGym.IconButton"
+				android:layout_width="56dp"
+				android:layout_height="56dp"
+				android:minWidth="48dp"
+				android:minHeight="48dp"
+				android:contentDescription="@string/assistant"
+				app:icon="@drawable/ic_assistant" />
+
+			<TextView
+				style="@style/EnerGym.QuickLabel"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="@dimen/label_gap"
+				android:text="@string/assistant"
+				android:importantForAccessibility="no" />
+		</LinearLayout>
+
+	</LinearLayout>
+</LinearLayout>

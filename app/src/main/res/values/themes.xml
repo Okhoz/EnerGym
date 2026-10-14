@@ -33,7 +33,7 @@
 		<item name="android:textColor">@color/button_text</item>
 		<item name="strokeColor">@color/button_outline</item>
 		<item name="strokeWidth">1dp</item>
-		<item name="cornerRadius">20dp</item>
+		<item name="cornerRadius">12dp</item>
 		<item name="rippleColor">#28D3B16B</item>
 		<item name="android:textAllCaps">false</item>
 		<item name="android:paddingTop">14dp</item>
@@ -46,6 +46,31 @@
 
 	<style name="EnerGym.NavigationIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
 		<item name="android:color">@color/surface_selected</item>
+	</style>
+
+	<style name="EnerGym.IconButton" parent="EnerGym.Button">
+		<item name="cornerRadius">28dp</item>
+		<item name="android:padding">12dp</item>
+		<item name="iconTint">@color/white</item>
+		<item name="iconSize">24dp</item>
+		<item name="iconPadding">0dp</item>
+		<item name="iconGravity">textStart</item>
+	</style>
+
+	<style name="EnerGym.PrimaryButton" parent="EnerGym.Button">
+		<item name="backgroundTint">@color/gold</item>
+		<item name="android:textColor">@color/surface</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+
+	<style name="EnerGym.QuickLabel" parent="EnerGym.FieldCaption">
+		<item name="android:textColor">@color/white</item>
+		<item name="android:textSize">12sp</item>
+		<item name="android:gravity">center</item>
+	</style>
+
+	<style name="EnerGym.StatValue" parent="EnerGym.ScreenTitle">
+		<item name="android:textSize">26sp</item>
 	</style>
 
 	<style name="EnerGym.NavigationLabel" parent="TextAppearance.Material3.LabelMedium">
@@ -68,7 +93,7 @@
 
 	<style name="EnerGym.GlassCard" parent="Widget.Material3.CardView.Filled">
 		<item name="cardBackgroundColor">@color/surface_card</item>
-		<item name="cardCornerRadius">24dp</item>
+		<item name="cardCornerRadius">18dp</item>
 		<item name="strokeColor">@color/glass_highlight</item>
 		<item name="strokeWidth">1dp</item>
 		<item name="cardElevation">0dp</item>
@@ -91,24 +116,24 @@
 		<item name="android:textColor">@color/text_secondary</item>
 		<item name="android:textSize">13sp</item>
 		<item name="android:textStyle">bold</item>
-		<item name="android:letterSpacing">0.1</item>
+		<item name="android:letterSpacing">0.06</item>
 	</style>
 
 	<style name="EnerGym.ScreenTitle" parent="">
 		<item name="android:textColor">@color/text_primary</item>
-		<item name="android:textSize">30sp</item>
+		<item name="android:textSize">26sp</item>
 		<item name="android:textStyle">bold</item>
 	</style>
 
 	<style name="EnerGym.Body" parent="">
 		<item name="android:textColor">@color/text_secondary</item>
-		<item name="android:textSize">16sp</item>
-		<item name="android:lineSpacingExtra">5dp</item>
+		<item name="android:textSize">15sp</item>
+		<item name="android:lineSpacingExtra">3dp</item>
 	</style>
 
 	<style name="EnerGym.CardTitle" parent="">
 		<item name="android:textColor">@color/text_primary</item>
-		<item name="android:textSize">20sp</item>
+		<item name="android:textSize">18sp</item>
 		<item name="android:textStyle">bold</item>
 	</style>
 

@@ -12,13 +12,13 @@
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:minHeight="72dp"
+		android:minHeight="56dp"
 		android:background="@drawable/glass_chrome"
-		android:layout_marginHorizontal="12dp"
-		android:layout_marginTop="8dp"
+		android:layout_marginHorizontal="0dp"
+		android:layout_marginTop="0dp"
 		android:gravity="center_vertical"
 		android:paddingHorizontal="@dimen/chrome_padding"
-		android:paddingVertical="@dimen/space_inline">
+		android:paddingVertical="4dp">
 
 		<com.energym.app.ui.effects.GlassButton
 			android:id="@+id/viewer_back"
@@ -97,7 +97,7 @@
 				style="@style/EnerGym.FieldCaption"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="8dp"
+				android:layout_marginTop="0dp"
 				android:text="Referencia, no evaluación personal. No utiliza cámara ni analiza tu cuerpo." />
 
 			<FrameLayout

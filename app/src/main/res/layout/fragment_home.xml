@@ -24,7 +24,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			style="@style/EnerGym.Eyebrow"
-			tools:text="ENTRENA A TU RITMO" />
+			tools:text="TU ACTIVIDAD" />
 
 		<TextView
 			android:id="@+id/screen_title"
@@ -32,7 +32,7 @@
 			android:layout_height="wrap_content"
 			android:layout_marginTop="@dimen/space_inline"
 			style="@style/EnerGym.ScreenTitle"
-			tools:text="Hoy empieza contigo" />
+			tools:text="Tu día, a tu ritmo" />
 
 		<TextView
 			android:id="@+id/screen_subtitle"
@@ -41,7 +41,7 @@
 			android:layout_marginTop="@dimen/space_inline"
 			android:layout_marginBottom="@dimen/section_gap"
 			style="@style/EnerGym.Body"
-			tools:text="Una propuesta según tu entorno. Un registro de lo que realmente haces." />
+			android:visibility="gone" />
 
 		<LinearLayout
 			android:id="@+id/rows"
@@ -57,6 +57,8 @@
 				tools:visibility="visible"
 				android:importantForAccessibility="noHideDescendants">
 				<!-- Solo editor: GONE en ejecución; ScreenFragment.render elimina estas filas. -->
+				<include layout="@layout/row_home_overview" />
+
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
@@ -81,7 +83,7 @@
 							android:layout_height="wrap_content"
 							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
-							tools:text="Conecta tu cuenta Google o entra en la demo local para preparar tu primer entrenamiento." />
+							tools:text="Entra con tu cuenta o prueba la demo local para empezar." />
 
 						<LinearLayout
 							android:layout_width="match_parent"
@@ -90,7 +92,7 @@
 							android:layout_marginTop="@dimen/space_inline">
 
 							<com.energym.app.ui.effects.GlassButton
-								style="@style/EnerGym.Button"
+								style="@style/EnerGym.PrimaryButton"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:minHeight="@dimen/primary_touch_target"
@@ -126,7 +128,7 @@
 							android:layout_height="wrap_content"
 							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
-							tools:text="Gimnasio · casa con material · sin equipamiento · deporte&#xA;Declara tus recursos: el lugar no los añade automáticamente." />
+							tools:text="Prepara tu rutina con el tiempo y los recursos que tienes." />
 
 						<LinearLayout
 							android:layout_width="match_parent"
@@ -164,20 +166,30 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							style="@style/EnerGym.CardTitle"
-							tools:text="Tu progreso, con contexto" />
+							tools:text="Tu registro" />
 
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
-							tools:text="Sesiones finalizadas y borradores guardados&#xA;Ejemplo de diseño · los datos reales se cargan al abrir la app." />
+							tools:text="Estado del almacenamiento local" />
 
 						<LinearLayout
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
-							android:layout_marginTop="@dimen/space_inline" />
+							android:layout_marginTop="@dimen/space_inline">
+
+							<com.energym.app.ui.effects.GlassButton
+								style="@style/EnerGym.Button"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:minHeight="@dimen/primary_touch_target"
+								android:layout_marginTop="@dimen/action_gap"
+								android:textSize="16sp"
+								tools:text="Ver historial" />
+						</LinearLayout>
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>
 			</LinearLayout>

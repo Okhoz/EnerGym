@@ -4,6 +4,17 @@ import com.energym.app.R;
 import com.energym.app.controller.AppController.Screen;
 
 import android.widget.LinearLayout;
+import android.view.View;
+import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+
+import android.content.res.ColorStateList;
+
+import com.google.android.material.button.MaterialButton;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * VISTA de inicio: resumen del estado y accesos a los eventos del controlador.
@@ -14,23 +25,38 @@ public final class HomeFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		heading("ENTRENA A TU RITMO", "Hoy empieza contigo",
-			"Una propuesta según tu entorno. Un registro de lo que realmente haces.");
-		LinearLayout next = card("Tu próximo paso", app.owner() == null ?
-			"Conecta tu cuenta Google o entra en la demo local para preparar tu primer entrenamiento." :
-			app.profileSummary());
+		heading(getString(R.string.home_eyebrow), getString(R.string.home_title), "");
+		View overview = getLayoutInflater().inflate(R.layout.row_home_overview, rows, false);
+		Locale locale = getResources().getConfiguration().getLocales().isEmpty() ? Locale.getDefault() :
+			getResources().getConfiguration().getLocales().get(0);
+		NumberFormat counts = NumberFormat.getIntegerInstance(locale);
+		((TextView) overview.findViewById(R.id.home_sessions)).setText(counts.format(app.history.size()));
+		((TextView) overview.findViewById(R.id.home_drafts)).setText(counts.format(app.pending.size()));
+		View profileShortcut = overview.findViewById(R.id.quick_profile);
+		profileShortcut.setContentDescription(getString(app.owner() == null ?
+			R.string.profile_shortcut_signed_out : R.string.profile_shortcut_description));
+		profileShortcut.setOnClickListener(v -> app.navigate(app.owner() == null ? Screen.ACCOUNT : Screen.PROFILE));
+		overview.findViewById(R.id.quick_training).setOnClickListener(v -> app.navigate(Screen.TRAINING));
+		overview.findViewById(R.id.quick_assistant).setOnClickListener(v -> app.navigate(Screen.ASSISTANT));
+		rows.addView(overview);
+		LinearLayout next = card(getString(R.string.home_next_step), app.owner() == null ?
+			getString(R.string.home_account_prompt) :
+			app.profile == null ? getString(R.string.home_profile_prompt) : app.profileSummary());
+		MaterialButton primary;
 		if (app.owner() == null)
-			action(next, "Elegir cuenta o demo", () -> app.navigate(Screen.ACCOUNT));
+			primary = action(next, getString(R.string.home_choose_account), true, () -> app.navigate(Screen.ACCOUNT));
 		else
-			action(next, app.profile == null ? "Configurar mi perfil" : "Editar mi perfil",
+			primary = action(next,
+				getString(app.profile == null ? R.string.home_configure_profile : R.string.home_edit_profile), true,
 				() -> app.navigate(Screen.PROFILE));
-		LinearLayout training = card("Entrenamiento a tu medida",
-			"Gimnasio · casa con material · sin equipamiento · deporte\nDeclara tus recursos: el lugar no los añade automáticamente.");
-		action(training, "Ver entrenamiento", () -> app.navigate(Screen.TRAINING));
-		card("Tu progreso, con contexto",
-			app.history.size() + " sesiones finalizadas\n" + app.pending.size() + " borradores guardados\n" +
-				state.syncText());
+		// La acción principal tiene más contraste; conserva el mismo evento del controlador.
+		primary.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.gold)));
+		primary.setTextColor(ContextCompat.getColor(requireContext(), R.color.surface));
+		LinearLayout training = card(getString(R.string.home_training_title), getString(R.string.home_training_body));
+		action(training, getString(R.string.home_view_training), () -> app.navigate(Screen.TRAINING));
+		LinearLayout history = card(getString(R.string.home_record_title), state.syncText());
+		action(history, getString(R.string.home_view_history), () -> app.navigate(Screen.HISTORY));
 		if (!app.notice.isEmpty())
-			card("Última acción", app.notice);
+			card(getString(R.string.home_last_action), app.notice);
 	}
 }

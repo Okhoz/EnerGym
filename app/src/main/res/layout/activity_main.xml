@@ -12,13 +12,13 @@
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:minHeight="72dp"
+		android:minHeight="56dp"
 		android:background="@drawable/glass_chrome"
-		android:layout_marginHorizontal="12dp"
-		android:layout_marginTop="8dp"
+		android:layout_marginHorizontal="0dp"
+		android:layout_marginTop="0dp"
 		android:gravity="center_vertical"
 		android:paddingHorizontal="@dimen/chrome_padding"
-		android:paddingVertical="@dimen/space_inline">
+		android:paddingVertical="4dp">
 
 		<com.energym.app.ui.effects.GlassButton
 			android:id="@+id/back"
@@ -54,7 +54,7 @@
 
 		<com.energym.app.ui.effects.GlassButton
 			android:id="@+id/account"
-			style="@style/EnerGym.Button"
+			style="@style/EnerGym.IconButton"
 			android:layout_width="@dimen/touch_target"
 			android:layout_height="wrap_content"
 			android:minHeight="@dimen/touch_target"
@@ -75,7 +75,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:paddingHorizontal="@dimen/screen_gutter"
-		android:paddingBottom="16dp"
+		android:paddingBottom="8dp"
 		android:textSize="12sp"
 		android:lineSpacingExtra="3dp"
 		android:textColor="@color/text_secondary"
@@ -86,7 +86,7 @@
 	<View
 		android:layout_width="match_parent"
 		android:layout_height="1dp"
-		android:background="@android:color/transparent" />
+		android:background="@color/glass_highlight" />
 
 	<androidx.constraintlayout.motion.widget.MotionLayout
 		android:id="@+id/screen_motion"
@@ -134,19 +134,19 @@
 	<View
 		android:layout_width="match_parent"
 		android:layout_height="1dp"
-		android:background="@android:color/transparent" />
+		android:background="@color/glass_highlight" />
 
 	<com.google.android.material.bottomnavigation.BottomNavigationView
 		android:id="@+id/navigation"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginHorizontal="12dp"
-		android:layout_marginBottom="@dimen/label_gap"
+		android:layout_marginHorizontal="0dp"
+		android:layout_marginBottom="0dp"
 		android:background="@drawable/glass_chrome"
 		app:menu="@menu/main_navigation"
 		app:labelVisibilityMode="labeled"
 		app:itemIconTint="@color/nav_colors"
-		app:itemTextColor="@color/button_text"
+		app:itemTextColor="@color/nav_colors"
 		app:itemActiveIndicatorStyle="@style/EnerGym.NavigationIndicator"
 		app:itemHorizontalTranslationEnabled="false"
 		app:itemTextAppearanceActive="@style/EnerGym.NavigationLabel"

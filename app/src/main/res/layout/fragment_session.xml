@@ -210,10 +210,10 @@
 									app:boxStrokeColor="@color/field_outline"
 									app:boxStrokeWidth="1dp"
 									app:boxStrokeWidthFocused="2dp"
-									app:boxCornerRadiusTopStart="18dp"
-									app:boxCornerRadiusTopEnd="18dp"
-									app:boxCornerRadiusBottomStart="18dp"
-									app:boxCornerRadiusBottomEnd="18dp">
+									app:boxCornerRadiusTopStart="12dp"
+									app:boxCornerRadiusTopEnd="12dp"
+									app:boxCornerRadiusBottomStart="12dp"
+									app:boxCornerRadiusBottomEnd="12dp">
 
 									<com.google.android.material.textfield.TextInputEditText
 										android:layout_width="match_parent"
@@ -251,10 +251,10 @@
 									app:boxStrokeColor="@color/field_outline"
 									app:boxStrokeWidth="1dp"
 									app:boxStrokeWidthFocused="2dp"
-									app:boxCornerRadiusTopStart="18dp"
-									app:boxCornerRadiusTopEnd="18dp"
-									app:boxCornerRadiusBottomStart="18dp"
-									app:boxCornerRadiusBottomEnd="18dp">
+									app:boxCornerRadiusTopStart="12dp"
+									app:boxCornerRadiusTopEnd="12dp"
+									app:boxCornerRadiusBottomStart="12dp"
+									app:boxCornerRadiusBottomEnd="12dp">
 
 									<com.google.android.material.textfield.TextInputEditText
 										android:layout_width="match_parent"
@@ -292,10 +292,10 @@
 									app:boxStrokeColor="@color/field_outline"
 									app:boxStrokeWidth="1dp"
 									app:boxStrokeWidthFocused="2dp"
-									app:boxCornerRadiusTopStart="18dp"
-									app:boxCornerRadiusTopEnd="18dp"
-									app:boxCornerRadiusBottomStart="18dp"
-									app:boxCornerRadiusBottomEnd="18dp">
+									app:boxCornerRadiusTopStart="12dp"
+									app:boxCornerRadiusTopEnd="12dp"
+									app:boxCornerRadiusBottomStart="12dp"
+									app:boxCornerRadiusBottomEnd="12dp">
 
 									<com.google.android.material.textfield.TextInputEditText
 										android:layout_width="match_parent"
@@ -333,10 +333,10 @@
 									app:boxStrokeColor="@color/field_outline"
 									app:boxStrokeWidth="1dp"
 									app:boxStrokeWidthFocused="2dp"
-									app:boxCornerRadiusTopStart="18dp"
-									app:boxCornerRadiusTopEnd="18dp"
-									app:boxCornerRadiusBottomStart="18dp"
-									app:boxCornerRadiusBottomEnd="18dp">
+									app:boxCornerRadiusTopStart="12dp"
+									app:boxCornerRadiusTopEnd="12dp"
+									app:boxCornerRadiusBottomStart="12dp"
+									app:boxCornerRadiusBottomEnd="12dp">
 
 									<com.google.android.material.textfield.TextInputEditText
 										android:layout_width="match_parent"
@@ -374,10 +374,10 @@
 									app:boxStrokeColor="@color/field_outline"
 									app:boxStrokeWidth="1dp"
 									app:boxStrokeWidthFocused="2dp"
-									app:boxCornerRadiusTopStart="18dp"
-									app:boxCornerRadiusTopEnd="18dp"
-									app:boxCornerRadiusBottomStart="18dp"
-									app:boxCornerRadiusBottomEnd="18dp">
+									app:boxCornerRadiusTopStart="12dp"
+									app:boxCornerRadiusTopEnd="12dp"
+									app:boxCornerRadiusBottomStart="12dp"
+									app:boxCornerRadiusBottomEnd="12dp">
 
 									<com.google.android.material.textfield.TextInputEditText
 										android:layout_width="match_parent"
