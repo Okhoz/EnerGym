@@ -121,6 +121,25 @@ public class NutritionSyncTest {
 	}
 
 	@Test
+	public void goalsSyncAndRemovalIsTerminal() {
+		GoalRepository goals = new GoalRepository(db);
+		com.energym.app.progress.Goal goal =
+			com.energym.app.progress.Goal.create(com.energym.app.progress.Goal.Type.EXERCISE_LOAD, 60, 0, "barbell-back-squat",
+				"Sentadilla trasera con barra");
+		goals.save(goal);
+		assertEquals("Sentadilla trasera con barra", goals.goals().get(0).exerciseName);
+		SyncRecord active = pending(SyncRecord.Kind.GOAL, goal.id);
+		assertEquals("goals", CloudDocumentCodec.collection(SyncRecord.Kind.GOAL));
+		assertEquals(active.getPayload(), roundtrip(active, 1).getPayload());
+		goals.remove(goal.id);
+		assertTrue(goals.goals().isEmpty());
+		Map<String, Object> tomb = CloudDocumentCodec.encode(pending(SyncRecord.Kind.GOAL, goal.id), 2);
+		assertEquals(true, tomb.get("terminal"));
+		assertEquals(CloudDocumentCodec.encode(active, 1).get("identity"), tomb.get("identity"));
+		assertThrows(IllegalArgumentException.class, () -> goals.save(goal));
+	}
+
+	@Test
 	public void legacyLocalDiaryIsCopiedOnceAndRemoved() {
 		SQLiteDatabase legacy = context.openOrCreateDatabase("energym_nutrition.db", Context.MODE_PRIVATE, null);
 		try {

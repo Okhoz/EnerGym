@@ -18,14 +18,43 @@ public final class TrainingFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		heading("TU PLAN", "Entrenamiento",
-			"Revisa la propuesta antes de aceptarla. Puedes sustituir ejercicios compatibles.");
-		LinearLayout movement = card("Referencias de movimiento",
-			"Vista previa técnica sin revisión profesional. Consulta primero la ejecución escrita; la animación disponible corresponde a su variante exacta.");
-		for (com.energym.app.domain.Exercise exercise : app.availableAnimations())
-			action(movement, exercise.getName(), () -> app.openExercise(exercise));
-		LinearLayout library = card("Biblioteca de ejercicios", app.catalog.getExercises().size() +
-			" ejercicios con su técnica escrita. Busca por nombre, músculo o material.");
+		heading("TU PLAN", "Entreno", "");
+		// 1. Lo que puedes hacer ahora: continuar, empezar o revisar.
+		if (app.sessions.session != null && app.sessions.session.getStatus() == Session.Status.DRAFT) {
+			LinearLayout active = card("Sesión abierta", "Tus valores se conservan aunque cambies de pantalla.");
+			primary(action(active, "Volver a mi sesión", true, () -> app.navigate(Screen.SESSION)));
+		}
+		for (Session draft : app.pending) {
+			LinearLayout row = card("Borrador recuperable",
+				draft.getRoutine().getTitle() + " · " + draft.getResults().size() + " ejercicios registrados");
+			action(row, "Continuar borrador", !app.sessions.busy, () -> app.resume(draft));
+		}
+		if (app.routines.preview != null) {
+			LinearLayout p = card("Propuesta sin aceptar",
+				app.routines.preview.getItems().size() + " ejercicios · " + app.routines.preview.getEstimatedMinutes() +
+					" min");
+			primary(action(p, "Revisar propuesta", true, () -> app.navigate(Screen.ROUTINE)));
+		}
+		if (app.routines.accepted != null) {
+			LinearLayout accepted = card("Tu rutina", app.routines.accepted.getTitle() + " · " +
+				app.routines.accepted.getItems().size() + " ejercicios · " + app.routines.accepted.getEstimatedMinutes() +
+				" min");
+			MaterialButton start = action(accepted, "Empezar sesión", !app.sessions.busy, app::startSession);
+			if (app.routines.preview == null)
+				primary(start);
+			action(accepted, "Ver ejercicios", true, () -> app.navigate(Screen.ROUTINE));
+		}
+		// 2. Plan: perfil resumido y nueva propuesta.
+		LinearLayout profile = card("Tu plan", app.profile == null ?
+			"Dinos tu objetivo, tiempo y material para crear tu rutina." : app.profileSummary());
+		MaterialButton create = action(profile, "Crear propuesta",
+			!app.loading && !app.profileSaving() && !app.routines.busy, app::createRoutine);
+		if (app.routines.accepted == null && app.routines.preview == null && app.profile != null)
+			primary(create);
+		action(profile, app.profile == null ? "Configurar mi perfil" : "Editar perfil",
+			() -> app.navigate(Screen.PROFILE));
+		// 3. Explorar: biblioteca con buscador y animaciones 3D.
+		LinearLayout library = card("Biblioteca", app.catalog.getExercises().size() + " ejercicios con su técnica.");
 		LinearLayout results = new LinearLayout(requireContext());
 		results.setOrientation(LinearLayout.VERTICAL);
 		textField(library, "exercise_search", "Buscar ejercicio", query, false, false, q -> {
@@ -34,35 +63,13 @@ public final class TrainingFragment extends ScreenFragment {
 		});
 		add(library, results, 0);
 		search(results, query);
-		LinearLayout profile = card("Tus filtros", app.profileSummary());
-		action(profile, app.profile == null ? "Configurar mi perfil" : "Editar perfil",
-			() -> app.navigate(Screen.PROFILE));
-		action(profile, "Crear propuesta", !app.loading && !app.profileSaving() && !app.routines.busy,
-			app::createRoutine);
-		if (app.routines.preview != null) {
-			LinearLayout p = card("Propuesta sin aceptar",
-				app.routines.preview.getItems().size() + " ejercicios · " + app.routines.preview.getEstimatedMinutes() +
-					" min estimados");
-			action(p, "Revisar propuesta", () -> app.navigate(Screen.ROUTINE));
+		if (!app.availableAnimations().isEmpty()) {
+			LinearLayout movement = card("Con vista 3D", "");
+			for (com.energym.app.domain.Exercise exercise : app.availableAnimations())
+				action(movement, exercise.getName(), () -> app.openExercise(exercise));
 		}
-		if (app.routines.accepted != null) {
-			LinearLayout accepted = card("Rutina aceptada",
-				app.routines.accepted.getTitle() + "\n" + app.routines.accepted.getItems().size() +
-					" ejercicios · versión " + app.routines.accepted.getVersionId());
-			action(accepted, "Empezar sesión", !app.sessions.busy, app::startSession);
-		}
-		for (Session draft : app.pending) {
-			LinearLayout row = card("Borrador recuperable",
-				draft.getRoutine().getTitle() + "\n" + draft.getResults().size() + " ejercicios registrados");
-			action(row, "Continuar borrador", !app.sessions.busy, () -> app.resume(draft));
-		}
-		if (app.sessions.session != null && app.sessions.session.getStatus() == Session.Status.DRAFT) {
-			LinearLayout active = card("Sesión abierta",
-				"Los valores escritos se conservan al cambiar de pantalla o rotar. Usa Guardar ejercicio para persistirlos.");
-			action(active, "Volver a mi sesión", () -> app.navigate(Screen.SESSION));
-		}
-		card("Alcance de la propuesta",
-			"Ejemplos locales sin revisión profesional. El plan usa disciplina, objetivo, entorno, recursos y tiempo; no interpreta aún tus textos ni crea un calendario semanal.");
+		text(rows, "Rutinas de ejemplo sin revisión profesional: adapta la intensidad a tu situación.",
+			R.style.EnerGym_FieldCaption, 4);
 	}
 
 	private String query = "";

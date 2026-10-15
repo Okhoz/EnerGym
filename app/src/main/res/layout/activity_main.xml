@@ -46,9 +46,10 @@
 			android:layout_weight="1"
 			android:layout_height="wrap_content"
 			android:text="@string/app_name"
-			android:textSize="20sp"
+			android:textSize="22sp"
 			android:textStyle="bold"
-			android:fontFamily="sans-serif-medium"
+			android:letterSpacing="-0.02"
+			android:fontFamily="sans-serif"
 			android:textColor="@color/white"
 			android:layout_marginEnd="@dimen/space_inline" />
 
@@ -81,6 +82,7 @@
 		android:textColor="@color/text_secondary"
 		android:accessibilityLiveRegion="polite"
 		tools:text="Sin cuenta · almacenamiento local"
+		android:visibility="gone"
 		android:paddingTop="@dimen/label_gap" />
 
 	<View

@@ -89,7 +89,7 @@ public final class BarChartView extends View {
 		}
 	}
 
-	static String compact(double v) {
+	public static String compact(double v) {
 		if (v >= 10000)
 			return String.format(Locale.ROOT, "%.0fk", v / 1000);
 		if (v >= 1000)

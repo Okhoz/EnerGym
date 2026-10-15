@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!-- El verde queda reservado al logo original. -->
-	<color name="surface">#080A09</color>
-	<color name="surface_card">#F0141615</color>
-	<color name="glass_highlight">#40D3B16B</color>
-	<color name="glass_field">#FF101210</color>
-	<color name="glass_button">#FF1B1E1B</color>
-	<color name="glass_gold_outline">#80D3B16B</color>
-	<color name="surface_selected">#29251B</color>
-	<color name="gold">#D3B16B</color>
+	<!-- Estilo limpio (tipo Instagram/Spotify): negro, superficies grises sin bordes y dorado solo para lo importante. El verde queda reservado al logo. -->
+	<color name="surface">#0A0A0A</color>
+	<color name="surface_card">#FF161616</color>
+	<color name="glass_highlight">#1FFFFFFF</color>
+	<color name="glass_field">#FF1C1C1C</color>
+	<color name="glass_button">#FF242424</color>
+	<color name="glass_gold_outline">#00000000</color>
+	<color name="surface_selected">#2E2A20</color>
+	<color name="gold">#E6B95C</color>
 	<color name="white">#FFFFFF</color>
 	<color name="text_primary">#FFFFFF</color>
-	<color name="text_secondary">#C6CAC7</color>
-	<color name="outline">#D3B16B</color>
-	<color name="disabled_outline">#716447</color>
+	<color name="text_secondary">#A3A3A3</color>
+	<color name="outline">#E6B95C</color>
+	<color name="disabled_outline">#00000000</color>
 	<color name="error">#FFB4AB</color>
 	<!-- Gráficas: pista neutra y macros diferenciados con contraste suficiente sobre negro. -->
-	<color name="chart_track">#2E322F</color>
+	<color name="chart_track">#2A2A2A</color>
 	<color name="chart_over">#E8826B</color>
 	<color name="macro_protein">#E9C98A</color>
 	<color name="macro_carbs">#9CC7B4</color>
 	<color name="macro_fat">#C9A7D9</color>
+	<color name="divider">#1FFFFFFF</color>
+	<color name="text_tertiary">#737373</color>
 </resources>

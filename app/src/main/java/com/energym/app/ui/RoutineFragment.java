@@ -19,12 +19,12 @@ public final class RoutineFragment extends ScreenFragment {
 
 	protected void content() {
 		Routine r = app.routines.preview != null ? app.routines.preview : app.routines.accepted;
-		heading("REVISA ANTES DE EMPEZAR", app.routines.preview == null ? "Rutina aceptada" : "Tu propuesta",
-			r == null ? "Crea una propuesta desde Entrenamiento." : r.getExplanation());
+		heading("REVISA ANTES DE EMPEZAR", app.routines.preview == null ? "Tu rutina" : "Tu propuesta",
+			r == null ? "Crea una propuesta desde Entreno." : r.getItems().size() + " ejercicios · " +
+				r.getEstimatedMinutes() + " min");
 		if (r == null)
 			return;
-		card("Resumen", r.getItems().size() + " ejercicios · " + r.getEstimatedMinutes() + " min estimados\n" +
-			app.profileSummary(r.getProfile()));
+		card("Para quién es", app.profileSummary(r.getProfile()));
 		int index = 0;
 		for (RoutineItem item : r.getItems()) {
 			final int i = index++;
@@ -50,13 +50,14 @@ public final class RoutineFragment extends ScreenFragment {
 				});
 		}
 		if (app.routines.preview != null) {
-			action(rows, "Aceptar propuesta", app.routines.canAccept(), app.routines::accept);
+			primary(action(rows, "Aceptar propuesta", app.routines.canAccept(), app.routines::accept));
 			action(rows, "Rechazar propuesta", !app.routines.busy, () -> {
 				app.routines.reject();
 				app.back();
 			});
 		} else
-			action(rows, "Empezar sesión", !app.sessions.busy, app::startSession);
+			primary(action(rows, "Empezar sesión", !app.sessions.busy, app::startSession));
+		text(rows, r.getExplanation(), R.style.EnerGym_FieldCaption, 12);
 	}
 }
 

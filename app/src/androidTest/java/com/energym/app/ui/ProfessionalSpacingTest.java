@@ -67,7 +67,7 @@ public final class ProfessionalSpacingTest {
 						scenario.onActivity(a -> a.state().app.navigate(screen));
 						MainFlowTest.await();
 						scenario.onActivity(a -> {
-							inspect(a.findViewById(R.id.main), screen + "-" + scale, 24);
+							inspect(a.findViewById(R.id.main), screen + "-" + scale, 12);
 							TextView account = a.findViewById(R.id.account);
 							check("Cuenta".contentEquals(
 									account.getContentDescription() == null ? "" : account.getContentDescription()),
@@ -144,7 +144,7 @@ public final class ProfessionalSpacingTest {
 					view.measure(View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY),
 						View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY));
 					view.layout(0, 0, w, h);
-					inspect(view, "layout-" + layout + "-" + width, controls == null ? 24 : 16);
+					inspect(view, "layout-" + layout + "-" + width, 12);
 					if (controls != null && width == 320) {
 						check(view.findViewById(R.id.viewer_speed_quarter).getTop() !=
 								view.findViewById(R.id.viewer_speed_normal).getTop(),

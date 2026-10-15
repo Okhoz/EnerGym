@@ -43,10 +43,9 @@ public class KeyboardInsetsTest {
 				MainFlowTest.click(scenario, "Entrar en demo local");
 			scenario.onActivity(a -> a.findViewById(R.id.back).performClick());
 			MainFlowTest.await();
-			boolean[] configure = {false};
-			scenario.onActivity(
-				a -> configure[0] = MainFlowTest.text(a.getWindow().getDecorView(), "Configurar mi perfil") != null);
-			MainFlowTest.click(scenario, configure[0] ? "Configurar mi perfil" : "Editar mi perfil");
+			// Inicio ofrece el acceso directo de perfil aunque ya exista uno guardado.
+			scenario.onActivity(a -> a.findViewById(R.id.quick_profile).performClick());
+			MainFlowTest.await();
 			scenario.onActivity(a -> {
 				EditText field = a.getWindow().getDecorView().findViewWithTag("preferences");
 				field.requestFocus();

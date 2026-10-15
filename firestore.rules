@@ -17,7 +17,7 @@ service cloud.firestore {
 				|| (kind == 'ROUTINE' && d.identity.matches('[a-f0-9]{64}') && d.terminal == true)
 				|| (kind == 'SESSION' && d.identity.matches('[a-f0-9]{64}'))
 				|| ((kind == 'BODY' || kind == 'WEIGHT') && d.identity == '' && d.terminal == false)
-				|| (kind == 'FOOD' && d.identity.matches('[a-f0-9]{64}')));
+				|| ((kind == 'FOOD' || kind == 'GOAL') && d.identity.matches('[a-f0-9]{64}')));
 		}
 		function nextVersion() {
 			return request.resource.data.cloudVersion == resource.data.cloudVersion + 1
@@ -61,6 +61,14 @@ service cloud.firestore {
 			allow create: if owns(uid) && valid(uid, 'FOOD', id) && request.resource.data.cloudVersion == 1;
 			// Solo una transición: activo → lápida (terminal), con la misma identidad.
 			allow update: if owns(uid) && valid(uid, 'FOOD', id) && nextVersion()
+				&& request.resource.data.identity == resource.data.identity && resource.data.terminal == false;
+			allow delete: if false;
+		}
+		match /users/{uid}/goals/{id} {
+			allow read: if owns(uid);
+			allow create: if owns(uid) && valid(uid, 'GOAL', id) && request.resource.data.cloudVersion == 1;
+			// Activo → lápida (terminal) una sola vez, con la misma identidad.
+			allow update: if owns(uid) && valid(uid, 'GOAL', id) && nextVersion()
 				&& request.resource.data.identity == resource.data.identity && resource.data.terminal == false;
 			allow delete: if false;
 		}

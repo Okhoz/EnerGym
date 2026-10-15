@@ -186,3 +186,11 @@ test('food can only move once from active to terminal tombstone', async () => {
 	await assertFails(deleteDoc(ref));
 	await assertFails(setDoc(doc(db('alice'), 'users/alice/food/meal-2'), nutrition('FOOD', 'meal-2', {identity: ''})));
 });
+test('goals follow the same active to tombstone lifecycle', async () => {
+	const ref = doc(db('alice'), 'users/alice/goals/goal-1');
+	const goal = (extra = {}) => ({...data('GOAL', 'goal-1'), identity: 'd'.repeat(64), terminal: false, ...extra});
+	await assertSucceeds(setDoc(ref, goal()));
+	await assertSucceeds(setDoc(ref, goal({cloudVersion: 2, updatedAt: 1001, terminal: true})));
+	await assertFails(setDoc(ref, goal({cloudVersion: 3, updatedAt: 1002})));
+	await assertFails(getDoc(doc(db('bob'), 'users/alice/goals/goal-1')));
+});

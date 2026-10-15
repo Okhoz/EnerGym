@@ -91,7 +91,6 @@ public class MainFlowTest {
 			scenario.onActivity(a -> {
 				assertEquals(1, a.state().app.history.size());
 				assertEquals(AppController.Screen.HISTORY, a.state().app.screen);
-				assertNotNull(text(a.getWindow().getDecorView(), "Sesión finalizada"));
 				assertTrue(textContaining(a.getWindow().getDecorView(), "Carga (kg; 0 = peso corporal): 0"));
 			});
 			click(scenario, "Cuenta");

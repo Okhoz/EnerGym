@@ -15,8 +15,7 @@ public final class AccountFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		heading("CUENTA Y AJUSTES", "Tus datos, contigo",
-			getString(R.string.account_intro));
+		heading("CUENTA Y AJUSTES", "Cuenta", getString(R.string.account_intro));
 		AccountUser user = state.user;
 		LinearLayout account = card(state.accountText(), user == null ? getString(R.string.account_signed_out) : user.getEmail());
 		boolean signing = state.accountStatus == AccountController.Status.SIGNING_IN || state.deletingLocalData;
@@ -34,7 +33,8 @@ public final class AccountFragment extends ScreenFragment {
 			action(account, getString(R.string.account_sign_out), !signing, state.accounts::signOut);
 		LinearLayout backup =
 			card("Respaldo", state.syncText() + (state.syncError.isEmpty() ? "" : "\n" + state.syncError));
-		action(backup, "Reintentar sincronización", user != null && !signing, state.sync::requestSync);
+		if (user != null)
+			action(backup, "Reintentar sincronización", !signing, state.sync::requestSync);
 		card("Separación de cuentas",
 			getString(R.string.account_separation));
 		assistantServer();

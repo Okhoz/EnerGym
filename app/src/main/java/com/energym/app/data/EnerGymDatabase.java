@@ -232,7 +232,8 @@ public final class EnerGymDatabase extends SQLiteOpenHelper {
 			(remote.getKind() == SyncRecord.Kind.SESSION &&
 				SnapshotCodec.decodeSession(local.record.getPayload()).getStatus() == Session.Status.FINISHED) ||
 			// Un alimento borrado localmente es definitivo: una copia remota anterior no lo resucita.
-			(remote.getKind() == SyncRecord.Kind.FOOD && NutritionRepository.deleted(local.record.getPayload())));
+			(remote.getKind() == SyncRecord.Kind.FOOD && NutritionRepository.deleted(local.record.getPayload())) ||
+			(remote.getKind() == SyncRecord.Kind.GOAL && GoalRepository.deleted(local.record.getPayload())));
 	}
 
 	private void validate(SyncRecord r) {
@@ -260,6 +261,9 @@ public final class EnerGymDatabase extends SQLiteOpenHelper {
 				break;
 			case WEIGHT:
 				NutritionRepository.canonicalWeight(r.getSyncId(), r.getPayload());
+				break;
+			case GOAL:
+				GoalRepository.canonical(r.getSyncId(), r.getPayload());
 				break;
 			case SESSION:
 				Session session = SnapshotCodec.decodeSession(r.getPayload());

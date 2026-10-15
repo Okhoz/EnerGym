@@ -258,7 +258,7 @@ public class AnatomyActivityTest {
 			Exercise knee = a.state().app.catalog.findExercise("knee-pushup");
 			a.state().app.openExercise(knee);
 			assertFalse(a.state().app.visualizationAvailable());
-			assertTrue(MainFlowTest.textContaining(a.getWindow().getDecorView(), "no tiene una animación"));
+			assertTrue(MainFlowTest.textContaining(a.getWindow().getDecorView(), "aún no tiene animación"));
 		});
 
 		context.startActivity(

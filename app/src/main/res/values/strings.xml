@@ -18,7 +18,7 @@
 	<string name="home_title">Tu día, a tu ritmo</string>
 	<string name="home_next_step">Tu próximo paso</string>
 	<string name="home_account_prompt">Entra con tu cuenta o prueba la demo local para empezar.</string>
-	<string name="home_profile_prompt">Prepara tu perfil: objetivo, entorno y material disponible.</string>
+	<string name="home_profile_prompt">Cuéntanos tu objetivo y material para crear tu rutina.</string>
 	<string name="home_choose_account">Elegir cuenta o demo</string>
 	<string name="home_configure_profile">Configurar mi perfil</string>
 	<string name="home_edit_profile">Editar mi perfil</string>
@@ -26,12 +26,12 @@
 	<string name="home_training_body">Prepara tu rutina con el tiempo y los recursos que tienes.</string>
 	<string name="home_view_training">Ver entrenamiento</string>
 	<string name="home_record_title">Tu registro</string>
-	<string name="home_view_history">Ver progreso y calendario</string>
+	<string name="home_view_history">Ver progreso</string>
 	<string name="home_last_action">Última acción</string>
-	<string name="account_intro">Conecta Google para activar el respaldo Firebase. La demo permanece solo en este dispositivo.</string>
+	<string name="account_intro">Tu cuenta guarda y respalda tus datos.</string>
 	<string name="account_signed_out">Elige cómo quieres entrar.</string>
 	<string name="account_sign_out">Salir de la cuenta / demo</string>
-	<string name="account_separation">Cada cuenta conserva su propio perfil, rutinas y sesiones. La demo no se copia automáticamente a Google. Cerrar sesión oculta los datos locales de esa cuenta.</string>
+	<string name="account_separation">Cada cuenta tiene sus propios datos. La demo no se copia a Google.</string>
 	<string name="account_local_data">Borrar elimina el perfil, las rutinas, las sesiones, la conversación y las propuestas locales de la cuenta o demo actual, y cierra su sesión. No borra otras cuentas ni datos de Firebase. Si vuelves a conectar Google, se restaurarán los datos ya confirmados en Firebase; los pendientes solo locales se perderán.</string>
 	<string name="chat_hint">Escribe un mensaje…</string>
 	<string name="chat_send">Enviar mensaje</string>

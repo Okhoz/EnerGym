@@ -28,6 +28,8 @@ public final class CloudDocumentCodec {
 				return "food";
 			case WEIGHT:
 				return "weights";
+			case GOAL:
+				return "goals";
 			default:
 				return "sessions";
 		}
@@ -79,6 +81,11 @@ public final class CloudDocumentCodec {
 				break;
 			case WEIGHT:
 				payload = NutritionRepository.canonicalWeight(record.getSyncId(), record.getPayload());
+				break;
+			case GOAL:
+				payload = GoalRepository.canonical(record.getSyncId(), record.getPayload());
+				identity = hash(record.getSyncId() + ":" + GoalRepository.createdAt(payload));
+				terminal = GoalRepository.deleted(payload);
 				break;
 			case FOOD:
 				// Identidad estable entre alta y lápida; la lápida es definitiva.

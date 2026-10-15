@@ -57,12 +57,19 @@ public abstract class ScreenFragment extends Fragment {
 	protected abstract void content();
 
 	protected void heading(String eyebrow, String title, String subtitle) {
-		((TextView) getView().findViewById(R.id.eyebrow)).setText(eyebrow);
+		// Diseño limpio: sin antetítulo en mayúsculas; el título basta para orientarse.
+		TextView over = getView().findViewById(R.id.eyebrow);
+		over.setText(eyebrow);
+		over.setVisibility(View.GONE);
 		ViewCompat.setAccessibilityHeading(getView().findViewById(R.id.screen_title), true);
 		((TextView) getView().findViewById(R.id.screen_title)).setText(title);
 		TextView description = getView().findViewById(R.id.screen_subtitle);
 		description.setText(subtitle);
 		description.setVisibility(subtitle.isEmpty() ? View.GONE : View.VISIBLE);
+		// Sin subtítulo, el título conserva la misma separación respecto al primer bloque.
+		TextView titleView = getView().findViewById(R.id.screen_title);
+		titleView.setPadding(titleView.getPaddingLeft(), titleView.getPaddingTop(), titleView.getPaddingRight(),
+			subtitle.isEmpty() ? dp(16) : 0);
 	}
 
 	protected LinearLayout card(String title, String body) {
@@ -128,7 +135,7 @@ public abstract class ScreenFragment extends Fragment {
 		b.setMinHeight(dp(48));
 		b.setTextSize(14);
 		b.setOnClickListener(v -> event.run());
-		return column(row, b, 8);
+		return column(row, b, 12);
 	}
 
 	/**
@@ -160,10 +167,18 @@ public abstract class ScreenFragment extends Fragment {
 		return Math.round(value * getResources().getDisplayMetrics().density);
 	}
 
+	/**
+	 * Acción principal: dorado relleno; deshabilitada vuelve al gris de las secundarias.
+	 */
 	protected void primary(MaterialButton button) {
-		button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
-			androidx.core.content.ContextCompat.getColor(requireContext(), R.color.gold)));
-		button.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.surface));
+		int[][] states = {{-android.R.attr.state_enabled}, {}};
+		android.content.Context c = requireContext();
+		button.setBackgroundTintList(new android.content.res.ColorStateList(states, new int[]{
+			androidx.core.content.ContextCompat.getColor(c, R.color.glass_button),
+			androidx.core.content.ContextCompat.getColor(c, R.color.gold)}));
+		button.setTextColor(new android.content.res.ColorStateList(states, new int[]{
+			androidx.core.content.ContextCompat.getColor(c, R.color.text_tertiary),
+			androidx.core.content.ContextCompat.getColor(c, R.color.surface)}));
 	}
 
 	protected void textField(LinearLayout target, String key, String label, String value, boolean number,

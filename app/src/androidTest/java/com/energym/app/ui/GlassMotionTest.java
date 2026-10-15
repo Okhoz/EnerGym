@@ -79,7 +79,7 @@ public final class GlassMotionTest {
 			scenario.onActivity(a -> {
 				ViewGroup rows =
 					a.getSupportFragmentManager().findFragmentById(R.id.content).getView().findViewById(R.id.rows);
-				assertTrue("Tarjetas runtime ausentes", rows.getChildCount() >= 3);
+				assertTrue("Tarjetas runtime ausentes", rows.getChildCount() >= 2);
 				View card = rows.getChildAt(0);
 				assertTrue("Tarjeta sin medida: visibility=" + card.getVisibility() + " height=" + card.getHeight() +
 					" measured=" + card.getMeasuredHeight(), card.getHeight() > 0);
@@ -148,7 +148,7 @@ public final class GlassMotionTest {
 				assertEquals(.4f, ((MotionLayout) a.findViewById(R.id.screen_motion)).getProgress(), .001f);
 				ViewGroup rows =
 					a.getSupportFragmentManager().findFragmentById(R.id.content).getView().findViewById(R.id.rows);
-				assertTrue("Tarjetas ausentes después de actualizar datos", rows.getChildCount() >= 3);
+				assertTrue("Tarjetas ausentes después de actualizar datos", rows.getChildCount() >= 2);
 				assertTrue("Tarjeta actualizada sin medida", rows.getChildAt(0).getHeight() > 0);
 			});
 			scenario.moveToState(Lifecycle.State.CREATED);

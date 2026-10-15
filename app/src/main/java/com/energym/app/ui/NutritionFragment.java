@@ -28,8 +28,7 @@ public final class NutritionFragment extends ScreenFragment {
 
 	protected void content() {
 		NutritionController n = state.nutrition;
-		heading("NUTRICIÓN", "Tu alimentación",
-			"Escanea el código de barras o el QR del envase, anota la cantidad y sigue tu balance diario.");
+		heading("NUTRICIÓN", "Nutrición", "");
 		if (app.owner() == null || n == null) {
 			LinearLayout signIn = card("Entra para empezar", "Tu diario se guarda por cuenta en este dispositivo.");
 			action(signIn, "Elegir cuenta", () -> app.navigate(Screen.ACCOUNT));
@@ -37,12 +36,19 @@ public final class NutritionFragment extends ScreenFragment {
 		}
 		LocalDate day = n.selected;
 		LinearLayout dates = columns(rows, 0);
-		compact(dates, "‹ Anterior", true, () -> n.select(day.minusDays(1)));
-		MaterialButton today = compact(dates, day.equals(n.today()) ? "Hoy" : "Ir a hoy", !day.equals(n.today()),
-			() -> n.select(n.today()));
-		today.setContentDescription("Día mostrado: " + label(day, n.today()));
-		compact(dates, "Siguiente ›", day.isBefore(n.today()), () -> n.select(day.plusDays(1)));
-		text(rows, label(day, n.today()), R.style.EnerGym_CardTitle, 16).setGravity(android.view.Gravity.CENTER);
+		MaterialButton previous = compact(dates, "‹", true, () -> n.select(day.minusDays(1)));
+		previous.setContentDescription("Día anterior");
+		previous.setTextSize(22);
+		// El botón central muestra el día; si no es hoy, pulsarlo vuelve a hoy.
+		MaterialButton today = compact(dates, label(day, n.today()), !day.equals(n.today()), () -> n.select(n.today()));
+		today.setContentDescription("Día mostrado: " + label(day, n.today()) + (day.equals(n.today()) ? "" : ". Ir a hoy"));
+		today.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.white));
+		today.setSingleLine(true);
+		today.setEllipsize(android.text.TextUtils.TruncateAt.END);
+		MaterialButton next = compact(dates, "›", day.isBefore(n.today()), () -> n.select(day.plusDays(1)));
+		next.setContentDescription("Día siguiente");
+		next.setTextSize(22);
+		((LinearLayout.LayoutParams) today.getLayoutParams()).weight = 3;
 		add(rows, new android.widget.Space(requireContext()), 8);
 
 		double[] totals = n.totals(day);
@@ -111,10 +117,8 @@ public final class NutritionFragment extends ScreenFragment {
 		action(body, "Anotar peso", !n.busy, () -> n.logWeight(typed[0]));
 		action(body, n.body == null ? "Completar mis datos" : "Editar mis datos", true, () -> open(Screen.BODY));
 
-		card("Fuente y límites",
-			"Las fichas proceden de Open Food Facts (base abierta ODbL) y pueden contener errores: revisa la etiqueta. " +
-				"Los objetivos son estimaciones (Mifflin-St Jeor) y no sustituyen el consejo de un dietista o médico, " +
-				"especialmente con alergias, embarazo o patologías.");
+		text(rows, "Datos de Open Food Facts (ODbL): revisa la etiqueta. Objetivos estimados; no sustituyen a un " +
+			"dietista o médico.", R.style.EnerGym_FieldCaption, 4);
 	}
 
 	private void open(Screen screen) {

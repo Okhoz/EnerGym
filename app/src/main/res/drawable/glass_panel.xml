@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Panel plano: el contraste lo aporta surface_card; sin degradados ni bordes. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-	<gradient
-		android:angle="270"
-		android:startColor="#04FFFFFF"
-		android:endColor="#00FFFFFF" />
-	<corners android:radius="18dp" />
+	<solid android:color="@android:color/transparent" />
+	<corners android:radius="20dp" />
 </shape>

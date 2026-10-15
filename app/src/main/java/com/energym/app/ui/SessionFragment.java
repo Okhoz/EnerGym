@@ -18,14 +18,14 @@ public final class SessionFragment extends ScreenFragment {
 
 	protected void content() {
 		heading("REGISTRA LO REAL", "Tu sesión",
-			"Escribe lo que has realizado. Los números de la propuesta son ejemplos, no resultados.");
+			"Anota lo que has hecho en cada ejercicio.");
 		if (app.sessions.session == null) {
 			card(app.sessions.busy ? "Abriendo borrador…" : "Sin sesión",
-				app.sessions.busy ? "Consultando sus valores guardados." : "Acepta una rutina desde Entrenamiento.");
+				app.sessions.busy ? "Consultando sus valores guardados." : "Acepta una rutina desde Entreno.");
 			return;
 		}
 		if (app.sessions.session.getStatus() == Session.Status.FINISHED) {
-			card("Sesión finalizada", "Consulta sus valores en Historial.");
+			card("Sesión finalizada", "Consulta sus valores en Progreso.");
 			return;
 		}
 		List<String> ids = new ArrayList<>(), names = new ArrayList<>();
@@ -44,7 +44,7 @@ public final class SessionFragment extends ScreenFragment {
 				"Valores guardados. Puedes actualizarlos antes de finalizar." : "Todavía sin valores guardados."));
 		action(context, "Ver técnica: " + e.getName(), () -> app.openExercise(e));
 		LinearLayout fields = card("Valores realizados", AppController.label(e.getMetricType().name()) +
-			" · unidades explícitas\nCarga cero significa peso corporal. El esfuerzo es opcional.");
+			" · carga 0 = peso corporal");
 		Map<String, String> inputs = app.sessions.inputs();
 		for (MetricValidator.Field f : new MetricValidator().fields(e.getMetricType()))
 			if (f.choices.isEmpty())
@@ -53,7 +53,7 @@ public final class SessionFragment extends ScreenFragment {
 			else
 				choice(fields, f.key, f.label, f.choices, f.choices, inputs.getOrDefault(f.key, ""),
 					v -> app.sessions.input(f.key, v));
-		action(rows, "Guardar ejercicio", !app.sessions.busy, app.sessions::record);
+		primary(action(rows, "Guardar ejercicio", !app.sessions.busy, app.sessions::record));
 		if (app.sessions.selected + 1 < ids.size())
 			action(rows, "Siguiente ejercicio", !app.sessions.busy,
 				() -> app.sessions.select(app.sessions.selected + 1));

@@ -48,6 +48,7 @@ public final class AppState extends AndroidViewModel {
 	public boolean deletingLocalData;
 	public VisualizationController visualization;
 	public com.energym.app.nutrition.NutritionController nutrition;
+	public com.energym.app.progress.GoalsController goals;
 	private com.energym.app.nutrition.SyncedNutritionStore nutritionStore;
 	// Consultas a Open Food Facts: independientes del chat y de SQLite.
 	private final ExecutorService lookupWorker = Executors.newSingleThreadExecutor();
@@ -92,8 +93,14 @@ public final class AppState extends AndroidViewModel {
 			(status, error) -> {
 				syncStatus = status;
 				syncError = error == null ? "" : error.getMessage();
-				if (app != null && status == SyncCoordinator.Status.SYNCED)
+				if (app != null && status == SyncCoordinator.Status.SYNCED) {
 					app.reload();
+					// Una restauración también puede traer diario, peso y objetivos de otro dispositivo.
+					if (nutrition != null)
+						nutrition.reload();
+					if (goals != null)
+						goals.reload();
+				}
 				changed();
 			});
 		AndroidAppStore store = new AndroidAppStore(sync);
@@ -105,6 +112,8 @@ public final class AppState extends AndroidViewModel {
 		} catch (Exception e) {
 			version = "1";
 		}
+		goals = new com.energym.app.progress.GoalsController(new com.energym.app.progress.SyncedGoalStore(sync),
+			this::changed, message -> app.error(message));
 		nutrition = new com.energym.app.nutrition.NutritionController(nutritionStore,
 			new com.energym.app.nutrition.OpenFoodFactsLookup(lookupWorker, main, version), java.time.LocalDate::now,
 			this::changed, message -> app.error(message));
@@ -147,6 +156,7 @@ public final class AppState extends AndroidViewModel {
 		app.observe(() -> {
 			assistant.activate(app.owner());
 			nutrition.activate(app.owner());
+			goals.activate(app.owner());
 			changed();
 		});
 		accounts = new AccountController(gateway, sync, main, (status, value, error) -> {

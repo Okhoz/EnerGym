@@ -19,7 +19,7 @@ public final class BodyFragment extends ScreenFragment {
 	protected void content() {
 		NutritionController n = state.nutrition;
 		heading("NUTRICIÓN", "Tus datos físicos",
-			"Se usan para estimar tu gasto diario y repartir calorías, proteínas, hidratos y grasas.");
+			"Para calcular tus calorías y macros diarios.");
 		if (n == null || app.owner() == null) {
 			card("Entra para empezar", "");
 			return;
