@@ -120,19 +120,19 @@ public final class NutritionFragment extends ScreenFragment {
 			primary(action(card, "Completar mis datos", true, () -> open(Screen.BODY)));
 			return;
 		}
-		double exercise = exerciseKcal(n, day);
-		double left = targets.kcal - totals[0] + exercise;
+		// Se redondea cada término antes de operar para que la cuenta visible cuadre (2451 − 195 + 0 = 2256).
+		long goal = Math.round(targets.kcal), food = Math.round(totals[0]), exercise = Math.round(exerciseKcal(n, day));
+		long left = goal - food + exercise;
 		LinearLayout equation = columns(card, 4);
-		term(equation, Math.round(targets.kcal), "Objetivo", false);
+		term(equation, goal, "Objetivo", false);
 		operator(equation, "−");
-		term(equation, Math.round(totals[0]), "Comida", false);
+		term(equation, food, "Comida", false);
 		operator(equation, "+");
-		term(equation, Math.round(exercise), "Ejercicio", false);
+		term(equation, exercise, "Ejercicio", false);
 		operator(equation, "=");
-		term(equation, Math.round(left), "Restantes", true);
-		equation.setContentDescription("Objetivo " + Math.round(targets.kcal) + " menos comida " +
-			Math.round(totals[0]) + " más ejercicio " + Math.round(exercise) + " igual a " + Math.round(left) +
-			" calorías restantes");
+		term(equation, left, "Restantes", true);
+		equation.setContentDescription("Objetivo " + goal + " menos comida " + food + " más ejercicio " + exercise +
+			" igual a " + left + " calorías restantes");
 		macro(card, "Hidratos", totals[2], targets.carbs, 0);
 		macro(card, "Proteínas", totals[1], targets.protein, 1);
 		macro(card, "Grasas", totals[3], targets.fat, 2);
