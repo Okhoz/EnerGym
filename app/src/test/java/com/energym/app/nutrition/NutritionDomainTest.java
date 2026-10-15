@@ -69,6 +69,47 @@ public class NutritionDomainTest {
 		assertNull(FoodProduct.extractCode("123"));
 	}
 
+	@Test
+	public void directRetailBarcodesKeepTheirProductDigits() {
+		assertEquals("96385074", FoodProduct.extractCode("96385074"));
+		assertEquals("036000291452", FoodProduct.extractCode("036000291452"));
+		assertEquals("3017620422003", FoodProduct.extractCode("3017620422003"));
+		assertEquals("13017620422000", FoodProduct.extractCode("13017620422000"));
+	}
+
+	@Test
+	public void rejectsTruncatedGtinsAndArbitraryTextInsideQr() {
+		assertNull(FoodProduct.extractCode("https://id.gs1.org/01/03017620422003999"));
+		assertNull(FoodProduct.extractCode("https://id.gs1.org/01/03017620422003garbage"));
+		assertNull(FoodProduct.extractCode("promo text /01/03017620422003"));
+		assertNull(FoodProduct.extractCode("promo (01)03017620422003"));
+	}
+
+	@Test
+	public void acceptsDelimitedGs1IdentifiersWithoutChangingTheirProduct() {
+		assertEquals("3017620422003", FoodProduct.extractCode("https://id.gs1.org/01/03017620422003/10/ABC?17=271231"));
+		assertEquals("3017620422003", FoodProduct.extractCode("https://example.org/01/03017620422003?10=ABC"));
+		assertEquals("3017620422003", FoodProduct.extractCode("010301762042200317271231"));
+	}
+
+	@Test
+	public void standardEnergyRemainsKilojoulesRegardlessOfContributorUnit() {
+		for (String unit : new String[]{"kJ", "kcal", "", "J"}) {
+			FoodProduct product = FoodProduct.parse("3017620422003", "{\"status\":1,\"product\":{\"nutriments\":" +
+				"{\"energy_100g\":2252,\"energy_unit\":\"" + unit + "\"}}}");
+			assertEquals(538, product.kcal100, 0.001);
+		}
+	}
+
+	@Test
+	public void invalidStandardEnergyStaysMissing() {
+		for (String value : new String[]{"-1", "\"Infinity\"", "\"NaN\""}) {
+			FoodProduct product = FoodProduct.parse("3017620422003", "{\"status\":1,\"product\":{\"nutriments\":" +
+				"{\"energy_100g\":" + value + "}}}");
+			assertTrue(Double.isNaN(product.kcal100));
+		}
+	}
+
 	static final class Store implements NutritionStore {
 		final List<FoodEntry> saved = new ArrayList<>();
 		BodyProfile body;
@@ -129,6 +170,92 @@ public class NutritionDomainTest {
 		c.remove(c.entriesOn(DAY).get(0));
 		assertTrue(store.saved.isEmpty());
 		assertEquals(0, c.totals(DAY)[0], 0);
+	}
+
+	@Test
+	public void manualDraftSurvivesAnOlderLookupResponse() {
+		List<NutritionStore.Callback<FoodProduct>> pending = new ArrayList<>();
+		NutritionController c = new NutritionController(new Store(), (code, cb) -> pending.add(cb), () -> DAY,
+			() -> {}, e -> fail(e));
+		c.activate("uid");
+		c.startManual(FoodEntry.Meal.LUNCH);
+		c.scanned("3017620422003");
+		c.startManual(FoodEntry.Meal.DINNER);
+		c.foodDraft.put("name", "Mi cena");
+		pending.get(0).success(new FoodProduct("3017620422003", "Nutella", "", "400 g", FoodEntry.Unit.G,
+			539, 6.3, 57.5, 30.9));
+		assertEquals("Mi cena", c.foodDraft.get("name"));
+		assertEquals("DINNER", c.foodDraft.get("meal"));
+		assertFalse(c.looking);
+		assertNull(c.product);
+	}
+
+	@Test
+	public void newestLookupSurvivesAnOlderLookupFailure() {
+		List<NutritionStore.Callback<FoodProduct>> pending = new ArrayList<>();
+		NutritionController c = new NutritionController(new Store(), (code, cb) -> pending.add(cb), () -> DAY,
+			() -> {}, e -> fail(e));
+		c.activate("uid");
+		c.scanned("3017620422003");
+		c.scanned("8410000000000");
+		pending.get(1).success(new FoodProduct("8410000000000", "Leche", "", "1 l", FoodEntry.Unit.ML,
+			46, 3.1, 4.7, 1.6));
+		pending.get(0).failure(new java.io.IOException("old request"));
+		assertEquals("Leche", c.foodDraft.get("name"));
+		assertEquals("8410000000000", c.foodDraft.get("barcode"));
+		assertEquals(FoodEntry.Unit.ML, c.product.unit);
+		assertFalse(c.looking);
+	}
+
+	@Test
+	public void lateCameraResultCannotReplaceANewerManualDraft() {
+		List<String> lookedUp = new ArrayList<>();
+		NutritionController c = new NutritionController(new Store(), (code, cb) -> lookedUp.add(code), () -> DAY,
+			() -> {}, e -> fail(e));
+		c.activate("uid");
+		c.startManual(FoodEntry.Meal.LUNCH);
+		long scan = c.scanToken();
+		c.startManual(FoodEntry.Meal.DINNER);
+		c.foodDraft.put("name", "Mi cena");
+		assertFalse(c.scanned("3017620422003", scan));
+		assertEquals("Mi cena", c.foodDraft.get("name"));
+		assertTrue(lookedUp.isEmpty());
+		assertFalse(c.looking);
+	}
+
+	@Test
+	public void lateCameraResultCannotCrossAnAccountRoundTrip() {
+		List<String> lookedUp = new ArrayList<>();
+		NutritionController c = new NutritionController(new Store(), (code, cb) -> lookedUp.add(code), () -> DAY,
+			() -> {}, e -> fail(e));
+		c.activate("uid-A");
+		long scan = c.scanToken();
+		c.activate("uid-B");
+		c.activate("uid-A");
+		assertFalse(c.scanned("3017620422003", scan));
+		assertNull(c.product);
+		assertTrue(lookedUp.isEmpty());
+		assertFalse(c.looking);
+	}
+
+	@Test
+	public void unknownAndFailedLookupsLeaveTheCodeForManualEntry() {
+		for (boolean failLookup : new boolean[]{false, true}) {
+			NutritionController c = new NutritionController(new Store(), (code, cb) -> {
+				if (failLookup)
+					cb.failure(new java.io.IOException("offline"));
+				else
+					cb.success(null);
+			}, () -> DAY, () -> {}, e -> fail(e));
+			c.activate("uid");
+			c.startManual(FoodEntry.Meal.SNACK);
+			assertTrue(c.scanned("9999999999994"));
+			assertEquals("9999999999994", c.foodDraft.get("barcode"));
+			assertEquals("SNACK", c.foodDraft.get("meal"));
+			assertNull(c.product);
+			assertNull(c.preview());
+			assertFalse(c.looking);
+		}
 	}
 
 	@Test

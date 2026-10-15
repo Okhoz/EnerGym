@@ -69,12 +69,14 @@ public final class FoodFragment extends ScreenFragment {
 			d.put("name", v);
 			refresh.run();
 		});
-		if (p == null)
-			choice(values, "unit", "La etiqueta indica valores por", Arrays.asList("G", "ML"),
-				Arrays.asList("100 g (sólidos)", "100 ml (líquidos)"), unit.name(), v -> {
-					d.put("unit", v);
-					app.changed();
-				});
+		choice(values, "unit", "La etiqueta indica valores por", Arrays.asList("G", "ML"),
+			Arrays.asList("100 g (sólidos)", "100 ml (líquidos)"), unit.name(), v -> {
+				d.put("unit", v);
+				app.changed();
+			});
+		if (p != null)
+			text(values, "Comprueba la base en la etiqueta. Cambiar g/ml no convierte la cantidad ni los valores.",
+				R.style.EnerGym_FieldCaption, 0);
 		String base = " por 100 " + unit.symbol;
 		field(values, d, "kcal100", "Calorías (kcal)" + base, refresh);
 		field(values, d, "protein100", "Proteínas (g)" + base, refresh);
@@ -88,7 +90,7 @@ public final class FoodFragment extends ScreenFragment {
 	 * Atajos: escanear o repetir un alimento reciente con su ficha ya rellena.
 	 */
 	private void recents(NutritionController n) {
-		primary(action(rows, "Escanear código de barras o QR", !n.busy, () -> NutritionFragment.scan(this)));
+		primary(action(rows, "Escanear código de barras", !n.busy, () -> NutritionFragment.scan(this)));
 		List<FoodEntry> recent = n.recentFoods(8);
 		if (recent.isEmpty())
 			return;

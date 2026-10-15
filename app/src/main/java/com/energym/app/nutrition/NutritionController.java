@@ -26,6 +26,7 @@ public final class NutritionController {
 	private final java.util.function.Consumer<String> error;
 	private String owner;
 	private long generation;
+	private long foodRevision;
 	private SortedMap<LocalDate, Double> dailyCalories = new TreeMap<>();
 
 	public NutritionController(NutritionStore store, NutritionStore.Lookup lookup, Supplier<LocalDate> clock,
@@ -47,6 +48,7 @@ public final class NutritionController {
 			return;
 		owner = next;
 		generation++;
+		foodRevision++;
 		body = null;
 		entries = Collections.emptyList();
 		weights = new TreeMap<>();
@@ -286,6 +288,8 @@ public final class NutritionController {
 	private FoodEntry.Meal targetMeal;
 
 	public void startManual() {
+		foodRevision++;
+		looking = false;
 		product = null;
 		foodDraft.clear();
 		foodDraft.put("unit", "G");
@@ -326,10 +330,22 @@ public final class NutritionController {
 		return result.subList(0, Math.min(limit, result.size()));
 	}
 
+	/** Identifica el formulario y la cuenta que abren el escáner. */
+	public long scanToken() {
+		return foodRevision;
+	}
+
 	/**
 	 * @return false si el contenido leído no es un código de alimento; en ese caso ya se ha informado del error.
 	 */
 	public boolean scanned(String code) {
+		return scanned(code, scanToken());
+	}
+
+	/** Un resultado de cámara solo pertenece al formulario y cuenta que abrieron el escáner. */
+	public boolean scanned(String code, long scanToken) {
+		if (owner == null || scanToken != foodRevision)
+			return false;
 		if (code == null)
 			return false;
 		String digits = FoodProduct.extractCode(code);
@@ -342,9 +358,10 @@ public final class NutritionController {
 		status = "Buscando " + digits + " en Open Food Facts…";
 		changed.run();
 		long token = generation;
+		long request = ++foodRevision;
 		lookup.find(digits, new NutritionStore.Callback<FoodProduct>() {
 			public void success(FoodProduct found) {
-				if (token != generation)
+				if (token != generation || request != foodRevision)
 					return;
 				looking = false;
 				startManual();
@@ -366,7 +383,7 @@ public final class NutritionController {
 			}
 
 			public void failure(Exception e) {
-				if (token != generation)
+				if (token != generation || request != foodRevision)
 					return;
 				looking = false;
 				startManual();

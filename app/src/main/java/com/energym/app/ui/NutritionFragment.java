@@ -86,7 +86,7 @@ public final class NutritionFragment extends ScreenFragment {
 				n.startManual(meal);
 				scan(this);
 			});
-			scanFood.setContentDescription("Escanear código para " + MEALS[meal.ordinal()]);
+			scanFood.setContentDescription("Escanear código de barras para " + MEALS[meal.ordinal()]);
 		}
 		if (!n.status.isEmpty())
 			text(rows, n.status, R.style.EnerGym_FieldCaption, 0);
@@ -238,14 +238,22 @@ public final class NutritionFragment extends ScreenFragment {
 	 * Escáner compartido por el diario y la pantalla de añadir alimento.
 	 */
 	static void scan(ScreenFragment f) {
+		NutritionController nutrition = f.state.nutrition;
+		if (nutrition == null || nutrition.owner() == null)
+			return;
+		long token = nutrition.scanToken();
 		GmsBarcodeScannerOptions options = new GmsBarcodeScannerOptions.Builder()
 			.setBarcodeFormats(Barcode.FORMAT_EAN_13, Barcode.FORMAT_EAN_8, Barcode.FORMAT_UPC_A, Barcode.FORMAT_UPC_E,
 				Barcode.FORMAT_QR_CODE, Barcode.FORMAT_DATA_MATRIX).enableAutoZoom().build();
 		GmsBarcodeScanner scanner = GmsBarcodeScanning.getClient(f.requireActivity(), options);
 		scanner.startScan().addOnSuccessListener(barcode -> {
-			if (f.state.nutrition.scanned(barcode.getRawValue()))
+			if (!f.isAdded() || f.state.nutrition != nutrition)
+				return;
+			if (nutrition.scanned(barcode.getRawValue(), token))
 				f.app.navigate(Screen.FOOD);
 		}).addOnFailureListener(e -> {
+			if (!f.isAdded() || f.state.nutrition != nutrition || token != nutrition.scanToken())
+				return;
 			f.app.error("No se pudo abrir el escáner (necesita Google Play services actualizado). " +
 				"Puedes introducir el alimento manualmente.");
 		});

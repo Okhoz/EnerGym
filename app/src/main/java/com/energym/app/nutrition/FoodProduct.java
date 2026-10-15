@@ -52,10 +52,23 @@ public final class FoodProduct {
 		if (value.matches("\\d{8}|\\d{12,14}"))
 			code = value;
 		else {
-			java.util.regex.Matcher m = java.util.regex.Pattern.compile("(?:/01/|\\(01\\)|^01)(\\d{14}|\\d{13}|\\d{12}|\\d{8})")
-				.matcher(value);
-			if (m.find())
-				code = m.group(1);
+			java.util.regex.Matcher gs1 = java.util.regex.Pattern
+				.compile("^\\(01\\)(\\d{14})(?=\\(|\\u001d|$)|^01(\\d{14})(?=\\d{2}|\\u001d|$)").matcher(value);
+			if (gs1.find())
+				code = gs1.group(1) == null ? gs1.group(2) : gs1.group(1);
+			else
+				try {
+					java.net.URI uri = new java.net.URI(value);
+					if (("https".equalsIgnoreCase(uri.getScheme()) || "http".equalsIgnoreCase(uri.getScheme())) &&
+						uri.getHost() != null) {
+						java.util.regex.Matcher path = java.util.regex.Pattern
+							.compile("(?:^|/)01/(\\d{14}|\\d{13}|\\d{12}|\\d{8})(?=/|$)").matcher(uri.getRawPath());
+						if (path.find())
+							code = path.group(1);
+					}
+				} catch (java.net.URISyntaxException ignored) {
+					// Un QR con texto libre no es un enlace GS1.
+				}
 		}
 		if (code == null)
 			return null;
@@ -92,6 +105,12 @@ public final class FoodProduct {
 			double kj = number(n, "energy-kj_100g");
 			if (!Double.isNaN(kj))
 				kcal = Math.round(kj / 4.184);
+		}
+		if (Double.isNaN(kcal)) {
+			double energy = number(n, "energy_100g");
+			// OFF normaliza energy_100g en kJ; energy_unit solo describe la unidad de entrada.
+			if (Double.isFinite(energy) && energy >= 0)
+				kcal = Math.round(energy / 4.184);
 		}
 		return new FoodProduct(barcode, limit(name, 120), limit(brand, 60), limit(quantity, 40), unit, kcal,
 			number(n, "proteins_100g"), number(n, "carbohydrates_100g"), number(n, "fat_100g"));
