@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fila de alimento del diario (estilo lista): nombre y cantidad a la izquierda, kcal a la derecha. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:minHeight="56dp"
+	android:gravity="center_vertical"
+	android:orientation="horizontal"
+	android:paddingVertical="10dp"
+	android:background="?attr/selectableItemBackground"
+	android:clickable="true"
+	android:focusable="true">
+
+	<LinearLayout
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_weight="1"
+		android:orientation="vertical">
+
+		<TextView
+			android:id="@+id/food_name"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:textColor="@color/white"
+			android:textSize="16sp"
+			android:maxLines="2"
+			android:ellipsize="end"
+			tools:text="Arroz blanco cocido" />
+
+		<TextView
+			android:id="@+id/food_detail"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="2dp"
+			android:textColor="@color/text_secondary"
+			android:textSize="13sp"
+			android:maxLines="1"
+			android:ellipsize="end"
+			tools:text="150 g · P 10,5 · H 118,5 · G 0,9" />
+	</LinearLayout>
+
+	<TextView
+		android:id="@+id/food_kcal"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginStart="12dp"
+		android:textColor="@color/white"
+		android:textSize="16sp"
+		android:fontFamily="sans-serif-medium"
+		tools:text="540" />
+</LinearLayout>

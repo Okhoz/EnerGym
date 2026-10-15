@@ -13,6 +13,8 @@ public final class ProgressBarView extends View {
 	private final Paint track, fill, label;
 	private final RectF rect = new RectF();
 	private double ratio;
+	private Integer color;
+	private boolean showPercent = true;
 
 	public ProgressBarView(Context context) {
 		this(context, null);
@@ -29,10 +31,33 @@ public final class ProgressBarView extends View {
 
 	public ProgressBarView set(double ratio, String description) {
 		this.ratio = Math.max(0, Math.min(1, ratio));
-		fill.setColor(this.ratio >= 1 ? palette.carbs : palette.gold);
+		fill.setColor(color != null ? color : this.ratio >= 1 ? palette.carbs : palette.gold);
 		setContentDescription(description + ": " + Math.round(this.ratio * 100) + " %");
 		invalidate();
 		return this;
+	}
+
+	/**
+	 * Color fijo (macros) y barra sin porcentaje, a todo el ancho.
+	 */
+	public ProgressBarView macro(int color) {
+		this.color = color;
+		showPercent = false;
+		fill.setColor(color);
+		invalidate();
+		return this;
+	}
+
+	public int protein() {
+		return palette.protein;
+	}
+
+	public int carbs() {
+		return palette.carbs;
+	}
+
+	public int fat() {
+		return palette.fat;
 	}
 
 	@Override
@@ -42,7 +67,7 @@ public final class ProgressBarView extends View {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		float textWidth = palette.dp(48);
+		float textWidth = showPercent ? palette.dp(48) : 0;
 		float barHeight = palette.dp(10), top = (getHeight() - barHeight) / 2;
 		float right = getWidth() - textWidth;
 		float radius = barHeight / 2;
@@ -52,7 +77,8 @@ public final class ProgressBarView extends View {
 			rect.set(0, top, Math.max(barHeight, (float) (right * ratio)), top + barHeight);
 			canvas.drawRoundRect(rect, radius, radius, fill);
 		}
-		canvas.drawText(Math.round(ratio * 100) + " %", getWidth(), getHeight() / 2f - (label.descent() + label.ascent()) / 2,
-			label);
+		if (showPercent)
+			canvas.drawText(Math.round(ratio * 100) + " %", getWidth(),
+				getHeight() / 2f - (label.descent() + label.ascent()) / 2, label);
 	}
 }

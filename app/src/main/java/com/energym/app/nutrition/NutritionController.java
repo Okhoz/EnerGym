@@ -274,12 +274,50 @@ public final class NutritionController {
 
 	// ---- Escáner y alimentos ----
 
+	/**
+	 * Comida a la que se añadirá el alimento (botón «Añadir alimento» de cada comida del diario).
+	 */
+	private FoodEntry.Meal targetMeal;
+
 	public void startManual() {
 		product = null;
 		foodDraft.clear();
 		foodDraft.put("unit", "G");
-		foodDraft.put("meal", defaultMeal().name());
+		foodDraft.put("meal", (targetMeal == null ? defaultMeal() : targetMeal).name());
 		status = "";
+	}
+
+	public void startManual(FoodEntry.Meal meal) {
+		targetMeal = meal;
+		startManual();
+	}
+
+	/**
+	 * Rellena el formulario con un alimento ya registrado: misma ficha, cantidad a confirmar.
+	 */
+	public void startFrom(FoodEntry recent) {
+		startManual();
+		foodDraft.put("name", recent.name);
+		foodDraft.put("barcode", recent.barcode);
+		foodDraft.put("unit", recent.unit.name());
+		foodDraft.put("amount", format(recent.amount));
+		foodDraft.put("kcal100", format(recent.kcal100));
+		foodDraft.put("protein100", format(recent.protein100));
+		foodDraft.put("carbs100", format(recent.carbs100));
+		foodDraft.put("fat100", format(recent.fat100));
+	}
+
+	/**
+	 * Alimentos distintos registrados recientemente (más reciente primero), para añadirlos de nuevo con un toque.
+	 */
+	public List<FoodEntry> recentFoods(int limit) {
+		List<FoodEntry> ordered = new ArrayList<>(entries);
+		ordered.sort((a, b) -> Long.compare(b.createdAt, a.createdAt));
+		Map<String, FoodEntry> unique = new LinkedHashMap<>();
+		for (FoodEntry e : ordered)
+			unique.putIfAbsent(e.name.toLowerCase(Locale.ROOT) + "|" + e.kcal100, e);
+		List<FoodEntry> result = new ArrayList<>(unique.values());
+		return result.subList(0, Math.min(limit, result.size()));
 	}
 
 	/**

@@ -33,6 +33,8 @@ public final class FoodFragment extends ScreenFragment {
 		}
 		Map<String, String> d = n.foodDraft;
 		FoodProduct p = n.product;
+		if (p == null && d.getOrDefault("barcode", "").isEmpty() && d.getOrDefault("name", "").isEmpty())
+			recents(n);
 		FoodEntry.Unit unit = FoodEntry.Unit.valueOf(d.getOrDefault("unit", "G"));
 		if (p != null)
 			card(p.displayName(), (p.quantity.isEmpty() ? "" : "Envase: " + p.quantity + "\n") + "Código " + p.barcode +
@@ -80,6 +82,30 @@ public final class FoodFragment extends ScreenFragment {
 		field(values, d, "fat100", "Grasas (g)" + base, refresh);
 		refresh.run();
 		primary(action(rows, "Añadir al diario", !n.busy, () -> n.addFood(() -> app.navigate(Screen.NUTRITION))));
+	}
+
+	/**
+	 * Atajos: escanear o repetir un alimento reciente con su ficha ya rellena.
+	 */
+	private void recents(NutritionController n) {
+		primary(action(rows, "Escanear código de barras o QR", !n.busy, () -> NutritionFragment.scan(this)));
+		List<FoodEntry> recent = n.recentFoods(8);
+		if (recent.isEmpty())
+			return;
+		LinearLayout list = card("Recientes", "");
+		for (FoodEntry e : recent) {
+			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, list, false);
+			((TextView) row.findViewById(R.id.food_name)).setText(e.name);
+			((TextView) row.findViewById(R.id.food_detail)).setText(NutritionController.format(e.amount) + " " +
+				e.unit.symbol + " · " + NutritionController.format(e.kcal100) + " kcal/100 " + e.unit.symbol);
+			((TextView) row.findViewById(R.id.food_kcal)).setText("+");
+			row.setContentDescription("Añadir de nuevo " + e.name);
+			row.setOnClickListener(v -> {
+				n.startFrom(e);
+				app.changed();
+			});
+			list.addView(row);
+		}
 	}
 
 	private void field(LinearLayout target, Map<String, String> d, String key, String label, Runnable refresh) {

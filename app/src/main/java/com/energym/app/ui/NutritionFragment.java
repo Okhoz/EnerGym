@@ -1,6 +1,9 @@
 package com.energym.app.ui;
 
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.energym.app.R;
 import com.energym.app.controller.AppController.Screen;
@@ -53,31 +56,10 @@ public final class NutritionFragment extends ScreenFragment {
 
 		double[] totals = n.totals(day);
 		BodyProfile.Targets targets = n.targets();
-		LinearLayout summary = card("Resumen del día", targets == null ?
-			"Completa tus datos físicos para calcular tus objetivos de calorías y macronutrientes." : balance(n, totals));
-		RingView kcal = new RingView(requireContext());
-		add(summary, kcal, 8).set("Calorías", totals[0], targets == null ? 0 : targets.kcal, "kcal", kcal.gold(), 12);
-		LinearLayout macros = columns(summary, 16);
-		RingView protein = column(macros, new RingView(requireContext()), 4);
-		protein.set("Proteínas", totals[1], targets == null ? 0 : targets.protein, "g", protein.protein(), 7);
-		RingView carbs = column(macros, new RingView(requireContext()), 4);
-		carbs.set("Hidratos", totals[2], targets == null ? 0 : targets.carbs, "g", carbs.carbs(), 7);
-		RingView fat = column(macros, new RingView(requireContext()), 4);
-		fat.set("Grasas", totals[3], targets == null ? 0 : targets.fat, "g", fat.fat(), 7);
-		if (targets == null)
-			primary(action(summary, "Completar mis datos", true, () -> open(Screen.BODY)));
+		remaining(n, day, totals, targets);
 
-		LinearLayout add = card("Añadir alimento", n.status);
-		MaterialButton scan = action(add, "Escanear código de barras o QR", !n.busy, this::scan);
-		primary(scan);
-		action(add, "Introducir manualmente", !n.busy, () -> {
-			n.startManual();
-			app.navigate(Screen.FOOD);
-		});
-
+		// Diario por comidas, como en un registro de calorías: cada comida con su total y su botón de añadir.
 		List<FoodEntry> entries = n.entriesOn(day);
-		if (entries.isEmpty())
-			card("Diario", "Aún no hay alimentos este día.");
 		for (FoodEntry.Meal meal : FoodEntry.Meal.values()) {
 			List<FoodEntry> items = new ArrayList<>();
 			double mealKcal = 0;
@@ -86,21 +68,28 @@ public final class NutritionFragment extends ScreenFragment {
 					items.add(e);
 					mealKcal += e.kcal();
 				}
-			if (items.isEmpty())
+			if (items.isEmpty() && meal == FoodEntry.Meal.OTHER)
 				continue;
-			LinearLayout list = card(MEALS[meal.ordinal()] + " · " + Math.round(mealKcal) + " kcal", "");
-			for (FoodEntry e : items) {
-				text(list, e.name, R.style.EnerGym_CardTitle, 12).setTextSize(16);
-				text(list, NutritionController.format(e.amount) + " " + e.unit.symbol + " · " + Math.round(e.kcal()) +
-					" kcal · P " + NutritionController.format(Math.round(e.protein() * 10) / 10.0) + " g · H " +
-					NutritionController.format(Math.round(e.carbs() * 10) / 10.0) + " g · G " +
-					NutritionController.format(Math.round(e.fat() * 10) / 10.0) + " g", R.style.EnerGym_Body, 4);
-				MaterialButton remove = action(list, "Quitar", !n.busy, () -> n.remove(e));
-				remove.setMinHeight(dp(44));
-				remove.setContentDescription("Quitar " + e.name);
-				((LinearLayout.LayoutParams) remove.getLayoutParams()).topMargin = dp(8);
-			}
+			LinearLayout section = card(MEALS[meal.ordinal()] + (items.isEmpty() ? "" : "   " + Math.round(mealKcal) +
+				" kcal"), "");
+			for (FoodEntry e : items)
+				foodRow(section, e, n);
+			LinearLayout buttons = columns(section, items.isEmpty() ? 0 : 8);
+			MaterialButton addFood = compact(buttons, "+ Añadir alimento", !n.busy, () -> {
+				n.startManual(meal);
+				app.navigate(Screen.FOOD);
+			});
+			addFood.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.gold));
+			addFood.setContentDescription("Añadir alimento a " + MEALS[meal.ordinal()]);
+			((LinearLayout.LayoutParams) addFood.getLayoutParams()).weight = 1.4f;
+			MaterialButton scanFood = compact(buttons, "Escanear", !n.busy, () -> {
+				n.startManual(meal);
+				scan(this);
+			});
+			scanFood.setContentDescription("Escanear código para " + MEALS[meal.ordinal()]);
 		}
+		if (!n.status.isEmpty())
+			text(rows, n.status, R.style.EnerGym_FieldCaption, 0);
 
 		LinearLayout week = card("Últimos 7 días", "Calorías por día" + (targets == null ? "." :
 			"; la línea discontinua marca tu objetivo de " + Math.round(targets.kcal) + " kcal."));
@@ -121,34 +110,145 @@ public final class NutritionFragment extends ScreenFragment {
 			"dietista o médico.", R.style.EnerGym_FieldCaption, 4);
 	}
 
+	/**
+	 * Cabecera tipo registro de calorías: Objetivo − Comida + Ejercicio = Restantes, y barras de macros.
+	 */
+	private void remaining(NutritionController n, LocalDate day, double[] totals, BodyProfile.Targets targets) {
+		LinearLayout card = card("Calorías restantes", targets == null ?
+			"Completa tus datos para calcular tu objetivo diario." : "");
+		if (targets == null) {
+			primary(action(card, "Completar mis datos", true, () -> open(Screen.BODY)));
+			return;
+		}
+		double exercise = exerciseKcal(n, day);
+		double left = targets.kcal - totals[0] + exercise;
+		LinearLayout equation = columns(card, 4);
+		term(equation, Math.round(targets.kcal), "Objetivo", false);
+		operator(equation, "−");
+		term(equation, Math.round(totals[0]), "Comida", false);
+		operator(equation, "+");
+		term(equation, Math.round(exercise), "Ejercicio", false);
+		operator(equation, "=");
+		term(equation, Math.round(left), "Restantes", true);
+		equation.setContentDescription("Objetivo " + Math.round(targets.kcal) + " menos comida " +
+			Math.round(totals[0]) + " más ejercicio " + Math.round(exercise) + " igual a " + Math.round(left) +
+			" calorías restantes");
+		macro(card, "Hidratos", totals[2], targets.carbs, 0);
+		macro(card, "Proteínas", totals[1], targets.protein, 1);
+		macro(card, "Grasas", totals[3], targets.fat, 2);
+	}
+
+	private void term(LinearLayout row, long value, String label, boolean highlight) {
+		LinearLayout box = new LinearLayout(requireContext());
+		box.setOrientation(LinearLayout.VERTICAL);
+		box.setGravity(android.view.Gravity.CENTER_HORIZONTAL);
+		TextView number = new TextView(requireContext());
+		number.setText(Long.toString(value));
+		number.setTextSize(highlight ? 20 : 17);
+		number.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+		number.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(),
+			highlight ? (value < 0 ? R.color.chart_over : R.color.gold) : R.color.white));
+		number.setMaxLines(1);
+		TextView caption = new TextView(requireContext());
+		caption.setText(label);
+		caption.setTextSize(11);
+		caption.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_secondary));
+		caption.setMaxLines(1);
+		box.addView(number);
+		box.addView(caption);
+		box.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+		row.addView(box, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, highlight ? 1.3f : 1));
+	}
+
+	private void operator(LinearLayout row, String symbol) {
+		TextView op = new TextView(requireContext());
+		op.setText(symbol);
+		op.setTextSize(17);
+		op.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_secondary));
+		op.setGravity(android.view.Gravity.CENTER);
+		op.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+		row.addView(op, new LinearLayout.LayoutParams(dp(14), ViewGroup.LayoutParams.WRAP_CONTENT));
+	}
+
+	private void macro(LinearLayout card, String name, double value, double target, int kind) {
+		LinearLayout line = columns(card, 14);
+		TextView label = new TextView(requireContext());
+		label.setTextAppearance(R.style.EnerGym_FieldCaption);
+		label.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.white));
+		label.setText(name);
+		line.addView(label, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+		TextView amount = new TextView(requireContext());
+		amount.setTextAppearance(R.style.EnerGym_FieldCaption);
+		amount.setText(Math.round(value) + " / " + Math.round(target) + " g");
+		line.addView(amount);
+		ProgressBarView bar = new ProgressBarView(requireContext());
+		bar.macro(kind == 0 ? bar.carbs() : kind == 1 ? bar.protein() : bar.fat());
+		add(card, bar, 2).set(target <= 0 ? 0 : value / target, name);
+	}
+
+	/**
+	 * Gasto estimado de los entrenos finalizados ese día: MET 5 × peso × horas registradas.
+	 */
+	private double exerciseKcal(NutritionController n, LocalDate day) {
+		if (n.body == null)
+			return 0;
+		com.energym.app.progress.ProgressStats stats = new com.energym.app.progress.ProgressStats(app.history,
+			java.time.ZoneId.systemDefault(), n.today());
+		double minutes = 0;
+		for (com.energym.app.domain.Session s : stats.sessionsOn(day))
+			minutes += Math.max(0, s.getCompletedAt() - s.getStartedAt()) / 60000.0;
+		return 5 * n.body.weightKg * Math.min(minutes, 240) / 60.0;
+	}
+
+	private void foodRow(LinearLayout section, FoodEntry e, NutritionController n) {
+		View row = getLayoutInflater().inflate(R.layout.row_food, section, false);
+		((TextView) row.findViewById(R.id.food_name)).setText(e.name);
+		((TextView) row.findViewById(R.id.food_detail)).setText(NutritionController.format(e.amount) + " " +
+			e.unit.symbol + " · P " + one(e.protein()) + " · H " + one(e.carbs()) + " · G " + one(e.fat()));
+		((TextView) row.findViewById(R.id.food_kcal)).setText(Long.toString(Math.round(e.kcal())));
+		row.setContentDescription(e.name + ", " + NutritionController.format(e.amount) + " " + e.unit.symbol + ", " +
+			Math.round(e.kcal()) + " kilocalorías. Toca para ver opciones.");
+		row.setOnClickListener(v -> new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+			.setTitle(e.name)
+			.setMessage(NutritionController.format(e.amount) + " " + e.unit.symbol + " · " + Math.round(e.kcal()) +
+				" kcal\nProteínas " + one(e.protein()) + " g · Hidratos " + one(e.carbs()) + " g · Grasas " +
+				one(e.fat()) + " g")
+			.setPositiveButton("Añadir otra vez", (d, w) -> {
+				n.startFrom(e);
+				app.navigate(Screen.FOOD);
+			})
+			.setNegativeButton("Eliminar", (d, w) -> n.remove(e))
+			.setNeutralButton("Cerrar", null).show());
+		section.addView(row);
+		View divider = new View(requireContext());
+		divider.setBackgroundColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.divider));
+		section.addView(divider, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
+	}
+
+	private static String one(double value) {
+		return NutritionController.format(Math.round(value * 10) / 10.0);
+	}
+
 	private void open(Screen screen) {
 		state.nutrition.fillBody();
 		app.navigate(screen);
 	}
 
-	private void scan() {
+	/**
+	 * Escáner compartido por el diario y la pantalla de añadir alimento.
+	 */
+	static void scan(ScreenFragment f) {
 		GmsBarcodeScannerOptions options = new GmsBarcodeScannerOptions.Builder()
 			.setBarcodeFormats(Barcode.FORMAT_EAN_13, Barcode.FORMAT_EAN_8, Barcode.FORMAT_UPC_A, Barcode.FORMAT_UPC_E,
 				Barcode.FORMAT_QR_CODE, Barcode.FORMAT_DATA_MATRIX).enableAutoZoom().build();
-		GmsBarcodeScanner scanner = GmsBarcodeScanning.getClient(requireActivity(), options);
+		GmsBarcodeScanner scanner = GmsBarcodeScanning.getClient(f.requireActivity(), options);
 		scanner.startScan().addOnSuccessListener(barcode -> {
-			if (state.nutrition.scanned(barcode.getRawValue()))
-				app.navigate(Screen.FOOD);
+			if (f.state.nutrition.scanned(barcode.getRawValue()))
+				f.app.navigate(Screen.FOOD);
 		}).addOnFailureListener(e -> {
-			app.error("No se pudo abrir el escáner (necesita Google Play services actualizado). " +
+			f.app.error("No se pudo abrir el escáner (necesita Google Play services actualizado). " +
 				"Puedes introducir el alimento manualmente.");
 		});
-	}
-
-	private static String balance(NutritionController n, double[] totals) {
-		double maintenance = n.body.maintenance();
-		double diff = totals[0] - maintenance;
-		String today = totals[0] == 0 ? "Sin registros todavía." : Math.abs(diff) < 50 ?
-			"En equilibrio con tu mantenimiento estimado." :
-			(diff < 0 ? "Déficit de " : "Superávit de ") + Math.round(Math.abs(diff)) + " kcal frente a tu mantenimiento.";
-		Double week = n.weeklyBalance();
-		return today + (week == null ? "" : "\nMedia 7 días: " + (week < 0 ? "déficit " : "superávit ") +
-			Math.round(Math.abs(week)) + " kcal/día.");
 	}
 
 	static String label(LocalDate day, LocalDate today) {

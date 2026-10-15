@@ -125,6 +125,33 @@ public class NutritionDomainTest {
 	}
 
 	@Test
+	public void recentFoodsAreDistinctAndRefillTheChosenMeal() {
+		Store store = new Store();
+		NutritionController c = new NutritionController(store, (code, cb) -> cb.success(null), () -> DAY, () -> {
+		}, e -> {
+		});
+		c.activate("uid");
+		for (String name : new String[]{"Arroz", "Pollo", "Arroz"}) {
+			c.startManual(FoodEntry.Meal.LUNCH);
+			c.foodDraft.put("name", name);
+			c.foodDraft.put("amount", "100");
+			c.foodDraft.put("kcal100", "120");
+			c.foodDraft.put("protein100", "10");
+			c.foodDraft.put("carbs100", "5");
+			c.foodDraft.put("fat100", "2");
+			c.addFood(() -> {
+			});
+		}
+		assertEquals(2, c.recentFoods(8).size());
+		assertEquals(FoodEntry.Meal.LUNCH, store.saved.get(0).meal);
+		c.startManual(FoodEntry.Meal.DINNER);
+		c.startFrom(c.recentFoods(8).get(0));
+		assertEquals("DINNER", c.foodDraft.get("meal"));
+		assertEquals("120", c.foodDraft.get("kcal100"));
+		assertNotNull(c.preview());
+	}
+
+	@Test
 	public void controllerValidatesBodyAndLogsWeight() {
 		Store store = new Store();
 		List<String> errors = new ArrayList<>();
