@@ -4,7 +4,7 @@ La app usa Google Credential Manager → Firebase Authentication → UID Firebas
 
 ## Estado actual
 
-No hay proyecto Firebase ni `google-services.json`: la consola está bloqueada al cargar el estado de aceptación de los términos. El build funciona con `CONFIGURATION_NEEDED`; la demo explícita usa `demo:local`, sin copia automática a Google y sin respaldo Firebase. Los tests locales no prueban login Google, escritura en un proyecto real ni reinstalación conectada a nube real. No se han publicado reglas ni activado facturación.
+Proyecto **`energym-e4699`** (plan Spark, sin facturación) creado el 15-10-2026: app Android `com.energym.app` con SHA-1/SHA-256 del keystore de depuración, proveedor Google habilitado y Firestore Standard en **eur3** con las reglas de `firestore.rules` publicadas desde la consola. Los `fieldOverrides` de `firestore.indexes.json` aún no se han desplegado. Cada desarrollador guarda su `app/google-services.json` (excluido de Git); sin él, el build sigue funcionando con `CONFIGURATION_NEEDED` y la demo `demo:local`. Verificado en emulador: inicio de sesión con Google, persistencia de la sesión tras reiniciar y «Respaldo confirmado» sin errores de permisos. Falta añadir las huellas de release/Play App Signing antes de distribuir.
 
 ## Crear la configuración real
 
