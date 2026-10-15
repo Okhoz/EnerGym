@@ -752,112 +752,70 @@ public final class ProposalController {
 	}
 
 	/**
-	 * Recorta unos 5 minutos de la propuesta actual sin cambiarla por otra: quita series al ejercicio con más
-	 * series, acorta los bloques de tiempo y, si no basta, quita el último ejercicio.
+	 * «−5 min»: quita ejercicios del final de la propuesta actual (unos 5 minutos, al menos uno) sin tocar el resto.
+	 * Siempre deja un ejercicio; la rutina no se sustituye por otra.
 	 */
 	public void reduceTime() {
 		if (preview == null || preview.isEmpty())
 			return;
-		int before = preview.getEstimatedMinutes();
-		int target = Math.max(5, before - 5);
 		List<RoutineItem> items = new ArrayList<>(preview.getItems());
-		List<String> changes = new ArrayList<>();
-		while (total(items) > target) {
-			if (!shorten(items, total(items) - target, changes)) {
-				if (items.size() <= 1)
-					break;
-				changes.add("sin " + items.remove(items.size() - 1).getExercise().getName());
-			}
-		}
-		int after = total(items);
-		if (after >= before) {
-			status = "⏱️ La rutina ya está en su mínimo (" + before + " min).";
+		if (items.size() <= 1) {
+			status = "⏱️ Ya solo queda un ejercicio; no se puede quitar más.";
 			changed.run();
 			return;
 		}
-		preview = new Routine(UUID.randomUUID().toString(), 0, preview.getTitle(), preview.getProfile(), items,
-			preview.getExplanation(), preview.getMetadata());
-		status = "⏱️ Rutina recortada de " + before + " a " + after + " min: " + String.join(", ", changes) + ".";
-		persist();
-		changed.run();
+		int before = total(items);
+		List<String> removed = new ArrayList<>();
+		do
+			removed.add(items.remove(items.size() - 1).getExercise().getName());
+		while (items.size() > 1 && before - total(items) < 5);
+		update(items, "⏱️ Quitado " + String.join(", ", removed) + " (" + before + " → " + total(items) + " min).");
 	}
 
 	/**
-	 * Alarga unos 5 minutos la propuesta actual sin pasarse del tiempo por sesión del perfil: una serie más al
-	 * ejercicio con menos series, más minutos en los bloques de tiempo y, si no basta, un ejercicio compatible nuevo.
+	 * «+5 min»: añade ejercicios compatibles al final (unos 5 minutos, al menos uno) sin pasar del tiempo por sesión
+	 * del perfil ni repetir ejercicios; lo ya propuesto no cambia.
 	 */
 	public void extendTime() {
 		if (preview == null || preview.isEmpty())
 			return;
 		TrainingProfile profile = preview.getProfile();
-		int before = preview.getEstimatedMinutes(), limit = profile.getDurationMinutes();
-		int target = Math.min(limit, before + 5);
-		if (target <= before) {
-			status = "⏱️ Ya ocupa tus " + limit + " min por sesión. Súbelos en Perfil para añadir más.";
-			changed.run();
-			return;
-		}
 		List<RoutineItem> items = new ArrayList<>(preview.getItems());
-		List<String> changes = new ArrayList<>();
-		while (total(items) < target && lengthen(items, limit - total(items), profile, changes)) {
+		int before = total(items), limit = profile.getDurationMinutes();
+		List<String> added = new ArrayList<>();
+		while (total(items) - before < 5) {
+			RoutineItem next = nextExercise(items, profile, limit - total(items));
+			if (next == null)
+				break;
+			// Antes de un bloque final de resistencia, para que siga cerrando la sesión.
+			int at = items.size();
+			while (at > 0 && items.get(at - 1).getExercise().getMetricType() == MetricType.ENDURANCE)
+				at--;
+			items.add(at, next);
+			added.add(next.getExercise().getName());
 		}
-		int after = total(items);
-		if (after <= before) {
-			status = "⏱️ No he encontrado cómo alargarla sin pasar de tus " + limit + " min por sesión.";
+		if (added.isEmpty()) {
+			status = limit - before < 3 ? "⏱️ Ya ocupa tus " + limit + " min por sesión. Súbelos en Perfil para añadir más." :
+				"⏱️ No quedan más ejercicios compatibles con tu perfil para añadir.";
 			changed.run();
 			return;
 		}
-		preview = new Routine(UUID.randomUUID().toString(), 0, preview.getTitle(), profile, items,
+		update(items, "⏱️ Añadido " + String.join(", ", added) + " (" + before + " → " + total(items) + " min).");
+	}
+
+	private void update(List<RoutineItem> items, String message) {
+		preview = new Routine(UUID.randomUUID().toString(), 0, preview.getTitle(), preview.getProfile(), items,
 			preview.getExplanation(), preview.getMetadata());
-		status = "⏱️ Rutina ampliada de " + before + " a " + after + " min: " + String.join(", ", changes) + ".";
+		swapped.clear();
+		status = message;
 		persist();
 		changed.run();
 	}
 
 	/**
-	 * Un paso de ampliación que cabe en «room» minutos; false si no hay ninguno posible.
+	 * Siguiente ejercicio compatible que no está en la rutina y cabe en «room» minutos, con prescripción segura.
 	 */
-	private boolean lengthen(List<RoutineItem> items, int room, TrainingProfile profile, List<String> changes) {
-		int best = -1, fewest = 5;
-		for (int i = 0; i < items.size(); i++) {
-			Map<String, String> p = items.get(i).getPrescription();
-			int sets = p.containsKey("sets") ? (int) Double.parseDouble(p.get("sets").replace(',', '.')) : 99;
-			if (sets < fewest) {
-				fewest = sets;
-				best = i;
-			}
-		}
-		if (best >= 0) {
-			RoutineItem item = items.get(best);
-			int minutes = item.getEstimatedMinutes() + (int) Math.ceil(item.getEstimatedMinutes() / (double) fewest);
-			Map<String, String> p = new LinkedHashMap<>(item.getPrescription());
-			p.put("sets", Integer.toString(fewest + 1));
-			if (minutes - item.getEstimatedMinutes() <= room && fits(item, p, minutes)) {
-				items.set(best, new RoutineItem(item.getExercise(), p, minutes, item.getJustification()));
-				changes.add("1 serie más de " + item.getExercise().getName());
-				return true;
-			}
-		}
-		for (int i = 0; i < items.size(); i++) {
-			RoutineItem item = items.get(i);
-			String key = item.getPrescription().containsKey("timeMinutes") ? "timeMinutes" :
-				item.getPrescription().containsKey("durationMinutes") ? "durationMinutes" : null;
-			if (key == null)
-				continue;
-			int add = Math.min(5, room);
-			if (add <= 0)
-				break;
-			Map<String, String> p = new LinkedHashMap<>(item.getPrescription());
-			p.put(key, Integer.toString((int) Double.parseDouble(p.get(key).replace(',', '.')) + add));
-			if (fits(item, p, item.getEstimatedMinutes() + add)) {
-				items.set(i, new RoutineItem(item.getExercise(), p, item.getEstimatedMinutes() + add,
-					item.getJustification()));
-				changes.add(add + " min más de " + item.getExercise().getName());
-				return true;
-			}
-		}
-		if (items.size() >= 6)
-			return false;
+	private RoutineItem nextExercise(List<RoutineItem> items, TrainingProfile profile, int room) {
 		Set<String> used = new HashSet<>();
 		for (RoutineItem i : items)
 			used.add(i.getExercise().getId());
@@ -868,17 +826,10 @@ public final class ProposalController {
 				continue;
 			TrainerPrompt.Prescription p = TrainerPrompt.prescribe(e, Collections.emptyMap(),
 				TrainerPrompt.beginner(profile.getLevel()), profile.getGoal(), room);
-			if (p == null || p.minutes > room)
-				continue;
-			// Antes de un bloque final de resistencia, para que siga cerrando la sesión.
-			int at = items.size();
-			while (at > 0 && items.get(at - 1).getExercise().getMetricType() == MetricType.ENDURANCE)
-				at--;
-			items.add(at, new RoutineItem(e, p.values, p.minutes, "Añadido al ampliar la sesión; pendiente de aceptación."));
-			changes.add("añadido " + e.getName());
-			return true;
+			if (p != null && p.minutes <= room)
+				return new RoutineItem(e, p.values, p.minutes, "Añadido con +5 min; pendiente de aceptación.");
 		}
-		return false;
+		return null;
 	}
 
 	private static int total(List<RoutineItem> items) {
@@ -886,62 +837,6 @@ public final class ProposalController {
 		for (RoutineItem i : items)
 			t += i.getEstimatedMinutes();
 		return t;
-	}
-
-	/**
-	 * Un paso de recorte: una serie menos al ejercicio con más series (mínimo 1) o menos minutos en un bloque de
-	 * tiempo (mínimo 5). Devuelve false si ya no se puede acortar nada sin quitar ejercicios.
-	 */
-	private static boolean shorten(List<RoutineItem> items, int excess, List<String> changes) {
-		int best = -1, most = 1;
-		for (int i = 0; i < items.size(); i++) {
-			Map<String, String> p = items.get(i).getPrescription();
-			int sets = p.containsKey("sets") ? (int) Double.parseDouble(p.get("sets").replace(',', '.')) : 0;
-			if (sets > most) {
-				most = sets;
-				best = i;
-			}
-		}
-		if (best >= 0) {
-			RoutineItem item = items.get(best);
-			Map<String, String> p = new LinkedHashMap<>(item.getPrescription());
-			p.put("sets", Integer.toString(most - 1));
-			int minutes = Math.max(1, (int) Math.ceil(item.getEstimatedMinutes() * (most - 1) / (double) most));
-			if (fits(item, p, minutes)) {
-				items.set(best, new RoutineItem(item.getExercise(), p, minutes, item.getJustification()));
-				changes.add("1 serie menos de " + item.getExercise().getName());
-				return true;
-			}
-		}
-		for (int i = 0; i < items.size(); i++) {
-			RoutineItem item = items.get(i);
-			String key = item.getPrescription().containsKey("timeMinutes") ? "timeMinutes" :
-				item.getPrescription().containsKey("durationMinutes") ? "durationMinutes" : null;
-			if (key == null)
-				continue;
-			int current = (int) Double.parseDouble(item.getPrescription().get(key).replace(',', '.'));
-			int cut = Math.min(excess, current - 5);
-			if (cut <= 0)
-				continue;
-			Map<String, String> p = new LinkedHashMap<>(item.getPrescription());
-			p.put(key, Integer.toString(current - cut));
-			int minutes = item.getEstimatedMinutes() - cut;
-			if (fits(item, p, minutes)) {
-				items.set(i, new RoutineItem(item.getExercise(), p, minutes, item.getJustification()));
-				changes.add(cut + " min menos de " + item.getExercise().getName());
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static boolean fits(RoutineItem item, Map<String, String> prescription, int minutes) {
-		try {
-			ChatProtocol.validatePrescription(item.getExercise(), prescription, minutes);
-			return true;
-		} catch (IllegalArgumentException e) {
-			return false;
-		}
 	}
 
 	/**

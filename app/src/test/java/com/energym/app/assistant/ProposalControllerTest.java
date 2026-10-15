@@ -123,62 +123,62 @@ public class ProposalControllerTest {
 	}
 
 	@Test
-	public void minusFiveMinutesTrimsTheSameRoutineInsteadOfReplacingIt() {
+	public void minusFiveMinutesRemovesExercisesAndKeepsTheRest() {
 		catalog = Arrays.asList(exercise("one", "One"), exercise("two", "Two"), exercise("three", "Three"));
 		profile[0] = new TrainingProfile.Builder().build();
 		ProposalController c = controller();
+		c.preview = routine("Tres", 6, catalog.get(0), catalog.get(1), catalog.get(2));
+		c.reduceTime();
+		assertEquals("Quita el último ejercicio; el resto sigue igual", Arrays.asList("one", "two"), ids(c.preview));
+		assertEquals("3", c.preview.getItems().get(0).getPrescription().get("sets"));
+		assertEquals("Tres", c.preview.getTitle());
+		assertEquals(RoutineMetadata.Origin.AI, c.preview.getMetadata().getOrigin());
+		assertTrue(c.status, c.status.startsWith("⏱️ Quitado"));
+		c.reduceTime();
+		c.reduceTime();
+		assertEquals("Siempre queda al menos uno", Arrays.asList("one"), ids(c.preview));
+		assertTrue(c.status, c.status.contains("un ejercicio"));
+	}
+
+	@Test
+	public void plusFiveMinutesAddsExercisesWithinTheProfileTime() {
+		catalog = Arrays.asList(exercise("one", "One"), exercise("two", "Two"), exercise("three", "Three"),
+			exercise("four", "Four"));
+		profile[0] = new TrainingProfile.Builder().durationMinutes(20).build();
+		ProposalController c = controller();
+		c.preview = routine("Uno", 4, catalog.get(0));
+		c.extendTime();
+		List<String> ids = ids(c.preview);
+		assertEquals("Lo que había sigue igual y primero", "one", ids.get(0));
+		assertTrue(ids.toString(), ids.size() >= 2);
+		assertEquals("Sin repetir ejercicios", ids.size(), new HashSet<>(ids).size());
+		assertTrue(c.status, c.status.startsWith("⏱️ Añadido"));
+		assertTrue(c.preview.isValidFor(profile[0]));
+		for (RoutineItem item : c.preview.getItems())
+			ChatProtocol.validatePrescription(item.getExercise(), item.getPrescription(), item.getEstimatedMinutes());
+		for (int i = 0; i < 10; i++)
+			c.extendTime();
+		assertTrue("Nunca pasa del tiempo por sesión", c.preview.getEstimatedMinutes() <= 20);
+		assertTrue(c.status, c.status.contains("20 min") || c.status.contains("No quedan"));
+	}
+
+	private Routine routine(String title, int minutes, Exercise... exercises) {
 		Map<String, String> values = new LinkedHashMap<>();
 		values.put("sets", "3");
 		values.put("repetitions", "10");
 		values.put("loadKg", "0");
 		values.put("restSeconds", "60");
-		c.preview = new Routine("p", 0, "Tres", profile[0], Arrays.asList(new RoutineItem(catalog.get(0), values, 6, "a"),
-			new RoutineItem(catalog.get(1), values, 6, "b"), new RoutineItem(catalog.get(2), values, 6, "c")), "x",
-			new RoutineMetadata(RoutineMetadata.Origin.AI, true));
-		int messages = c.messages.size();
-		c.reduceTime();
-		Routine trimmed = c.preview;
-		assertTrue(trimmed.getEstimatedMinutes() + " min", trimmed.getEstimatedMinutes() <= 13);
-		assertEquals("Mismos ejercicios, solo menos series", Arrays.asList("one", "two", "three"),
-			Arrays.asList(trimmed.getItems().get(0).getExercise().getId(), trimmed.getItems().get(1).getExercise().getId(),
-				trimmed.getItems().get(2).getExercise().getId()));
-		assertEquals(RoutineMetadata.Origin.AI, trimmed.getMetadata().getOrigin());
-		assertTrue(c.status, c.status.startsWith("⏱️ Rutina recortada de 18 a"));
-		assertEquals("No genera otra rutina por el chat", messages, c.messages.size());
-		for (RoutineItem item : trimmed.getItems())
-			ChatProtocol.validatePrescription(item.getExercise(), item.getPrescription(), item.getEstimatedMinutes());
-		for (int i = 0; i < 10; i++)
-			c.reduceTime();
-		assertFalse("Siempre queda al menos un ejercicio", c.preview.getItems().isEmpty());
-		assertTrue(c.status, c.status.contains("mínimo"));
+		List<RoutineItem> items = new ArrayList<>();
+		for (Exercise e : exercises)
+			items.add(new RoutineItem(e, values, minutes, "x"));
+		return new Routine("p", 0, title, profile[0], items, "x", new RoutineMetadata(RoutineMetadata.Origin.AI, true));
 	}
 
-	@Test
-	public void plusFiveMinutesExtendsTheSameRoutineWithinTheProfileTime() {
-		catalog = Arrays.asList(exercise("one", "One"), exercise("two", "Two"), exercise("three", "Three"));
-		profile[0] = new TrainingProfile.Builder().durationMinutes(30).build();
-		ProposalController c = controller();
-		Map<String, String> values = new LinkedHashMap<>();
-		values.put("sets", "2");
-		values.put("repetitions", "10");
-		values.put("loadKg", "0");
-		values.put("restSeconds", "60");
-		c.preview = new Routine("p", 0, "Dos", profile[0], Arrays.asList(new RoutineItem(catalog.get(0), values, 4, "a"),
-			new RoutineItem(catalog.get(1), values, 4, "b")), "x", new RoutineMetadata(RoutineMetadata.Origin.AI, true));
-		c.extendTime();
-		Routine longer = c.preview;
-		assertTrue(longer.getEstimatedMinutes() + " min", longer.getEstimatedMinutes() > 8);
-		assertTrue(longer.getEstimatedMinutes() <= 30);
-		assertEquals("one", longer.getItems().get(0).getExercise().getId());
-		assertEquals("two", longer.getItems().get(1).getExercise().getId());
-		assertTrue(c.status, c.status.startsWith("⏱️ Rutina ampliada de 8 a"));
-		assertTrue(longer.isValidFor(profile[0]));
-		for (RoutineItem item : longer.getItems())
-			ChatProtocol.validatePrescription(item.getExercise(), item.getPrescription(), item.getEstimatedMinutes());
-		for (int i = 0; i < 10; i++)
-			c.extendTime();
-		assertTrue("Nunca pasa del tiempo por sesión", c.preview.getEstimatedMinutes() <= 30);
-		assertTrue(c.status, c.status.contains("30 min"));
+	private static List<String> ids(Routine r) {
+		List<String> ids = new ArrayList<>();
+		for (RoutineItem i : r.getItems())
+			ids.add(i.getExercise().getId());
+		return ids;
 	}
 
 	@Test
