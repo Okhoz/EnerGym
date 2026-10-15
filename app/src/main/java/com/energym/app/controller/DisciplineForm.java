@@ -118,6 +118,8 @@ public final class DisciplineForm {
 			.detail(new Detail("split", "División que prefieres", false, "FULL_BODY|Cuerpo completo",
 				"UPPER_LOWER|Torso / pierna", "PUSH_PULL_LEGS|Empuje / tirón / pierna", "BODY_PART|Por grupos musculares"))
 			.detail(new Detail("priority", "Zona o ejercicio prioritario", false)));
+		add(new Builder("powerlifting").categories(Category.GYM)
+			.goals(Goal.STRENGTH).resources(Resource.BARBELL, Resource.BENCH).noSpace());
 		add(new Builder("calisthenics").categories(Category.NO_EQUIPMENT, Category.HOME_EQUIPMENT, Category.GYM)
 			.goals(Goal.STRENGTH, Goal.GENERAL_FITNESS, Goal.MOBILITY)
 			.resources(Resource.BANDS, Resource.MAT, Resource.CHAIR, Resource.WALL, Resource.SUPPORT, Resource.BENCH)

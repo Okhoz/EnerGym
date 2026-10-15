@@ -9,6 +9,12 @@
 			"complementaryCoverage": "PENDING_VALIDATION"
 		},
 		{
+			"id": "powerlifting",
+			"name": "Powerlifting",
+			"specificCoverage": "EXAMPLE_UNREVIEWED",
+			"complementaryCoverage": "PENDING_VALIDATION"
+		},
+		{
 			"id": "calisthenics",
 			"name": "Calistenia",
 			"specificCoverage": "EXAMPLE_UNREVIEWED",
@@ -353,7 +359,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"functional"
+				"functional",
+				"powerlifting"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -690,7 +697,8 @@
 			"sportIds": [
 				"strength",
 				"calisthenics",
-				"functional"
+				"functional",
+				"powerlifting"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -744,7 +752,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"powerlifting"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -4462,7 +4471,8 @@
 			"sportIds": [
 				"strength",
 				"calisthenics",
-				"functional"
+				"functional",
+				"powerlifting"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
