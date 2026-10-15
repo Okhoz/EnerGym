@@ -51,6 +51,13 @@ public abstract class ScreenFragment extends Fragment {
 			return;
 		rows = getView().findViewById(R.id.rows);
 		rows.removeAllViews();
+		if (app.owner() != null && !app.initialDataReady && app.screen != AppController.Screen.ACCOUNT) {
+			heading("", "Restaurando tus datos", "Estamos comprobando los datos guardados de esta cuenta.");
+			LinearLayout actions = card("Restauración inicial",
+				"Espera a que termine antes de editar. Si no hay conexión, puedes reintentar desde Cuenta.");
+			action(actions, "Ir a Cuenta", () -> app.navigate(AppController.Screen.ACCOUNT));
+			return;
+		}
 		content();
 	}
 

@@ -29,7 +29,8 @@ public final class AndroidAppStore implements AppStore {
 
 	public void load(Callback<Snapshot> c) {
 		sync.withDatabase(db -> new Snapshot(db.loadProfile(), new RoutineRepository(db).versions(),
-			new SessionRepository(db).pending(), new SessionRepository(db).history()), callback(c, false));
+			new SessionRepository(db).pending(), new SessionRepository(db).history(), !db.initialRestorePending()),
+			callback(c, false));
 	}
 
 	public void profile(TrainingProfile p, Callback<Void> c) {

@@ -58,6 +58,8 @@ public final class AppController {
 	public Exercise exercise;
 	public String error = "", notice = "";
 	public boolean loading;
+	/** Becomes true only when a current account snapshot includes cached or validated restored data. */
+	public boolean initialDataReady = true;
 	private final AppStore store;
 	private String owner;
 	private long generation, loadRequest;
@@ -176,6 +178,7 @@ public final class AppController {
 		if (Objects.equals(owner, next))
 			return;
 		owner = next;
+		initialDataReady = owner == null;
 		generation++;
 		navigationRevision++;
 		loadRequest++;
@@ -218,6 +221,7 @@ public final class AppController {
 				if (token != generation || request != loadRequest)
 					return;
 				loading = false;
+				initialDataReady = snapshot.initialDataReady;
 				profile = snapshot.profile;
 				history = snapshot.history;
 				pending = snapshot.pending;
@@ -294,6 +298,8 @@ public final class AppController {
 	}
 
 	public void profileInput(String key, String value) {
+		if (owner != null && !initialDataReady)
+			return;
 		profileDraft.put(key, value);
 		profileDirty = true;
 		// Cambiar disciplina o tipo cambia qué se pregunta: se ajusta el borrador y se redibuja el formulario.
@@ -346,6 +352,10 @@ public final class AppController {
 		}
 		if (profileSaving)
 			return;
+		if (!initialDataReady) {
+			error("Espera a que termine la restauración inicial. Puedes reintentar desde Cuenta.");
+			return;
+		}
 		try {
 			normalizeProfileDraft();
 			DisciplineForm form = disciplineForm();

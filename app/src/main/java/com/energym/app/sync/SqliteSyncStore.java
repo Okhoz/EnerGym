@@ -62,6 +62,8 @@ public final class SqliteSyncStore implements LocalSyncStore {
 						remote.getRevision(), time, SyncRecord.State.CLEAN));
 			}
 			database.importSyncRecords(adjusted);
+			// Includes a successful empty response for a genuinely new account; invalid/failed imports stay guarded.
+			database.initialServerRestoreCompleted();
 		} catch (JSONException e) {
 			throw new IllegalArgumentException("Snapshot local inválido", e);
 		}

@@ -20,6 +20,7 @@ public final class EnerGymDatabase extends SQLiteOpenHelper {
 	 */
 	public static final String DEMO_OWNER_UID = "demo:local";
 	private final String ownerUid;
+	private final InitialRestoreGate initialRestore = new InitialRestoreGate();
 
 	/**
 	 * Cada operación filtra la identidad fijada al crear la instancia, incluso usando IDs locales.
@@ -59,6 +60,31 @@ public final class EnerGymDatabase extends SQLiteOpenHelper {
 
 	public String getOwnerUid() {
 		return ownerUid;
+	}
+
+	/** Enable before exposing a new authenticated scope. This method performs no disk I/O. */
+	public void requireInitialRestore() {
+		if (!DEMO_OWNER_UID.equals(ownerUid))
+			initialRestore.requireRestore();
+	}
+
+	/** Called on the serial database worker before data actions, never on the UI thread. */
+	public void inspectInitialCache() {
+		if (!initialRestore.needsCacheInspection())
+			return;
+		try (Cursor cursor = getReadableDatabase().query("records", new String[]{"local_id"}, "owner_uid=?",
+			new String[]{ownerUid}, null, null, null, "1")) {
+			initialRestore.cacheInspected(cursor.moveToFirst());
+		}
+	}
+
+	public boolean initialRestorePending() {
+		return initialRestore.pending();
+	}
+
+	/** Only the SERVER sync adapter calls this after committing its entire validated batch. */
+	public void initialServerRestoreCompleted() {
+		initialRestore.serverRestored();
 	}
 
 	/**
@@ -297,6 +323,7 @@ public final class EnerGymDatabase extends SQLiteOpenHelper {
 	}
 
 	long writeLocal(SyncRecord.Kind kind, String syncId, String payload) {
+		initialRestore.requireWritable();
 		Row old = find(kind, syncId);
 		if (old != null && old.record.getPayload().equals(payload))
 			return old.id;

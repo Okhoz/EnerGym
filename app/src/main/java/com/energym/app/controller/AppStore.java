@@ -18,12 +18,18 @@ public interface AppStore {
 		public final TrainingProfile profile;
 		public final List<Routine> routines;
 		public final List<Session> pending, history;
+		public final boolean initialDataReady;
 
 		public Snapshot(TrainingProfile p, List<Routine> r, List<Session> d, List<Session> h) {
+			this(p, r, d, h, true);
+		}
+
+		public Snapshot(TrainingProfile p, List<Routine> r, List<Session> d, List<Session> h, boolean initialDataReady) {
 			profile = p;
 			routines = r;
 			pending = d;
 			history = h;
+			this.initialDataReady = initialDataReady;
 		}
 	}
 

@@ -40,6 +40,8 @@ $mavenCache = Join-Path $PWD 'backend/.cache/m2'
 .\gradlew.bat :app:connectedDebugAndroidTest
 ```
 
+El comando instrumental anterior es histórico. Para la suite general del árbol actual utiliza el runner ADB y la lista explícita de exclusiones de [la revisión actual](review-2026-10-15.md), incluida la clase `com.energym.app.sync.FirebaseLiveRestoreProbeTest`. Ese probe se ejecuta aparte únicamente con opt-in autorizado; su omisión no es una prueba aprobada.
+
 Offline necesita caché completa, no solo carpeta existente; indicar la caché staging conocida si se verifica el proyecto real sin descargar. El dispositivo debe estar coordinado. Revisar sin material, sustitución, cada métrica, aceptación/rechazo, históricos, cuenta/contexto, referencia disponible y fallback escrito, y desconexión/revocación. Instrumentales reales Gemini solo con parámetros autorizados; Task8 no usa AVD ni claves. Firma y despliegue públicos, Firebase remoto y validación profesional permanecen pendientes. Logs detallados de investigación fuera del producto.
 
 ## Verificación fresca de staging tras formato Task8

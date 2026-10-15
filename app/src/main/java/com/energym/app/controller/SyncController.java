@@ -76,6 +76,7 @@ public final class SyncController implements AccountController.SessionTarget, Au
 			return;
 		generation++;
 		database = new EnerGymDatabase(context, uid);
+		database.requireInitialRestore();
 		coordinator.activate(new SqliteSyncStore(database));
 	}
 
@@ -100,6 +101,7 @@ public final class SyncController implements AccountController.SessionTarget, Au
 				if (!current(token, target))
 					return;
 				try {
+					target.inspectInitialCache();
 					T result = action.run(target);
 					deliver(token, target, () -> callback.onSuccess(result));
 				} catch (Exception e) {
