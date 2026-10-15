@@ -105,12 +105,17 @@ public class MainFlowTest {
 	}
 
 	@Test
-	public void missingFirebaseConfigurationIsHonestAndDemoSurvivesRotation() throws Exception {
+	public void accountConfigurationIsHonestAndDemoSurvivesRotation() throws Exception {
 		try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
 			await();
 			click(scenario, "Cuenta");
-			scenario.onActivity(
-				a -> assertNotNull(text(a.getWindow().getDecorView(), "Google: configuración pendiente")));
+			scenario.onActivity(a -> {
+				boolean missing = a.state().accountStatus ==
+					com.energym.app.controller.AccountController.Status.CONFIGURATION_NEEDED;
+				assertEquals("La advertencia debe corresponder a la configuración de esta instalación", missing,
+					text(a.getWindow().getDecorView(), "Google: configuración pendiente") != null);
+				assertNotNull(text(a.getWindow().getDecorView(), "Conectar con Google"));
+			});
 			click(scenario, "Entrar en demo local");
 			scenario.recreate();
 			await();

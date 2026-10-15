@@ -83,6 +83,7 @@ public final class ProgressionEngine {
 				double sets = number(p.get("sets")), reps = number(p.get("repetitions"));
 				double doneSets = number(done.get("sets")), doneReps = number(done.get("repetitions"));
 				double load = number(done.get("loadKg"));
+				p.put("loadKg", fmt(load));
 				boolean external = !item.getExercise().getRequiredResources().isEmpty() && load > 0;
 				if (doneSets < sets || doneReps < reps * 0.75) {
 					// Muy por debajo de lo previsto: se baja un 10 % la carga o una repetición.
@@ -115,7 +116,7 @@ public final class ProgressionEngine {
 			}
 			case ISOMETRIC: {
 				double seconds = number(p.get("durationSeconds")), sets = number(p.get("sets"));
-				if (hard || number(done.get("durationSeconds")) < seconds)
+				if (hard || number(done.get("sets")) < sets || number(done.get("durationSeconds")) < seconds)
 					break;
 				if (seconds < 90)
 					p.put("durationSeconds", fmt(seconds + (beginner ? 5 : 10)));

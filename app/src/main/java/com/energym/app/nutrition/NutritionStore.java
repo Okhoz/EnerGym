@@ -17,16 +17,30 @@ public interface NutritionStore {
 		public final BodyProfile body;
 		public final List<FoodEntry> entries;
 		public final SortedMap<LocalDate, Double> weights;
+		public final SortedMap<LocalDate, Double> dailyCalories;
 
 		public Snapshot(BodyProfile body, List<FoodEntry> entries, SortedMap<LocalDate, Double> weights) {
+			this(body, entries, weights, summarize(entries));
+		}
+
+		public Snapshot(BodyProfile body, List<FoodEntry> entries, SortedMap<LocalDate, Double> weights,
+			SortedMap<LocalDate, Double> dailyCalories) {
 			this.body = body;
 			this.entries = Collections.unmodifiableList(new ArrayList<>(entries));
 			this.weights = Collections.unmodifiableSortedMap(new TreeMap<>(weights));
+			this.dailyCalories = Collections.unmodifiableSortedMap(new TreeMap<>(dailyCalories));
+		}
+
+		private static SortedMap<LocalDate, Double> summarize(List<FoodEntry> entries) {
+			SortedMap<LocalDate, Double> result = new TreeMap<>();
+			for (FoodEntry e : entries)
+				result.merge(e.day, e.kcal(), Double::sum);
+			return result;
 		}
 	}
 
 	/**
-	 * Lee el perfil físico, los alimentos desde {@code from} y el registro de peso completo.
+	 * Lee el perfil físico, los alimentos desde {@code from}, el peso y el resumen diario completos.
 	 */
 	void load(String owner, LocalDate from, Callback<Snapshot> callback);
 

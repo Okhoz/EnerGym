@@ -26,6 +26,7 @@ public final class NutritionController {
 	private final java.util.function.Consumer<String> error;
 	private String owner;
 	private long generation;
+	private SortedMap<LocalDate, Double> dailyCalories = new TreeMap<>();
 
 	public NutritionController(NutritionStore store, NutritionStore.Lookup lookup, Supplier<LocalDate> clock,
 		Runnable changed, java.util.function.Consumer<String> error) {
@@ -49,6 +50,7 @@ public final class NutritionController {
 		body = null;
 		entries = Collections.emptyList();
 		weights = new TreeMap<>();
+		dailyCalories = new TreeMap<>();
 		product = null;
 		busy = false;
 		looking = false;
@@ -69,22 +71,25 @@ public final class NutritionController {
 			return;
 		}
 		long token = generation;
-		store.load(owner, clock.get().minusDays(HISTORY_DAYS - 1).isBefore(selected) ?
-			clock.get().minusDays(HISTORY_DAYS - 1) : selected, new NutritionStore.Callback<NutritionStore.Snapshot>() {
-			public void success(NutritionStore.Snapshot s) {
-				if (token != generation)
-					return;
-				body = s.body;
-				entries = s.entries;
-				weights = new TreeMap<>(s.weights);
-				changed.run();
-			}
+		LocalDate recentFrom = clock.get().minusDays(HISTORY_DAYS - 1);
+		LocalDate selectedFrom = selected.minusDays(6);
+		store.load(owner, recentFrom.isBefore(selectedFrom) ? recentFrom : selectedFrom,
+			new NutritionStore.Callback<NutritionStore.Snapshot>() {
+				public void success(NutritionStore.Snapshot s) {
+					if (token != generation)
+						return;
+					body = s.body;
+					entries = s.entries;
+					weights = new TreeMap<>(s.weights);
+					dailyCalories = new TreeMap<>(s.dailyCalories);
+					changed.run();
+				}
 
-			public void failure(Exception e) {
-				if (token == generation)
-					error.accept("No se pudo leer tu diario: " + e.getMessage());
-			}
-		});
+				public void failure(Exception e) {
+					if (token == generation)
+						error.accept("No se pudo leer tu diario: " + e.getMessage());
+				}
+			});
 	}
 
 	public void select(LocalDate day) {
@@ -159,10 +164,11 @@ public final class NutritionController {
 	}
 
 	public Set<LocalDate> loggedDays() {
-		Set<LocalDate> days = new TreeSet<>();
-		for (FoodEntry e : entries)
-			days.add(e.day);
-		return days;
+		return new TreeSet<>(dailyCalories.keySet());
+	}
+
+	public double historyCalories(LocalDate day) {
+		return dailyCalories.getOrDefault(day, 0.0);
 	}
 
 	// ---- Perfil físico ----
@@ -426,6 +432,7 @@ public final class NutritionController {
 				List<FoodEntry> next = new ArrayList<>(entries);
 				next.add(entry);
 				entries = next;
+				dailyCalories.merge(entry.day, entry.kcal(), Double::sum);
 				product = null;
 				foodDraft.clear();
 				status = entry.name + " añadido: " + Math.round(entry.kcal()) + " kcal.";
@@ -452,6 +459,16 @@ public final class NutritionController {
 				List<FoodEntry> next = new ArrayList<>(entries);
 				next.removeIf(e -> e.id.equals(entry.id));
 				entries = next;
+				boolean dayHasEntries = false;
+				for (FoodEntry e : next)
+					if (e.day.equals(entry.day)) {
+						dayHasEntries = true;
+						break;
+					}
+				if (dayHasEntries)
+					dailyCalories.put(entry.day, totals(entry.day)[0]);
+				else
+					dailyCalories.remove(entry.day);
 				status = entry.name + " eliminado del diario.";
 				changed.run();
 			}

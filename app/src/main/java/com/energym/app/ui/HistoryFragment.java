@@ -65,38 +65,38 @@ public final class HistoryFragment extends ScreenFragment {
 		stat(row2, BarChartView.compact(stats.totalVolume()), "kg levantados");
 		stat(row2, BarChartView.compact(stats.totalDistance()), "km");
 		stat(row2, Integer.toString(n == null ? 0 : n.loggedDays().size()), "días con dieta");
-		if (stats.total() == 0)
-			return;
 
-		LinearLayout trend = card("Tu mejora", "Últimas 4 semanas frente a las 4 anteriores");
-		text(trend, "Sesiones: " + trend(stats.sessionsTrend(), ""), R.style.EnerGym_Body, 8);
-		text(trend, "Tiempo: " + trend(stats.minutesTrend(), " min"), R.style.EnerGym_Body, 4);
-		LinearLayout figures = columns(trend, 12);
-		stat(figures, Integer.toString(stats.weekStreak()), stats.weekStreak() == 1 ? "semana seguida" : "semanas seguidas");
-		stat(figures, Integer.toString(stats.daysThisMonth()), "días este mes");
+		if (stats.total() > 0) {
+			LinearLayout trend = card("Tu mejora", "Últimas 4 semanas frente a las 4 anteriores");
+			text(trend, "Sesiones: " + trend(stats.sessionsTrend(), ""), R.style.EnerGym_Body, 8);
+			text(trend, "Tiempo: " + trend(stats.minutesTrend(), " min"), R.style.EnerGym_Body, 4);
+			LinearLayout figures = columns(trend, 12);
+			stat(figures, Integer.toString(stats.weekStreak()), stats.weekStreak() == 1 ? "semana seguida" : "semanas seguidas");
+			stat(figures, Integer.toString(stats.daysThisMonth()), "días este mes");
 
-		bars("Sesiones por semana", stats.sessionsPerWeek(), stats);
-		bars("Minutos por semana", stats.minutesPerWeek(), stats);
-		if (stats.totalVolume() > 0)
-			bars("Kilos levantados por semana", stats.volumePerWeek(), stats);
-		if (stats.totalDistance() > 0)
-			bars("Kilómetros por semana", stats.distancePerWeek(), stats);
+			bars("Sesiones por semana", stats.sessionsPerWeek(), stats);
+			bars("Minutos por semana", stats.minutesPerWeek(), stats);
+			if (stats.totalVolume() > 0)
+				bars("Kilos levantados por semana", stats.volumePerWeek(), stats);
+			if (stats.totalDistance() > 0)
+				bars("Kilómetros por semana", stats.distancePerWeek(), stats);
 
-		List<ProgressStats.Improvement> improvements = stats.improvements();
-		if (!improvements.isEmpty()) {
-			ProgressStats.Improvement top = improvements.get(0);
-			LinearLayout records = card("Récords por ejercicio", "Primera carga → mejor carga");
-			for (int i = 0; i < Math.min(5, improvements.size()); i++) {
-				ProgressStats.Improvement m = improvements.get(i);
-				text(records, m.name + "\n" + NutritionController.format(m.first) + " → " +
-						NutritionController.format(m.best) + " kg" + (m.gain() > 0 ? "  ▲ +" +
-						NutritionController.format(Math.round(m.gain() * 10) / 10.0) + " kg" : ""),
-					R.style.EnerGym_Body, 10);
+			List<ProgressStats.Improvement> improvements = stats.improvements();
+			if (!improvements.isEmpty()) {
+				ProgressStats.Improvement top = improvements.get(0);
+				LinearLayout records = card("Récords por ejercicio", "Primera carga → mejor carga");
+				for (int i = 0; i < Math.min(5, improvements.size()); i++) {
+					ProgressStats.Improvement m = improvements.get(i);
+					text(records, m.name + "\n" + NutritionController.format(m.first) + " → " +
+							NutritionController.format(m.best) + " kg" + (m.gain() > 0 ? "  ▲ +" +
+							NutritionController.format(Math.round(m.gain() * 10) / 10.0) + " kg" : ""),
+						R.style.EnerGym_Body, 10);
+				}
+				double[] loads = stats.loadHistory(top.exerciseId);
+				if (loads.length > 1)
+					add(records, new LineChartView(requireContext()), 12).set(loads,
+						new String[]{"1.ª vez", "última"}, "kg", "Evolución de carga en " + top.name);
 			}
-			double[] loads = stats.loadHistory(top.exerciseId);
-			if (loads.length > 1)
-				add(records, new LineChartView(requireContext()), 12).set(loads,
-					new String[]{"1.ª vez", "última"}, "kg", "Evolución de carga en " + top.name);
 		}
 		if (n != null && n.weights.size() > 1) {
 			List<LocalDate> days = new ArrayList<>(n.weights.keySet());
@@ -166,8 +166,8 @@ public final class HistoryFragment extends ScreenFragment {
 						.append(com.energym.app.controller.AppController.metrics(item.getExercise().getMetricType(), done));
 			}
 		}
-		if (n != null && n.totals(selected)[0] > 0)
-			detail.append("\nComida: ").append(Math.round(n.totals(selected)[0])).append(" kcal");
+		if (n != null && n.historyCalories(selected) > 0)
+			detail.append("\nComida: ").append(Math.round(n.historyCalories(selected))).append(" kcal");
 		text(calendar, detail.toString(), R.style.EnerGym_Body, 12);
 	}
 

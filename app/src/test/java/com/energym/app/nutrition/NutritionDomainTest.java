@@ -75,7 +75,14 @@ public class NutritionDomainTest {
 		final SortedMap<LocalDate, Double> weights = new TreeMap<>();
 
 		public void load(String owner, LocalDate from, Callback<Snapshot> c) {
-			c.success(new Snapshot(body, saved, weights));
+			List<FoodEntry> entries = new ArrayList<>();
+			SortedMap<LocalDate, Double> dailyCalories = new TreeMap<>();
+			for (FoodEntry e : saved) {
+				dailyCalories.merge(e.day, e.kcal(), Double::sum);
+				if (!e.day.isBefore(from))
+					entries.add(e);
+			}
+			c.success(new Snapshot(body, entries, weights, dailyCalories));
 		}
 
 		public void saveBody(String owner, BodyProfile b, Callback<Void> c) {
@@ -149,6 +156,92 @@ public class NutritionDomainTest {
 		assertEquals("DINNER", c.foodDraft.get("meal"));
 		assertEquals("120", c.foodDraft.get("kcal100"));
 		assertNotNull(c.preview());
+	}
+
+	@Test
+	public void loggedDaysIncludeFoodOutsideTheDiaryWindow() {
+		Store store = new Store();
+		LocalDate oldDay = DAY.minusDays(60);
+		store.saved.add(FoodEntry.create(oldDay, FoodEntry.Meal.LUNCH, "Arroz", "", FoodEntry.Unit.G, 100, 100, 2, 20, 1));
+		NutritionController c = new NutritionController(store, (code, cb) -> cb.success(null), () -> DAY, () -> {
+		}, e -> fail(e));
+		c.activate("uid");
+		assertTrue(c.entries.isEmpty());
+		assertEquals(Collections.singleton(oldDay), c.loggedDays());
+		assertEquals(100, c.historyCalories(oldDay), 0);
+		assertEquals(0, c.historyCalories(DAY), 0);
+	}
+
+	@Test
+	public void completeDailySummaryTracksFoodChangesAndClearsOnAccountChange() {
+		Store store = new Store();
+		LocalDate oldDay = DAY.minusDays(60);
+		FoodEntry old = FoodEntry.create(oldDay, FoodEntry.Meal.LUNCH, "Arroz", "", FoodEntry.Unit.G, 100, 100, 2, 20, 1);
+		store.saved.add(old);
+		NutritionController c = new NutritionController(store, (code, cb) -> cb.success(null), () -> DAY, () -> {
+		}, e -> fail(e));
+		c.activate("uid-A");
+		c.select(oldDay);
+		c.startManual(FoodEntry.Meal.LUNCH);
+		c.foodDraft.put("name", "Pollo");
+		c.foodDraft.put("amount", "100");
+		c.foodDraft.put("kcal100", "150");
+		c.foodDraft.put("protein100", "20");
+		c.foodDraft.put("carbs100", "0");
+		c.foodDraft.put("fat100", "5");
+		c.addFood(() -> {
+		});
+		assertEquals(250, c.historyCalories(oldDay), 0);
+		c.remove(old);
+		assertEquals(150, c.historyCalories(oldDay), 0);
+		assertTrue(c.loggedDays().contains(oldDay));
+		c.remove(c.entriesOn(oldDay).get(0));
+		assertEquals(0, c.historyCalories(oldDay), 0);
+		assertFalse(c.loggedDays().contains(oldDay));
+		store.saved.add(old);
+		c.reload();
+		assertEquals(100, c.historyCalories(oldDay), 0);
+		c.activate(null);
+		assertTrue(c.loggedDays().isEmpty());
+		assertEquals(0, c.historyCalories(oldDay), 0);
+		store.saved.clear();
+		store.saved.add(FoodEntry.create(DAY, FoodEntry.Meal.LUNCH, "Pasta", "", FoodEntry.Unit.G, 100, 200, 5, 35, 3));
+		c.activate("uid-B");
+		assertEquals(Collections.singleton(DAY), c.loggedDays());
+		assertEquals(200, c.historyCalories(DAY), 0);
+		assertEquals(0, c.historyCalories(oldDay), 0);
+	}
+
+	@Test
+	public void compatibleSnapshotBuildsDailySummaryFromItsEntries() {
+		List<FoodEntry> entries = Arrays.asList(
+			FoodEntry.create(DAY, FoodEntry.Meal.LUNCH, "Arroz", "", FoodEntry.Unit.G, 100, 100, 2, 20, 1),
+			FoodEntry.create(DAY, FoodEntry.Meal.DINNER, "Caldo", "", FoodEntry.Unit.ML, 100, 50, 2, 5, 1));
+		NutritionStore.Snapshot snapshot = new NutritionStore.Snapshot(null, entries, new TreeMap<>());
+		assertEquals(150, snapshot.dailyCalories.get(DAY), 0);
+	}
+
+	@Test
+	public void historicalWeeklyCaloriesIncludeDaysBeforeTheSelectedDay() {
+		for (int daysAgo : new int[]{22, 60}) {
+			Store store = new Store();
+			LocalDate selected = DAY.minusDays(daysAgo);
+			for (int i = 0; i < 7; i++)
+				store.saved.add(FoodEntry.create(selected.minusDays(i), FoodEntry.Meal.LUNCH, "Arroz", "",
+					FoodEntry.Unit.G, 100, 100, 2, 20, 1));
+			store.body = new BodyProfile(BodyProfile.Sex.MALE, 30, 180, 80, BodyProfile.Activity.MODERATE,
+				BodyProfile.Goal.MAINTAIN, "");
+			store.saved.add(FoodEntry.create(DAY, FoodEntry.Meal.LUNCH, "Comida de hoy", "",
+				FoodEntry.Unit.G, 100, 200, 10, 20, 5));
+			NutritionController c = new NutritionController(store, (code, cb) -> cb.success(null), () -> DAY, () -> {
+			}, e -> fail(e));
+			c.activate("uid");
+			c.select(selected);
+			assertArrayEquals("Selección hace " + daysAgo + " días", new double[]{100, 100, 100, 100, 100, 100, 100},
+				c.caloriesSeries(7), 0);
+			assertEquals(200, c.totals(DAY)[0], 0);
+			assertEquals(-2559, c.weeklyBalance(), 0.001);
+		}
 	}
 
 	@Test

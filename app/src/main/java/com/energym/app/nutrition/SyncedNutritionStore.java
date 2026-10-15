@@ -47,7 +47,14 @@ public final class SyncedNutritionStore implements NutritionStore {
 		boolean[] migrated = {false};
 		run(owner, false, repo -> {
 			migrated[0] = migrate(owner, repo);
-			return new Snapshot(repo.body(), repo.food(from), repo.weights());
+			List<FoodEntry> entries = new ArrayList<>();
+			SortedMap<LocalDate, Double> dailyCalories = new TreeMap<>();
+			for (FoodEntry e : repo.food(LocalDate.MIN)) {
+				dailyCalories.merge(e.day, e.kcal(), Double::sum);
+				if (!e.day.isBefore(from))
+					entries.add(e);
+			}
+			return new Snapshot(repo.body(), entries, repo.weights(), dailyCalories);
 		}, new Callback<Snapshot>() {
 			public void success(Snapshot value) {
 				callback.success(value);
