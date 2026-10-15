@@ -29,6 +29,11 @@
 
 	<style name="Theme.EnerGym" parent="Base.Theme.EnerGym" />
 
+	<style name="EnerGym.Circle" parent="">
+		<item name="cornerFamily">rounded</item>
+		<item name="cornerSize">50%</item>
+	</style>
+
 	<!-- Menú ☰: superficie de tarjeta, texto blanco y esquinas suaves, como el resto de la app. -->
 	<style name="EnerGym.PopupMenu" parent="Theme.EnerGym">
 		<item name="colorSurfaceContainer">@color/surface_card</item>

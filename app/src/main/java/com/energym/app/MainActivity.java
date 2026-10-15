@@ -83,6 +83,7 @@ public final class MainActivity extends AppCompatActivity {
 		state = new ViewModelProvider(this).get(AppState.class);
 		state.bindViewer(viewerLaunch);
 		findViewById(R.id.account).setOnClickListener(this::openMenu);
+		findViewById(R.id.avatar).setOnClickListener(this::openAvatarMenu);
 		findViewById(R.id.back).setOnClickListener(v -> {
 			if (state.app != null)
 				state.app.back();
@@ -128,6 +129,7 @@ public final class MainActivity extends AppCompatActivity {
 				state.accountText() + " · " + state.syncText());
 		if (state.app == null)
 			return;
+		updateAvatar();
 		rendering = true;
 		try {
 			AppController app = state.app;
@@ -180,6 +182,81 @@ public final class MainActivity extends AppCompatActivity {
 		menu.inflate(R.menu.main_menu);
 		menu.setOnMenuItemClickListener(item -> menuSelected(item.getItemId()));
 		menu.show();
+	}
+
+	private AvatarStore avatars;
+	private String shownAvatar = "";
+	private final ActivityResultLauncher<androidx.activity.result.PickVisualMediaRequest> avatarPicker =
+		registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+			String owner = state == null || state.app == null ? null : state.app.owner();
+			if (uri == null || owner == null)
+				return;
+			try {
+				avatars().save(owner, uri);
+			} catch (Exception e) {
+				new MaterialAlertDialogBuilder(this).setTitle("Foto de perfil")
+					.setMessage("No se pudo usar esa imagen. Prueba con otra.").setPositiveButton("Entendido", null).show();
+			}
+			shownAvatar = "";
+			updateAvatar();
+		});
+
+	private AvatarStore avatars() {
+		if (avatars == null)
+			avatars = new AvatarStore(this);
+		return avatars;
+	}
+
+	/**
+	 * Toque en la foto: sin cuenta lleva a Cuenta; con cuenta, elegir o cambiar la foto, quitarla o abrir el perfil.
+	 */
+	private void openAvatarMenu(View anchor) {
+		if (state.app == null)
+			return;
+		String owner = state.app.owner();
+		if (owner == null) {
+			state.app.navigate(AppController.Screen.ACCOUNT);
+			return;
+		}
+		androidx.appcompat.widget.PopupMenu menu = new androidx.appcompat.widget.PopupMenu(
+			new android.view.ContextThemeWrapper(this, R.style.EnerGym_PopupMenu), anchor, android.view.Gravity.END);
+		boolean has = avatars().has(owner);
+		menu.getMenu().add(0, 1, 0, has ? "Cambiar foto de perfil" : "Elegir foto de perfil");
+		if (has)
+			menu.getMenu().add(0, 2, 1, "Quitar foto");
+		menu.getMenu().add(0, 3, 2, getString(R.string.menu_profile));
+		menu.setOnMenuItemClickListener(item -> {
+			if (item.getItemId() == 1)
+				avatarPicker.launch(new androidx.activity.result.PickVisualMediaRequest.Builder()
+					.setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build());
+			else if (item.getItemId() == 2) {
+				avatars().delete(owner);
+				shownAvatar = "";
+				updateAvatar();
+			} else
+				menuSelected(R.id.menu_profile);
+			return true;
+		});
+		menu.show();
+	}
+
+	/**
+	 * Muestra la foto de la cuenta activa o, si no hay, el icono de persona. Solo recarga si cambia la cuenta.
+	 */
+	private void updateAvatar() {
+		String owner = state == null || state.app == null ? null : state.app.owner();
+		String key = owner == null ? "-" : owner + (avatars().has(owner) ? ":foto" : ":sin");
+		if (key.equals(shownAvatar))
+			return;
+		shownAvatar = key;
+		android.widget.ImageView avatar = findViewById(R.id.avatar);
+		android.graphics.Bitmap photo = owner == null ? null : avatars().load(owner);
+		int padding = photo == null ? Math.round(10 * getResources().getDisplayMetrics().density) : 0;
+		avatar.setPadding(padding, padding, padding, padding);
+		if (photo == null)
+			avatar.setImageResource(R.drawable.ic_account);
+		else
+			avatar.setImageBitmap(photo);
 	}
 
 	/**

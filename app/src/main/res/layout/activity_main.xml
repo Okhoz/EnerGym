@@ -53,6 +53,22 @@
 			android:textColor="@color/white"
 			android:layout_marginEnd="@dimen/space_inline" />
 
+		<!-- Foto de perfil (o icono de persona): al tocarla se elige, cambia o quita la foto. -->
+		<com.google.android.material.imageview.ShapeableImageView
+			android:id="@+id/avatar"
+			android:layout_width="44dp"
+			android:layout_height="44dp"
+			android:layout_marginEnd="8dp"
+			android:padding="10dp"
+			android:background="@color/glass_button"
+			android:scaleType="centerCrop"
+			android:src="@drawable/ic_account"
+			android:clickable="true"
+			android:focusable="true"
+			android:contentDescription="@string/avatar_description"
+			android:tooltipText="@string/avatar_description"
+			app:shapeAppearanceOverlay="@style/EnerGym.Circle" />
+
 		<com.energym.app.ui.effects.GlassButton
 			android:id="@+id/account"
 			style="@style/EnerGym.IconButton"
