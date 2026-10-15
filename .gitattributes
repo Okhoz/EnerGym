@@ -1,0 +1,2 @@
+# El visor comprueba la huella de los bytes del manifiesto: conservar LF en todos los sistemas.
+/app/src/main/assets/visual/manifest.json text eol=lf

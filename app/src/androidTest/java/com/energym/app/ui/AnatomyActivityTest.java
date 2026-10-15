@@ -92,9 +92,29 @@ public class AnatomyActivityTest {
 			assertTrue(id, nonBlack(initial) > 1500);
 			click("viewer_middle");
 			Bitmap middle = captureSurface("viewer-" + id + "-middle.png");
-			assertTrue("No cambia la pose real: " + id, different(initial, middle) > 150);
+			assertTrue("Superficie vacía en pose intermedia: " + id, nonBlack(middle) > 1500);
+			// Los isométricos sostienen su postura; exigir desplazamiento falsearía su técnica.
+			if (!id.equals("forearm-plank"))
+				assertTrue("No cambia la pose real: " + id, different(initial, middle) > 150);
 			android.util.Log.i("EnerGymViewerQA", id + " initialSamples=" + nonBlack(initial) + " initialMiddle=" +
 				different(initial, middle));
+			context.sendBroadcast(new Intent(AnatomyActivity.ACTION_CLOSE).setPackage(context.getPackageName()));
+			awaitGone();
+		}
+	}
+
+	@Test
+	public void repairedVariantsRenderTheirDifferentMarkedPoses() throws Exception {
+		for (String id : new String[]{"band-triceps-extension", "dumbbell-sumo-squat", "plank-shoulder-taps"}) {
+			launch(id);
+			awaitReady();
+			click("viewer_initial");
+			Bitmap initial = captureSurface("viewer-repaired-" + id + "-initial.png");
+			assertTrue("Superficie inicial vacía: " + id, nonBlack(initial) > 1500);
+			click("viewer_middle");
+			Bitmap middle = captureSurface("viewer-repaired-" + id + "-middle.png");
+			assertTrue("Superficie intermedia vacía: " + id, nonBlack(middle) > 1500);
+			assertTrue("El marcador debe mostrar otra fase del movimiento: " + id, different(initial, middle) > 150);
 			context.sendBroadcast(new Intent(AnatomyActivity.ACTION_CLOSE).setPackage(context.getPackageName()));
 			awaitGone();
 		}
@@ -283,7 +303,8 @@ public class AnatomyActivityTest {
 		Thread.sleep(400);
 		save(automation.takeScreenshot(), "viewer-training.png");
 
-		MainFlowTest.click(parent, "Flexión estándar");
+		MainFlowTest.edit(parent, "exercise_search", "Flexión estándar");
+		MainFlowTest.click(parent, "Abrir técnica de Flexión estándar");
 		save(automation.takeScreenshot(), "viewer-exercise.png");
 
 		MainFlowTest.click(parent, "Vista previa 3D");
@@ -349,7 +370,8 @@ public class AnatomyActivityTest {
 			parent.onActivity(a -> a.state().app.navigate(AppController.Screen.TRAINING));
 			Thread.sleep(300);
 			save(automation.takeScreenshot(), "viewer-training-font130.png");
-			MainFlowTest.click(parent, "Flexión estándar");
+			MainFlowTest.edit(parent, "exercise_search", "Flexión estándar");
+			MainFlowTest.click(parent, "Abrir técnica de Flexión estándar");
 			save(automation.takeScreenshot(), "viewer-exercise-font130.png");
 			MainFlowTest.click(parent, "Vista previa 3D");
 			awaitReady();

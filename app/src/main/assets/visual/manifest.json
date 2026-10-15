@@ -2,8 +2,8 @@
 	"version": 2,
 	"model": {
 		"assetPath": "visual/energym_motions.glb",
-		"sha256": "46fc49771546ae4519d17c35e0d37d72c39779e1d4ca9d87629b3597dec3dee9",
-		"bytes": 8655180,
+		"sha256": "d54759e5ff47bd98f48c85380cfe1b283d61d335a70129556b91426ae17c9e50",
+		"bytes": 8676916,
 		"license": "CC0-1.0",
 		"licenseFiles": [
 			"visual/licenses/Mesh2Motion-CC0.md",
@@ -699,12 +699,12 @@
 		},
 		{
 			"exerciseId": "band-triceps-extension",
-			"clip": "esq/triceps-overhead-cable",
+			"clip": "esq/triceps-pushdown-band",
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
-			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 1.057
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.888
 		},
 		{
 			"exerciseId": "band-lateral-raise",
@@ -1644,7 +1644,7 @@
 		},
 		{
 			"exerciseId": "dumbbell-sumo-squat",
-			"clip": "esq/squat-sumo-goblet",
+			"clip": "esq/squat-sumo-low-dumbbell",
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
@@ -2178,7 +2178,7 @@
 			"clip": "esq/plank-shoulder-taps",
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
-			"durationSeconds": 1.8,
+			"durationSeconds": 3.6,
 			"middle": 0.6,
 			"viewRadius": 0.882
 		},

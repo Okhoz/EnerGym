@@ -179,15 +179,26 @@ NEUTRAL_R = resolve(full({}))
 # --- Muestreo de un clip -----------------------------------------------------------------------------
 
 class Clip:
-	"""keys: lista de (segundos, pose). El último instante se cierra con la primera pose (bucle)."""
+	"""keys: lista (segundos, pose) o fábrica según rig; el último instante cierra el bucle."""
 
 	def __init__(self, name, keys, duration, props=None, middle=None, kind="SCHEMATIC"):
 		self.name, self.duration, self.kind = name, float(duration), kind
+		self._keys_for_rig = keys if callable(keys) else None
+		self.keys = []
+		if self._keys_for_rig is None:
+			self._set_keys(keys)
+		self.props = props or {}
+		self.middle = float(middle) if middle is not None else self._default_middle()
+
+	def _set_keys(self, keys):
 		self.keys = [(float(t), full(p)) for t, p in keys]
 		assert self.keys[0][0] == 0 and all(a[0] < b[0] for a, b in zip(self.keys, self.keys[1:]))
 		assert self.keys[-1][0] < self.duration
-		self.props = props or {}
-		self.middle = float(middle) if middle is not None else self._default_middle()
+
+	def prepare(self, rig):
+		"""Resuelve objetivos que dependen de la geometría del rig, antes de interpolar las poses."""
+		if self._keys_for_rig is not None:
+			self._set_keys(self._keys_for_rig(rig))
 
 	def _default_middle(self):
 		return self.keys[len(self.keys) // 2][0] if len(self.keys) > 1 else self.duration / 2
@@ -212,6 +223,7 @@ def grip(world, idx, side):
 
 def sample(rig, clip):
 	"""Devuelve tiempos y, por nodo, listas de TRS; también el centro de cámara del clip."""
+	clip.prepare(rig)
 	idx = rig.idx
 	root = idx["root"]
 	rest_root_t = list(rig.glb.rest_trs(root)[0])

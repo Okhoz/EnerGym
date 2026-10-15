@@ -1,6 +1,6 @@
 # Referencia animada local
 
-Los 287 ejercicios del catálogo tienen vista 3D. Todo vive en un único archivo, `app/src/main/assets/visual/energym_motions.glb` (8,7 MB; ~3,5 MB comprimido en el APK), con una malla MakeHuman/MPFB CC0 y 257 clips. Antes había cuatro GLB de ~5,95 MB que repetían la malla (~11 MB comprimidos).
+Los 287 ejercicios del catálogo tienen vista 3D. Todo vive en un único archivo, `app/src/main/assets/visual/energym_motions.glb` (8,7 MB; ~3,5 MB comprimido en el APK), con una malla MakeHuman/MPFB CC0 y 258 clips. Antes había cuatro GLB de ~5,95 MB que repetían la malla (~11 MB comprimidos).
 
 Hay dos tipos de clip, y la interfaz siempre dice cuál se está viendo («Captura de movimiento CC0», «Captura CC0 de un gesto similar» o «Animación esquemática»):
 
@@ -8,7 +8,7 @@ Hay dos tipos de clip, y la interfaz siempre dice cuál se está viendo («Captu
 | --- | --- | --- |
 | Captura CC0 exacta | `standard-pushup`, `jumping-jacks`, `running-easy`, `brisk-walk`, `prep-short-sprints`, `swimming-easy`, `swimming-intervals`, `shadow-boxing` | Clips Mesh2Motion CC0: los cuatro de OpenGym3D (copiados tal cual) y «Sprint», «Swim_Fwd», «Punch_Jab»+«Punch_Cross» retargeteados |
 | Captura CC0 de gesto similar | `running-intervals`, `tempo-run`, `fartlek-run`, `long-run` (trote), `treadmill-incline-walk` (marcha), `hill-sprints` (sprint) | Mismos clips; ilustran el gesto en el sitio, no el ritmo ni la pendiente |
-| Animación esquemática | Los 273 restantes (250 clips distintos) | Generada por EnerGym por patrón de movimiento |
+| Animación esquemática | Los 273 restantes (251 clips distintos) | Generada por EnerGym por patrón de movimiento |
 
 Las animaciones esquemáticas parten de poses clave escritas por patrón (sentadilla, bisagra, zancada, empuje, tracción, curl, extensión, elevación, plancha, core, cardio, saltos y estiramientos), con parámetros por ejercicio: apertura, profundidad, inclinación del tronco, agarre (prono/supino/neutro) y carga. Un solucionador resuelve la cinemática directa e inversa (pies o manos plantados), apoya en el suelo el punto más bajo de la malla e interpola con suavizado. Se añaden props simplificados (barra, mancuernas, apoyo o banco, barra fija); las máquinas y las poleas se representan solo con el asiento o sin aparato. Son orientativas: no son capturas ni demostraciones validadas, y no se ha revisado su técnica de forma profesional.
 
@@ -19,6 +19,16 @@ Las animaciones esquemáticas parten de poses clave escritas por patrón (sentad
 3. `python -I tools/build_exercise_motions.py entradas` escribe el GLB y `manifest.json` y actualiza en `ResourceManifest` las huellas `MANIFEST_SHA256` y `MODEL_SHA256`. Sin dependencias externas; tarda menos de un minuto.
 
 `tools/exercise_motion_catalog.py` asigna cada ejercicio a su clip. Los clips CC0 de OpenGym3D se copian sin cambios. Los esquemáticos y los retargeteados se muestrean a 15 o 30 fps y se guardan con rotaciones en SHORT normalizado; los canales constantes usan dos claves, porque Filament ignora los muestreadores de una sola clave. Cada clip coloca `CamTarget` en el centro de su movimiento, y el manifiesto guarda un radio de encuadre (`viewRadius`) para que la cámara se aleje en ejercicios amplios, como las dominadas.
+
+### Reparación de tres variantes esquemáticas (15-10-2026)
+
+La descripción de cada ejercicio en `catalog.json` es la referencia de producto para estas correcciones: `band-triceps-extension` empuja hacia abajo con brazos junto al tronco, `dumbbell-sumo-squat` sostiene una mancuerna baja entre las piernas y `plank-shoulder-taps` toca ambos hombros contrarios por turnos. Los objetivos de contacto de este último se obtienen mediante FK del rig empaquetado; sus claves se resuelven antes del muestreo, sin asumir coordenadas de hombro universales. Las otras 284 filas del manifiesto y sus animaciones permanecen idénticas.
+
+`python -B tools/test_exercise_motion_variants.py` comprueba las tres variantes tanto en las curvas fuente como en el GLB, contacto mano/hombro, apoyo de la otra mano, tiempos, recuentos, valores finitos, cobertura completa de los 287 ejercicios y las huellas del runtime. Con `--baseline carpeta_original` también compara las 284 filas y todos los clips protegidos, sus bytes binarios, malla, materiales y rig.
+
+Para reproducir exclusivamente esta reparación sin volver a descargar recursos, `python -B tools/repair_motion_variants.py carpeta_original` exige el GLB original con SHA-256 `46fc49771546ae4519d17c35e0d37d72c39779e1d4ca9d87629b3597dec3dee9` y manifiesto `c20f184a484d150ef1cc1557bfefb3ccbf5fdf08011ff0492f5dd3f6693986d2`. Lee esa carpeta y escribe en la raíz que contiene el script. Conserva todos los rangos BIN originales (incluidos datos antiguos sin uso) y añade solo los canales nuevos. El aumento de tamaño es 21.736 bytes; total 8.676.916 bytes y 258 clips. La regeneración completa desde las cinco entradas originales sigue disponible con `build_exercise_motions.py`.
+
+El GLB reparado tiene SHA-256 `d54759e5ff47bd98f48c85380cfe1b283d61d335a70129556b91426ae17c9e50` y el manifiesto `1fff29b2b326749288228a5eb7fe14e1400eee80d158b99f5152216dfca9aeb3`. Los siete clips de captura CC0, sus fuentes y licencias se conservan. Estas son comprobaciones geométricas y de empaquetado; no constituyen revisión profesional ni validación del renderizador Android de esta reparación.
 
 ## Procedencia exacta: flexión estándar
 

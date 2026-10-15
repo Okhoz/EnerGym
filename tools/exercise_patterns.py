@@ -57,6 +57,12 @@ def squat(name, hold="free", depth=.5, width=.06, lean=38, jump=False, pulse=Fal
 		arms_top = arms_bottom = GOBLET
 		props["goblet"] = 1
 		lean = min(lean, 28)
+	elif hold == "low-dumbbell":
+		# Una sola mancuerna vertical cuelga de ambas manos entre las piernas, no ante el pecho.
+		arms_top = arms_bottom = {"armL": ik("L", [.045, -.54, .22], [.3, -1, .1], "chest"),
+			"armR": ik("R", [.045, -.54, .22], [.3, -1, .1], "chest")}
+		props["goblet"] = 1  # El prop de mancuerna única vertical también sirve para el agarre bajo.
+		lean = min(lean, 28)
 	elif hold == "dumbbells":
 		arms_top = arms_bottom = hanging()
 		props["dumbbells"] = 1
@@ -447,7 +453,7 @@ def curl(name, kind="dumbbell"):
 # --- Tríceps ---------------------------------------------------------------------------------------------
 
 def triceps(name, kind="overhead"):
-	if kind in ("overhead", "cable-overhead", "band"):
+	if kind in ("overhead", "cable-overhead"):
 		down = standing(**arms(168, 15, 150, toward=[0, 0, -1]))
 		up = standing(**arms(172, 12, 10, toward=[0, 0, -1]))
 		return cycle(name, down, up, 2.6, {"goblet": 1} if kind == "overhead" else {})
@@ -456,10 +462,10 @@ def triceps(name, kind="overhead"):
 		bent = pose(base, **arms(55, 180, 95, toward=[0, -1, 0], frame="world"))
 		ext = pose(base, **arms(70, 180, 5, toward=[0, -1, 0], frame="world"))
 		return cycle(name, bent, ext, 2.4, {"dumbbells": 1})
-	if kind == "pushdown":
+	if kind in ("pushdown", "band-pushdown"):
 		up = standing(8, **arms(10, 5, 105, toward=[0, 0, 1]), twistarmL=PRONATED, twistarmR=PRONATED)
 		down = standing(8, **arms(8, 5, 8, toward=[0, 0, 1]), twistarmL=PRONATED, twistarmR=PRONATED)
-		return cycle(name, up, down, 2.4, {"barbell": 1})
+		return cycle(name, up, down, 2.4, {"barbell": 1} if kind == "pushdown" else {})
 	if kind == "skull":
 		top = lying(**arms(100, 8, 5), twistarmL=PRONATED, twistarmR=PRONATED)
 		bottom = lying(**arms(115, 8, 125, toward=[0, 1, 0]), twistarmL=PRONATED, twistarmR=PRONATED)
@@ -824,9 +830,19 @@ def plank(name, kind="high"):
 		return Clip(name, [(0, base), (1.5, pose(base, lift=.01))], 3.0, {}, middle=0)
 	if kind == "shoulder-taps":
 		base = plank_pose(0, hands_width=.3)
-		tap = pose(base)
-		tap["armR"] = ik("R", [.12, .25, .55], [-.5, .5, -1])
-		return Clip(name, [(0, base), (.6, tap), (1.2, base)], 1.8, {}, middle=.6)
+
+		def keys_for_rig(rig):
+			# FK de la postura de apoyo: objetivos sobre los hombros reales de este rig.
+			shoulders = measure(rig, base, ("upperarm01.L", "upperarm01.R"))
+			taps = {}
+			for moving, opposite in (("R", "L"), ("L", "R")):
+				x, y, z = shoulders["upperarm01." + opposite]
+				# ik refleja X para el lado derecho; convertir desde la posición mundial del hombro contrario.
+				target = [x if moving == "L" else -x, y + .015, z]
+				taps[moving] = pose(base, **{"arm" + moving: ik(moving, target, [.7, .2, -.4])})
+			return [(0, base), (.6, taps["R"]), (1.2, base), (1.8, base), (2.4, taps["L"]), (3.0, base)]
+
+		return Clip(name, keys_for_rig, 3.6, {}, middle=.6)
 	if kind == "jacks":
 		closed = plank_pose(0)
 		open_ = pose(closed)
