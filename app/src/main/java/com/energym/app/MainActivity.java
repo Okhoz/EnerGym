@@ -71,8 +71,9 @@ public final class MainActivity extends AppCompatActivity {
 			view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
 			return WindowInsetsCompat.CONSUMED;
 		});
-		if (saved != null)
+		if (saved != null) {
 			launchedLease = saved.getString("viewerLease");
+		}
 		viewer = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
 			String token =
 				result.getData() == null ? launchedLease : result.getData().getStringExtra(AnatomyActivity.EXTRA_LEASE);
@@ -81,6 +82,9 @@ public final class MainActivity extends AppCompatActivity {
 			launchedLease = null;
 		});
 		state = new ViewModelProvider(this).get(AppState.class);
+		if (saved != null)
+			pendingAvatar.restore(saved.getString("avatarOwner"), saved.getLong("avatarRevision", -1),
+				saved.getString("avatarUri"), state.instanceId.equals(saved.getString("avatarStateInstance")));
 		state.bindViewer(viewerLaunch);
 		findViewById(R.id.avatar).setOnClickListener(this::openMenu);
 		findViewById(R.id.back).setOnClickListener(v -> {
@@ -128,6 +132,7 @@ public final class MainActivity extends AppCompatActivity {
 				state.accountText() + " · " + state.syncText());
 		if (state.app == null)
 			return;
+		queuePendingAvatar();
 		updateAvatar();
 		rendering = true;
 		try {
@@ -170,7 +175,7 @@ public final class MainActivity extends AppCompatActivity {
 	}
 
 	/**
-	 * Menú hamburguesa de la esquina superior derecha: perfil, datos físicos y cuenta (con el entrenador IA).
+	 * Menú de la foto de perfil: perfil, datos físicos y cuenta (con el entrenador IA).
 	 * Sin cuenta, perfil y datos físicos llevan primero a Cuenta para entrar.
 	 */
 	private void openMenu(View anchor) {
@@ -180,6 +185,7 @@ public final class MainActivity extends AppCompatActivity {
 			new android.view.ContextThemeWrapper(this, R.style.EnerGym_PopupMenu), anchor, android.view.Gravity.END);
 		menu.inflate(R.menu.main_menu);
 		String owner = state.app.owner();
+		long menuRevision = state.app.accountRevision();
 		// La foto es el propio botón del menú: con cuenta, aquí se elige, cambia o quita.
 		if (owner != null) {
 			boolean has = avatars().has(owner);
@@ -188,10 +194,15 @@ public final class MainActivity extends AppCompatActivity {
 				menu.getMenu().add(1, PHOTO_REMOVE, 11, "Quitar foto");
 		}
 		menu.setOnMenuItemClickListener(item -> {
-			if (item.getItemId() == PHOTO_PICK)
+			// Un menú abierto antes de cambiar de cuenta no actúa sobre ninguna de las dos cuentas.
+			if (!java.util.Objects.equals(owner, state.app.owner()) || menuRevision != state.app.accountRevision())
+				return true;
+			if (item.getItemId() == PHOTO_PICK) {
+				releaseAvatarUri(pendingAvatar.uri());
+				pendingAvatar.begin(owner, menuRevision);
 				avatarPicker.launch(new androidx.activity.result.PickVisualMediaRequest.Builder()
 					.setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build());
-			else if (item.getItemId() == PHOTO_REMOVE) {
+			} else if (item.getItemId() == PHOTO_REMOVE) {
 				avatars().delete(owner);
 				shownAvatar = "";
 				updateAvatar();
@@ -206,20 +217,66 @@ public final class MainActivity extends AppCompatActivity {
 
 	private AvatarStore avatars;
 	private String shownAvatar = "";
+	private final PendingAvatarSelection pendingAvatar = new PendingAvatarSelection();
+	private boolean avatarCheckPosted;
 	private final ActivityResultLauncher<androidx.activity.result.PickVisualMediaRequest> avatarPicker =
 		registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
-			String owner = state == null || state.app == null ? null : state.app.owner();
-			if (uri == null || owner == null)
+			if (uri == null)
+				releaseAvatarUri(pendingAvatar.uri());
+			if (uri != null && pendingAvatar.owner() != null) {
+				// El URI puede esperar a que termine la restauración de la cuenta, incluso tras otro reinicio.
+				try {
+					getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				} catch (SecurityException ignored) {
+					// Algunos proveedores solo conceden acceso temporal al resultado.
+				}
+			}
+			pendingAvatar.result(uri == null ? null : uri.toString());
+			queuePendingAvatar();
+		});
+
+	private void queuePendingAvatar() {
+		if (pendingAvatar.owner() == null || avatarCheckPosted || state == null || state.app == null ||
+			state.accounts == null || !state.accountResolved)
+			return;
+		avatarCheckPosted = true;
+		// La identidad debe estar confirmada; no se deduce del estado provisional al inicializar la app.
+		findViewById(R.id.avatar).post(() -> {
+			avatarCheckPosted = false;
+			if (isFinishing() || isDestroyed() || getSupportFragmentManager().isStateSaved() || state.app == null ||
+				state.accounts == null || !state.accountResolved)
 				return;
+			String owner = pendingAvatar.owner(), previousUri = pendingAvatar.uri();
+			String uri = pendingAvatar.take(state.app.owner(), state.app.accountRevision(),
+				state.accountStatus != AccountController.Status.SIGNING_IN);
+			if (uri == null) {
+				if (pendingAvatar.owner() == null)
+					releaseAvatarUri(previousUri);
+				return;
+			}
 			try {
-				avatars().save(owner, uri);
+				avatars().save(owner, android.net.Uri.parse(uri));
 			} catch (Exception e) {
 				new MaterialAlertDialogBuilder(this).setTitle("Foto de perfil")
 					.setMessage("No se pudo usar esa imagen. Prueba con otra.").setPositiveButton("Entendido", null).show();
+			} finally {
+				releaseAvatarUri(uri);
 			}
 			shownAvatar = "";
 			updateAvatar();
 		});
+	}
+
+	private void releaseAvatarUri(String uri) {
+		if (uri == null)
+			return;
+		try {
+			getContentResolver().releasePersistableUriPermission(android.net.Uri.parse(uri),
+				Intent.FLAG_GRANT_READ_URI_PERMISSION);
+		} catch (SecurityException ignored) {
+			// No hay permiso persistente si el proveedor solo concedió acceso temporal.
+		}
+	}
 
 	private AvatarStore avatars() {
 		if (avatars == null)
@@ -247,7 +304,7 @@ public final class MainActivity extends AppCompatActivity {
 	}
 
 	/**
-	 * Destino de cada opción del menú ☰ (también lo usan las pruebas instrumentadas).
+	 * Destino de cada opción del menú de perfil (también lo usan las pruebas instrumentadas).
 	 */
 	public boolean menuSelected(int id) {
 		AppController app = state.app;
@@ -308,6 +365,10 @@ public final class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle out) {
 		out.putString("viewerLease", launchedLease);
+		out.putString("avatarOwner", pendingAvatar.owner());
+		out.putLong("avatarRevision", pendingAvatar.revision());
+		out.putString("avatarUri", pendingAvatar.uri());
+		out.putString("avatarStateInstance", state.instanceId);
 		super.onSaveInstanceState(out);
 	}
 
@@ -339,6 +400,8 @@ public final class MainActivity extends AppCompatActivity {
 
 	@Override
 	protected void onDestroy() {
+		if (isFinishing())
+			releaseAvatarUri(pendingAvatar.uri());
 		if (backdrop != null) {
 			backdrop.close();
 		}

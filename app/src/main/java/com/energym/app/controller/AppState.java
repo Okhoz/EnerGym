@@ -28,6 +28,8 @@ import java.util.Collections;
  * Un único worker serializa SQLite/cloud; todos los eventos que renderizan se entregan en main.
  */
 public final class AppState extends AndroidViewModel {
+	// La instancia retenida conserva las revisiones; una instancia nueva debe restaurar la identidad.
+	public final String instanceId = java.util.UUID.randomUUID().toString();
 	public AppController app;
 	// Estado transitorio de vista: sobrevive a técnica/back y se vacía al cambiar de cuenta o borrador.
 	public final com.energym.app.ui.TrainingViewState training = new com.energym.app.ui.TrainingViewState();
@@ -36,6 +38,8 @@ public final class AppState extends AndroidViewModel {
 	public AccountController accounts;
 	public SyncController sync;
 	public ProposalController assistant;
+	// Distingue la identidad confirmada del estado provisional durante el arranque.
+	public boolean accountResolved;
 	public AccountController.Status accountStatus = AccountController.Status.CONFIGURATION_NEEDED;
 	public SyncCoordinator.Status syncStatus = SyncCoordinator.Status.SIGNED_OUT;
 	public AccountUser user;
@@ -170,6 +174,7 @@ public final class AppState extends AndroidViewModel {
 			changed();
 		});
 		accounts = new AccountController(gateway, sync, main, (status, value, error) -> {
+			accountResolved = true;
 			accountStatus = status;
 			user = value;
 			if (status == AccountController.Status.AUTHENTICATED ||
