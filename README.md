@@ -1,67 +1,52 @@
 # EnerGym
 
-Aplicación Android Java/XML para crear rutinas, conservar versiones y registrar sesiones. ID: `com.energym.app`. Tema negro/blanco/dorado, logo verde transparente, paneles tintados y movimiento acotado.
+Aplicación Android Java/XML para planificar entrenamientos, registrar sesiones, alimentación y peso, y consultar el progreso de cada cuenta. Paquete `com.energym.app`. Diseño negro, blanco y dorado, con el logo verde y componentes compartidos.
 
-## Funciones y arquitectura
+## Estado actual — 15-10-2026
 
-El perfil declara objetivo, lugar, recursos, días y duración. Las propuestas siguen siendo provisionales hasta «Guardar perfil y aceptar»; rechazar no escribe. La aceptación compara el perfil vigente y guarda perfil/rutina en una transacción. Sesiones e históricos conservan snapshots y métricas de su versión. Datos locales y conversación se separan por propietario.
+- **Cuenta:** Google Credential Manager → Firebase Authentication → SQLite/Firestore por UID. El proyecto real `energym-e4699` está configurado para debug; se verificaron inicio de sesión, sesión persistida y «Respaldo confirmado». La reinstalación con restauración remota completa y la firma definitiva aún requieren comprobación. Véase [Firebase](docs/firebase-setup.md).
+- **Entreno:** formulario por disciplina, propuestas revisables antes de aceptar, versiones inmutables e históricos con snapshots. La progresión se calcula desde resultados registrados y necesita aceptación explícita.
+- **Biblioteca:** 287 ejercicios con técnica escrita, idénticos en app/backend, y visor nativo sin conexión. El modelo CC0 reúne capturas y movimientos esquemáticos; son referencias técnicas pendientes de revisión profesional. No analiza el cuerpo ni usa la cámara. [Recursos](docs/resources.md) y [licencias](THIRD_PARTY_NOTICES.md).
+- **Nutrición:** diario por comidas, escáner EAN/UPC y QR GS1 con Google Play services, consulta de Open Food Facts o entrada manual; cantidades en g/ml, objetivos estimados, macros y peso. El resumen diario completo conserva las fechas antiguas aunque el diario cargue una ventana acotada. Datos y borrados de alimentos se sincronizan por cuenta.
+- **Progreso:** resumen, objetivos, gráficas y calendario con entrenamientos y alimentación, también antes de terminar el primer entrenamiento. Las gráficas usan los datos guardados; no inventan mediciones.
+- **Asistente:** guiado local identificado como reglas y conexión privada a IA desde Cuenta. El proveedor elegido es Groq Free (`openai/gpt-oss-120b`); hay una prueba sintética real documentada con respuesta y propuesta válidas. Las claves viven en el backend. Perfil y mensajes se envían sólo al usar la conexión externa; el historial exige consentimiento separado. [Configuración Groq](backend/docs/groq-free.md).
 
-MVC: domain/catalog/data contienen modelos, compatibilidad, validación y persistencia; controller y los controladores del asistente coordinan acciones mediante interfaces comprobables en JVM; Activities, Fragments y XML presentan datos y remiten eventos. Las vistas no ejecutan SQL ni deciden compatibilidad.
+**La app todavía no está lista para publicación:** el chat sigue usando emparejamiento privado; faltan autenticación Firebase en el backend, cuotas durables por usuario/globales y el cliente Android automático con su endpoint fijo. También faltan el despliegue HTTPS real, las comprobaciones Docker y la firma de distribución. Las guardas de release exigen configuración privada válida, pero no sustituyen estas verificaciones. [Preparación de release](docs/production-release.md) y [Docker](backend/deploy/README.md).
 
-El guiado local gratuito se identifica como conversación por reglas. La IA necesita conexión al backend y envío externo explícito. Las claves del proveedor permanecen en el servidor; el token Android vive en memoria. El consentimiento solo autoriza historial acotado; revocarlo elimina el payload e invalida respuestas pendientes consentidas. No hay cambio automático de proveedor/modelo ni respuesta local presentada como IA.
+## Arquitectura y datos
 
-El catálogo v2 añade Flexión estándar (`standard-pushup`), distinta de `knee-pushup`. Su vista previa técnica nativa permite reproducción, pausa, velocidad, marcadores, giro, zoom y vistas. Para otros recursos/dispositivos incompatibles conserva referencia escrita. No hay capas musculares, evaluación personal con cámara ni revisión profesional. Consulta [recursos](docs/resources.md) y [licencias](THIRD_PARTY_NOTICES.md).
+MVC: `domain`, `catalog`, `data`, `nutrition` y `progress` contienen modelos y persistencia; los controladores coordinan mediante interfaces comprobables; Activities, Fragments y XML presentan datos y remiten eventos. Las vistas no ejecutan SQL ni deciden compatibilidad.
 
-## Nutrición, progreso y biblioteca
+Aceptar guarda perfil/rutina de manera transaccional y comprueba que el perfil vigente no cambió. Rechazar no escribe. Cada sesión conserva su rutina y resultados históricos. Conversaciones y datos se separan por propietario; cambiar cuenta invalida callbacks pendientes. El respaldo del sistema está desactivado; Firebase es el canal declarado. «Borrar datos locales» afecta sólo a esa cuenta y dispositivo: el respaldo cloud confirmado puede recuperarse al iniciar sesión de nuevo.
 
-- **Nutrición** (pestaña propia): escáner de Google Play services para EAN/UPC y QR GS1 (sin permiso de cámara en la app), ficha de [Open Food Facts](https://world.openfoodfacts.org) (ODbL) o entrada manual, cantidad en g o ml según la base de la etiqueta (no convierte ml en g), anillos de kcal/macros, barras de 7 días, déficit/superávit frente al mantenimiento estimado (Mifflin-St Jeor) y registro de peso. Perfil físico, alimentos y peso se guardan como registros de la cuenta y se respaldan en Firebase (`users/{uid}/body|food|weights`) con la misma cola que rutinas y sesiones; quitar un alimento sube una lápida definitiva. El diario de la versión anterior (`energym_nutrition.db`) se migra una vez al abrir Nutrición. Las pruebas de reglas Firestore requieren Node y el emulador de Firebase.
-- **Progreso** (antes Historial): resumen global con tendencia de 4 semanas, sesiones y minutos por semana, volumen de fuerza, evolución del peso, calendario mensual (entrenos y días con alimentación) e historial de sesiones.
-- **Biblioteca**: catálogo v2 con 287 ejercicios (gimnasio, máquinas y poleas, barra, mancuernas, bandas, peso corporal, abdominales, movilidad, cardio y preparación deportiva) y su técnica escrita, idéntico en app y backend (`tools/catalog_expansion.py` + `tools/catalog_more.py`). El buscador de Entreno ofrece preguntar al asistente cuando un ejercicio no existe; esa respuesta no entra en el catálogo. El backend envía a la IA una lista compacta y acotada (48) de ejercicios elegibles para respetar la guarda de 18 KB del plan gratuito.
+## Compilar y comprobar
 
-## Compilar y ejecutar
-
-Android Studio, SDK Platform37 y Build Tools36.1.0; Android API26+, compileSdk/targetSdk37. El visor requiere Vulkan1.1. Gradle Wrapper9.6.0/AGP9.4.1, fuentes Java11; JBR25.0.3 ejecuta Gradle. Backend Java17+; pruebas verificadas con Java21. Configura sdk.dir en local.properties y selecciona JBR como Gradle JDK; no publiques esa configuración local.
-
-Desde la raíz del proyecto, PowerShell:
+Android Studio, SDK Platform37/Build Tools36.1.0, Android API26+, Gradle Wrapper9.6.0/AGP9.4.1 y fuentes Java11. Gradle usa el JBR de Android Studio; backend Java17+ (pruebas con Java21). Configurar `sdk.dir` en `local.properties`, que se excluye de Git. El visor requiere un dispositivo compatible con Vulkan; conserva referencia escrita si no puede cargar.
 
 ```powershell
 $env:JAVA_HOME = 'C:\Program Files\Android\Android Studio\jbr'
 .\gradlew.bat :app:testDebugUnitTest :app:assembleDebug :app:lintDebug
-$mavenCache = Join-Path $PWD 'backend/.cache/m2'
-.\backend\mvnw.cmd -f backend/pom.xml "-Dmaven.repo.local=$mavenCache" test package
+# Recorrido instrumental: ver docs/review-2026-10-15.md (runner ADB y exclusiones de esta instalación).
 ```
 
-El primer acceso puede descargar dependencias públicas gratuitas. Para -o/--offline, la caché indicada debe contener todas las dependencias: su existencia como carpeta no garantiza completitud. La verificación del proyecto real utilizó la caché ya poblada de staging; su caché propia no tenía maven-resources-plugin3.4.0. Ajusta la ruta a una caché conocida o permite resolución pública normal.
-
-APK debug: app/build/outputs/apk/debug/app-debug.apk; JAR: backend/target/energym-backend-1.0.0.jar. Debug conserva la demo local para desarrollo y pruebas. Release oculta esa entrada y el controlador también la rechaza, conservando la identidad Google vigente. Abre el proyecto y ejecuta app sobre un dispositivo; reutiliza un emulador abierto. Pruebas instrumentales: `.\gradlew.bat :app:connectedDebugAndroidTest` con dispositivo conectado y coordinado. Estas pruebas no llaman a Gemini salvo parámetros opt-in explícitos del fixture real.
-
-Release está bloqueada si faltan las entradas privadas Firebase, origen HTTPS y firma. [Preparación de release](docs/production-release.md) explica las variables, validación local y artefactos. Esa validación no demuestra Google/Firebase, restauración remota, servidor real ni permiso para distribuir Gemini gratuito en España. La conexión automática autenticada del asistente sigue pendiente de Task16.
-
-## Gemini legado en desarrollo
-
-[backend/README.md](backend/README.md) detalla configuración y privacidad. La clave Windows ya configurada se usa solo en el servidor. Desde backend en **PowerShell7**, genera un código privado nuevo para el emparejamiento y cópialo sin registrarlo en logs:
+Las pruebas de conexión con servidor/Gemini son opt-in y no se ejecutan como inferencias reales por defecto. La prueba de instalación sin Firebase requiere un build deliberadamente sin configuración. Las pruebas instrumentales usan datos sintéticos y la cuenta de desarrollo. El tooling puede reinstalar la app; usar un emulador de pruebas y conservar previamente cualquier dato que se necesite. [Verificación y exclusiones actuales](docs/review-2026-10-15.md).
 
 ```powershell
-$env:ENERGYM_PAIRING_CODE = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(16))
-Set-Clipboard $env:ENERGYM_PAIRING_CODE
-.\start-server.ps1 -Provider Gemini -CheckConfiguration
-.\start-server.ps1 -Provider Gemini
+# Backend: JAVA_HOME debe señalar un JDK17+.
+$mavenCache = Join-Path $PWD 'backend/.cache/m2'
+.\backend\mvnw.cmd -f backend/pom.xml "-Dmaven.repo.local=$mavenCache" test package
+# Reglas Firebase locales, después de instalar las dependencias de firebase-tests:
+.\firebase-tests\run-tests.ps1
 ```
 
-En otra terminal, con adb del SDK disponible: `adb reverse tcp:8080 tcp:8080`. En la app debug introduce http://127.0.0.1:8080 y pega el código en conexión privada. El código se consume una vez; genera otro para un nuevo emparejamiento. HTTP loopback solo debug; release exige HTTPS. No hay servidor público/certificado real comprobado ni facturación autorizada.
+El modo offline requiere una caché completa. La última verificación del backend reutilizó la caché local ya poblada de staging, sin transferir su código antiguo al proyecto actual. Los tests de reglas necesitan Node y Java21+, usan `demo-energym` exclusivamente en el emulador y no publican reglas.
 
-**Gemini real comprobado:** el tercer recorrido Android del 14-10-2026 pasó 1 prueba en10.409s con gemini-3.5-flash-lite y catálogo2. Recibió una propuesta válida de tres ejercicios, sin prescripciones faltantes; SQLite permaneció intacta antes de aceptar. La aceptación creó la versión con perfil/rutina exactos y persistió tras recrear. Se usó una demo genérica con historyConsent=false. Dos intentos anteriores fallidos motivaron la corrección revisada schema/prompt; backend final42pruebas verdes. Una prueba anterior de backend recibió HTTP200 en2067ms.
+Artefactos: `app/build/outputs/apk/debug/app-debug.apk` y `backend/target/energym-backend-1.0.0.jar`. Debug conserva la cuenta local de desarrollo; release la oculta y rechaza también su activación directa. La APK se ejecuta en Android; Docker aloja el servidor.
 
-Gemini3.8 fue una opción de desarrollo, pero superó los plazos en las pruebas. La cuota gratuita tiene límites/condiciones; no se promete uso ilimitado. Según los términos oficiales enlazados en backend, ofrecer clientes API Gemini a usuarios del EEE/Suiza/Reino Unido exige Paid Services. Gemini queda como proveedor legado: la solicitud vigente exige una IA gratuita sin activar pagos y la alternativa de producción está pendiente de selección y verificación. No se ha autorizado un despliegue de pago.
+## XML y recursos
 
-Google Authentication/Firestore tienen adaptadores y pruebas locales; **Firebase real sigue sin configurar**. Login remoto y restauración tras reinstalar no están comprobados.
+Abrir `app/src/main/res/layout/activity_main.xml`, `fragment_*.xml` o `row_*.xml` en **Design**/**Split**. Los XML aportan estructura y muestras `tools:`; parte del contenido se construye dinámicamente desde los datos. El visor nativo se comprueba al ejecutar. Las muestras del editor no son cuentas ni mediciones reales.
 
-## XML y rendimiento
+El movimiento se cancela al pausar y sólo las transiciones de ruta lo reinician. Blur está limitado a decoración estática y dispone de fallback por API, memoria y energía; no desenfoca texto, controles ni SurfaceView. El rendimiento físico y la revisión profesional de movimientos siguen pendientes. Los bytes del manifiesto 3D se conservan en LF mediante `.gitattributes`, porque el visor comprueba su SHA-256.
 
-En Android Studio abre app/src/main/res/layout/activity_main.xml, fragment_*.xml o row_*.xml y selecciona **Design** o **Split**. Las muestras tools/GONE se inflan y luego las filas de ejemplo se retiran al renderizar; no se afirma coste cero. La revisión comprobó XML y empaquetado de19layouts, no píxeles del editor. La animación nativa se muestra al ejecutar.
-
-El movimiento solo se inicia al cambiar ruta y se cancela al pausar/detach. RenderEffect se limita a decoración estática acotada y tiene fallback por API, memoria, energía, animación deshabilitada y visor. El AVD192MB utilizó fallback; RenderEffect habilitado y rendimiento físico no están medidos. No hay blur de controles, texto, cámara ni SurfaceView. La memoria del visor se recupera al cerrar su proceso privado; conserva principal y recreaciones.
-
-[docs/acceptance.md](docs/acceptance.md) registra pruebas, artefactos y límites. El formato Task8 no modifica comportamiento ni añade cambios de diseño.
-
-Evidencia histórica de staging tras Task8:107JVM sin fallos, debug/release correctos y lint0errores/91avisos. Desde Task14, un release sin las entradas privadas exigidas falla expresamente; aquel build anterior no acreditaba una app operativa en producción. Root verifica el proyecto real y el recorrido Android, sin confundir la evidencia staging con una instalación nueva.
+`dev` reúne el desarrollo y sus copias verificadas; `main` recibe bloques importantes finalizados; se conserva `codex/energym` para el proyecto terminado. [Aceptación histórica](docs/acceptance.md) conserva pruebas de versiones anteriores y no sustituye el estado actual.

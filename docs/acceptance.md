@@ -1,4 +1,6 @@
-# Aceptación de EnerGym
+# Aceptación histórica de EnerGym
+
+Este documento conserva evidencia de versiones anteriores. Estado y correcciones actuales: [revisión del 15-10-2026](review-2026-10-15.md). Las notas de Firebase sin configurar o de cobertura limitada al primer ejercicio describen aquellos builds.
 
 Estado documental14-10-2026. Evidencia de bloques revisados separada de la verificación final del árbol tras formato.
 

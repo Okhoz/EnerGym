@@ -1,10 +1,12 @@
-# Groq Free para EnerGym (preparación, desactivado)
+# Groq Free para EnerGym
+
+Estado 15-10-2026: proveedor integrado, desactivado por defecto y comprobado con una llamada real sintética (apartado «Primera prueba real»). La publicación sigue pendiente de autenticación Firebase, cuotas durables y despliegue HTTPS. La conexión de desarrollo usa emparejamiento privado.
 
 El usuario pidió una IA gratuita. Se prepara GroqCloud Free con `openai/gpt-oss-120b`; no es ChatGPT. La alternativa permitida es `openai/gpt-oss-20b`. Ambos aparecen en el [plan Free](https://console.groq.com/docs/rate-limits) y admiten [JSON Schema estricto](https://console.groq.com/docs/structured-outputs). No hay modelo predeterminado, selección automática, reintentos ni fallback a un proveedor de pago.
 
 ## Activación pendiente
 
-Esta entrega no crea cuenta, clave, tarjeta ni facturación y no hace inferencias reales. Antes de activarla, confirmar el plan **Free** en la consola y las condiciones presentadas en el alta; no añadir tarjeta ni aceptar Upgrade/Developer. Si el alta exige pago, detenerse. Una clave o el nombre de un modelo abierto no demuestra gratuidad. Este software no puede evitar cargos si el propietario cambia la cuenta a un plan pagado.
+El adaptador no crea cuenta, clave, tarjeta ni facturación por sí mismo. La prueba real autorizada se documenta más abajo. Antes de activarla, confirmar el plan **Free** en la consola y las condiciones presentadas en el alta; no añadir tarjeta ni aceptar Upgrade/Developer. Si el alta exige pago, detenerse. Una clave o el nombre de un modelo abierto no demuestra gratuidad. Este software no puede evitar cargos si el propietario cambia la cuenta a un plan pagado.
 
 El [Services Agreement](https://console.groq.com/docs/legal/services-agreement) permite integrar la API para usuarios finales y contempla clientes del EEE; revisar la restricción de edad de 18 años y las condiciones efectivas antes del lanzamiento. Preparar autorización Firebase y cuotas durables por usuario/global corresponde a Task16; este adaptador no completa producción.
 
@@ -17,7 +19,7 @@ GROQ_MODEL=openai/gpt-oss-120b
 GROQ_API_KEY=<clave privada del servidor>
 ```
 
-Sin cualquiera de esas condiciones el proveedor queda desactivado. `TRUE`, `1` y modelos fuera de allowlist no sirven como opt-in. Mantener Gemini/OpenAI desactivados. Nunca introducir la clave en Android/APK, URLs, argumentos de consola, payloads o repositorio. El helper del workspace `tools/configurar-groq.ps1` pide la entrada oculta y guarda exclusivamente `GROQ_API_KEY` como variable de usuario Windows; no activa el proveedor. Las variables de usuario persisten sin cifrado y pueden leerlas procesos de ese usuario. No ejecutar el helper desde la automatización ni mostrar la clave. Para contenedores, el soporte `_FILE` de Groq y el runbook Docker se integrarán por separado tras revisión de Task15; no asumir que una variable Windows aparece automáticamente en Docker.
+Sin cualquiera de esas condiciones el proveedor queda desactivado. `TRUE`, `1` y modelos fuera de allowlist no sirven como opt-in. Mantener Gemini/OpenAI desactivados. Nunca introducir la clave en Android/APK, URLs, argumentos de consola, payloads o repositorio. El helper del workspace `tools/configurar-groq.ps1` pide la entrada oculta y guarda exclusivamente `GROQ_API_KEY` como variable de usuario Windows; no activa el proveedor. Las variables de usuario persisten sin cifrado y pueden leerlas procesos de ese usuario. No ejecutar el helper desde la automatización ni mostrar la clave. Para contenedores, usar `compose.groq.yaml` y el [runbook Docker](../deploy/README.md): se montan archivos privados para la clave y el código de emparejamiento. Una variable Windows no aparece automáticamente en Docker.
 
 ## Cuotas y límite provisional
 
@@ -31,7 +33,7 @@ Antes de activar, medir tokens de perfiles sintéticos representativos y máximo
 
 HTTPS fijo `https://api.groq.com/openai/v1/chat/completions`, sin variable de endpoint ni redirects. HTTP Java17, timeout de conexión 5s, solicitud 18s y deadline total de descarga 20s; respuesta máxima 65.536 bytes. Las claves y cuerpos de error no se registran ni retornan. 401/403 del proveedor producen `503 PROVIDER_NOT_CONFIGURED`; cuota y presupuesto `429 RATE_LIMITED`; timeout `504 PROVIDER_TIMEOUT`; errores HTTP restantes conservan `PROVIDER_UNAVAILABLE`; JSON/refusal/truncamiento producen `INVALID_PROVIDER_RESPONSE`.
 
-`response_format.json_schema.strict=true` envía **exactamente** `proposal-schema.json`, incluidos `minItems`/`maxItems`, sin adaptación ni downgrade a JSON mode. Su aceptación exacta por Groq queda pendiente de una prueba sintética con clave autorizada: la documentación de [Structured Outputs](https://console.groq.com/docs/structured-outputs) no confirma expresamente esos dos keywords. Si Groq rechaza el esquema, la solicitud falla; no se reintenta con una versión menos estricta. La validación local permanece completa (métricas, carga, equipo, catálogo y duración); un esquema aceptado no reemplaza esa validación.
+`response_format.json_schema.strict=true` envía **exactamente** `proposal-schema.json`, incluidos `minItems`/`maxItems`, sin adaptación ni downgrade a JSON mode. La prueba sintética documentada del 15-10-2026 confirmó que Groq aceptó ese esquema exacto. Esa comprobación no garantiza disponibilidad futura ni calidad general de las propuestas. Si Groq rechaza el esquema, la solicitud falla; no se reintenta con una versión menos estricta. La validación local permanece completa (métricas, carga, equipo, catálogo y duración); un esquema aceptado no reemplaza esa validación.
 
 El sistema español incluye el catálogo filtrado y `exerciseContext` que prepara el servidor. No amplía el historial y solo lo recibe con consentimiento existente; ese consentimiento sigue separado de sincronización Firebase. El parser exige una choice, `finish_reason=stop`, mensaje assistant y contenido JSON objeto único; rechaza herramientas, rechazo, Markdown, duplicados, resultados parciales o ambiguos. Nunca ejecuta comandos de herramientas. El servidor añade correlación, versión del catálogo y aviso de propuesta; la aplicación exige vista previa y aceptación local.
 
@@ -45,4 +47,4 @@ Resultado: `/health` 200; emparejamiento 201; `/api/chat` **200 en 2,3 s** con u
 
 ## Comprobaciones realizadas y pendientes
 
-Las pruebas usan fixtures sintéticas y servidor HTTP loopback; la entrada de endpoint/timeout interna existe exclusivamente como seam de pruebas y no se expone por configuración. No se ha probado alta, claves reales, aceptación remota del schema ni calidad de rutinas españolas. Todo ello, plan Free sin pago, términos/edad, ZDR, tokenización, auth y cuotas siguen pendientes antes de habilitar llamadas.
+Las pruebas usan fixtures sintéticas y servidor HTTP loopback; la entrada de endpoint/timeout interna existe exclusivamente como seam de pruebas y no se expone por configuración. La primera prueba real anterior comprobó clave, esquema remoto y una propuesta sintética válida; no acredita calidad general ni disponibilidad permanente. Términos/edad, ZDR, tokenización, autenticación y cuotas siguen pendientes antes de usuarios reales.

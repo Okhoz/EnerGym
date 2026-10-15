@@ -13,3 +13,7 @@ app/google-services.json
 **/*.p12
 **/*.pfx
 **/*signing*.properties
+
+# Caché local de las herramientas Python; nunca forma parte del producto.
+**/__pycache__/
+*.py[cod]

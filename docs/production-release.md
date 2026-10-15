@@ -1,6 +1,8 @@
 # Preparación privada de release
 
-Task14 prepara las guardas de build y la política de cuentas. No configura Firebase, OAuth, Firestore, dominio ni servidor real; no crea certificados ni publica artefactos. La solicitud vigente exige una IA gratuita sin activar pagos; la alternativa de producción sigue pendiente de selección y verificación. Gemini queda como proveedor legado de desarrollo por el conflicto documentado entre su API gratuita sin billing y distribución en EEE; Docker no lo resuelve.
+Estado 15-10-2026: Firebase debug ya está configurado y Groq tiene una prueba privada real; la autenticación del backend, el cliente automático, las cuotas durables, el despliegue HTTPS y la firma final siguen pendientes. [Revisión actual](review-2026-10-15.md).
+
+Task14 prepara las guardas de build y la política de cuentas. No configura Firebase, OAuth, Firestore, dominio ni servidor real; no crea certificados ni publica artefactos. La solicitud vigente exige una IA gratuita sin activar pagos; se ha elegido Groq Free, comprobado en desarrollo privado; aún falta su integración autenticada de producción. Gemini queda como proveedor legado de desarrollo por el conflicto documentado entre su API gratuita sin billing y distribución en EEE; Docker no lo resuelve.
 
 ## Entradas
 
