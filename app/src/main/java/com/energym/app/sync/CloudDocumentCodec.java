@@ -30,6 +30,8 @@ public final class CloudDocumentCodec {
 				return "weights";
 			case GOAL:
 				return "goals";
+			case TRAINING_ARCHIVE:
+				return "trainingArchive";
 			default:
 				return "sessions";
 		}
@@ -71,6 +73,11 @@ public final class CloudDocumentCodec {
 				if (!routine.getProposalId().equals(record.getSyncId()))
 					throw new IllegalArgumentException("Identidad de rutina incorrecta");
 				payload = SnapshotCodec.encodeRoutine(routine);
+				identity = hash(payload);
+				terminal = true;
+				break;
+			case TRAINING_ARCHIVE:
+				payload = TrainingArchiveRepository.canonical(record.getSyncId(), record.getPayload());
 				identity = hash(payload);
 				terminal = true;
 				break;

@@ -208,17 +208,26 @@ public final class NutritionFragment extends ScreenFragment {
 		((TextView) row.findViewById(R.id.food_kcal)).setText(Long.toString(Math.round(e.kcal())));
 		row.setContentDescription(e.name + ", " + NutritionController.format(e.amount) + " " + e.unit.symbol + ", " +
 			Math.round(e.kcal()) + " kilocalorías. Toca para ver opciones.");
+		long scope = n.scopeRevision();
+		row.setTag("food_options_" + e.id);
 		row.setOnClickListener(v -> new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
 			.setTitle(e.name)
-			.setMessage(NutritionController.format(e.amount) + " " + e.unit.symbol + " · " + Math.round(e.kcal()) +
-				" kcal\nProteínas " + one(e.protein()) + " g · Hidratos " + one(e.carbs()) + " g · Grasas " +
-				one(e.fat()) + " g")
-			.setPositiveButton("Añadir otra vez", (d, w) -> {
-				n.startFrom(e);
-				app.navigate(Screen.FOOD);
-			})
-			.setNegativeButton("Eliminar", (d, w) -> n.remove(e))
-			.setNeutralButton("Cerrar", null).show());
+			.setItems(new String[]{"Editar alimento", "Añadir otra vez", "Eliminar del diario"}, (dialog, which) -> {
+				if (n.busy || scope != n.scopeRevision()) return;
+				if (which == 0) {
+					n.edit(e);
+					app.navigate(Screen.FOOD);
+				} else if (which == 1) {
+					n.startFrom(e);
+					app.navigate(Screen.FOOD);
+				} else new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+					.setTitle("¿Eliminar este alimento?")
+					.setMessage(e.name + " se quitará del diario y se recalcularán tus calorías y macronutrientes.")
+					.setNegativeButton("Cancelar", null)
+					.setPositiveButton("Eliminar", (confirm, button) -> {
+						if (scope == n.scopeRevision()) n.remove(e);
+					}).show();
+			}).setNegativeButton("Cancelar", null).show());
 		section.addView(row);
 		View divider = new View(requireContext());
 		divider.setBackgroundColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.divider));

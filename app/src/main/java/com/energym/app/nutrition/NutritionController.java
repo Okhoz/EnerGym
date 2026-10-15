@@ -26,7 +26,8 @@ public final class NutritionController {
 	private final java.util.function.Consumer<String> error;
 	private String owner;
 	private long generation;
-	private long foodRevision;
+	private long foodRevision, loadRequest;
+	private FoodEntry editing;
 	private SortedMap<LocalDate, Double> dailyCalories = new TreeMap<>();
 
 	public NutritionController(NutritionStore store, NutritionStore.Lookup lookup, Supplier<LocalDate> clock,
@@ -54,6 +55,7 @@ public final class NutritionController {
 		weights = new TreeMap<>();
 		dailyCalories = new TreeMap<>();
 		product = null;
+		editing = null;
 		busy = false;
 		looking = false;
 		status = "";
@@ -62,6 +64,8 @@ public final class NutritionController {
 		foodDraft.clear();
 		reload();
 	}
+
+	public long scopeRevision() { return generation; }
 
 	public String owner() {
 		return owner;
@@ -72,13 +76,13 @@ public final class NutritionController {
 			changed.run();
 			return;
 		}
-		long token = generation;
+		long token = generation, request = ++loadRequest;
 		LocalDate recentFrom = clock.get().minusDays(HISTORY_DAYS - 1);
 		LocalDate selectedFrom = selected.minusDays(6);
 		store.load(owner, recentFrom.isBefore(selectedFrom) ? recentFrom : selectedFrom,
 			new NutritionStore.Callback<NutritionStore.Snapshot>() {
 				public void success(NutritionStore.Snapshot s) {
-					if (token != generation)
+					if (token != generation || request != loadRequest)
 						return;
 					body = s.body;
 					entries = s.entries;
@@ -88,7 +92,7 @@ public final class NutritionController {
 				}
 
 				public void failure(Exception e) {
-					if (token == generation)
+					if (token == generation && request == loadRequest)
 						error.accept("No se pudo leer tu diario: " + e.getMessage());
 				}
 			});
@@ -288,6 +292,8 @@ public final class NutritionController {
 	private FoodEntry.Meal targetMeal;
 
 	public void startManual() {
+		if (busy) return;
+		editing = null;
 		foodRevision++;
 		looking = false;
 		product = null;
@@ -298,6 +304,7 @@ public final class NutritionController {
 	}
 
 	public void startManual(FoodEntry.Meal meal) {
+		if (busy) return;
 		targetMeal = meal;
 		startManual();
 	}
@@ -306,6 +313,7 @@ public final class NutritionController {
 	 * Rellena el formulario con un alimento ya registrado: misma ficha, cantidad a confirmar.
 	 */
 	public void startFrom(FoodEntry recent) {
+		if (busy) return;
 		startManual();
 		foodDraft.put("name", recent.name);
 		foodDraft.put("barcode", recent.barcode);
@@ -315,6 +323,25 @@ public final class NutritionController {
 		foodDraft.put("protein100", format(recent.protein100));
 		foodDraft.put("carbs100", format(recent.carbs100));
 		foodDraft.put("fat100", format(recent.fat100));
+	}
+
+	/** Abre la misma entrada, conservando ID, día y fecha de alta para la sincronización. */
+	public void edit(FoodEntry entry) {
+		if (owner == null || busy || entry == null) return;
+		FoodEntry current = null;
+		for (FoodEntry value : entries) if (value.id.equals(entry.id)) { current = value; break; }
+		if (current == null) return;
+		startFrom(current);
+		editing = current;
+		foodDraft.put("meal", current.meal.name());
+	}
+
+	public boolean editingFood() { return editing != null; }
+
+	/** Cancelar invalida los callbacks del escáner y nunca escribe en el diario. */
+	public void cancelFood() {
+		if (busy) return;
+		startManual();
 	}
 
 	/**
@@ -422,11 +449,13 @@ public final class NutritionController {
 	}
 
 	private FoodEntry build() {
-		return FoodEntry.create(selected, FoodEntry.Meal.valueOf(foodDraft.getOrDefault("meal", "OTHER")),
+		FoodEntry value = FoodEntry.create(editing == null ? selected : editing.day, FoodEntry.Meal.valueOf(foodDraft.getOrDefault("meal", "OTHER")),
 			foodDraft.getOrDefault("name", ""), foodDraft.get("barcode"),
 			FoodEntry.Unit.valueOf(foodDraft.getOrDefault("unit", "G")), number(foodDraft.get("amount")),
 			number(foodDraft.get("kcal100")), number(foodDraft.get("protein100")), number(foodDraft.get("carbs100")),
 			number(foodDraft.get("fat100")));
+		return editing == null ? value : new FoodEntry(editing.id, editing.day, value.meal, value.name, value.barcode,
+			value.unit, value.amount, value.kcal100, value.protein100, value.carbs100, value.fat100, editing.createdAt);
 	}
 
 	public void addFood(Runnable done) {
@@ -441,18 +470,24 @@ public final class NutritionController {
 		}
 		busy = true;
 		long token = generation;
-		store.add(owner, entry, new NutritionStore.Callback<Void>() {
+		loadRequest++;
+		boolean update = editing != null;
+		changed.run();
+		NutritionStore.Callback<Void> callback = new NutritionStore.Callback<Void>() {
 			public void success(Void v) {
 				if (token != generation)
 					return;
 				busy = false;
 				List<FoodEntry> next = new ArrayList<>(entries);
+				if (update) next.removeIf(old -> old.id.equals(entry.id));
 				next.add(entry);
 				entries = next;
-				dailyCalories.merge(entry.day, entry.kcal(), Double::sum);
+				dailyCalories.put(entry.day, totals(entry.day)[0]);
 				product = null;
 				foodDraft.clear();
-				status = entry.name + " añadido: " + Math.round(entry.kcal()) + " kcal.";
+				editing = null;
+				foodRevision++;
+				status = entry.name + (update ? " actualizado: " : " añadido: ") + Math.round(entry.kcal()) + " kcal.";
 				done.run();
 				changed.run();
 			}
@@ -460,7 +495,9 @@ public final class NutritionController {
 			public void failure(Exception e) {
 				fail(token, e);
 			}
-		});
+		};
+		if (update) store.update(owner, entry, callback);
+		else store.add(owner, entry, callback);
 	}
 
 	public void remove(FoodEntry entry) {
@@ -468,6 +505,8 @@ public final class NutritionController {
 			return;
 		busy = true;
 		long token = generation;
+		loadRequest++;
+		changed.run();
 		store.remove(owner, entry.id, new NutritionStore.Callback<Void>() {
 			public void success(Void v) {
 				if (token != generation)

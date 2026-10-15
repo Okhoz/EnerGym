@@ -48,6 +48,11 @@ public interface NutritionStore {
 
 	void add(String owner, FoodEntry entry, Callback<Void> callback);
 
+	/** Mantiene el ID y la fecha de alta de una entrada existente. */
+	default void update(String owner, FoodEntry entry, Callback<Void> callback) {
+		callback.failure(new UnsupportedOperationException("El almacén no admite editar alimentos"));
+	}
+
 	void remove(String owner, String entryId, Callback<Void> callback);
 
 	void weight(String owner, LocalDate day, double kg, Callback<Void> callback);

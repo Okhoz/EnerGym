@@ -145,8 +145,11 @@ public final class TrainingFragment extends ScreenFragment {
 			(ai ? "Habla con tu entrenador para preparar un plan." : "Elige ejercicios y ajusta tus series, repeticiones y cargas.") :
 			"Selecciona la rutina que quieras entrenar.");
 		MaterialButton create = action(list, ai ? "Crear rutina con IA" : "Crear rutina manual",
-			app.owner() != null && !app.loading && !app.manual.busy, () -> {
+			app.owner() != null && !app.loading && !app.manual.busy && (!ai || !state.assistant.busy), () -> {
 				if (ai) {
+					if (state.assistant.busy)
+						return;
+					state.assistant.selectLocalGuidance(false);
 					state.assistant.messageInput("Prepara una rutina para mí.");
 					app.navigate(Screen.ASSISTANT);
 				} else app.createManualRoutine();
@@ -155,12 +158,38 @@ public final class TrainingFragment extends ScreenFragment {
 		for (Routine routine : routines) {
 			boolean selected = app.routines.accepted != null &&
 				app.routines.accepted.getProposalId().equals(routine.getProposalId());
-			MaterialButton choose = action(list, routine.getTitle() + (selected ? " · seleccionada" : ""), !app.routines.busy,
-				() -> app.selectRoutine(routine.getProposalId()));
+			LinearLayout row = columns(list, 12);
+			MaterialButton choose = compact(row, routine.getTitle() + (selected ? " · seleccionada" : ""),
+				!app.routines.busy && !app.trainingMutation, () -> app.selectRoutine(routine.getProposalId()));
+			choose.setMaxLines(3);
+			MaterialButton options = compact(row, "⋮", !app.trainingMutation && !app.manual.busy,
+				() -> routineOptions(routine));
+			options.setContentDescription("Opciones de la rutina " + routine.getTitle());
+			options.setTag("routine_options_" + routine.getProposalId());
+			LinearLayout.LayoutParams size = (LinearLayout.LayoutParams) options.getLayoutParams();
+			size.width = dp(56);
+			size.weight = 0;
 			choose.setTextColor(color(selected ? R.color.gold : R.color.white));
 			text(list, origin(routine) + " · " + summary(routine) + "\nProgresión " +
 				(routine.isProgressionEnabled() ? "activada" : "desactivada"), R.style.EnerGym_FieldCaption, 4);
 		}
+	}
+
+	private void routineOptions(Routine routine) {
+		long scope = app.accountRevision();
+		new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+			.setTitle(routine.getTitle())
+			.setItems(new String[]{"Editar rutina", "Eliminar rutina"}, (dialog, which) -> {
+				if (scope != app.accountRevision()) return;
+				if (which == 0) app.editRoutine(routine);
+				else new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+					.setTitle("¿Eliminar esta rutina?")
+					.setMessage("Se quitará de tus rutinas y de tu cuenta sincronizada. Las sesiones que ya has registrado se conservan.")
+					.setNegativeButton("Cancelar", null)
+					.setPositiveButton("Eliminar", (confirm, button) -> {
+						if (scope == app.accountRevision()) app.deleteRoutine(routine);
+					}).show();
+			}).setNegativeButton("Cancelar", null).show();
 	}
 
 	private List<Session> distinctDrafts() {
@@ -186,7 +215,19 @@ public final class TrainingFragment extends ScreenFragment {
 			text(drafts, draft.getRoutine().getTitle() + " · " + draft.getResults().size() + " ejercicios registrados",
 				R.style.EnerGym_FieldCaption, 12);
 			action(drafts, "Continuar borrador", !app.sessions.busy, () -> app.resume(draft));
+			action(drafts, "Eliminar borrador", !app.trainingMutation && !app.sessions.busy, () -> confirmDraftDelete(draft));
 		}
+	}
+
+	private void confirmDraftDelete(Session draft) {
+		long scope = app.accountRevision();
+		new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+			.setTitle("¿Eliminar este borrador?")
+			.setMessage("Se eliminarán sus registros de tu cuenta. Esta acción no se puede deshacer.")
+			.setNegativeButton("Cancelar", null)
+			.setPositiveButton("Eliminar", (dialog, button) -> {
+				if (scope == app.accountRevision()) app.deleteSession(draft);
+			}).show();
 	}
 
 	private void moreOptions() {

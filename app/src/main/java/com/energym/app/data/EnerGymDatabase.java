@@ -252,9 +252,13 @@ public final class EnerGymDatabase extends SQLiteOpenHelper {
 	}
 
 	private boolean skipImport(Row local, SyncRecord remote) {
+		// Borrar es definitivo también entre dispositivos: una edición pendiente no retiene un alimento borrado.
+		if (local != null && remote.getKind() == SyncRecord.Kind.FOOD &&
+			NutritionRepository.deleted(remote.getPayload()) && !NutritionRepository.deleted(local.record.getPayload()))
+			return false;
 		// Un registro que perderá frente al pendiente/finalizado local no introduce nuevas dependencias de restauración.
 		return local != null && (local.record.getState() == SyncRecord.State.PENDING ||
-			remote.getUpdatedAt() <= local.record.getUpdatedAt() || remote.getKind() == SyncRecord.Kind.ROUTINE ||
+			remote.getUpdatedAt() <= local.record.getUpdatedAt() || remote.getKind() == SyncRecord.Kind.ROUTINE || remote.getKind() == SyncRecord.Kind.TRAINING_ARCHIVE ||
 			(remote.getKind() == SyncRecord.Kind.SESSION &&
 				SnapshotCodec.decodeSession(local.record.getPayload()).getStatus() == Session.Status.FINISHED) ||
 			// Un alimento borrado localmente es definitivo: una copia remota anterior no lo resucita.
@@ -267,6 +271,9 @@ public final class EnerGymDatabase extends SQLiteOpenHelper {
 		if (!ownerUid.equals(r.getOwnerUid()))
 			throw new IllegalArgumentException("Registro de otra cuenta");
 		switch (r.getKind()) {
+			case TRAINING_ARCHIVE:
+				TrainingArchiveRepository.canonical(r.getSyncId(), r.getPayload());
+				break;
 			case PROFILE:
 				if (!"profile".equals(r.getSyncId()))
 					throw new IllegalArgumentException("ID de perfil inválido");

@@ -42,6 +42,7 @@ public final class ManualRoutineController {
 	private String owner, title = "", proposalId = UUID.randomUUID().toString();
 	private boolean progression = true;
 	private Routine saved;
+	private String editingId;
 	private long generation;
 	public boolean busy;
 	public String error = "", query = "";
@@ -68,6 +69,31 @@ public final class ManualRoutineController {
 		changed.run();
 	}
 
+
+	/** Copia completa y editable de una rutina aceptada; no modifica la versión histórica. */
+	public void edit(Routine original) {
+		if (busy || owner == null || original == null) return;
+		clear(original.getProfile());
+		editingId = original.getProposalId();
+		title = original.getTitle();
+		progression = original.isProgressionEnabled();
+		for (RoutineItem item : original.getItems()) {
+			Exercise canonical = ChatProtocol.find(catalog, item.getExercise().getId());
+			if (canonical == null) {
+				clear(original.getProfile());
+				fail("Hay un ejercicio que ya no está en el catálogo. La versión guardada se conserva.");
+				return;
+			}
+			Draft draft = new Draft(canonical);
+			draft.values.putAll(item.getPrescription());
+			draft.minutes = Integer.toString(item.getEstimatedMinutes());
+			drafts.add(draft);
+		}
+		changed.run();
+	}
+
+	public boolean editing() { return editingId != null; }
+
 	private void clear(TrainingProfile profile) {
 		generation++;
 		busy = false;
@@ -76,6 +102,7 @@ public final class ManualRoutineController {
 		selected = 0;
 		progression = true;
 		saved = null;
+		editingId = null;
 		proposalId = UUID.randomUUID().toString();
 		base = profile == null ? new TrainingProfile.Builder().build() : profile;
 		contextFields.clear();
@@ -295,7 +322,7 @@ public final class ManualRoutineController {
 		long token = generation;
 		changed.run();
 		try {
-			store.acceptManual(routine, new AppStore.Callback<Routine>() {
+			AppStore.Callback<Routine> callback = new AppStore.Callback<Routine>() {
 				public void success(Routine value) {
 					if (token != generation) return;
 					busy = false;
@@ -312,7 +339,9 @@ public final class ManualRoutineController {
 					busy = false;
 					fail(failure.getMessage());
 				}
-			});
+			};
+			if (editingId == null) store.acceptManual(routine, callback);
+			else store.replaceManual(editingId, routine, callback);
 		} catch (RuntimeException failure) {
 			if (token == generation) { busy = false; fail("No se pudo guardar la rutina manual."); }
 		}

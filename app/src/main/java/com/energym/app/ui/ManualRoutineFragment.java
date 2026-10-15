@@ -25,7 +25,9 @@ public final class ManualRoutineFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		heading("", "Rutina manual", "Elige ejercicios del catálogo y ajusta su prescripción. Sólo se guarda al confirmarlo.");
+		heading("", app.manual.editing() ? "Editar rutina" : "Rutina manual", app.manual.editing() ?
+			"Los cambios se guardarán como una nueva versión. Tus sesiones anteriores se conservan." :
+			"Elige ejercicios del catálogo y ajusta su prescripción. Sólo se guarda al confirmarlo.");
 		if (app.owner() == null) {
 			action(card("Tu cuenta", "Selecciona una cuenta antes de guardar una rutina."), "Ir a Cuenta",
 				() -> app.navigate(AppController.Screen.ACCOUNT));
@@ -58,7 +60,7 @@ public final class ManualRoutineFragment extends ScreenFragment {
 			TextView error = text(save, c.error, R.style.EnerGym_Body, 8);
 			error.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
 		}
-		primary(action(save, c.busy ? "Guardando…" : "Guardar mi rutina", !c.busy && !app.loading, c::save));
+		primary(action(save, c.busy ? "Guardando…" : c.editing() ? "Guardar cambios" : "Guardar mi rutina", !c.busy && !app.loading, c::save));
 		action(save, "Volver a entrenamientos", !c.busy, () -> app.navigate(AppController.Screen.TRAINING));
 		LinearLayout library = card("Añadir del catálogo", "Empieza por los ejercicios compatibles. Desmarca la opción para explorar todos y consultar su técnica.");
 		browser = new ExerciseBrowser(this, library, state.manualExerciseBrowser, "manual", true, new ExerciseBrowser.Results() {

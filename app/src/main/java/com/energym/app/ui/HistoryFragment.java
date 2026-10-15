@@ -169,6 +169,16 @@ public final class HistoryFragment extends ScreenFragment {
 		if (n != null && n.historyCalories(selected) > 0)
 			detail.append("\nComida: ").append(Math.round(n.historyCalories(selected))).append(" kcal");
 		text(calendar, detail.toString(), R.style.EnerGym_Body, 12);
+		long scope = app.accountRevision();
+		for (Session session : that)
+			action(calendar, "Eliminar sesión: " + session.getRoutine().getTitle(), !app.trainingMutation, () ->
+				new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+					.setTitle("¿Eliminar esta sesión?")
+					.setMessage("Se quitará de tu historial y se recalculará el progreso. La rutina se conserva. No se puede deshacer.")
+					.setNegativeButton("Cancelar", null)
+					.setPositiveButton("Eliminar", (dialog, button) -> {
+						if (scope == app.accountRevision()) app.deleteSession(session);
+					}).show());
 	}
 
 	// ---------------- Objetivos ----------------

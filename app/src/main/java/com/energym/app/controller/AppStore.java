@@ -57,6 +57,16 @@ public interface AppStore {
 		callback.failure(new UnsupportedOperationException("Este almacén no admite rutinas manuales"));
 	}
 
+	/** Edición explícita: nueva versión y archivo de la anterior en una transacción por cuenta. */
+	default void replaceManual(String originalId, Routine value, Callback<Routine> callback) {
+		callback.failure(new UnsupportedOperationException("Este almacén no admite editar rutinas"));
+	}
+
+	/** Lápida sincronizable, sin destruir los snapshots históricos. */
+	default void archiveTraining(boolean routine, String syncId, Callback<Void> callback) {
+		callback.failure(new UnsupportedOperationException("Este almacén no admite eliminar entrenamientos"));
+	}
+
 	/**
 	 * Aceptación explícita de perfil propuesto y rutina juntos, comparando el perfil vigente.
 	 */

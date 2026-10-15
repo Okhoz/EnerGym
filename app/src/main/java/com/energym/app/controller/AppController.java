@@ -58,7 +58,7 @@ public final class AppController {
 	public Screen screen = Screen.HOME, tab = Screen.HOME;
 	public Exercise exercise;
 	public String error = "", notice = "";
-	public boolean loading;
+	public boolean loading, trainingMutation;
 	/** Becomes true only when a current account snapshot includes cached or validated restored data. */
 	public boolean initialDataReady = true;
 	private final AppStore store;
@@ -181,6 +181,9 @@ public final class AppController {
 		error = "";
 	}
 
+	/** Invalida los diálogos abiertos antes de cambiar de cuenta, incluso A → B → A. */
+	public long accountRevision() { return generation; }
+
 	public String owner() {
 		return owner;
 	}
@@ -214,7 +217,7 @@ public final class AppController {
 		notice = "";
 		screen = Screen.HOME;
 		tab = Screen.HOME;
-		loading = false;
+		loading = trainingMutation = false;
 		if (owner != null)
 			reload();
 		else
@@ -294,6 +297,7 @@ public final class AppController {
 	}
 
 	public void createRoutine() {
+		if (trainingMutation) return;
 		if (owner == null) {
 			navigate(Screen.ACCOUNT);
 			return;
@@ -304,6 +308,7 @@ public final class AppController {
 	}
 
 	public void startSession() {
+		if (trainingMutation || loading || !initialDataReady) return;
 		if (sessions.session != null && sessions.session.getStatus() == Session.Status.DRAFT &&
 			routines.accepted != null && !sessions.session.getRoutine().getProposalId().equals(routines.accepted.getProposalId())) {
 			error("Ya hay una sesión de otra rutina abierta. Continúala o finalízala antes de empezar la seleccionada.");
@@ -316,6 +321,7 @@ public final class AppController {
 	}
 
 	public void createManualRoutine() {
+		if (trainingMutation) return;
 		if (owner == null) {
 			navigate(Screen.ACCOUNT);
 			return;
@@ -328,8 +334,59 @@ public final class AppController {
 		navigate(Screen.MANUAL_ROUTINE);
 	}
 
+	/** Las rutinas de IA también se pueden ajustar a mano, guardando una nueva versión. */
+	public void editRoutine(Routine routine) {
+		if (loading || trainingMutation || !initialDataReady || owner == null) return;
+		for (Routine version : versions)
+			if (version.getProposalId().equals(routine.getProposalId())) {
+				manual.edit(version);
+				if (manual.editing()) navigate(Screen.MANUAL_ROUTINE);
+				else if (!manual.error.isEmpty()) error(manual.error);
+				return;
+			}
+		error("Esta rutina ya no está disponible en tu cuenta.");
+	}
+
+	public void deleteRoutine(Routine routine) {
+		if (routine != null) archiveTraining(true, routine.getProposalId());
+	}
+
+	public void deleteSession(Session session) {
+		if (session != null) archiveTraining(false, session.getSyncId());
+	}
+
+	private void archiveTraining(boolean routine, String syncId) {
+		if (owner == null || loading || trainingMutation || routines.busy || sessions.busy || manual.busy || !initialDataReady) return;
+		boolean found = routine ? versions.stream().anyMatch(r -> r.getProposalId().equals(syncId)) :
+			history.stream().anyMatch(s -> s.getSyncId().equals(syncId)) || pending.stream().anyMatch(s -> s.getSyncId().equals(syncId)) ||
+			(sessions.session != null && sessions.session.getSyncId().equals(syncId));
+		if (!found) { error("Este entrenamiento ya no está disponible en tu cuenta."); return; }
+		trainingMutation = true;
+		long token = generation;
+		changed();
+		store.archiveTraining(routine, syncId, new AppStore.Callback<Void>() {
+			public void success(Void ignored) {
+				if (token != generation) return;
+				trainingMutation = false;
+				if (routine && Objects.equals(selectedRoutineId, syncId)) {
+					selectedRoutineId = null;
+					routines.accepted = lastLoadedRoutine = null;
+				}
+				if (!routine && sessions.session != null && sessions.session.getSyncId().equals(syncId)) sessions.reset();
+				notice = routine ? "Rutina eliminada. Tus sesiones registradas se conservan." : "Sesión eliminada del progreso.";
+				reload();
+				if (!routine && screen == Screen.SESSION) navigate(Screen.TRAINING);
+			}
+			public void failure(Exception e) {
+				if (token != generation) return;
+				trainingMutation = false;
+				error(e.getMessage());
+			}
+		});
+	}
+
 	public void selectRoutine(String proposalId) {
-		if (routines.busy)
+		if (routines.busy || trainingMutation)
 			return;
 		for (Routine version : versions)
 			if (version.getProposalId().equals(proposalId)) {

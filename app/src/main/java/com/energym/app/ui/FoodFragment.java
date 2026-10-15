@@ -26,14 +26,14 @@ public final class FoodFragment extends ScreenFragment {
 			return;
 		}
 		heading("NUTRICIÓN · " + NutritionFragment.label(n.selected, n.today()).toUpperCase(NutritionFragment.SPANISH),
-			n.product == null ? "Añadir alimento" : n.product.name, n.status);
+			n.editingFood() ? "Editar alimento" : n.product == null ? "Añadir alimento" : n.product.name, n.status);
 		if (n.looking) {
 			card("Buscando la ficha…", "Consultando Open Food Facts con el código escaneado.");
 			return;
 		}
 		Map<String, String> d = n.foodDraft;
 		FoodProduct p = n.product;
-		if (p == null && d.getOrDefault("barcode", "").isEmpty() && d.getOrDefault("name", "").isEmpty())
+		if (!n.editingFood() && p == null && d.getOrDefault("barcode", "").isEmpty() && d.getOrDefault("name", "").isEmpty())
 			recents(n);
 		FoodEntry.Unit unit = FoodEntry.Unit.valueOf(d.getOrDefault("unit", "G"));
 		if (p != null)
@@ -83,7 +83,12 @@ public final class FoodFragment extends ScreenFragment {
 		field(values, d, "carbs100", "Hidratos de carbono (g)" + base, refresh);
 		field(values, d, "fat100", "Grasas (g)" + base, refresh);
 		refresh.run();
-		primary(action(rows, "Añadir al diario", !n.busy, () -> n.addFood(() -> app.navigate(Screen.NUTRITION))));
+		primary(action(rows, n.editingFood() ? "Guardar cambios" : "Añadir al diario", !n.busy,
+			() -> n.addFood(() -> app.navigate(Screen.NUTRITION))));
+		action(rows, "Cancelar", !n.busy, () -> {
+			n.cancelFood();
+			app.navigate(Screen.NUTRITION);
+		});
 	}
 
 	/**

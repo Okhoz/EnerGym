@@ -28,6 +28,9 @@ public final class SessionRepository {
 			if (old != null &&
 				SnapshotCodec.decodeSession(old.record.getPayload()).getStatus() == Session.Status.FINISHED)
 				return old.id;
+			if (new TrainingArchiveRepository(database).contains(SyncRecord.Kind.SESSION, session.getSyncId()) ||
+				(old == null && new TrainingArchiveRepository(database).contains(SyncRecord.Kind.ROUTINE, session.getRoutine().getProposalId())))
+				throw new IllegalArgumentException("El entrenamiento ya está eliminado");
 			Routine accepted = routines.load(session.getRoutine().getVersionId());
 			if (accepted == null ||
 				!SnapshotCodec.encodeRoutine(accepted).equals(SnapshotCodec.encodeRoutine(session.getRoutine())))
@@ -46,7 +49,7 @@ public final class SessionRepository {
 
 	public Session load(long id) {
 		EnerGymDatabase.Row row = database.find(SyncRecord.Kind.SESSION, id);
-		return row == null ? null : decode(row);
+		return row == null || new TrainingArchiveRepository(database).contains(SyncRecord.Kind.SESSION, row.record.getSyncId()) ? null : decode(row);
 	}
 
 	/**
@@ -64,7 +67,7 @@ public final class SessionRepository {
 	public void finish(long id) {
 		database.transaction(() -> {
 			EnerGymDatabase.Row row = database.find(SyncRecord.Kind.SESSION, id);
-			if (row == null)
+			if (row == null || new TrainingArchiveRepository(database).contains(SyncRecord.Kind.SESSION, row.record.getSyncId()))
 				throw new IllegalArgumentException("Sesión inexistente para esta cuenta");
 			Session original = SnapshotCodec.decodeSession(row.record.getPayload());
 			if (original.getStatus() != Session.Status.FINISHED)
@@ -84,7 +87,10 @@ public final class SessionRepository {
 
 	private List<Session> list(Session.Status status) {
 		List<Session> result = new ArrayList<>();
+		Set<String> archived = new TrainingArchiveRepository(database).targets(SyncRecord.Kind.SESSION);
 		for (EnerGymDatabase.Row row : database.rows(SyncRecord.Kind.SESSION, null)) {
+			if (archived.contains(row.record.getSyncId()))
+				continue;
 			Session session = decode(row);
 			if (session.getStatus() == status)
 				result.add(session);

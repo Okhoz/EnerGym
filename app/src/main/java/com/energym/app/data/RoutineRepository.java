@@ -63,6 +63,23 @@ public final class RoutineRepository {
 		});
 	}
 
+	/** Reemplaza la ficha visible; conserva la versión anterior en los snapshots de las sesiones. */
+	public Routine replaceManual(String originalId, Routine replacement) {
+		return database.transaction(() -> {
+			if (originalId.equals(replacement.getProposalId()))
+				throw new IllegalArgumentException("La edición necesita una nueva versión");
+			Routine original = bySyncId(originalId);
+			if (original == null)
+				throw new IllegalArgumentException("La rutina no pertenece a esta cuenta");
+			TrainingArchiveRepository archived = new TrainingArchiveRepository(database);
+			if (archived.contains(SyncRecord.Kind.ROUTINE, originalId) && bySyncId(replacement.getProposalId()) == null)
+				throw new IllegalArgumentException("La rutina ya está eliminada o fue editada en otro dispositivo");
+			long id = saveManual(replacement);
+			archived.archive(SyncRecord.Kind.ROUTINE, originalId);
+			return load(id);
+		});
+	}
+
 	/**
 	 * Compara recursos/consentimiento dentro de SQLite; ningún fallo deja el perfil parcialmente guardado.
 	 */
@@ -82,8 +99,10 @@ public final class RoutineRepository {
 		// El empate entre dispositivos se resuelve por UUID ascendente, nunca por el ID SQLite regenerado.
 		rows.sort(Comparator.<EnerGymDatabase.Row>comparingLong(row -> row.record.getUpdatedAt()).reversed()
 			.thenComparing(row -> row.record.getSyncId()));
+		Set<String> archived = new TrainingArchiveRepository(database).targets(SyncRecord.Kind.ROUTINE);
 		for (EnerGymDatabase.Row row : rows)
-			result.add(decode(row));
+			if (!archived.contains(row.record.getSyncId()))
+				result.add(decode(row));
 		return Collections.unmodifiableList(result);
 	}
 

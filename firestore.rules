@@ -14,7 +14,7 @@ service cloud.firestore {
 				&& d.revision is int && d.revision > 0 && d.updatedAt is int && d.updatedAt > 0
 				&& d.cloudVersion is int && d.cloudVersion > 0 && d.identity is string && d.terminal is bool
 				&& ((kind == 'PROFILE' && d.identity == '' && d.terminal == false)
-				|| (kind == 'ROUTINE' && d.identity.matches('[a-f0-9]{64}') && d.terminal == true)
+				|| ((kind == 'ROUTINE' || kind == 'TRAINING_ARCHIVE') && d.identity.matches('[a-f0-9]{64}') && d.terminal == true)
 				|| (kind == 'SESSION' && d.identity.matches('[a-f0-9]{64}'))
 				|| ((kind == 'BODY' || kind == 'WEIGHT') && d.identity == '' && d.terminal == false)
 				|| ((kind == 'FOOD' || kind == 'GOAL') && d.identity.matches('[a-f0-9]{64}')));
@@ -35,6 +35,13 @@ service cloud.firestore {
 			allow create: if owns(uid) && valid(uid, 'ROUTINE', id) && request.resource.data.cloudVersion == 1;
 			allow update, delete: if false;
 			// Una aceptación es una versión histórica inmutable.
+		}
+
+		// Lápidas definitivas; no borran versiones históricas ni datos de otra cuenta.
+		match /users/{uid}/trainingArchive/{id} {
+			allow read: if owns(uid);
+			allow create: if owns(uid) && valid(uid, 'TRAINING_ARCHIVE', id) && request.resource.data.cloudVersion == 1;
+			allow update, delete: if false;
 		}
 		match /users/{uid}/sessions/{id} {
 			allow read: if owns(uid);
@@ -59,7 +66,7 @@ service cloud.firestore {
 		match /users/{uid}/food/{id} {
 			allow read: if owns(uid);
 			allow create: if owns(uid) && valid(uid, 'FOOD', id) && request.resource.data.cloudVersion == 1;
-			// Solo una transición: activo → lápida (terminal), con la misma identidad.
+			// Ediciones de un alimento activo y transición a lápida definitiva, con la misma identidad.
 			allow update: if owns(uid) && valid(uid, 'FOOD', id) && nextVersion()
 				&& request.resource.data.identity == resource.data.identity && resource.data.terminal == false;
 			allow delete: if false;
@@ -71,6 +78,10 @@ service cloud.firestore {
 			allow update: if owns(uid) && valid(uid, 'GOAL', id) && nextVersion()
 				&& request.resource.data.identity == resource.data.identity && resource.data.terminal == false;
 			allow delete: if false;
+		}
+		// Sólo el backend autenticado mediante IAM administra las cuotas; ningún cliente accede.
+		match /assistant_quotas/{document=**} {
+			allow read, write: if false;
 		}
 		match /{document=**} {
 			allow read, write: if false;

@@ -36,6 +36,19 @@ public final class NutritionRepository {
 		});
 	}
 
+	/** Actualiza la misma entrada; una lápida nunca vuelve a convertirse en un alimento activo. */
+	public void update(FoodEntry entry) {
+		database.transaction(() -> {
+			EnerGymDatabase.Row row = database.find(SyncRecord.Kind.FOOD, entry.id);
+			if (row == null || deleted(row.record.getPayload()))
+				throw new IllegalArgumentException("El alimento ya no está disponible en esta cuenta");
+			FoodEntry previous = decodeFood(row.record.getPayload());
+			if (previous.createdAt != entry.createdAt || !previous.day.equals(entry.day))
+				throw new IllegalArgumentException("La edición no puede cambiar la identidad ni el día del registro");
+			return database.writeLocal(SyncRecord.Kind.FOOD, entry.id, encodeFood(entry));
+		});
+	}
+
 	/**
 	 * Sustituye el alimento por su lápida; un ID desconocido o ya borrado no escribe nada.
 	 */

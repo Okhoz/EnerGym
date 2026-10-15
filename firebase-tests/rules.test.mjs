@@ -31,7 +31,7 @@ before(async () => {
 		projectId: 'demo-energym',
 		firestore: {
 			host: '127.0.0.1',
-			port: 8080,
+			port: Number(process.env.FIRESTORE_EMULATOR_HOST?.split(':').at(-1) || '18080'),
 			rules: readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8')
 		}
 	});
@@ -53,7 +53,7 @@ function data(kind = 'PROFILE', id = 'profile') {
 		updatedAt: 1000,
 		cloudVersion: 1,
 		identity: kind === 'PROFILE' ? '' : 'a'.repeat(64),
-		terminal: kind === 'ROUTINE'
+		terminal: kind === 'ROUTINE' || kind === 'TRAINING_ARCHIVE'
 	};
 }
 function db(uid) {
@@ -193,4 +193,67 @@ test('goals follow the same active to tombstone lifecycle', async () => {
 	await assertSucceeds(setDoc(ref, goal({cloudVersion: 2, updatedAt: 1001, terminal: true})));
 	await assertFails(setDoc(ref, goal({cloudVersion: 3, updatedAt: 1002})));
 	await assertFails(getDoc(doc(db('bob'), 'users/alice/goals/goal-1')));
+});
+
+test('training archive owner can create read and query immutable tombstones', async () => {
+	const own = db('alice');
+	const ref = doc(own, 'users/alice/trainingArchive/Routine_archived-1');
+	const archive = data('TRAINING_ARCHIVE', 'Routine_archived-1');
+	await assertSucceeds(setDoc(ref, archive));
+	await assertSucceeds(getDoc(ref));
+	await assertSucceeds(getDocs(query(collection(own, 'users/alice/trainingArchive'), orderBy(documentId()), limit(100))));
+	await assertFails(setDoc(ref, {...archive, cloudVersion: 2, revision: 2, updatedAt: 1001}));
+	await assertFails(deleteDoc(ref));
+});
+
+test('training archive denies foreign and unauthenticated reads creates queries and deletes', async () => {
+	const path = 'users/alice/trainingArchive/Session_archived-1';
+	await setDoc(doc(db('alice'), path), data('TRAINING_ARCHIVE', 'Session_archived-1'));
+	for (const uid of [undefined, 'bob']) {
+		const client = db(uid);
+		await assertFails(getDoc(doc(client, path)));
+		await assertFails(getDocs(collection(client, 'users/alice/trainingArchive')));
+		await assertFails(setDoc(doc(client, 'users/alice/trainingArchive/Session_new-1'),
+			data('TRAINING_ARCHIVE', 'Session_new-1')));
+		await assertFails(deleteDoc(doc(client, path)));
+	}
+});
+
+test('training archive rejects invalid envelope payload owner identity and initial version', async () => {
+	const ref = doc(db('alice'), 'users/alice/trainingArchive/Routine_invalid-1');
+	const archive = data('TRAINING_ARCHIVE', 'Routine_invalid-1');
+	for (const invalid of [
+		{...archive, ownerUid: 'bob'}, {...archive, kind: 'ROUTINE'}, {...archive, syncId: 'different'},
+		{...archive, terminal: false}, {...archive, identity: ''}, {...archive, identity: 'g'.repeat(64)},
+		{...archive, cloudVersion: 2}, {...archive, revision: 0}, {...archive, updatedAt: 0},
+		{...archive, payload: ''}, {...archive, payload: {target: 'routine'}},
+		{...archive, payload: '€'.repeat(200001)}, {...archive, extra: true}
+	]) await assertFails(setDoc(ref, invalid));
+});
+
+test('food edits keep identity until the terminal tombstone then never resurrect', async () => {
+	const ref = doc(db('alice'), 'users/alice/food/meal-edited');
+	const original = nutrition('FOOD', 'meal-edited');
+	await assertSucceeds(setDoc(ref, original));
+	await assertSucceeds(setDoc(ref, {...original, payload: '{"amount":150}', cloudVersion: 2, revision: 2, updatedAt: 1001}));
+	await assertFails(setDoc(ref, {...original, identity: 'c'.repeat(64), cloudVersion: 3, revision: 3, updatedAt: 1002}));
+	await assertSucceeds(setDoc(ref, {...original, terminal: true, cloudVersion: 3, revision: 3, updatedAt: 1002}));
+	await assertFails(setDoc(ref, {...original, cloudVersion: 4, revision: 4, updatedAt: 1003}));
+});
+
+test('quota documents deny mobile reads writes deletes and queries for every identity', async () => {
+	await env.withSecurityRulesDisabled(async (context) => {
+		await setDoc(doc(context.firestore(), 'assistant_quotas/energym_global'), {
+			day: '2026-10-15', dayCount: 1, minutePeriod: 29869680, minuteCount: 1
+		});
+	});
+	for (const uid of [undefined, 'alice', 'bob']) {
+		const client = db(uid);
+		await assertFails(getDoc(doc(client, 'assistant_quotas/energym_global')));
+		await assertFails(setDoc(doc(client, 'assistant_quotas/energym_global'), {dayCount: 0}));
+		await assertFails(setDoc(doc(client, 'assistant_quotas/energym_u_fixture'), {dayCount: 0}));
+		await assertFails(deleteDoc(doc(client, 'assistant_quotas/energym_global')));
+		await assertFails(getDocs(collection(client, 'assistant_quotas')));
+		await assertFails(setDoc(doc(client, 'assistant_quotas/energym_global/nested/counter'), {dayCount: 0}));
+	}
 });

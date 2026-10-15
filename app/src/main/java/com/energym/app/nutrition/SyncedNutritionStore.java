@@ -110,6 +110,13 @@ public final class SyncedNutritionStore implements NutritionStore {
 		}, callback);
 	}
 
+	public void update(String owner, FoodEntry entry, Callback<Void> callback) {
+		run(owner, true, repo -> {
+			repo.update(entry);
+			return null;
+		}, callback);
+	}
+
 	public void remove(String owner, String entryId, Callback<Void> callback) {
 		run(owner, true, repo -> {
 			repo.remove(entryId);

@@ -61,6 +61,17 @@ public final class SessionFragment extends ScreenFragment {
 			app.sessions.session.getResults().size() + " de " + ids.size() +
 				" ejercicios registrados. Guarda todos antes de finalizar.");
 		action(finish, "Finalizar sesión", !app.sessions.busy, app.sessions::finish);
+		action(finish, "Eliminar borrador", !app.sessions.busy && !app.trainingMutation, () -> {
+			Session current = app.sessions.session;
+			long scope = app.accountRevision();
+			new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+				.setTitle("¿Eliminar este borrador?")
+				.setMessage("Se eliminarán sus registros de tu cuenta. Esta acción no se puede deshacer.")
+				.setNegativeButton("Cancelar", null)
+				.setPositiveButton("Eliminar", (dialog, button) -> {
+					if (scope == app.accountRevision()) app.deleteSession(current);
+				}).show();
+		});
 	}
 }
 
