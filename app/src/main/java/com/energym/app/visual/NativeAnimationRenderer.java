@@ -135,7 +135,7 @@ public final class NativeAnimationRenderer implements UiHelper.RendererCallback,
 		for (int i = 0; i < 3; i++)
 			center[i] = c[i];
 		baseDistance = Math.max(.2, 3.0 * Math.max(h[0], Math.max(h[1], h[2])));
-		// El límite de reposo es vertical; el GLB incorpora CamTarget para centrar la flexión horizontal.
+		// El límite de reposo no sigue la pose animada; cada GLB incorpora CamTarget para centrar el cuerpo.
 		int target = asset.getFirstEntityByName("CamTarget");
 		if (target != 0) {
 			TransformManager transforms = engine.getTransformManager();

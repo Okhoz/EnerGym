@@ -51,6 +51,159 @@
 				0.5,
 				1.0
 			]
+		},
+		{
+			"exerciseId": "jumping-jacks",
+			"assetPath": "visual/jumping_jacks_native.glb",
+			"sha256": "dd6f6e860be59702714edefed5dac8265d391c4d4a2244ac7fea18b52ef2abfa",
+			"sourceSha256": "94aa534eded3272a61f775d3a7067a9093df97c99f5505d64e39251c46697a0e",
+			"adaptation": "Removed orphan Human weights animation: zero mesh morph targets. Mesh, rig and BIN unchanged.",
+			"binaryChunkSha256": "b8c2aee85ea30f7510998da1b6d3fd0fb5828a636fc9b68902d705e1e276ae3f",
+			"sourceUrl": "https://assiamahs.github.io/opengym3d/assets/jumping_jack.glb",
+			"sourceRevision": "ea3a60130fdcfb3c4771e44d09f84ebab4ee9bae",
+			"sourceRevisionNote": "GitHub Pages deployment of ea3a601 (render & deploy run 35005945810, 2026-09-15) was the live export on 2026-10-15; the spec exercises/jumping_jack.json maps to cc0/mesh2motion/human-addon-animations.glb#Jumping Jacks. Bytes identified by SHA-256.",
+			"license": "CC0-1.0",
+			"licenseFiles": [
+				"visual/licenses/Mesh2Motion-CC0.md",
+				"visual/licenses/CC0-1.0.txt"
+			],
+			"creators": "OpenGym3D · Mesh2Motion · MakeHuman/MPFB core assets",
+			"reviewStatus": "TECHNICAL_PREVIEW_PROFESSIONAL_REVIEW_PENDING",
+			"professionallyReviewed": false,
+			"technicalEvidence": "Mesh2Motion clip «Jumping Jacks» retargeted by OpenGym3D onto the MakeHuman rig. Same orphan Human weights clip as push_up.glb (zero morph targets) removed by tools/normalize_opengym3d.py; BIN chunk byte-identical. Filament runtime acceptance pending device check, see docs/resources.md.",
+			"capabilities": [
+				"play",
+				"pause",
+				"speed",
+				"view",
+				"marker",
+				"rotate",
+				"zoom"
+			],
+			"views": [
+				"front",
+				"side",
+				"rear",
+				"reset"
+			],
+			"regions": [],
+			"clipNames": [
+				"Human.rig"
+			],
+			"durationSeconds": 1.266667,
+			"markers": {
+				"initial": 0,
+				"middle": 0.6333335,
+				"final": 1.266667
+			},
+			"markerMeaning": "Timeline samples of the inspected clips, not professionally approved movement phases; initial and final belong to a near-closed loop.",
+			"speeds": [
+				0.25,
+				0.5,
+				1.0
+			]
+		},
+		{
+			"exerciseId": "running-easy",
+			"assetPath": "visual/jog_native.glb",
+			"sha256": "ad9cb7c7b9828e1f65d00a6d02b3afddf0a0fe52070eca5e335300c1231d5a2c",
+			"sourceSha256": "3e20fe0299cd78c9534f4c1320a4e2e4f31f8b4ae51598a69065f93a43a0c020",
+			"adaptation": "Removed orphan Human weights animation: zero mesh morph targets. Mesh, rig and BIN unchanged.",
+			"binaryChunkSha256": "05ec689556476c4419480c1688fd43456057457f1463303172866d2995fa246b",
+			"sourceUrl": "https://assiamahs.github.io/opengym3d/assets/jog.glb",
+			"sourceRevision": "ea3a60130fdcfb3c4771e44d09f84ebab4ee9bae",
+			"sourceRevisionNote": "GitHub Pages deployment of ea3a601 (render & deploy run 35005945810, 2026-09-15) was the live export on 2026-10-15; the spec exercises/jog.json maps to cc0/mesh2motion/human-base-animations.glb#Jog. Bytes identified by SHA-256.",
+			"license": "CC0-1.0",
+			"licenseFiles": [
+				"visual/licenses/Mesh2Motion-CC0.md",
+				"visual/licenses/CC0-1.0.txt"
+			],
+			"creators": "OpenGym3D · Mesh2Motion · MakeHuman/MPFB core assets",
+			"reviewStatus": "TECHNICAL_PREVIEW_PROFESSIONAL_REVIEW_PENDING",
+			"professionallyReviewed": false,
+			"technicalEvidence": "Mesh2Motion clip «Jog» (jog in place) retargeted by OpenGym3D; shows stride and arm swing, not outdoor travel or pace. Same orphan Human weights clip as push_up.glb (zero morph targets) removed by tools/normalize_opengym3d.py; BIN chunk byte-identical. Filament runtime acceptance pending device check, see docs/resources.md.",
+			"capabilities": [
+				"play",
+				"pause",
+				"speed",
+				"view",
+				"marker",
+				"rotate",
+				"zoom"
+			],
+			"views": [
+				"front",
+				"side",
+				"rear",
+				"reset"
+			],
+			"regions": [],
+			"clipNames": [
+				"Human.rig"
+			],
+			"durationSeconds": 1.2,
+			"markers": {
+				"initial": 0,
+				"middle": 0.6,
+				"final": 1.2
+			},
+			"markerMeaning": "Timeline samples of the inspected clips, not professionally approved movement phases; initial and final belong to a near-closed loop.",
+			"speeds": [
+				0.25,
+				0.5,
+				1.0
+			]
+		},
+		{
+			"exerciseId": "brisk-walk",
+			"assetPath": "visual/walk_native.glb",
+			"sha256": "fb71090b36eb0f03a17b451618e6a28a0bb83e043baf7c1f348acf3b890c92f5",
+			"sourceSha256": "789867cd7f3ab8362f29632d1b424eb0f31193fca3a05318ac830a03b2115eb1",
+			"adaptation": "Removed orphan Human weights animation: zero mesh morph targets. Mesh, rig and BIN unchanged.",
+			"binaryChunkSha256": "55decda8a7701e5edb2798ed3a7d1e207220a0d168afc1a3d5cd07116cc34a77",
+			"sourceUrl": "https://assiamahs.github.io/opengym3d/assets/walk.glb",
+			"sourceRevision": "ea3a60130fdcfb3c4771e44d09f84ebab4ee9bae",
+			"sourceRevisionNote": "GitHub Pages deployment of ea3a601 (render & deploy run 35005945810, 2026-09-15) was the live export on 2026-10-15; the spec exercises/walk.json maps to cc0/mesh2motion/human-base-animations.glb#Walk. Bytes identified by SHA-256.",
+			"license": "CC0-1.0",
+			"licenseFiles": [
+				"visual/licenses/Mesh2Motion-CC0.md",
+				"visual/licenses/CC0-1.0.txt"
+			],
+			"creators": "OpenGym3D · Mesh2Motion · MakeHuman/MPFB core assets",
+			"reviewStatus": "TECHNICAL_PREVIEW_PROFESSIONAL_REVIEW_PENDING",
+			"professionallyReviewed": false,
+			"technicalEvidence": "Mesh2Motion clip «Walk» (walk in place) retargeted by OpenGym3D; shows step and arm swing, not brisk-walk speed. Same orphan Human weights clip as push_up.glb (zero morph targets) removed by tools/normalize_opengym3d.py; BIN chunk byte-identical. Filament runtime acceptance pending device check, see docs/resources.md.",
+			"capabilities": [
+				"play",
+				"pause",
+				"speed",
+				"view",
+				"marker",
+				"rotate",
+				"zoom"
+			],
+			"views": [
+				"front",
+				"side",
+				"rear",
+				"reset"
+			],
+			"regions": [],
+			"clipNames": [
+				"Human.rig"
+			],
+			"durationSeconds": 1.7,
+			"markers": {
+				"initial": 0,
+				"middle": 0.85,
+				"final": 1.7
+			},
+			"markerMeaning": "Timeline samples of the inspected clips, not professionally approved movement phases; initial and final belong to a near-closed loop.",
+			"speeds": [
+				0.25,
+				0.5,
+				1.0
+			]
 		}
 	]
 }

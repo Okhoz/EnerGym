@@ -117,8 +117,7 @@ public final class AppState extends AndroidViewModel {
 		});
 		ExerciseResourcePolicy resourcePolicy;
 		try {
-			resourcePolicy = new ExerciseResourcePolicy(catalog,
-				Collections.singletonList(PackagedResources.load(context).forExercise("standard-pushup")));
+			resourcePolicy = new ExerciseResourcePolicy(catalog, PackagedResources.load(context).all());
 		} catch (Exception e) {
 			resourcePolicy = new ExerciseResourcePolicy(catalog, Collections.emptyList());
 		}

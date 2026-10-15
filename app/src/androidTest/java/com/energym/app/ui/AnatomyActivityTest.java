@@ -81,6 +81,24 @@ public class AnatomyActivityTest {
 	}
 
 	@Test
+	public void additionalCc0ResourcesLoadInFilamentAndMove() throws Exception {
+		for (String id : new String[]{"jumping-jacks", "running-easy", "brisk-walk"}) {
+			launch(id);
+			awaitReady();
+			click("viewer_initial");
+			Bitmap initial = captureSurface("viewer-" + id + "-initial.png");
+			assertTrue(id, nonBlack(initial) > 1500);
+			click("viewer_middle");
+			Bitmap middle = captureSurface("viewer-" + id + "-middle.png");
+			assertTrue("No cambia la pose real: " + id, different(initial, middle) > 150);
+			android.util.Log.i("EnerGymViewerQA", id + " initialSamples=" + nonBlack(initial) + " initialMiddle=" +
+				different(initial, middle));
+			context.sendBroadcast(new Intent(AnatomyActivity.ACTION_CLOSE).setPackage(context.getPackageName()));
+			awaitGone();
+		}
+	}
+
+	@Test
 	public void remoteNativeMeshMovesAndRealButtonsControlCamera() throws Exception {
 
 		launch("standard-pushup");

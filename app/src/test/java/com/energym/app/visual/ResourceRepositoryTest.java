@@ -35,6 +35,54 @@ public class ResourceRepositoryTest {
 	}
 
 	@Test
+	public void everyVerifiedResourcePassesIntegrityWithPackagedBytes() throws Exception {
+		List<ResourceManifest> verified = ResourceManifest.verified();
+		ResourceRepository repo = new ResourceRepository(verified, path -> Files.newInputStream(Paths.get("src/main/assets", path)));
+		Set<String> paths = new HashSet<>();
+		for (ResourceManifest r : verified) {
+			assertTrue(paths.add(r.assetPath));
+			assertSame(r, repo.forExercise(r.exerciseId));
+			assertFalse(r.professionallyReviewed);
+			assertEquals("CC0-1.0", r.license);
+			assertEquals(Collections.singleton("Human.rig"), r.clipNames);
+			assertEquals(r.duration, r.markers.get("final"), 0f);
+			assertEquals(r.duration / 2, r.markers.get("middle"), .000001f);
+			assertTrue(repo.loadVerified(r).length > 5_000_000);
+		}
+		assertEquals(Arrays.asList("standard-pushup", "jumping-jacks", "running-easy", "brisk-walk"), new ArrayList<>(ids(repo.all())));
+		assertNull(repo.forExercise("knee-pushup"));
+		assertNull(repo.forExercise("burpee"));
+	}
+
+	@Test
+	public void packagedManifestAndCatalogDeclareEachVerifiedResource() throws Exception {
+		String manifest = new String(Files.readAllBytes(Paths.get("src/main/assets/visual/manifest.json")), "UTF-8");
+		String catalog = new String(Files.readAllBytes(Paths.get("src/main/assets/catalog.json")), "UTF-8");
+		assertEquals(ResourceManifest.verified().size(), manifest.split("\"exerciseId\"", -1).length - 1);
+		for (ResourceManifest r : ResourceManifest.verified()) {
+			assertTrue(r.exerciseId, manifest.contains("\"exerciseId\": \"" + r.exerciseId + "\""));
+			assertTrue(r.exerciseId, manifest.contains("\"sha256\": \"" + r.sha256 + "\""));
+			assertTrue(r.exerciseId, manifest.contains("\"sourceSha256\": \"" + r.sourceSha256 + "\""));
+			assertTrue(r.exerciseId, manifest.contains("\"sourceUrl\": \"" + r.sourceUrl + "\""));
+			assertTrue(r.exerciseId, catalog.contains("\"id\": \"" + r.exerciseId + "\""));
+			// La adaptación solo reescribe JSON: el BIN empaquetado es el de la exportación original.
+			byte[] bytes = Files.readAllBytes(Paths.get("src/main/assets", r.assetPath));
+			int jsonSize = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt(12);
+			StringBuilder hash = new StringBuilder();
+			for (byte b : MessageDigest.getInstance("SHA-256").digest(Arrays.copyOfRange(bytes, 20 + jsonSize, bytes.length)))
+				hash.append(String.format("%02x", b & 255));
+			assertTrue(r.exerciseId, manifest.contains("\"binaryChunkSha256\": \"" + hash + "\""));
+		}
+	}
+
+	private static Set<String> ids(Collection<ResourceManifest> resources) {
+		Set<String> ids = new LinkedHashSet<>();
+		for (ResourceManifest r : resources)
+			ids.add(r.exerciseId);
+		return ids;
+	}
+
+	@Test
 	public void corruptFileFailsBeforeNativeParsing() throws Exception {
 		byte[] bytes = Files.readAllBytes(Paths.get("src/main/assets/visual/push_up_native.glb"));
 		bytes[100] ^= 1;

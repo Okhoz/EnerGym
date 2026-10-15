@@ -31,6 +31,10 @@ public final class ResourceRepository {
 		return byExercise.get(id);
 	}
 
+	public Collection<ResourceManifest> all() {
+		return Collections.unmodifiableCollection(byExercise.values());
+	}
+
 	/**
 	 * Lectura acotada y SHA-256 previo al motor. Un error se traduce a fallback, nunca se ignora.
 	 */

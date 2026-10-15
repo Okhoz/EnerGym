@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * Adaptador Android de datos: coteja el manifiesto con el único artefacto auditado de esta versión.
+ * Adaptador Android de datos: coteja el manifiesto con los artefactos auditados de esta versión.
  */
 public final class PackagedResources {
 	private PackagedResources() {
@@ -30,34 +30,45 @@ public final class PackagedResources {
 			}
 			JSONObject root = new JSONObject(bytes.toString(StandardCharsets.UTF_8.name()));
 			JSONArray rows = root.getJSONArray("resources");
-			if (root.getInt("version") != 1 || rows.length() != 1)
+			Map<String, ResourceManifest> expected = new LinkedHashMap<>();
+			for (ResourceManifest resource : ResourceManifest.verified())
+				expected.put(resource.exerciseId, resource);
+			if (root.getInt("version") != 1 || rows.length() != expected.size())
 				throw new IOException("Versión de recursos no admitida");
-			JSONObject row = rows.getJSONObject(0);
-			ResourceManifest expected = ResourceManifest.pushUp();
-			Map<String, Float> markers = new LinkedHashMap<>();
-			JSONObject markerJson = row.getJSONObject("markers");
-			Iterator<String> keys = markerJson.keys();
-			while (keys.hasNext()) {
-				String key = keys.next();
-				markers.put(key, (float) markerJson.getDouble(key));
+			List<ResourceManifest> resources = new ArrayList<>();
+			for (int i = 0; i < rows.length(); i++) {
+				ResourceManifest actual = parse(rows.getJSONObject(i));
+				// remove() impide que una fila duplicada ocupe el lugar de otro recurso verificado.
+				ResourceManifest audited = expected.remove(actual.exerciseId);
+				if (rows.getJSONObject(i).getBoolean("professionallyReviewed") || audited == null ||
+					!matches(actual, audited))
+					throw new IOException("Manifiesto fuera de la lista verificada técnicamente");
+				resources.add(actual);
 			}
-			Set<Float> speeds = new LinkedHashSet<>();
-			JSONArray speedJson = row.getJSONArray("speeds");
-			for (int i = 0; i < speedJson.length(); i++)
-				speeds.add((float) speedJson.getDouble(i));
-			ResourceManifest actual =
-				new ResourceManifest(row.getString("exerciseId"), row.getString("assetPath"), row.getString("sha256"),
-					row.getString("sourceSha256"), row.getString("adaptation"), row.getString("sourceUrl"),
-					row.getString("license"), row.getString("sourceRevision"), row.getString("reviewStatus"),
-					strings(row.getJSONArray("capabilities")), strings(row.getJSONArray("views")),
-					strings(row.getJSONArray("regions")), strings(row.getJSONArray("clipNames")), markers, speeds,
-					(float) row.getDouble("durationSeconds"));
-			if (row.getBoolean("professionallyReviewed") || !matches(actual, expected))
-				throw new IOException("Manifiesto fuera de la lista verificada técnicamente");
-			return new ResourceRepository(Collections.singletonList(actual), path -> context.getAssets().open(path));
+			return new ResourceRepository(resources, path -> context.getAssets().open(path));
 		} catch (JSONException | IllegalArgumentException e) {
 			throw new IOException("Manifiesto de recursos inválido", e);
 		}
+	}
+
+	private static ResourceManifest parse(JSONObject row) throws JSONException {
+		Map<String, Float> markers = new LinkedHashMap<>();
+		JSONObject markerJson = row.getJSONObject("markers");
+		Iterator<String> keys = markerJson.keys();
+		while (keys.hasNext()) {
+			String key = keys.next();
+			markers.put(key, (float) markerJson.getDouble(key));
+		}
+		Set<Float> speeds = new LinkedHashSet<>();
+		JSONArray speedJson = row.getJSONArray("speeds");
+		for (int i = 0; i < speedJson.length(); i++)
+			speeds.add((float) speedJson.getDouble(i));
+		return new ResourceManifest(row.getString("exerciseId"), row.getString("assetPath"), row.getString("sha256"),
+			row.getString("sourceSha256"), row.getString("adaptation"), row.getString("sourceUrl"),
+			row.getString("license"), row.getString("sourceRevision"), row.getString("reviewStatus"),
+			strings(row.getJSONArray("capabilities")), strings(row.getJSONArray("views")),
+			strings(row.getJSONArray("regions")), strings(row.getJSONArray("clipNames")), markers, speeds,
+			(float) row.getDouble("durationSeconds"));
 	}
 
 	private static Set<String> strings(JSONArray array) throws JSONException {
