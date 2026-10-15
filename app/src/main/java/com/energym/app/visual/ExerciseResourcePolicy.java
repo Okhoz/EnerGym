@@ -38,11 +38,15 @@ public final class ExerciseResourcePolicy {
 		return Collections.unmodifiableList(result);
 	}
 
+	/**
+	 * Las disciplinas asociadas (sportIds) no cambian el movimiento: añadir una no retira la vista 3D a rutinas
+	 * aceptadas antes.
+	 */
 	public static boolean same(Exercise a, Exercise b) {
 		return a != null && b != null && a.getId().equals(b.getId()) && a.getName().equals(b.getName()) &&
 			a.getDescription().equals(b.getDescription()) && a.getMetricType() == b.getMetricType() &&
 			a.getGoals().equals(b.getGoals()) && a.getEnvironments().equals(b.getEnvironments()) &&
-			a.getRequiredResources().equals(b.getRequiredResources()) && a.getSportIds().equals(b.getSportIds()) &&
+			a.getRequiredResources().equals(b.getRequiredResources()) &&
 			a.getCoverage() == b.getCoverage() && a.isReviewed() == b.isReviewed() &&
 			a.getAlternativeIds().equals(b.getAlternativeIds());
 	}
