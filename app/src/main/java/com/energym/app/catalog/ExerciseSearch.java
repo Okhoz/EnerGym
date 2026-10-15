@@ -83,7 +83,7 @@ public final class ExerciseSearch {
 			return 1;
 		if (all(terms, name))
 			return 2;
-		String identifiers = name + " " + normalize(e.getId());
+		String identifiers = name + " " + normalize(e.getId()) + " " + aliases(e.getId());
 		if (all(terms, identifiers))
 			return 3;
 		StringBuilder metadata = new StringBuilder(identifiers);
@@ -94,6 +94,27 @@ public final class ExerciseSearch {
 		return all(terms, metadata + " " + normalize(e.getDescription())) ? 5 : -1;
 	}
 
+	/** Nombres habituales de los básicos: apuntan al mismo ID y respetan todos los filtros. */
+	private String aliases(String exerciseId) {
+		switch (exerciseId) {
+			case "barbell-back-squat": return "sentadilla convencional sentadilla clasica sentadilla libre back squat";
+			case "barbell-deadlift": return "peso muerto convencional peso muerto clasico conventional deadlift";
+			case "barbell-bench-press": return "press plano press banca plano bench press";
+			case "barbell-overhead-press": return "press militar de pie overhead press";
+			case "barbell-row": return "remo inclinado con barra bent over row";
+			case "barbell-romanian-deadlift": return "peso muerto rumano romanian deadlift rdl";
+			case "lat-pulldown": return "jalones al pecho polea alta lat pulldown";
+			case "seated-cable-row": return "remo sentado polea baja cable row";
+			case "leg-press": return "prensa cuadriceps leg press";
+			case "leg-extension": return "extension cuadriceps extensiones de piernas leg extension";
+			case "leg-curl": return "curl piernas femoral tumbado leg curl";
+			case "dumbbell-lateral-raise": return "elevaciones laterales de hombros lateral raise";
+			case "barbell-hip-thrust": return "empuje de cadera hip thrust gluteos";
+			case "cable-triceps-pushdown": return "triceps polea pushdown";
+			case "parallel-bar-dips": return "fondos paralelas dips";
+			default: return "";
+		}
+	}
 	private boolean all(List<String> terms, String text) {
 		List<String> words = Arrays.asList(text.split(" "));
 		for (String term : terms) {

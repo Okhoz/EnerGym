@@ -92,4 +92,18 @@ public final class ExerciseSearchTest {
 		assertTrue(find("", new ExerciseSearch.Filters("absent", null, "", null)).isEmpty());
 		assertTrue(find("zapatillainexistente", ExerciseSearch.Filters.all()).isEmpty());
 	}
+	@Test public void commonGymNamesFindTheCanonicalLiftsWithoutDuplicatingThem() {
+		Exercise squat = exercise("barbell-back-squat", "Sentadilla trasera con barra", "Técnica de sentadilla.",
+			"strength", Environment.GYM, Goal.STRENGTH, Resource.BARBELL);
+		Exercise deadlift = exercise("barbell-deadlift", "Peso muerto con barra", "Técnica de peso muerto.",
+			"strength", Environment.GYM, Goal.STRENGTH, Resource.BARBELL);
+		Exercise bench = exercise("barbell-bench-press", "Press de banca con barra", "Técnica de banca.",
+			"strength", Environment.GYM, Goal.STRENGTH, Resource.BARBELL, Resource.BENCH);
+		ExerciseSearch search = new ExerciseSearch(Arrays.asList(squat, deadlift, bench));
+		assertEquals(Collections.singletonList("barbell-back-squat"), ids(search.find("sentadilla convencional", ExerciseSearch.Filters.all())));
+		assertEquals(Collections.singletonList("barbell-deadlift"), ids(search.find("peso muerto convencional", ExerciseSearch.Filters.all())));
+		assertEquals(Collections.singletonList("barbell-bench-press"), ids(search.find("press plano", ExerciseSearch.Filters.all())));
+		assertEquals(3, search.find("", ExerciseSearch.Filters.all()).size());
+		assertTrue(search.find("sentadilla convencional", new ExerciseSearch.Filters("", Environment.HOME, "", null)).isEmpty());
+	}
 }
