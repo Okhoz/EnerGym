@@ -29,7 +29,7 @@ import java.util.concurrent.Executor;
 /**
  * ADAPTADOR Gemma 4 E2B con LiteRT-LM para móviles sin Gemini Nano. El usuario descarga una vez el modelo
  * (Apache 2.0, Hugging Face, versión fijada y verificada por SHA-256); después todo corre en el móvil, sin red
- * ni servidor. La descarga la hace el gestor de descargas de Android, solo por Wi-Fi y reanudable.
+ * ni servidor. Se descarga sola al abrir la app (Wi-Fi o datos) con el gestor de descargas de Android, reanudable.
  */
 public final class GemmaModel implements OnDeviceModel {
 	static final String URL = "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/" +
@@ -57,8 +57,11 @@ public final class GemmaModel implements OnDeviceModel {
 		return "Gemma";
 	}
 
+	/**
+	 * Se descarga sola al abrir la app por primera vez, como parte de la instalación (decisión del producto).
+	 */
 	public boolean downloadNeedsConsent() {
-		return true;
+		return false;
 	}
 
 	public long downloadBytes() {
@@ -149,8 +152,10 @@ public final class GemmaModel implements OnDeviceModel {
 					DownloadManager.Request request = new DownloadManager.Request(Uri.parse(URL))
 						.setTitle("Entrenador IA de EnerGym")
 						.setDescription("Modelo Gemma para usar la IA sin internet")
-						.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI)
-						.setAllowedOverMetered(false)
+						.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI |
+							DownloadManager.Request.NETWORK_MOBILE)
+						.setAllowedOverMetered(true)
+						.setAllowedOverRoaming(false)
 						.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
 						.setDestinationUri(Uri.fromFile(target));
 					id = dm.enqueue(request);

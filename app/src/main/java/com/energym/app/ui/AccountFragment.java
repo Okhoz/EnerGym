@@ -63,8 +63,8 @@ public final class AccountFragment extends ScreenFragment {
 			LinearLayout local = card("Entrenador con IA", c.connectionNotice());
 			if (!c.downloadOffer().isEmpty())
 				primary(action(local, c.downloadOffer(), !c.busy, c::downloadModel));
-			text(local, "Usa Gemini Nano si tu móvil lo trae o, si no, Gemma (Google, licencia Apache 2.0) descargado " +
-				"una vez. Todo se ejecuta en el móvil: no usa servidores ni envía tus mensajes fuera del dispositivo. " +
+			text(local, "Usa Gemini Nano si tu móvil lo trae o, si no, Gemma (Google, licencia Apache 2.0), que " +
+				"se descarga sola la primera vez que abres la app (2,6 GB). Todo se ejecuta en el móvil: no usa servidores ni envía tus mensajes fuera del dispositivo. " +
 				"Si tu móvil no puede, el chat usa el guiado local.", R.style.EnerGym_FieldCaption, 8);
 			if (!c.status.isEmpty()) text(local, c.status, R.style.EnerGym_Body, 12);
 			return;

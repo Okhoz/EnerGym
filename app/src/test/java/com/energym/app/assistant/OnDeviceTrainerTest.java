@@ -137,6 +137,35 @@ public class OnDeviceTrainerTest {
 	}
 
 	@Test
+	public void routineCardIsCompactAndReadable() {
+		ChatClient.Request r = request(profile, "rutina", Collections.emptyList());
+		Routine routine = ChatProtocol.reply(TrainerPrompt.reply("{\"texto\":\"Vamos\",\"rutina\":{\"titulo\":\"Piernas\"," +
+			"\"ejercicios\":[{\"id\":\"squat\",\"series\":3,\"repeticiones\":10},{\"id\":\"plank\"},{\"id\":\"jog\"}]}}",
+			r, catalog, 2), r, catalog, 2).proposal;
+		String card = RoutineCard.text(routine);
+		assertTrue(card, card.startsWith("📋 Piernas\n⏱️ "));
+		assertTrue(card, card.contains("💪 Sentadilla\n      3 × 10 · descanso 60 s"));
+		assertTrue(card, card.contains("🧱 Plancha\n      2 × 20 s · descanso 60 s"));
+		assertTrue(card, card.contains("🏃 Trote suave"));
+		assertFalse("Sin la lista de campos técnicos", card.contains("Series previstas"));
+	}
+
+	@Test
+	public void routineJsonInsideTheTextIsHiddenAndBecomesTheCard() {
+		ChatClient.Request r = request(profile, "rutina", Collections.emptyList());
+		// Caso real del S23: la rutina va dentro de «texto» y además llega cortada.
+		String output = "¡Hola! Vamos a darle duro 🔥\n\nAquí tienes una rutina corta para hoy:\n\nRutina:\n{\n\"titulo\":" +
+			"\"Antebrazo\",\n\"ejercicios\":[\n{\n\"id\":\"plank\",\"series\":3,\n\"motivo\":\"Core\"\n},\n{\n\"id\":\"squat\"";
+		ChatProtocol.Reply reply = ChatProtocol.reply(TrainerPrompt.reply(output, r, catalog, 2), r, catalog, 2);
+		assertFalse(reply.text, reply.text.contains("{"));
+		assertFalse(reply.text, reply.text.contains("Rutina:"));
+		assertTrue(reply.text.startsWith("¡Hola! Vamos a darle duro 🔥"));
+		assertNotNull(reply.proposal);
+		assertEquals(Arrays.asList("plank", "squat"), Arrays.asList(reply.proposal.getItems().get(0).getExercise().getId(),
+			reply.proposal.getItems().get(1).getExercise().getId()));
+	}
+
+	@Test
 	public void routineDescribedOnlyInTheTextStillBecomesAProposal() {
 		ChatClient.Request r = request(profile, "rutina de core", Collections.emptyList());
 		String output = "{\"texto\":\"Hoy: 1. Plancha para el core. 2. Sentadilla con control.\",\"rutina\":null}";
@@ -164,6 +193,23 @@ public class OnDeviceTrainerTest {
 	}
 
 	@Test
+	public void automaticDownloadThatFailsOffersARetry() {
+		FakeModel gemma = new FakeModel(OnDeviceModel.DOWNLOADABLE);
+		OnDeviceChatClient client = new OnDeviceChatClient(gemma, catalog, 2, Runnable::run, Runnable::run);
+		client.activate(null);
+		assertEquals("Empieza sola al abrir la app, sin cuenta", 1, gemma.downloads);
+		assertEquals("", client.downloadOffer());
+		gemma.download.failure("MODEL_DOWNLOAD_FAILED");
+		assertEquals("MODEL_DOWNLOAD_FAILED", client.unavailableCode());
+		assertEquals("Reintentar la descarga del entrenador IA", client.downloadOffer());
+		client.startDownload();
+		assertEquals(2, gemma.downloads);
+		assertEquals("MODEL_DOWNLOADING", client.unavailableCode());
+		gemma.download.success(null);
+		assertTrue(client.connected());
+	}
+
+	@Test
 	public void bigDownloadWaitsForTheUserAndThenRuns() {
 		FakeModel gemma = new FakeModel(OnDeviceModel.DOWNLOADABLE);
 		gemma.consent = true;
@@ -178,7 +224,7 @@ public class OnDeviceTrainerTest {
 		assertEquals("", client.downloadOffer());
 		assertEquals("MODEL_DOWNLOADING", client.unavailableCode());
 		gemma.download.failure("MODEL_DOWNLOAD_FAILED");
-		assertEquals("Tras un fallo se puede reintentar", "MODEL_NEEDS_DOWNLOAD", client.unavailableCode());
+		assertEquals("Tras un fallo se puede reintentar", "MODEL_DOWNLOAD_FAILED", client.unavailableCode());
 		client.startDownload();
 		gemma.download.success(null);
 		assertTrue(client.connected());

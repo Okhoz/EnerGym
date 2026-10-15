@@ -56,7 +56,8 @@ public final class TrainerPrompt {
 				.append("{\"id\":\"id exacto de EJERCICIOS DISPONIBLES\",\"series\":3,\"repeticiones\":10,")
 				.append("\"motivo\":\"por qué encaja con su perfil\"}]}}\n")
 				.append("Elige de 3 a 5 ejercicios solo de la lista, en buen orden (movilidad o calentamiento primero ")
-				.append("si los hay). En \"texto\" explica el enfoque y da consejos de técnica, pero no escribas ")
+				.append("si los hay). La rutina va SOLO en \"rutina\": nunca copies la rutina, IDs ni JSON dentro de ")
+				.append("\"texto\". En \"texto\" (2 o 3 párrafos cortos) explica el enfoque y da consejos de técnica, pero no escribas ")
 				.append("series, repeticiones ni segundos: la app los calcula y los muestra. Empieza conservador, con un esfuerzo de 6 o 7 sobre 10, para que la app pueda ")
 				.append("subir series, repeticiones, carga o tiempo en cada sesión (sobrecarga progresiva). ")
 				.append("Ten en cuenta el nivel, la experiencia, las limitaciones y los datos de su disciplina.\n");
@@ -98,15 +99,26 @@ public final class TrainerPrompt {
 			text = t instanceof String ? ((String) t).trim() : "";
 			if (parsed.get("rutina") instanceof Map)
 				routine = cast(parsed.get("rutina"));
-		} else if (text.contains("{")) {
+		} else if (text.contains("\"texto\"")) {
 			// JSON roto (p. ej. una llave de más): nunca se enseña crudo; se rescata solo el texto si se puede.
 			java.util.regex.Matcher t = java.util.regex.Pattern.compile("\"texto\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\"")
 				.matcher(text);
 			text = t.find() ? t.group(1).replace("\\n", "\n").replace("\\\"", "\"") : "";
 		} else
 			text = text.replaceAll("```[a-zA-Z]*", "").trim();
+		// A veces el modelo mete la rutina en JSON dentro del propio texto (incluso cortada): se quita del texto y,
+		// si trae ejercicios, se usa como rutina.
+		String source = text;
+		int brace = text.indexOf('{');
+		if (brace >= 0) {
+			Map<String, Object> embedded = json(text.substring(brace));
+			if (routine == null && embedded != null)
+				routine = embedded.get("rutina") instanceof Map ? cast(embedded.get("rutina")) :
+					embedded.get("ejercicios") instanceof List ? embedded : null;
+			text = text.substring(0, brace).replaceAll("(?i)(^|\\n)[^\\n]{0,20}rutina[^\\n]{0,10}:\\s*$", "").trim();
+		}
 		if (routine == null && r.profile != null)
-			routine = fromNames(text, eligible(r.profile, catalog));
+			routine = fromNames(source, eligible(r.profile, catalog));
 		Map<String, Object> proposal = r.profile == null || routine == null ? null : proposal(routine, r, catalog);
 		if (text.isEmpty())
 			text = proposal != null ? "Aquí tienes tu entrenamiento de hoy. Revísalo antes de aceptarlo." :
@@ -131,12 +143,18 @@ public final class TrainerPrompt {
 	static Map<String, Object> fromNames(String text, List<Exercise> eligible) {
 		String lower = text.toLowerCase(Locale.ROOT);
 		TreeMap<Integer, Exercise> found = new TreeMap<>();
+		boolean byId = false;
 		for (Exercise e : eligible) {
 			int at = lower.indexOf(e.getName().toLowerCase(Locale.ROOT));
+			// Un ID entre comillas procede de un JSON de rutina (aunque esté cortado): basta con uno.
+			int id = lower.indexOf("\"" + e.getId() + "\"");
+			if (id >= 0)
+				byId = true;
+			at = at < 0 ? id : id < 0 ? at : Math.min(at, id);
 			if (at >= 0)
 				found.putIfAbsent(at, e);
 		}
-		if (found.size() < 2)
+		if (found.size() < (byId ? 1 : 2))
 			return null;
 		List<Object> items = new ArrayList<>();
 		for (Exercise e : found.values())

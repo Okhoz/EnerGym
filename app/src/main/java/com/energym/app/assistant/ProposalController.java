@@ -161,10 +161,13 @@ public final class ProposalController {
 			int progress = client.downloadProgress();
 			if (unavailable.equals("MODEL_NEEDS_DOWNLOAD"))
 				return "Tu móvil no trae Gemini Nano, pero puede usar " + model + " sin internet. Descárgalo una vez " +
-					"(por Wi-Fi, gratis) y tu entrenador usará IA en el propio móvil. Mientras, responde el guiado local.";
+					"(gratis) y tu entrenador usará IA en el propio móvil. Mientras, responde el guiado local.";
+			if (unavailable.equals("MODEL_DOWNLOAD_FAILED"))
+				return "No se pudo completar la descarga de " + model + ". Comprueba la conexión y vuelve a intentarlo; " +
+					"mientras, responde el guiado local.";
 			if (unavailable.equals("MODEL_DOWNLOADING"))
-				return "Descargando la IA de tu móvil (" + model + (progress >= 0 ? ", " + progress + " %" : "") +
-					"). Mientras tanto te responde el guiado local.";
+				return "Preparando tu entrenador IA: descargando " + model + " (2,6 GB, solo la primera vez" +
+					(progress >= 0 ? ", " + progress + " %" : "") + "). Mientras tanto te responde el guiado local.";
 			if (unavailable.equals("MODEL_CHECKING"))
 				return "Comprobando qué IA puede usar tu móvil…";
 			if (unavailable.equals("MODEL_UNAVAILABLE"))

@@ -175,14 +175,7 @@ public final class AssistantFragment extends ScreenFragment {
 	 * La propuesta aparece como respuesta del asistente: resumen, ejercicios y decisiones sin guardar nada antes.
 	 */
 	private void proposal(ProposalController c, Routine routine) {
-		StringBuilder text = new StringBuilder("Propuesta · sin guardar\n").append(routine.getTitle()).append(" · ")
-			.append(routine.getEstimatedMinutes()).append(" min");
-		for (RoutineItem item : routine.getItems())
-			text.append("\n\n• ").append(item.getExercise().getName()).append(" (").append(item.getEstimatedMinutes())
-				.append(" min)\n").append(AppController.prescription(item.getExercise().getMetricType(),
-					item.getPrescription()));
-		text.append("\n\nEjemplo sin revisión profesional. Al aceptar se guardan el perfil mostrado y la rutina.");
-		bubble(text.toString(), false);
+		bubble(com.energym.app.assistant.RoutineCard.text(routine), false);
 		LinearLayout choices = columns(rows, 10);
 		primary(compact(choices, "Aceptar", !c.busy && !routine.isEmpty(), c::accept));
 		compact(choices, "Rechazar", !c.busy, c::reject);

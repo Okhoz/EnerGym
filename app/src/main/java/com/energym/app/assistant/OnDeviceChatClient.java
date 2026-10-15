@@ -16,7 +16,7 @@ public final class OnDeviceChatClient implements ChatClient {
 	private final int catalogVersion;
 	private final Executor worker, delivery;
 	private int state = -1;
-	private boolean checking;
+	private boolean checking, failed;
 	private long epoch;
 	private Runnable listener = () -> {
 	};
@@ -90,6 +90,7 @@ public final class OnDeviceChatClient implements ChatClient {
 		synchronized (this) {
 			// Sigue «comprobando» hasta que termine: otra activación no lanza una segunda descarga.
 			state = OnDeviceModel.DOWNLOADING;
+			failed = false;
 			notify = listener;
 		}
 		delivery.execute(notify);
@@ -100,6 +101,9 @@ public final class OnDeviceChatClient implements ChatClient {
 
 			public void failure(String code) {
 				// Se puede volver a intentar desde el chat o en la próxima activación.
+				synchronized (OnDeviceChatClient.this) {
+					failed = true;
+				}
 				update(OnDeviceModel.DOWNLOADABLE);
 			}
 		});
@@ -109,9 +113,11 @@ public final class OnDeviceChatClient implements ChatClient {
 	 * Texto del botón para descargar el modelo, o vacío si no hace falta que el usuario lo pida.
 	 */
 	public synchronized String downloadOffer() {
-		if (state != OnDeviceModel.DOWNLOADABLE || !model.downloadNeedsConsent())
+		if (state != OnDeviceModel.DOWNLOADABLE || !(failed || model.downloadNeedsConsent()))
 			return "";
-		return String.format(java.util.Locale.forLanguageTag("es-ES"), "Descargar el entrenador IA (%.1f GB, por Wi-Fi)",
+		if (failed)
+			return "Reintentar la descarga del entrenador IA";
+		return String.format(java.util.Locale.forLanguageTag("es-ES"), "Descargar el entrenador IA (%.1f GB)",
 			model.downloadBytes() / 1e9);
 	}
 
@@ -152,6 +158,8 @@ public final class OnDeviceChatClient implements ChatClient {
 	public synchronized String unavailableCode() {
 		if (state == OnDeviceModel.AVAILABLE)
 			return "";
+		if (state == OnDeviceModel.DOWNLOADABLE && failed)
+			return "MODEL_DOWNLOAD_FAILED";
 		if (state == OnDeviceModel.DOWNLOADABLE && model.downloadNeedsConsent())
 			return "MODEL_NEEDS_DOWNLOAD";
 		if (state == OnDeviceModel.DOWNLOADABLE || state == OnDeviceModel.DOWNLOADING)

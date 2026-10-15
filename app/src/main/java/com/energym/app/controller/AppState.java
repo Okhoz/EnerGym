@@ -127,6 +127,8 @@ public final class AppState extends AndroidViewModel {
 			new ChainedModel(new GeminiNanoModel(chatWorker), new GemmaModel(context, chatWorker)),
 			catalog.getExercises(), catalog.getVersion(), chatWorker, main);
 		trainer.listen(this::changed);
+		// Al abrir la app (aunque aún no haya cuenta) se comprueba el modelo y, si falta, empieza su descarga.
+		trainer.activate(null);
 		assistant = new ProposalController(store, new LocalConversationStore(context, worker), trainer,
 			catalog.getExercises(), catalog.getVersion(), () -> app.profile, this::changed, r -> {
 			app.routineAccepted(r);
