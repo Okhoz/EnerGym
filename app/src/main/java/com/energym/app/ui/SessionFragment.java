@@ -96,14 +96,14 @@ public final class SessionFragment extends ScreenFragment {
 		restLabel = text(card, "", R.style.EnerGym_CardTitle, 0);
 		LinearLayout presets = columns(card, 8);
 		for (int seconds : new int[]{60, 90, 120})
-			compact(presets, seconds < 120 ? seconds + " s" : "2 min", true, () -> {
+			compact(presets, seconds / 60 + ":" + (seconds % 60 == 0 ? "00" : "30"), true, () -> {
 				restEndsAt = SystemClock.elapsedRealtime() + seconds * 1000L;
 				tick();
 			});
-		compact(presets, "Parar", true, () -> {
+		compact(presets, "✕", true, () -> {
 			restEndsAt = 0;
 			tick();
-		});
+		}).setContentDescription("Parar el descanso");
 		tick();
 	}
 
