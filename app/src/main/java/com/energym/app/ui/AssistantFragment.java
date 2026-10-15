@@ -138,19 +138,50 @@ public final class AssistantFragment extends ScreenFragment {
 			((LinearLayout.LayoutParams) chip.getLayoutParams()).topMargin = dp(4);
 			((LinearLayout.LayoutParams) chip.getLayoutParams()).bottomMargin = dp(8);
 		}
-		for (ConversationStore.Message m : c.messages)
+		// La tarjeta de rutina va justo tras la respuesta que la propuso; lo hablado después queda debajo.
+		int anchor = Math.min(c.previewAnchor, c.messages.size());
+		for (int i = 0; i < c.messages.size(); i++) {
+			if (i == anchor && c.preview != null)
+				proposal(c, c.preview);
+			ConversationStore.Message m = c.messages.get(i);
 			bubble(m.text, m.role.equals("user"));
+		}
+		if (c.preview != null && anchor >= c.messages.size())
+			proposal(c, c.preview);
 		if (c.busy)
 			bubble("Escribiendo…", false).setAlpha(0.7f);
-		if (c.preview != null)
-			proposal(c, c.preview);
 		if (!c.status.isEmpty()) {
 			TextView note = text(rows, c.status, R.style.EnerGym_FieldCaption, 12);
 			note.setGravity(Gravity.CENTER);
 			note.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
 		}
+		shortcuts(c);
 		ScrollView scroll = getView().findViewById(R.id.chat_scroll);
 		scroll.post(() -> scroll.fullScroll(View.FOCUS_DOWN));
+	}
+
+	/**
+	 * Atajos de entrenamiento junto al chat: solo los que tienen sentido ahora (continuar, empezar, subir de
+	 * nivel) y pedir una rutina nueva, para pasar de la conversación al entreno sin salir del chat.
+	 */
+	private void shortcuts(ProposalController c) {
+		if (c.preview != null)
+			return;
+		Session draft = null;
+		for (Session s : app.pending)
+			if (s.getStatus() == Session.Status.DRAFT) {
+				draft = s;
+				break;
+			}
+		LinearLayout row = columns(rows, 14);
+		if (draft != null) {
+			Session open = draft;
+			primary(compact(row, "▶ Continuar entreno", !c.busy, () -> app.resume(open)));
+		} else if (app.routines.accepted != null && !app.routines.accepted.isEmpty())
+			primary(compact(row, "▶ Empezar entreno", !c.busy, app::startSession));
+		if (app.progression() != null)
+			compact(row, "📈 Subir de nivel", !c.busy, app::reviewProgression);
+		compact(row, "🆕 Rutina nueva", !c.busy, () -> c.send("Hazme una rutina para hoy"));
 	}
 
 	private TextView bubble(String message, boolean mine) {

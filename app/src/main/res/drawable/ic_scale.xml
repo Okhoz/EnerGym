@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Báscula: datos físicos y peso. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+	android:width="24dp"
+	android:height="24dp"
+	android:viewportWidth="24"
+	android:viewportHeight="24">
+	<path
+		android:fillColor="@android:color/transparent"
+		android:strokeColor="@color/white"
+		android:strokeWidth="1.6"
+		android:strokeLineCap="round"
+		android:strokeLineJoin="round"
+		android:pathData="M6,4 L18,4 Q20,4 20,6 L20,18 Q20,20 18,20 L6,20 Q4,20 4,18 L4,6 Q4,4 6,4 Z M8,10 Q12,6 16,10 M12,10 L13.4,8.2" />
+</vector>

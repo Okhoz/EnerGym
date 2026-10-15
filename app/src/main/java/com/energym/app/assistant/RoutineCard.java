@@ -42,7 +42,7 @@ public final class RoutineCard {
 	/**
 	 * Dosis en una línea legible; los campos que falten simplemente no se muestran.
 	 */
-	static String dose(MetricType type, Map<String, String> p) {
+	public static String dose(MetricType type, Map<String, String> p) {
 		StringBuilder s = new StringBuilder();
 		switch (type) {
 			case STRENGTH:

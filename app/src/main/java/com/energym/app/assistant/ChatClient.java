@@ -18,6 +18,10 @@ public interface ChatClient {
 		 * Últimos mensajes solo para un modelo que corre en el propio móvil: ChatProtocol.request no los envía.
 		 */
 		public final List<ConversationStore.Message> recent;
+		/**
+		 * Resumen del entrenamiento (rutina, sesiones, progresión) solo para el modelo del móvil; no se serializa.
+		 */
+		public String training = "";
 
 		public Request(String conversation, String request, String exercise, String message, TrainingProfile profile,
 			boolean consent, List<ConversationStore.Message> history) {

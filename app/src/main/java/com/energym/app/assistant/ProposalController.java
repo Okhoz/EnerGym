@@ -94,6 +94,7 @@ public final class ProposalController {
 				messages.addAll(s.messages);
 				fields.putAll(s.fields);
 				preview = s.preview;
+				previewAnchor = Integer.MAX_VALUE;
 				previewBase = s.previewBase;
 				base = s.base;
 				exercise = s.exercise;
@@ -111,7 +112,23 @@ public final class ProposalController {
 	private void setPreview(Routine value, TrainingProfile expected) {
 		preview = value;
 		previewBase = expected;
+		previewAnchor = messages.size();
 		swapped.clear();
+	}
+
+	/**
+	 * Número de mensajes que había cuando llegó la propuesta: el chat la dibuja justo debajo de la respuesta que
+	 * la generó, y lo que se hable después aparece debajo de la tarjeta (no encima).
+	 */
+	public int previewAnchor = Integer.MAX_VALUE;
+
+	private Supplier<String> training = () -> "";
+
+	/**
+	 * Resumen del entrenamiento que recibe el entrenador del móvil (rutina activa, sesiones, progresión).
+	 */
+	public void trainingContext(Supplier<String> summary) {
+		training = summary == null ? () -> "" : summary;
 	}
 
 	private void clearPreview() {
@@ -296,12 +313,17 @@ public final class ProposalController {
 	}
 
 	private void add(String role, String text) {
+		// La explicación que acompaña a una propuesta recién creada va encima de su tarjeta, no debajo.
+		if (preview != null && role.equals("assistant") && previewAnchor == messages.size())
+			previewAnchor++;
 		messages.add(new ConversationStore.Message(role, text));
 		int size = 0;
 		for (ConversationStore.Message m : messages)
 			size += m.text.length();
 		while (messages.size() > 48 || size > 16000) {
 			size -= messages.remove(0).text.length();
+			if (previewAnchor != Integer.MAX_VALUE && previewAnchor > 0)
+				previewAnchor--;
 		}
 	}
 
@@ -677,7 +699,7 @@ public final class ProposalController {
 				fields.clear();
 				seed(base);
 				add("assistant",
-					"Perfil y propuesta aceptados. La nueva rutina está disponible en Entrenamiento; las sesiones anteriores conservan sus snapshots.");
+					"✅ Rutina guardada y lista en Entreno. Cuando quieras, pulsa «▶ Empezar entreno» aquí abajo y te acompaño sesión a sesión.");
 				persist();
 				onAccepted.accept(r);
 				changed.run();
@@ -934,6 +956,8 @@ public final class ProposalController {
 		long requestOrigin = navigationOrigin.getAsLong();
 		ChatClient.Request request = new ChatClient.Request(conversationId, UUID.randomUUID().toString(),
 			exercise == null ? null : exercise.getId(), text.trim(), proposed, data, consent, h, recent);
+		if (client.onDevice())
+			request.training = training.get();
 		add("user", text.trim());
 		persist();
 		pendingHistory = consent;

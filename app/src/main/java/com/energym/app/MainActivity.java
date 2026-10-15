@@ -185,39 +185,56 @@ public final class MainActivity extends AppCompatActivity {
 	private void openMenu(View anchor) {
 		if (state.app == null)
 			return;
-		androidx.appcompat.widget.PopupMenu menu = new androidx.appcompat.widget.PopupMenu(
-			new android.view.ContextThemeWrapper(this, R.style.EnerGym_PopupMenu), anchor, android.view.Gravity.END);
-		menu.inflate(R.menu.main_menu);
 		String owner = state.app.owner();
 		long menuRevision = state.app.accountRevision();
+		android.graphics.Bitmap photo = owner == null ? null : avatars().load(owner);
+		if (photo == null && owner != null && remoteAvatar != null)
+			photo = remoteAvatar.imageFor(owner, menuRevision, googlePhotoUrl(owner));
+		String name, subtitle;
+		if (owner == null) {
+			name = "Sin cuenta";
+			subtitle = "Entra para guardar tu progreso";
+		} else if (state.user != null && owner.equals(state.user.getUid())) {
+			name = state.user.getDisplayName() == null || state.user.getDisplayName().isEmpty() ? "Tu cuenta" :
+				state.user.getDisplayName();
+			subtitle = state.user.getEmail() == null ? "Cuenta de Google" : state.user.getEmail();
+		} else {
+			name = "Demo local";
+			subtitle = "Datos solo en este móvil";
+		}
+		ProfileSheet sheet = new ProfileSheet(this, photo, name, subtitle);
+		// Un panel abierto antes de cambiar de cuenta no actúa sobre ninguna de las dos cuentas.
+		java.util.function.IntConsumer go = id -> {
+			if (java.util.Objects.equals(owner, state.app.owner()) && menuRevision == state.app.accountRevision())
+				menuSelected(id);
+		};
+		sheet.item(R.drawable.ic_training, getString(R.string.menu_profile), false, () -> go.accept(R.id.menu_profile))
+			.item(R.drawable.ic_scale, getString(R.string.menu_body), false, () -> go.accept(R.id.menu_body))
+			.item(R.drawable.ic_settings, getString(R.string.menu_account), false, () -> go.accept(R.id.menu_account));
 		// La foto es el propio botón del menú: con cuenta, aquí se elige, cambia o quita.
 		if (owner != null) {
 			boolean has = avatars().has(owner);
-			menu.getMenu().add(1, PHOTO_PICK, 10, has ? "Cambiar foto de perfil" : "Elegir foto de perfil");
-			if (has)
-				menu.getMenu().add(1, PHOTO_REMOVE, 11, googlePhotoUrl(owner).isEmpty() ? "Quitar foto" : "Usar foto de Google");
-		}
-		menu.setOnMenuItemClickListener(item -> {
-			// Un menú abierto antes de cambiar de cuenta no actúa sobre ninguna de las dos cuentas.
-			if (!java.util.Objects.equals(owner, state.app.owner()) || menuRevision != state.app.accountRevision())
-				return true;
-			if (item.getItemId() == PHOTO_PICK) {
+			sheet.divider().item(R.drawable.ic_photo, has ? "Cambiar foto de perfil" : "Elegir foto de perfil", false, () -> {
+				if (!java.util.Objects.equals(owner, state.app.owner()) || menuRevision != state.app.accountRevision())
+					return;
 				releaseAvatarUri(pendingAvatar.uri());
 				pendingAvatar.begin(owner, menuRevision);
 				avatarPicker.launch(new androidx.activity.result.PickVisualMediaRequest.Builder()
 					.setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build());
-			} else if (item.getItemId() == PHOTO_REMOVE) {
-				avatars().delete(owner);
-				shownAvatar = "";
-				updateAvatar();
-			} else
-				return menuSelected(item.getItemId());
-			return true;
-		});
-		menu.show();
+			});
+			if (has)
+				sheet.item(R.drawable.ic_account, googlePhotoUrl(owner).isEmpty() ? "Quitar foto" : "Usar foto de Google",
+					true, () -> {
+						if (!java.util.Objects.equals(owner, state.app.owner()) || menuRevision != state.app.accountRevision())
+							return;
+						avatars().delete(owner);
+						shownAvatar = "";
+						updateAvatar();
+					});
+		}
+		sheet.show();
 	}
 
-	private static final int PHOTO_PICK = 101, PHOTO_REMOVE = 102;
 
 	private AvatarStore avatars;
 	private String shownAvatar = "";

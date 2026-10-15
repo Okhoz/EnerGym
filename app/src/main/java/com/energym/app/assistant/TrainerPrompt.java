@@ -62,6 +62,12 @@ public final class TrainerPrompt {
 				.append("subir series, repeticiones, carga o tiempo en cada sesión (sobrecarga progresiva). ")
 				.append("Ten en cuenta el nivel, la experiencia, las limitaciones y los datos de su disciplina.\n");
 		p.append("\nPERFIL DEL CLIENTE\n").append(profile(r.profileData)).append('\n');
+		if (!r.training.isEmpty())
+			p.append("\nSU ENTRENAMIENTO (datos reales de la app)\n").append(cut(r.training, 1400)).append('\n')
+				.append("Úsalo para responder sobre su progreso, comentar sus últimas sesiones y ajustar lo que ")
+				.append("propongas (no repitas lo que ya le cuesta, sube poco a poco lo que domina). Si hay una ")
+				.append("progresión lista o un entreno a medias, díselo: puede usar los botones del chat para ")
+				.append("aplicarla, continuar o empezar el entreno.\n");
 		if (r.profile == null) {
 			List<String> missing = missing(r.profileData);
 			p.append("Perfil incompleto (falta: ").append(String.join(", ", missing)).append("). Responde a su ")

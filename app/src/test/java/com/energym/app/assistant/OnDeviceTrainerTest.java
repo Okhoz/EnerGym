@@ -33,6 +33,20 @@ public class OnDeviceTrainerTest {
 	}
 
 	@Test
+	public void trainerSeesTheTrainingButItNeverLeavesThePhone() {
+		ChatClient.Request r = request(profile, "¿Cómo voy?", Collections.emptyList());
+		r.training = "Rutina activa: Piernas (20 min): Sentadilla 3 × 10\nSesiones terminadas: 4\n" +
+			"Progresión lista para aplicar: Sentadilla: 3 × 12";
+		String prompt = TrainerPrompt.build(r, catalog);
+		assertTrue(prompt.contains("SU ENTRENAMIENTO"));
+		assertTrue(prompt.contains("Sesiones terminadas: 4"));
+		assertTrue(prompt.contains("Progresión lista para aplicar"));
+		assertFalse("El resumen no viaja en la petición de red", ChatProtocol.request(r).contains("Sesiones terminadas"));
+		r.training = "";
+		assertFalse(TrainerPrompt.build(r, catalog).contains("SU ENTRENAMIENTO"));
+	}
+
+	@Test
 	public void promptStaysWithinTheOnDeviceInputLimit() {
 		List<Exercise> big = new ArrayList<>();
 		for (int i = 0; i < 300; i++)

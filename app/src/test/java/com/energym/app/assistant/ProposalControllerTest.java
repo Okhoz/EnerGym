@@ -97,6 +97,18 @@ public class ProposalControllerTest {
 	}
 
 	@Test
+	public void proposalCardStaysUnderTheReplyThatCreatedIt() {
+		ProposalController c = controller();
+		propose(c);
+		assertNotNull(c.preview);
+		int anchor = c.previewAnchor;
+		assertEquals("La tarjeta va tras la respuesta que la propuso", c.messages.size(), anchor);
+		c.sendLocal("¿Y cuánto descanso entre series?");
+		assertEquals("Lo hablado después queda debajo de la tarjeta", anchor, c.previewAnchor);
+		assertTrue(c.messages.size() > anchor);
+	}
+
+	@Test
 	public void swapButtonCyclesAlternativesForAnyExerciseAndSaysWhatChanged() {
 		catalog = Arrays.asList(exercise("one", "One"), exercise("two", "Two"), exercise("three", "Three"),
 			exercise("four", "Four"));

@@ -414,6 +414,55 @@ public final class AppController {
 	}
 
 	/**
+	 * Resumen del entrenamiento para el entrenador IA del móvil (nunca se envía fuera): rutina activa, últimas
+	 * sesiones con lo anotado, entreno a medias y progresión disponible. Vacío si aún no hay nada.
+	 */
+	public String trainingSummary() {
+		StringBuilder s = new StringBuilder();
+		Routine active = routines.accepted;
+		if (active != null && !active.isEmpty()) {
+			s.append("Rutina activa: ").append(active.getTitle()).append(" (").append(active.getEstimatedMinutes())
+				.append(" min): ");
+			List<String> items = new ArrayList<>();
+			for (RoutineItem i : active.getItems())
+				items.add(i.getExercise().getName() + " " +
+					com.energym.app.assistant.RoutineCard.dose(i.getExercise().getMetricType(), i.getPrescription()));
+			s.append(String.join("; ", items)).append('\n');
+		}
+		s.append("Sesiones terminadas: ").append(history.size()).append('\n');
+		List<Session> finished = new ArrayList<>(history);
+		finished.sort((a, b) -> Long.compare(b.getCompletedAt(), a.getCompletedAt()));
+		java.time.format.DateTimeFormatter day = java.time.format.DateTimeFormatter.ofPattern("d/M");
+		for (Session session : finished.subList(0, Math.min(3, finished.size()))) {
+			s.append("- ").append(java.time.Instant.ofEpochMilli(session.getCompletedAt())
+				.atZone(java.time.ZoneId.systemDefault()).format(day)).append(' ')
+				.append(session.getRoutine().getTitle()).append(": ");
+			List<String> done = new ArrayList<>();
+			for (RoutineItem i : session.getRoutine().getItems()) {
+				Map<String, String> r = session.getResults().get(i.getExercise().getId());
+				if (r == null)
+					continue;
+				String effort = r.containsKey("effort") ? " · esfuerzo " + r.get("effort") + "/10" : "";
+				done.add(i.getExercise().getName() + " " +
+					com.energym.app.assistant.RoutineCard.dose(i.getExercise().getMetricType(), r) + effort);
+			}
+			s.append(done.isEmpty() ? "sin datos anotados" : String.join("; ", done)).append('\n');
+		}
+		for (Session draft : pending)
+			if (draft.getStatus() == Session.Status.DRAFT) {
+				s.append("Entreno a medias: ").append(draft.getRoutine().getTitle()).append(" (")
+					.append(draft.getResults().size()).append(" de ").append(draft.getRoutine().getItems().size())
+					.append(" ejercicios anotados)\n");
+				break;
+			}
+		ProgressionEngine.Plan plan = progression();
+		if (plan != null)
+			s.append("Progresión lista para aplicar: ").append(String.join("; ", plan.changes)).append('\n');
+		String text = s.toString().trim();
+		return text.equals("Sesiones terminadas: 0") ? "" : text.length() > 1400 ? text.substring(0, 1399) + "…" : text;
+	}
+
+	/**
 	 * Abre la progresión como propuesta: se revisa y acepta igual que cualquier otra versión.
 	 */
 	public void reviewProgression() {
