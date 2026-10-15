@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Marca de EnerGym en vector: mancuerna de trazo fino con una hoja en el centro, en el dorado de la app.
+     Mismo trazo y remates redondeados que los iconos de navegación para que todo se vea como un conjunto. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+	android:width="24dp"
+	android:height="24dp"
+	android:viewportWidth="24"
+	android:viewportHeight="24">
+	<path
+		android:fillColor="@android:color/transparent"
+		android:strokeColor="@color/gold"
+		android:strokeWidth="1.6"
+		android:strokeLineCap="round"
+		android:strokeLineJoin="round"
+		android:pathData="M3,10.5 L3,14.5 M6,7.5 L6,17.5 M18,7.5 L18,17.5 M21,10.5 L21,14.5 M6,12.5 L18,12.5" />
+	<path
+		android:fillColor="@android:color/transparent"
+		android:strokeColor="@color/gold"
+		android:strokeWidth="1.6"
+		android:strokeLineCap="round"
+		android:strokeLineJoin="round"
+		android:pathData="M12,12.5 C11.4,8.9 12.8,6 15.6,4.8 C16.1,8 14.6,10.9 12,12.5 Z M12,12.5 L14.3,8.3" />
+</vector>

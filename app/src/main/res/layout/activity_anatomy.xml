@@ -36,7 +36,7 @@
 			android:layout_width="32dp"
 			android:layout_height="32dp"
 			android:layout_marginEnd="@dimen/space_inline"
-			android:src="@drawable/energym_logo"
+			android:src="@drawable/ic_brand"
 			android:scaleType="fitCenter"
 			android:contentDescription="@string/logo_description" />
 
@@ -158,7 +158,7 @@
 					<ImageView
 						android:layout_width="80dp"
 						android:layout_height="80dp"
-						android:src="@drawable/energym_logo"
+						android:src="@drawable/ic_brand"
 						android:scaleType="fitCenter"
 						android:contentDescription="@string/logo_description" />
 

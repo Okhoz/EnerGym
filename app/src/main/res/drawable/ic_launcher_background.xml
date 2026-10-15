@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Fondo del icono: negro grafito con un degradado muy sutil, sobrio y a juego con las superficies de la app. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-	<solid android:color="@color/surface" />
+	<gradient
+		android:type="radial"
+		android:gradientRadius="80dp"
+		android:centerX="0.5"
+		android:centerY="0.42"
+		android:startColor="#FF1E1E1E"
+		android:endColor="#FF0A0A0A" />
 </shape>
