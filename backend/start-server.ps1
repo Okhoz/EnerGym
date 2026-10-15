@@ -1,5 +1,5 @@
 ﻿param(
-	[ValidateSet('None', 'Groq', 'Gemini', 'OpenAI')][string]$Provider = 'None',
+	[ValidateSet('None', 'Groq', 'Gemini', 'OpenAI')][string]$Provider = 'Gemini',
 	[string]$Model = '',
 	[string]$JavaExecutable = '',
 	[switch]$CheckConfiguration
@@ -43,9 +43,11 @@ $taskStart.Environment['ENERGYM_AI_PROVIDER'] = 'none'
 $taskStart.Environment['GEMINI_ENABLED'] = 'false'
 $taskStart.Environment['OPENAI_ENABLED'] = 'false'
 $taskStart.Environment['GROQ_ENABLED'] = 'false'
-$taskStart.Environment.Remove('GEMINI_API_KEY') | Out-Null
-$taskStart.Environment.Remove('OPENAI_API_KEY') | Out-Null
-$taskStart.Environment.Remove('GROQ_API_KEY') | Out-Null
+foreach ($taskProviderPrefix in @('GEMINI', 'GROQ', 'OPENAI')) {
+	foreach ($taskSuffix in @('_API_KEY', '_API_KEY_FILE', '_MODEL')) {
+		$taskStart.Environment.Remove($taskProviderPrefix + $taskSuffix) | Out-Null
+	}
+}
 $taskStart.Environment['ENERGYM_PAIRING_CODE'] = $taskPairing
 $taskPlainKey = $null
 try {
@@ -59,7 +61,14 @@ try {
 		}
 		$taskPlainKey = Get-TaskEnvironmentValue ($taskPrefix + '_API_KEY')
 		if ([string]::IsNullOrWhiteSpace($taskPlainKey) -or $taskPlainKey.Length -gt 1024 -or $taskPlainKey -match '[\x00-\x20\x7f]') {
-			throw 'Falta una clave válida del proveedor seleccionado. Groq: ejecuta tools/configurar-groq.ps1 personalmente desde la raíz del proyecto.'
+			$taskKeyHelp = if ($Provider -eq 'Gemini') {
+				'Gemini: ejecuta backend/configurar-gemini.ps1 personalmente desde la raíz del proyecto.'
+			} elseif ($Provider -eq 'Groq') {
+				'Groq: ejecuta tools/configurar-groq.ps1 personalmente desde la raíz del proyecto.'
+			} else {
+				'OpenAI: configura OPENAI_API_KEY fuera del repositorio.'
+			}
+			throw ('Falta una clave válida del proveedor seleccionado. ' + $taskKeyHelp)
 		}
 		if ([string]::IsNullOrWhiteSpace($Model)) {
 			$Model = Get-TaskEnvironmentValue ($taskPrefix + '_MODEL')
@@ -77,6 +86,9 @@ try {
 		}
 		if ($Provider -eq 'Groq' -and @('openai/gpt-oss-120b', 'openai/gpt-oss-20b') -cnotcontains $Model) {
 			throw 'Groq requiere un modelo Free documentado explícito: openai/gpt-oss-120b u openai/gpt-oss-20b. Revisa el plan Free en la consola antes de activar.'
+		}
+		if ($Provider -eq 'Gemini' -and @('gemini-3.5-flash-lite', 'gemini-3.8-flash') -cnotcontains $Model) {
+			throw 'Gemini requiere un modelo con nivel gratuito documentado: gemini-3.5-flash-lite o gemini-3.8-flash. No actives billing; revisa cuota y condiciones antes de usar datos reales.'
 		}
 		$taskStart.Environment['ENERGYM_AI_PROVIDER'] = $Provider.ToLowerInvariant()
 		$taskStart.Environment[$taskPrefix + '_ENABLED'] = 'true'

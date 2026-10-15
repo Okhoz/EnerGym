@@ -1,10 +1,10 @@
-# Groq Free para EnerGym
+# Groq Free opcional para EnerGym
 
-Estado 15-10-2026: proveedor integrado, desactivado por defecto y comprobado con una llamada real sintética (apartado «Primera prueba real»). La publicación sigue pendiente de autenticación Firebase, cuotas durables y despliegue HTTPS. La conexión de desarrollo usa emparejamiento privado.
+Estado 15-10-2026, tras la selección de Gemini: Groq se conserva como proveedor opcional, únicamente con selección explícita; no es el predeterminado ni un fallback. La llamada real sintética anterior se conserva en «Primera prueba real». [Gemini Free](gemini-free.md) documenta la elección actual y su nueva prueba privada válida de dos ejercicios; esa prueba no sustituye esta evidencia Groq ni demuestra un despliegue. La publicación sigue pendiente de autenticación Firebase, cuotas durables y despliegue HTTPS. La conexión de desarrollo usa emparejamiento privado.
 
-El usuario pidió una IA gratuita. Se prepara GroqCloud Free con `openai/gpt-oss-120b`; no es ChatGPT. La alternativa permitida es `openai/gpt-oss-20b`. Ambos aparecen en el [plan Free](https://console.groq.com/docs/rate-limits) y admiten [JSON Schema estricto](https://console.groq.com/docs/structured-outputs). No hay modelo predeterminado, selección automática, reintentos ni fallback a un proveedor de pago.
+La prueba privada anterior de IA gratuita usó GroqCloud Free con `openai/gpt-oss-120b`; no es ChatGPT. La alternativa permitida es `openai/gpt-oss-20b`. Ambos aparecen en el [plan Free](https://console.groq.com/docs/rate-limits) y admiten [JSON Schema estricto](https://console.groq.com/docs/structured-outputs). El adaptador Groq exige un modelo explícito; no hay selección automática, reintentos ni fallback a un proveedor de pago.
 
-## Activación pendiente
+## Activación opcional explícita
 
 El adaptador no crea cuenta, clave, tarjeta ni facturación por sí mismo. La prueba real autorizada se documenta más abajo. Antes de activarla, confirmar el plan **Free** en la consola y las condiciones presentadas en el alta; no añadir tarjeta ni aceptar Upgrade/Developer. Si el alta exige pago, detenerse. Una clave o el nombre de un modelo abierto no demuestra gratuidad. Este software no puede evitar cargos si el propietario cambia la cuenta a un plan pagado.
 
@@ -19,7 +19,7 @@ GROQ_MODEL=openai/gpt-oss-120b
 GROQ_API_KEY=<clave privada del servidor>
 ```
 
-Sin cualquiera de esas condiciones el proveedor queda desactivado. `TRUE`, `1` y modelos fuera de allowlist no sirven como opt-in. Mantener Gemini/OpenAI desactivados. Nunca introducir la clave en Android/APK, URLs, argumentos de consola, payloads o repositorio. El helper del workspace `tools/configurar-groq.ps1` pide la entrada oculta y guarda exclusivamente `GROQ_API_KEY` como variable de usuario Windows; no activa el proveedor. Las variables de usuario persisten sin cifrado y pueden leerlas procesos de ese usuario. No ejecutar el helper desde la automatización ni mostrar la clave. Para contenedores, usar `compose.groq.yaml` y el [runbook Docker](../deploy/README.md): se montan archivos privados para la clave y el código de emparejamiento. Una variable Windows no aparece automáticamente en Docker.
+Desde `backend`, para seleccionarlo mediante el launcher: `.\start-server.ps1 -Provider Groq -Model openai/gpt-oss-120b`. Sin cualquiera de esas condiciones el proveedor queda desactivado. `TRUE`, `1` y modelos fuera de allowlist no sirven como opt-in. Mantener Gemini/OpenAI desactivados. Nunca introducir la clave en Android/APK, URLs, argumentos de consola, payloads o repositorio. El helper del workspace `tools/configurar-groq.ps1` pide la entrada oculta y guarda exclusivamente `GROQ_API_KEY` como variable de usuario Windows; no activa el proveedor. Las variables de usuario persisten sin cifrado y pueden leerlas procesos de ese usuario. No ejecutar el helper desde la automatización ni mostrar la clave. Para contenedores, usar `compose.groq.yaml` y el [runbook Docker](../deploy/README.md): se montan archivos privados para la clave y el código de emparejamiento. Una variable Windows no aparece automáticamente en Docker.
 
 ## Cuotas y límite provisional
 

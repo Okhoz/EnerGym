@@ -8,7 +8,9 @@ Se conserva el contrato del servidor: HTTP sólo loopback; cualquier bind extern
 
 Task16 debe implementar autenticación Firebase, validación del secreto proxy y cuotas por UID/globales durables, y acordar sus secretos y volumen de estado. Hoy el servidor no comprueba `X-EnerGym-Proxy-Token`; no publicar este stack. El nombre del archivo deja visible este estado. TLS no sustituye autenticación ni autorización.
 
-Ambos Compose fijan proveedor `none`, Gemini desactivado y OpenAI desactivado. El usuario ha revocado Gemini y exige una IA gratuita, sin billing ni fallback de pago; la investigación del proveedor sustituto sigue pendiente. Gemini queda como integración heredada opcional, nunca requisito exclusivo del despliegue. La investigación oficial previa no encontró una excepción al requisito de Paid Services para sus clientes en EEE/CH/UK: contenedores, ubicación del host y Firebase no resuelven ese bloqueo. No habilitar Gemini ni presentar este stack como servicio europeo gratuito listo. `/health` no consulta un modelo ni demuestra cuota, Firebase o disponibilidad del proveedor.
+Las dos bases Compose fijan proveedor `none`. La superposición `compose.gemini.yaml` selecciona explícitamente Gemini Free con `gemini-3.5-flash-lite` y exige los archivos privados de clave y emparejamiento. Groq continúa como superposición opcional, sin fallback. Las pruebas privadas se documentan por separado; no se ha arrancado este stack con Docker.
+
+La [tabla de precios Gemini](https://ai.google.dev/gemini-api/docs/pricing) ofrece entrada/salida Free para 3.5 Flash Lite y 3.8 Flash. Sus [términos](https://ai.google.dev/gemini-api/terms) exigen Paid Services para ofrecer clientes API a usuarios del EEE/CH/UK; la publicación gratuita en esos destinos sigue pendiente. Docker, la ubicación del host y Firebase no eliminan ese requisito. `/health` no consulta un modelo ni acredita cuota, autenticación o disponibilidad del proveedor.
 
 ## Imagen y build reproducible
 
@@ -57,7 +59,7 @@ Guardar materiales privados **fuera de `backend`, fuera del repositorio y del co
 | `ENERGYM_FRONTEND_KEY_FILE` | Clave privada del certificado externo |
 | `ENERGYM_PROXY_TOKEN_FILE` | Mismo secreto para proxy y backend, 43–128 caracteres base64url; mínimo32 bytes aleatorios |
 
-Archivos de contraseña/token: UTF-8 sin BOM, una sola línea, newline final opcional. Ni valores de ejemplo ni credenciales falsas son entradas válidas. El entrypoint consume las variables `_FILE` conocidas, rechaza archivos vacíos y no permite valor directo simultáneo. `GEMINI_API_KEY_FILE` sólo conserva compatibilidad heredada opcional; no activa un proveedor. Acordar el contrato de secretos del nuevo proveedor gratuito cuando se haya elegido y verificado. No recibe `JAVA_TOOL_OPTIONS` ni comandos Java arbitrarios del runbook. Un admin del host puede leer secretos/procesos: preservar el control de acceso al daemon Docker.
+Archivos de contraseña/token: UTF-8 sin BOM, una sola línea, newline final opcional. Ni valores de ejemplo ni credenciales falsas son entradas válidas. El entrypoint consume las variables `_FILE` conocidas, rechaza archivos vacíos y no permite valor directo simultáneo. `GEMINI_API_KEY_FILE` es la entrada de la clave del proveedor seleccionado por `compose.gemini.yaml`; el archivo por sí solo no activa el proveedor. `ENERGYM_PAIRING_CODE_FILE` aporta el código privado de un solo uso y también es obligatorio en esa superposición. No recibe `JAVA_TOOL_OPTIONS` ni comandos Java arbitrarios del runbook. Un admin del host puede leer secretos/procesos: preservar el control de acceso al daemon Docker.
 
 Proxy sin root en8443, backend sin root en8080 con TLS, root filesystem de sólo lectura, capacidades retiradas, sin elevación de privilegios, límites CPU/memoria/PIDs y tmpfs limitado. Sólo `backend_link` conecta proxy/backend y es red interna. El backend dispone de red de salida independiente para proveedores; no conectar terceros a ella ni a `backend_link`. El proxy sobrescribe el token y elimina headers forwarded. Nginx verifica CA/hostname upstream y no reintenta automáticamente una petición al backend. Las restricciones de entrada Nginx no sustituyen las cuotas globales/perUID de Task16; no hay persistencia de cuotas implementada por Task15.
 
@@ -92,17 +94,32 @@ Esta tarea no activa billing, no llama a modelos ni compra infraestructura. Un h
 - [Secrets Compose](https://docs.docker.com/reference/compose-file/secrets/), [servicios Compose y restricciones de secretos file](https://docs.docker.com/reference/compose-file/services/).
 - [Nginx: verificación TLS upstream](https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_ssl_verify).
 
-La revisión estática local de `validate-infra.ps1` comprueba guardas, **no es un parser YAML/Dockerfile ni demuestra que un contenedor arranque**. Sin Docker y sin parser YAML instalado no se ejecutó `docker compose config`, build/run ni `nginx -t` de la imagen. Esos controles siguen pendientes en el host real.
+La revisión estática local de `validate-infra.ps1` comprueba guardas, **no es un parser YAML/Dockerfile ni demuestra que un contenedor arranque**. La fase anterior comprobó YAML localmente; eso no sustituye al parser Compose ni al runtime. Sin Docker no se ejecutó `docker compose config`, build/run ni `nginx -t` de la imagen. Esos controles siguen pendientes en el host real.
 
-## Activar Groq Free en el contenedor
+## Seleccionar Gemini Free en el contenedor
 
-`compose.groq.yaml` es una superposición opcional sobre `compose.preview.yaml` o `compose.production.pending.yaml`. Fija `ENERGYM_AI_PROVIDER=groq`, `GROQ_ENABLED=true`, el modelo Free `openai/gpt-oss-120b` (o `openai/gpt-oss-20b` mediante `GROQ_MODEL`) y monta la clave como secreto `GROQ_API_KEY_FILE`; el entrypoint la carga sin imprimirla y rechaza definir a la vez `GROQ_API_KEY` directa.
+`compose.gemini.yaml` se añade a una de las bases. Selecciona Gemini, desactiva los demás proveedores y fija literalmente `gemini-3.5-flash-lite`; la variable `GEMINI_MODEL` del host no cambia ese valor. La alternativa `gemini-3.8-flash` se selecciona explícitamente con el lanzador local, no mediante esta superposición. El gateway y el lanzador rechazan otros modelos. No hay fallback ni reintentos automáticos.
 
-1. Crear en el host, **fuera del repositorio**, un archivo UTF-8 sin BOM con la clave en una línea, legible solo por UID 10001. Definir `ENERGYM_GROQ_KEY_FILE` con su ruta absoluta.
-2. Crear otro archivo privado UTF-8 sin BOM con un código aleatorio nuevo de al menos 32 caracteres. Definir `ENERGYM_PAIRING_CODE_FILE` con su ruta absoluta. La superposición lo monta en `/run/secrets/pairing_code`; el entrypoint ya admite ese secreto. No introducir el código en YAML, argumentos visibles ni logs. Se consume una sola vez; para una conexión nueva hay que renovar el archivo y recrear el backend. No reutilizar la clave Groq como código.
-3. Con ambas variables definidas en el entorno privado del operador: `docker compose -f compose.preview.yaml -f compose.groq.yaml config --quiet`, seguido de `docker compose -f compose.preview.yaml -f compose.groq.yaml up -d`.
-4. Comprobar con la sonda interna. La vista HTTP no publica puertos: este comando prepara el proveedor y el emparejamiento dentro del contenedor, sin crear un endpoint accesible desde Android. Para comprobar la conexión privada HTTPS, usar la vista TLS pendiente con certificados reales y conservar sus restricciones loopback. El código se usa exclusivamente en «Cuenta → Conectar servidor de IA» cuando exista esa conexión privada válida. La primera llamada real (15/10/2026, perfil sintético, ejecución local sin Docker) respondió 200 en 2,3 s; ver `docs/groq-free.md`.
+Preparar fuera del repositorio y contexto Docker dos archivos UTF-8 sin BOM, una línea cada uno: la clave Gemini ya existente y un código aleatorio nuevo de emparejamiento. El operador debe asegurar que los pueda leer UID/GID10001 y no otros usuarios del host. No insertar su contenido en YAML, argumentos, imágenes ni logs. El código se consume una vez y debe renovarse para otra conexión.
 
-Sin `ENERGYM_PAIRING_CODE_FILE`, Compose rechaza esta superposición antes de arrancar. Antes se habilitaba el proveedor sin proporcionar al contenedor ningún código, por lo que todos los emparejamientos devolvían 401 aunque la sonda de salud pasara. La comprobación YAML local del 15-10-2026 verifica la sintaxis y el montaje declarado; Docker sigue sin estar instalado aquí, así que el parser Compose y el arranque real deben comprobarse en el host.
+Definir las rutas de esos archivos en el entorno privado del operador y, desde `backend`, en el host con Docker ya instalado:
 
-Antes de usuarios reales: ZDR activado en Groq, autenticación Firebase y cuotas por usuario (Task16). Mientras falten, mantener la vista sin publicar a Internet.
+```powershell
+$env:ENERGYM_GEMINI_KEY_FILE = 'C:\EnerGym-private\gemini-api-key.txt'
+$env:ENERGYM_PAIRING_CODE_FILE = 'C:\EnerGym-private\pairing-code.txt'
+# Adaptar las rutas al host propio; no contienen los secretos.
+docker compose -f compose.preview.yaml -f compose.gemini.yaml config --quiet
+docker compose -f compose.preview.yaml -f compose.gemini.yaml build
+docker compose -f compose.preview.yaml -f compose.gemini.yaml up -d
+docker compose -f compose.preview.yaml -f compose.gemini.yaml exec backend java -Xmx64m -cp /app/backend.jar com.energym.server.Healthcheck
+```
+
+Las variables host obligatorias son `ENERGYM_GEMINI_KEY_FILE` y `ENERGYM_PAIRING_CODE_FILE`; dentro del contenedor se montan como `GEMINI_API_KEY_FILE` y `ENERGYM_PAIRING_CODE_FILE`. Si falta cualquiera, Compose rechaza la superposición. El entrypoint rechaza además archivo ausente/vacío o valor directo simultáneo. No basta con tener `GEMINI_API_KEY` como variable de usuario en Windows: no aparece automáticamente en Docker.
+
+Esta vista HTTP no publica puertos ni crea un endpoint Android. Para una conexión privada con el cliente se necesita la vista TLS pendiente, certificados reales y sus restricciones loopback. No publicar este stack mientras falten la autenticación Firebase, validación del secreto proxy y cuotas durables. Las cuotas efectivas de Gemini se consultan en AI Studio. Un 429 no cambia de modelo ni activa un plan de pago. La fase Gemini pasó 67 pruebas backend y ocho casos del lanzador; tres YAML se parsearon con Node y se comprobaron los flags, proveedor, modelo y secretos obligatorios. La llamada privada Gemini fue válida, sin Docker ni Android. Véase [Gemini Free](../docs/gemini-free.md). El build/run real del contenedor sigue pendiente en el host propio.
+
+## Groq como opción explícita de compatibilidad
+
+`compose.groq.yaml` sigue disponible al seleccionarlo expresamente en lugar de `compose.gemini.yaml`. No combinar ambas superposiciones: una configuración selecciona un solo proveedor. Groq requiere `ENERGYM_GROQ_KEY_FILE` y `ENERGYM_PAIRING_CODE_FILE`; monta clave y código como secretos de archivo. Sin pairing, Compose rechaza su arranque. Mantener Gemini/OpenAI desactivados en esa configuración.
+
+La prueba real del 15-10-2026 con Groq fue local, sin Docker: respondió 200 en 2,3 s con perfil sintético y esquema válido. Es evidencia histórica de aquella configuración, no una prueba del contenedor ni la selección actual. Véase [Groq opcional](../docs/groq-free.md). Si se usa con personas reales siguen pendientes ZDR, autenticación y cuotas; la prueba no acredita calidad general ni disponibilidad permanente.

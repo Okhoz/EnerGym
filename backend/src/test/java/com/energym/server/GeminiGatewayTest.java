@@ -90,17 +90,29 @@ class GeminiGatewayTest {
 	}
 
 	@Test
-	void otherModelsKeepTheirOwnThinkingDefaultsWithoutUnsupportedParameters() throws Exception {
-		for (String model : List.of("gemini-3.5-flash-lite", "gemini-2.5-flash-lite", "custom-model")) {
+	void flashLiteKeepsItsThinkingDefaultsWithoutUnsupportedParameters() throws Exception {
+		Map<String, String> env = new HashMap<>(ENV);
+		env.put("GEMINI_MODEL", "gemini-3.5-flash-lite");
+		GeminiGateway provider = assertInstanceOf(GeminiGateway.class, ProviderFactory.fromEnvironment(env));
+		assertTrue(provider.configured());
+		JsonNode payload = provider.payload(new ProposalValidator().providerRequest(ChatServiceTest.request()));
+		assertEquals("gemini-3.5-flash-lite", payload.path("model").asText());
+		assertFalse(payload.path("generation_config").has("thinking_level"));
+		assertFalse(payload.has("tools"));
+		assertFalse(payload.path("store").asBoolean(true));
+	}
+
+	@Test
+	void onlyTheSelectedFreeTierModelsCanBeEnabled() throws Exception {
+		for (String model : List.of("gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-2.5-pro",
+			"gemini-3.5-flash-lite-paid", "custom-model", "models/gemini-3.5-flash-lite", "")) {
 			Map<String, String> env = new HashMap<>(ENV);
 			env.put("GEMINI_MODEL", model);
-			GeminiGateway provider = assertInstanceOf(GeminiGateway.class, ProviderFactory.fromEnvironment(env));
-			assertTrue(provider.configured());
-			JsonNode payload = provider.payload(new ProposalValidator().providerRequest(ChatServiceTest.request()));
-			assertEquals(model, payload.path("model").asText());
-			assertFalse(payload.path("generation_config").has("thinking_level"));
-			assertFalse(payload.has("tools"));
-			assertFalse(payload.path("store").asBoolean(true));
+			Provider provider = ProviderFactory.fromEnvironment(env);
+			boolean freeModel = model.equals("gemini-3.5-flash-lite") || model.equals("gemini-3.8-flash");
+			assertEquals(freeModel, provider.configured(), model);
+			if (!freeModel)
+				assertThrows(IllegalStateException.class, () -> provider.respond(ChatServiceTest.request()), model);
 		}
 	}
 

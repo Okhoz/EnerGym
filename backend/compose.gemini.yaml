@@ -1,0 +1,19 @@
+# Gemini Free: superposición opcional sobre compose.preview.yaml o compose.production.pending.yaml.
+# Uso: docker compose -f compose.preview.yaml -f compose.gemini.yaml up -d
+# Sólo secretos de archivo; no activa billing ni completa los pendientes de publicación de producción.
+services:
+  backend:
+    environment:
+      ENERGYM_AI_PROVIDER: gemini
+      GEMINI_ENABLED: "true"
+      GEMINI_MODEL: gemini-3.5-flash-lite
+      GROQ_ENABLED: "false"
+      OPENAI_ENABLED: "false"
+      GEMINI_API_KEY_FILE: /run/secrets/gemini_api_key
+      ENERGYM_PAIRING_CODE_FILE: /run/secrets/pairing_code
+    secrets: [gemini_api_key, pairing_code]
+secrets:
+  gemini_api_key:
+    file: ${ENERGYM_GEMINI_KEY_FILE:?Archivo privado con la clave Gemini fuera del repositorio obligatorio}
+  pairing_code:
+    file: ${ENERGYM_PAIRING_CODE_FILE:?Archivo privado de emparejamiento obligatorio para la vista previa}

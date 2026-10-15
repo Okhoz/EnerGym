@@ -18,6 +18,7 @@ import java.util.concurrent.Flow;
  */
 public final class GeminiGateway implements Provider {
 	private static final URI ENDPOINT = URI.create("https://generativelanguage.googleapis.com/v1beta/interactions");
+	private static final Set<String> FREE_MODELS = Set.of("gemini-3.5-flash-lite", "gemini-3.8-flash");
 	private final boolean enabled;
 	private final String key, model;
 	private final URI endpoint;
@@ -36,7 +37,7 @@ public final class GeminiGateway implements Provider {
 		key = env.getOrDefault("GEMINI_API_KEY", "").trim();
 		model = env.getOrDefault("GEMINI_MODEL", "").trim();
 		enabled = "true".equals(env.get("GEMINI_ENABLED")) && !key.isEmpty() && key.length() <= 1024 &&
-			key.chars().noneMatch(c -> c <= 32 || c == 127) && model.matches("[A-Za-z0-9._-]{1,100}");
+			key.chars().noneMatch(c -> c <= 32 || c == 127) && FREE_MODELS.contains(model);
 	}
 
 	public static Provider fromEnvironment(Map<String, String> env) {

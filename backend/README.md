@@ -1,40 +1,32 @@
-# Backend opcional EnerGym
+# Backend EnerGym
 
-Java 17+, Maven y JSON. Este servidor prepara el chat de la app con **Groq Free**, desactivado por defecto, mediante el contrato `/api/chat`. Devuelve `503 PROVIDER_NOT_CONFIGURED` mientras no se haya seleccionado y habilitado un proveedor completo; no inventa respuestas. Las pruebas usan fixtures sintéticas en localhost y no llaman a los modelos. No hay cuenta, clave, despliegue cloud ni facturación configurados por este código. Consulta [Groq Free y verificaciones pendientes](docs/groq-free.md) antes de activar.
+Java 17+, Maven y JSON. El lanzador local selecciona **Gemini Free** y `gemini-3.5-flash-lite` de forma predeterminada; `-Provider None` desactiva el proveedor. Groq y OpenAI se conservan únicamente como opciones explícitas de compatibilidad. No hay fallback ni reintentos automáticos. La clave permanece en el servidor y nunca viaja a Android.
 
-`ENERGYM_AI_PROVIDER=groq`, `GROQ_ENABLED=true` exacto, clave del servidor y modelo explícito de allowlist (`openai/gpt-oss-120b` o `openai/gpt-oss-20b`) habilitan Groq. Confirmar Free en la consola: una clave no acredita el plan y una cuenta pagada puede facturar. Sin selección o configuración completa todo queda desactivado; no hay fallback ni reintentos automáticos. La clave permanece en el servidor y nunca viaja a Android. Los adaptadores Gemini/OpenAI se conservan por compatibilidad, pero no se activan en esta preparación.
+El servidor Java directo y las bases Compose permanecen desactivados sin selección/configuración completa (`503 PROVIDER_NOT_CONFIGURED`). El predeterminado corresponde a `start-server.ps1`, no a inferir un proveedor desde cualquier clave presente. Las pruebas automáticas usan fixtures de localhost. Véase [Gemini Free](docs/gemini-free.md) para precios, cuotas, privacidad y el límite de publicación en EEE/CH/UK. La nueva prueba sintética con Gemini respondió 200 en 2.508 ms y produjo una propuesta validada de dos ejercicios; fue una comprobación backend, sin nuevo recorrido Android.
 
 ## Compilar y ejecutar
 
 Desde esta carpeta, con JDK 17 o superior y `JAVA_HOME` configurado:
 
 ```powershell
+# PowerShell 7, desde backend; JAVA_HOME debe señalar un JDK17+.
 .\mvnw.cmd "-Dmaven.repo.local=$PWD/.cache/m2" test package
-$env:ENERGYM_AI_PROVIDER = 'none'
-$env:GEMINI_ENABLED = 'false'
-$env:OPENAI_ENABLED = 'false'
-$env:GROQ_ENABLED = 'false'
-$env:ENERGYM_PAIRING_CODE = '<codigo-aleatorio-privado-de-32-caracteres>'
-java -jar target/energym-backend-1.0.0.jar
+# Código nuevo, privado y de un solo uso. No se imprime su valor.
+$env:ENERGYM_PAIRING_CODE = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
+Set-Clipboard -Value $env:ENERGYM_PAIRING_CODE
+.\start-server.ps1 -CheckConfiguration
+.\start-server.ps1
 ```
 
-El wrapper de Apache Maven 3.9.16 se copió sin modificar ANKA. La primera compilación descarga solo dependencias públicas gratuitas de Maven Central. `.env.example` contiene una plantilla; Java lee variables del proceso y no carga archivos .env. El código debe ser aleatorio (24–128 caracteres); no reutilizar el marcador de ejemplo.
+El lanzador lee la `GEMINI_API_KEY` vigente del proceso o usuario de Windows; nunca mostrarla. Si el propietario la renueva, usar la configuración actualizada antes de comprobar la API. `-CheckConfiguration` comprueba la configuración local sin iniciar Java ni llamar a la API. El siguiente comando inicia el servidor; las solicitudes de chat consumen la cuota disponible. Pegar el código del portapapeles únicamente en «Cuenta → Conectar servidor de IA» y vaciarlo cuando ya no se necesite. No usar transcripciones ni trazas que expongan secretos. El launcher limpia las claves de otros proveedores del proceso Java.
 
-## Groq Free en Windows (activación pendiente)
+Desde `backend`, el modelo predeterminado es `gemini-3.5-flash-lite` cuando no se indica otro; `-Model gemini-3.8-flash` es la alternativa Free explícita. Una variable `GEMINI_MODEL` privada permite seleccionar uno de los modelos admitidos. Para arrancar sin proveedor: `.\start-server.ps1 -Provider None`. Groq necesita `-Provider Groq -Model openai/gpt-oss-120b` y su configuración completa; OpenAI necesita `-Provider OpenAI -Model <modelo>` y su configuración. Esas opciones no se activan automáticamente al fallar Gemini ni prueban gratuidad de otra cuenta.
 
-Tras confirmar cuenta Free sin tarjeta y las comprobaciones de [groq-free.md](docs/groq-free.md), ejecuta personalmente `tools/configurar-groq.ps1` desde la raíz del proyecto. La entrada está oculta; el helper guarda únicamente la variable de usuario `GROQ_API_KEY`, sin llamar a Groq ni activar el backend. Abre una terminal nueva. No mostrar la clave ni incluirla en comandos.
+El wrapper de Apache Maven 3.9.16 se copió sin modificar ANKA. La primera compilación descarga dependencias públicas de Maven Central. Java lee variables del proceso, no archivos `.env`. El código de emparejamiento admite 24–128 caracteres y se consume una vez; renovar el código para otra conexión. La preparación Docker requiere archivos privados de clave y pairing, además de un host Docker propio: [runbook](deploy/README.md).
 
-Con el backend compilado, JDK 17+ y código de emparejamiento privado configurado, la comprobación local siguiente no inicia Java ni hace inferencias:
+## Desarrollo privado y publicación pendiente
 
-```powershell
-.\start-server.ps1 -Provider Groq -Model openai/gpt-oss-120b -CheckConfiguration
-```
-
-Solo después de resolver las verificaciones de cuenta, esquema, tokens, ZDR y despliegue: `start-server.ps1 -Provider Groq -Model openai/gpt-oss-120b` permite iniciar el backend local. Iniciarlo no crea un plan ni genera una consulta; atender solicitudes del chat sí puede consumir cuotas. El valor por defecto de `-Provider` sigue siendo `None`, y el launcher limpia las claves de proveedores no seleccionados del proceso Java. Auth y cuotas durables requieren Task16 antes de producción.
-
-## Compatibilidad previa (no seleccionada)
-
-Los adaptadores Gemini/OpenAI siguen presentes para no romper configuraciones anteriores; no se recomiendan ni se habilitan para esta petición de IA gratuita. Los términos de Gemini para usuarios del EEE motivaron buscar otra opción. La documentación técnica y la evidencia histórica siguiente describen trabajo previo, no pruebas de Groq ni autorización actual para pagar o activar esos proveedores.
+La tabla oficial de precios declara entrada/salida Free para los dos modelos permitidos. Consultar las cuotas efectivas del proyecto en AI Studio; no hay un número universal garantizado. Los términos exigen Paid Services para ofrecer clientes API Gemini a usuarios del EEE, Suiza o Reino Unido. Ese requisito mantiene pendiente la publicación gratuita en esos destinos; esta preparación conserva las pruebas privadas sintéticas por separado y no activa pagos. Autenticación Firebase del backend, cuotas durables por usuario/globales y despliegue HTTPS siguen pendientes.
 
 La dirección predeterminada es `127.0.0.1:8080`, HTTP permitido únicamente con `ENERGYM_DEV_MODE=true` y enlace loopback. Para emulador/dispositivo de desarrollo conectado usar `adb reverse tcp:8080 tcp:8080` y URL de app `http://127.0.0.1:8080` solo debug. Release exige HTTPS.
 
@@ -151,15 +143,15 @@ El catálogo es copia exacta versionada de app/src/main/assets/catalog.json. Con
 
 OpenAI usa Responses en HTTPS fijo, modelo configurable, store:false, JSON schema estricto `text.format` con required y additionalProperties:false, max_output_tokens2000 y sin tools. Refusals/incomplete/malformed se rechazan; validación posterior del dominio sigue siendo obligatoria. store:false no promete ausencia de retención de seguridad del proveedor.
 
-Gemini usa `POST https://generativelanguage.googleapis.com/v1beta/interactions`, clave en cabecera `x-goog-api-key`, `response_format` textual JSON con el mismo esquema de propuestas, `store:false`, `stream:false`, `background:false`, máximo 2000 tokens y sin tools ni `previous_interaction_id`. El modelo anterior `gemini-3.5-flash-lite` mantiene su razonamiento predeterminado. Si se selecciona explícitamente el modelo exacto `gemini-3.8-flash`, fija `generation_config.thinking_level=low`, opción documentada para reducir el razonamiento y la latencia frente a su valor predeterminado `medium`; otros modelos configurables conservan su valor predeterminado y no reciben ese parámetro. `thinking_summaries=none` solo oculta resúmenes, no desactiva el razonamiento. El límite de tokens incluye pensamiento y respuesta. HTTPS fijo en producción, sin redirecciones. Solo acepta estado `completed`, pasos auxiliares `thought` documentados y exactamente un `model_output` con un único bloque `text`. El campo opcional `errors` debe ser una lista vacía; si contiene fallos o tiene un tipo inválido (incluido null), se rechaza incluso con estado `completed`. Rechazos, herramientas, estados parciales, salida ambigua, contenido corrupto y anotaciones de retrieval se rechazan; ProposalValidator valida después catálogo, comandos y prescripciones. Se mantienen conexión 5s, solicitud 18s, deadline total 20s (incluye el cuerpo) y descarga máxima 65536 bytes.
+Gemini usa `POST https://generativelanguage.googleapis.com/v1beta/interactions`, clave en cabecera `x-goog-api-key`, `response_format` textual JSON con el mismo esquema de propuestas, `store:false`, `stream:false`, `background:false`, máximo 2000 tokens y sin tools ni `previous_interaction_id`. El modelo predeterminado `gemini-3.5-flash-lite` mantiene su razonamiento predeterminado. Si se selecciona explícitamente el modelo exacto `gemini-3.8-flash`, fija `generation_config.thinking_level=low`, opción documentada para reducir el razonamiento y la latencia frente a su valor predeterminado `medium`; la allowlist de Gemini Free admite únicamente esos dos modelos y rechaza otros nombres, sin consultar la API. `thinking_summaries=none` solo oculta resúmenes, no desactiva el razonamiento. El límite de tokens incluye pensamiento y respuesta. HTTPS fijo en producción, sin redirecciones. Solo acepta estado `completed`, pasos auxiliares `thought` documentados y exactamente un `model_output` con un único bloque `text`. El campo opcional `errors` debe ser una lista vacía; si contiene fallos o tiene un tipo inválido (incluido null), se rechaza incluso con estado `completed`. Rechazos, herramientas, estados parciales, salida ambigua, contenido corrupto y anotaciones de retrieval se rechazan; ProposalValidator valida después catálogo, comandos y prescripciones. Se mantienen conexión 5s, solicitud 18s, deadline total 20s (incluye el cuerpo) y descarga máxima 65536 bytes.
 
-Documentación oficial consultada antes de implementar: [Structured Outputs de Gemini](https://ai.google.dev/gemini-api/docs/structured-output), [referencia Interactions](https://ai.google.dev/api/interactions-api), [Thinking y niveles compatibles](https://ai.google.dev/gemini-api/docs/thinking), [Structured Outputs para Responses](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses), [referencia Responses](https://developers.openai.com/api/reference/resources/responses/methods/create). Las pruebas usan proveedor falso o parseo de fixtures: cero llamadas reales.
+Documentación oficial consultada antes de implementar: [Structured Outputs de Gemini](https://ai.google.dev/gemini-api/docs/structured-output), [referencia Interactions](https://ai.google.dev/api/interactions-api), [Thinking y niveles compatibles](https://ai.google.dev/gemini-api/docs/thinking), [Structured Outputs para Responses](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses), [referencia Responses](https://developers.openai.com/api/reference/resources/responses/methods/create). Las pruebas automáticas usan proveedor falso o parseo de fixtures; las llamadas sintéticas históricas y la nueva comprobación se documentan por separado.
 
 ## Verificación
 
-`mvnw.cmd "-Dmaven.repo.local=$PWD/.cache/m2" test package`: ver el informe Task16a para la suite completa fresca; HTTP localhost incluido, jar ejecutable. Cubre autenticación/expiry/revocación/one-use, tamaño/esquema, rate limit, timeouts de cabeceras y cuerpo, default disabled aun con credenciales, selección explícita sin fallback, razonamiento low solo en el modelo compatible, consentimiento de historial, catálogo/material/cobertura/prescripción, propuestas tipadas, comandos correlacionados, refusals/payload estricto, cuota externa y descarga limitada. No incluye comprobación real de modelo/clave/cuota/billing/certificado ni servicio cloud. Los scripts tienen comprobación de sintaxis y el lanzador se verifica con credenciales ficticias, sin ejecutar el ayudante de captura de claves reales.
+`mvnw.cmd "-Dmaven.repo.local=$PWD/.cache/m2" test package`: la fase anterior registró 66 pruebas sin fallos; la fase Gemini ejecutó 67 pruebas sin fallos, errores ni omitidas y empaquetó el JAR; HTTP localhost incluido, jar ejecutable. Cubre autenticación/expiry/revocación/one-use, tamaño/esquema, rate limit, timeouts de cabeceras y cuerpo, default disabled aun con credenciales, selección explícita sin fallback, razonamiento low solo en el modelo compatible, consentimiento de historial, catálogo/material/cobertura/prescripción, propuestas tipadas, comandos correlacionados, refusals/payload estricto, cuota externa y descarga limitada. La suite automática no comprueba una clave real ni cuota, billing, certificado o servicio cloud. La comprobación sintética real de Gemini está registrada en [gemini-free.md](docs/gemini-free.md). Ocho casos del lanzador pasaron en el proyecto real. Se parsearon tres YAML y se comprobaron selección, modelo, flags y secretos obligatorios de la superposición; Docker build/run sigue pendiente. En la fase anterior se comprobó la sintaxis de los scripts y el lanzador con credenciales ficticias, sin ejecutar el ayudante de captura de claves reales.
 
-## Evidencia final de desarrollo y caché
+## Evidencia histórica de desarrollo y caché
 
 El 14-10-2026, el tercer recorrido Android real pasó una prueba en10.409s (runner13.704s) con gemini-3.5-flash-lite/catalog2: propuesta válida de tres ejercicios, sin campos faltantes ni comandos, SQLite intacta antes de aceptación explícita, y perfil/rutina exactos persistidos tras aceptar y recrear. Demo genérica/historyConsent=false; diagnóstico solo metadatos, sin claves ni contenido crudo. Los dos fallos previos se conservaron y llevaron a la corrección revisada de esquema/prompt. Esta evidencia no es un despliegue ni una promesa de cuota ilimitada.
 
