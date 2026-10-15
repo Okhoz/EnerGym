@@ -204,6 +204,8 @@ dependencies {
 	implementation(libs.appcompat)
 	implementation(libs.constraintlayout)
 	implementation("androidx.dynamicanimation:dynamicanimation:1.1.0")
+	// Escáner de Google Play services: la cámara la gestiona el sistema, la app no pide permiso de cámara.
+	implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
 	implementation(libs.material)
 	testImplementation(libs.junit)
 	androidTestImplementation(libs.espresso.core)

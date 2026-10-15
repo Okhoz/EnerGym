@@ -47,6 +47,10 @@ public final class AppState extends AndroidViewModel {
 	private boolean cleared;
 	public boolean deletingLocalData;
 	public VisualizationController visualization;
+	public com.energym.app.nutrition.NutritionController nutrition;
+	private com.energym.app.nutrition.SqliteNutritionStore nutritionStore;
+	// Consultas a Open Food Facts: independientes del chat y de SQLite.
+	private final ExecutorService lookupWorker = Executors.newSingleThreadExecutor();
 	private Consumer<VisualizationController.Request> viewerLaunch;
 
 	public void bindViewer(Consumer<VisualizationController.Request> launch) {
@@ -94,6 +98,16 @@ public final class AppState extends AndroidViewModel {
 			});
 		AndroidAppStore store = new AndroidAppStore(sync);
 		app = new AppController(store, catalog);
+		nutritionStore = new com.energym.app.nutrition.SqliteNutritionStore(context, worker, main);
+		String version;
+		try {
+			version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+		} catch (Exception e) {
+			version = "1";
+		}
+		nutrition = new com.energym.app.nutrition.NutritionController(nutritionStore,
+			new com.energym.app.nutrition.OpenFoodFactsLookup(lookupWorker, main, version), java.time.LocalDate::now,
+			this::changed, message -> app.error(message));
 		assistant = new ProposalController(store, new LocalConversationStore(context, worker),
 			new HttpChatClient(chatWorker, main,
 				(context.getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0),
@@ -133,6 +147,7 @@ public final class AppState extends AndroidViewModel {
 		});
 		app.observe(() -> {
 			assistant.activate(app.owner());
+			nutrition.activate(app.owner());
 			changed();
 		});
 		accounts = new AccountController(gateway, sync, main, (status, value, error) -> {
@@ -184,6 +199,15 @@ public final class AppState extends AndroidViewModel {
 			return;
 		deletingLocalData = true;
 		assistant.clearLocalData();
+		nutritionStore.clear(expectedOwner, new com.energym.app.nutrition.NutritionStore.Callback<Void>() {
+			public void success(Void ignored) {
+			}
+
+			public void failure(Exception error) {
+				if (!cleared)
+					app.error("No se pudo borrar el diario de nutrición local: " + error.getMessage());
+			}
+		});
 		if (visualization != null)
 			visualization.revoke();
 		app.activate(null);
@@ -269,6 +293,7 @@ public final class AppState extends AndroidViewModel {
 		if (assistant != null)
 			assistant.disconnect();
 		chatWorker.shutdown();
+		lookupWorker.shutdown();
 		if (app != null)
 			app.observe(null);
 		if (networkCallback != null)
@@ -277,6 +302,8 @@ public final class AppState extends AndroidViewModel {
 			accounts.close();
 		if (sync != null)
 			sync.close();
+		if (nutritionStore != null)
+			worker.execute(nutritionStore::close);
 		worker.shutdown();
 	}
 }

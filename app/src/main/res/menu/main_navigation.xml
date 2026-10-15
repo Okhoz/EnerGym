@@ -10,11 +10,15 @@
 		app:contentDescription="@string/training"
 		android:icon="@drawable/ic_training" />
 	<item
+		android:id="@+id/tab_nutrition"
+		android:title="@string/nutrition"
+		android:icon="@drawable/ic_nutrition" />
+	<item
 		android:id="@+id/tab_assistant"
 		android:title="@string/assistant"
 		android:icon="@drawable/ic_assistant" />
 	<item
 		android:id="@+id/tab_history"
 		android:title="@string/history"
-		android:icon="@drawable/ic_history" />
+		android:icon="@drawable/ic_progress" />
 </menu>

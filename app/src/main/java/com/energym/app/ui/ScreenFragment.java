@@ -89,6 +89,83 @@ public abstract class ScreenFragment extends Fragment {
 		action(target, label, true, event);
 	}
 
+	/**
+	 * Añade una vista propia (gráfica, calendario, texto) a ancho completo con separación superior.
+	 */
+	protected <V extends View> V add(LinearLayout target, V view, int topDp) {
+		LinearLayout.LayoutParams params =
+			new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		params.topMargin = dp(topDp);
+		target.addView(view, params);
+		return view;
+	}
+
+	/**
+	 * Fila horizontal de columnas iguales: anillos de macros, cifras resumen o botones compactos.
+	 */
+	protected LinearLayout columns(LinearLayout target, int topDp) {
+		LinearLayout row = new LinearLayout(requireContext());
+		row.setOrientation(LinearLayout.HORIZONTAL);
+		row.setBaselineAligned(false);
+		return add(target, row, topDp);
+	}
+
+	protected <V extends View> V column(LinearLayout row, V view, int gapDp) {
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+		if (row.getChildCount() > 0)
+			params.setMarginStart(dp(gapDp));
+		row.addView(view, params);
+		return view;
+	}
+
+	/**
+	 * Botón compacto para filas horizontales: mismo estilo que las acciones, sin margen superior propio.
+	 */
+	protected MaterialButton compact(LinearLayout row, String label, boolean enabled, Runnable event) {
+		MaterialButton b = (MaterialButton) getLayoutInflater().inflate(R.layout.row_action, row, false);
+		b.setText(label);
+		b.setEnabled(enabled);
+		b.setMinHeight(dp(48));
+		b.setTextSize(14);
+		b.setOnClickListener(v -> event.run());
+		return column(row, b, 8);
+	}
+
+	/**
+	 * Cifra destacada con su leyenda debajo, para resúmenes en columnas.
+	 */
+	protected View stat(LinearLayout row, String value, String caption) {
+		LinearLayout box = new LinearLayout(requireContext());
+		box.setOrientation(LinearLayout.VERTICAL);
+		TextView number = new TextView(requireContext());
+		number.setTextAppearance(R.style.EnerGym_StatValue);
+		number.setText(value);
+		TextView label = new TextView(requireContext());
+		label.setTextAppearance(R.style.EnerGym_FieldCaption);
+		label.setText(caption);
+		box.addView(number);
+		box.addView(label);
+		box.setContentDescription(value + " " + caption);
+		return column(row, box, 12);
+	}
+
+	protected TextView text(LinearLayout target, String value, int style, int topDp) {
+		TextView view = new TextView(requireContext());
+		view.setTextAppearance(style);
+		view.setText(value);
+		return add(target, view, topDp);
+	}
+
+	protected int dp(float value) {
+		return Math.round(value * getResources().getDisplayMetrics().density);
+	}
+
+	protected void primary(MaterialButton button) {
+		button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+			androidx.core.content.ContextCompat.getColor(requireContext(), R.color.gold)));
+		button.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.surface));
+	}
+
 	protected void textField(LinearLayout target, String key, String label, String value, boolean number,
 		boolean integer, Consumer<String> event) {
 		View row = getLayoutInflater().inflate(R.layout.row_field, target, false);

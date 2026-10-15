@@ -11,7 +11,7 @@ import java.util.*;
 public final class AppController {
 	public TrainingProfile profile;
 
-	public enum Screen {HOME, TRAINING, ASSISTANT, HISTORY, PROFILE, ROUTINE, SESSION, EXERCISE, ACCOUNT}
+	public enum Screen {HOME, TRAINING, ASSISTANT, HISTORY, PROFILE, ROUTINE, SESSION, EXERCISE, ACCOUNT, NUTRITION, FOOD, BODY}
 
 	/**
 	 * Descriptor de edición: la vista infla XML y remite texto, no interpreta enums ni reglas.
@@ -208,7 +208,8 @@ public final class AppController {
 
 	public void navigate(Screen next) {
 		navigationRevision++;
-		if (next == Screen.HOME || next == Screen.TRAINING || next == Screen.ASSISTANT || next == Screen.HISTORY) {
+		if (next == Screen.HOME || next == Screen.TRAINING || next == Screen.ASSISTANT || next == Screen.HISTORY ||
+			next == Screen.NUTRITION) {
 			tab = next;
 			backStack.clear();
 		} else if (screen != next)

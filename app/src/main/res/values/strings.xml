@@ -5,7 +5,8 @@
 	<string name="training">Entrenamiento</string>
 	<string name="training_navigation">Entreno</string>
 	<string name="assistant">Asistente</string>
-	<string name="history">Historial</string>
+	<string name="history">Progreso</string>
+	<string name="nutrition">Nutrición</string>
 	<string name="back">Volver</string>
 	<string name="logo_description">Logo de EnerGym: mancuerna y hoja</string>
 	<string name="home_sessions_label">Sesiones finalizadas</string>
@@ -25,7 +26,7 @@
 	<string name="home_training_body">Prepara tu rutina con el tiempo y los recursos que tienes.</string>
 	<string name="home_view_training">Ver entrenamiento</string>
 	<string name="home_record_title">Tu registro</string>
-	<string name="home_view_history">Ver historial</string>
+	<string name="home_view_history">Ver progreso y calendario</string>
 	<string name="home_last_action">Última acción</string>
 	<string name="account_intro">Conecta Google para activar el respaldo Firebase. La demo permanece solo en este dispositivo.</string>
 	<string name="account_signed_out">Elige cómo quieres entrar.</string>

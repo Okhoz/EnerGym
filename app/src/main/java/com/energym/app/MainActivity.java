@@ -102,6 +102,8 @@ public final class MainActivity extends AppCompatActivity {
 				screen = AppController.Screen.ASSISTANT;
 			else if (id == R.id.tab_history)
 				screen = AppController.Screen.HISTORY;
+			else if (id == R.id.tab_nutrition)
+				screen = AppController.Screen.NUTRITION;
 			state.app.navigate(screen);
 			if (screen == AppController.Screen.HISTORY)
 				state.app.reload();
@@ -140,6 +142,8 @@ public final class MainActivity extends AppCompatActivity {
 				tab = R.id.tab_assistant;
 			else if (app.tab == AppController.Screen.HISTORY)
 				tab = R.id.tab_history;
+			else if (app.tab == AppController.Screen.NUTRITION)
+				tab = R.id.tab_nutrition;
 			nav.setSelectedItemId(tab);
 			findViewById(R.id.back).setVisibility(app.screen == app.tab ? View.GONE : View.VISIBLE);
 			Fragment current = getSupportFragmentManager().findFragmentById(R.id.content);
@@ -185,6 +189,12 @@ public final class MainActivity extends AppCompatActivity {
 				return new ExerciseFragment();
 			case ACCOUNT:
 				return new AccountFragment();
+			case NUTRITION:
+				return new NutritionFragment();
+			case FOOD:
+				return new FoodFragment();
+			case BODY:
+				return new BodyFragment();
 			default:
 				return new HomeFragment();
 		}

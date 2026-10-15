@@ -15,4 +15,10 @@
 	<color name="outline">#D3B16B</color>
 	<color name="disabled_outline">#716447</color>
 	<color name="error">#FFB4AB</color>
+	<!-- Gráficas: pista neutra y macros diferenciados con contraste suficiente sobre negro. -->
+	<color name="chart_track">#2E322F</color>
+	<color name="chart_over">#E8826B</color>
+	<color name="macro_protein">#E9C98A</color>
+	<color name="macro_carbs">#9CC7B4</color>
+	<color name="macro_fat">#C9A7D9</color>
 </resources>

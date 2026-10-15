@@ -54,6 +54,15 @@ public final class HomeFragment extends ScreenFragment {
 		primary.setTextColor(ContextCompat.getColor(requireContext(), R.color.surface));
 		LinearLayout training = card(getString(R.string.home_training_title), getString(R.string.home_training_body));
 		action(training, getString(R.string.home_view_training), () -> app.navigate(Screen.TRAINING));
+		if (app.owner() != null && state.nutrition != null) {
+			double[] today = state.nutrition.totals(state.nutrition.today());
+			com.energym.app.nutrition.BodyProfile.Targets targets = state.nutrition.targets();
+			LinearLayout food = card(getString(R.string.nutrition), targets == null ?
+				"Escanea tus alimentos y sigue calorías y macros del día." :
+				"Hoy: " + Math.round(today[0]) + " de " + Math.round(targets.kcal) + " kcal · proteínas " +
+					Math.round(today[1]) + " de " + Math.round(targets.protein) + " g");
+			action(food, "Abrir nutrición", () -> app.navigate(Screen.NUTRITION));
+		}
 		LinearLayout history = card(getString(R.string.home_record_title), state.syncText());
 		action(history, getString(R.string.home_view_history), () -> app.navigate(Screen.HISTORY));
 		if (!app.notice.isEmpty())
