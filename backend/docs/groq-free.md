@@ -37,6 +37,12 @@ El sistema español incluye el catálogo filtrado y `exerciseContext` que prepar
 
 `reasoning_effort=low` y `include_reasoning=false` ocultan la salida de razonamiento; **no desactivan su cómputo ni coste en tokens**. Se omite `store`: la [API de Groq](https://console.groq.com/docs/api-reference) declara que no está soportado. No afirmar retención cero. [Your Data](https://console.groq.com/docs/your-data) permite retención de inputs/outputs para fiabilidad/abuso hasta 30 días y excepciones legales; conserva metadatos. Habilitar ZDR en Data Controls antes de datos reales y revisar [DPA](https://console.groq.com/docs/legal/customer-data-processing-addendum), transferencias y condiciones aplicables. Mensaje, historial y campos libres pueden contener datos sensibles: no enviar identidad, email, UID ni diagnósticos, y usar solo perfiles sintéticos en la primera prueba. Ni ZDR ni el aviso eliminan esa posibilidad.
 
+## Primera prueba real (15/10/2026)
+
+El propietario confirmó en la consola que la cuenta está en el plan **Free sin tarjeta**. Se arrancó el JAR local en loopback (`127.0.0.1:18080`) con `ENERGYM_AI_PROVIDER=groq`, `GROQ_ENABLED=true`, `GROQ_MODEL=openai/gpt-oss-120b` y la clave leída de la variable de usuario solo para ese proceso (sin imprimirla); el proceso se detuvo al terminar. Perfil sintético: fuerza, casa, `HOME_EQUIPMENT` con `DUMBBELLS`+`MAT`, 3 días, 30 min, principiante, sin historial ni consentimiento.
+
+Resultado: `/health` 200; emparejamiento 201; `/api/chat` **200 en 2,3 s** con una propuesta de 5 ejercicios del catálogo ampliado (sentadilla goblet, press de hombros, remo con mancuernas, plancha, abdominal bicicleta), 28 min estimados y prescripciones completas que superaron la validación local del servidor. Groq aceptó el esquema estricto exacto, incluidos `minItems`/`maxItems`. Sigue pendiente: activar ZDR en Data Controls, revisar la edad mínima/condiciones antes del lanzamiento, autenticación Firebase y cuotas durables por usuario (Task16) y un despliegue HTTPS público.
+
 ## Comprobaciones realizadas y pendientes
 
 Las pruebas usan fixtures sintéticas y servidor HTTP loopback; la entrada de endpoint/timeout interna existe exclusivamente como seam de pruebas y no se expone por configuración. No se ha probado alta, claves reales, aceptación remota del schema ni calidad de rutinas españolas. Todo ello, plan Free sin pago, términos/edad, ZDR, tokenización, auth y cuotas siguen pendientes antes de habilitar llamadas.
