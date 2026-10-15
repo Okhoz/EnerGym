@@ -12,7 +12,7 @@ import java.util.concurrent.Executor;
  * Sin listeners persistentes ni caché en disco; SQLite es la única cola offline por cuenta.
  */
 public final class FirebaseCloudGateway implements CloudSyncGateway {
-	private static final int PAGE_SIZE = 100, MAX_RESTORE_RECORDS = 2000;
+	private static final int PAGE_SIZE = 100, MAX_RESTORE_RECORDS = 10000;
 	private final AccountGateway accounts;
 	private final FirebaseFirestore firestore;
 	private final Executor worker;
@@ -55,8 +55,9 @@ public final class FirebaseCloudGateway implements CloudSyncGateway {
 				return;
 			}
 			SyncRecord.Kind kind = kinds[index];
-			if (kind == SyncRecord.Kind.PROFILE) {
-				firestore.collection("users").document(owner).collection("profile").document("current")
+			if (CloudDocumentCodec.singleton(kind)) {
+				firestore.collection("users").document(owner).collection(CloudDocumentCodec.collection(kind))
+					.document("current")
 					.get(Source.SERVER).addOnCompleteListener(worker, task -> {
 						try {
 							requireOwner(owner);
@@ -88,7 +89,7 @@ public final class FirebaseCloudGateway implements CloudSyncGateway {
 						result.add(CloudDocumentCodec.decode(owner, kind, doc.getId(), doc.getData()));
 						if (result.size() > MAX_RESTORE_RECORDS)
 							throw new IllegalStateException(
-								"Respaldo supera 2000 registros; no se importó un lote parcial");
+								"Respaldo supera 10000 registros; no se importó un lote parcial");
 					}
 					if (docs.size() == PAGE_SIZE)
 						readPage(owner, kinds, index, docs.get(docs.size() - 1), result, callback);

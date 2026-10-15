@@ -157,3 +157,32 @@ test('session can finish once without changing historical identity', async () =>
 test('unknown collections denied even for own UID', async () => {
 	await assertFails(setDoc(doc(db('alice'), 'users/alice/conversations/id'), data()));
 });
+function nutrition(kind, id, extra = {}) {
+	return {
+		...data(kind, id),
+		identity: kind === 'FOOD' ? 'b'.repeat(64) : '',
+		terminal: false,
+		...extra
+	};
+}
+test('own nutrition body weights and food sync with versioned updates', async () => {
+	const own = db('alice');
+	const body = doc(own, 'users/alice/body/current');
+	await assertSucceeds(setDoc(body, nutrition('BODY', 'body')));
+	await assertSucceeds(setDoc(body, nutrition('BODY', 'body', {cloudVersion: 2, updatedAt: 1001})));
+	const weight = doc(own, 'users/alice/weights/2026-10-15');
+	await assertSucceeds(setDoc(weight, nutrition('WEIGHT', '2026-10-15')));
+	await assertSucceeds(setDoc(weight, nutrition('WEIGHT', '2026-10-15', {cloudVersion: 2, updatedAt: 1001})));
+	await assertFails(setDoc(doc(own, 'users/alice/weights/ayer'), nutrition('WEIGHT', 'ayer')));
+	await assertFails(deleteDoc(weight));
+	await assertFails(getDoc(doc(db('bob'), 'users/alice/body/current')));
+});
+test('food can only move once from active to terminal tombstone', async () => {
+	const ref = doc(db('alice'), 'users/alice/food/meal-1');
+	await assertSucceeds(setDoc(ref, nutrition('FOOD', 'meal-1')));
+	await assertFails(setDoc(ref, nutrition('FOOD', 'meal-1', {cloudVersion: 2, updatedAt: 1001, identity: 'c'.repeat(64)})));
+	await assertSucceeds(setDoc(ref, nutrition('FOOD', 'meal-1', {cloudVersion: 2, updatedAt: 1001, terminal: true})));
+	await assertFails(setDoc(ref, nutrition('FOOD', 'meal-1', {cloudVersion: 3, updatedAt: 1002, terminal: false})));
+	await assertFails(deleteDoc(ref));
+	await assertFails(setDoc(doc(db('alice'), 'users/alice/food/meal-2'), nutrition('FOOD', 'meal-2', {identity: ''})));
+});

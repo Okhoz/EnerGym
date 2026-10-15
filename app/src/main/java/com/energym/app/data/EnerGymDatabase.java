@@ -230,7 +230,9 @@ public final class EnerGymDatabase extends SQLiteOpenHelper {
 		return local != null && (local.record.getState() == SyncRecord.State.PENDING ||
 			remote.getUpdatedAt() <= local.record.getUpdatedAt() || remote.getKind() == SyncRecord.Kind.ROUTINE ||
 			(remote.getKind() == SyncRecord.Kind.SESSION &&
-				SnapshotCodec.decodeSession(local.record.getPayload()).getStatus() == Session.Status.FINISHED));
+				SnapshotCodec.decodeSession(local.record.getPayload()).getStatus() == Session.Status.FINISHED) ||
+			// Un alimento borrado localmente es definitivo: una copia remota anterior no lo resucita.
+			(remote.getKind() == SyncRecord.Kind.FOOD && NutritionRepository.deleted(local.record.getPayload())));
 	}
 
 	private void validate(SyncRecord r) {
@@ -247,6 +249,17 @@ public final class EnerGymDatabase extends SQLiteOpenHelper {
 				Routine routine = SnapshotCodec.decodeRoutine(r.getPayload());
 				if (!r.getSyncId().equals(routine.getProposalId()) || !routine.isValidFor(routine.getProfile()))
 					throw new IllegalArgumentException("Snapshot de rutina inválido");
+				break;
+			case BODY:
+				if (!NutritionRepository.BODY_ID.equals(r.getSyncId()))
+					throw new IllegalArgumentException("ID de perfil físico inválido");
+				NutritionRepository.decodeBody(r.getPayload());
+				break;
+			case FOOD:
+				NutritionRepository.canonicalFood(r.getSyncId(), r.getPayload());
+				break;
+			case WEIGHT:
+				NutritionRepository.canonicalWeight(r.getSyncId(), r.getPayload());
 				break;
 			case SESSION:
 				Session session = SnapshotCodec.decodeSession(r.getPayload());

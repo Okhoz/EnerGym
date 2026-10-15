@@ -48,7 +48,7 @@ public final class AppState extends AndroidViewModel {
 	public boolean deletingLocalData;
 	public VisualizationController visualization;
 	public com.energym.app.nutrition.NutritionController nutrition;
-	private com.energym.app.nutrition.SqliteNutritionStore nutritionStore;
+	private com.energym.app.nutrition.SyncedNutritionStore nutritionStore;
 	// Consultas a Open Food Facts: independientes del chat y de SQLite.
 	private final ExecutorService lookupWorker = Executors.newSingleThreadExecutor();
 	private Consumer<VisualizationController.Request> viewerLaunch;
@@ -98,7 +98,7 @@ public final class AppState extends AndroidViewModel {
 			});
 		AndroidAppStore store = new AndroidAppStore(sync);
 		app = new AppController(store, catalog);
-		nutritionStore = new com.energym.app.nutrition.SqliteNutritionStore(context, worker, main);
+		nutritionStore = new com.energym.app.nutrition.SyncedNutritionStore(context, sync);
 		String version;
 		try {
 			version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
@@ -198,15 +198,8 @@ public final class AppState extends AndroidViewModel {
 			return;
 		deletingLocalData = true;
 		assistant.clearLocalData();
-		nutritionStore.clear(expectedOwner, new com.energym.app.nutrition.NutritionStore.Callback<Void>() {
-			public void success(Void ignored) {
-			}
-
-			public void failure(Exception error) {
-				if (!cleared)
-					app.error("No se pudo borrar el diario de nutrición local: " + error.getMessage());
-			}
-		});
+		// El diario sincronizable se borra con la base de la cuenta; aquí solo resta el archivo de la versión anterior.
+		worker.execute(() -> nutritionStore.clearLegacy(expectedOwner));
 		if (visualization != null)
 			visualization.revoke();
 		app.activate(null);
@@ -301,8 +294,6 @@ public final class AppState extends AndroidViewModel {
 			accounts.close();
 		if (sync != null)
 			sync.close();
-		if (nutritionStore != null)
-			worker.execute(nutritionStore::close);
 		worker.shutdown();
 	}
 }

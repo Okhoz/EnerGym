@@ -6,7 +6,7 @@ import java.util.Objects;
  * Registro inmutable para adaptadores de nube: identidad por cuenta y revisión exacta del contenido enviado.
  */
 public final class SyncRecord {
-	public enum Kind {PROFILE, ROUTINE, SESSION}
+	public enum Kind {PROFILE, ROUTINE, SESSION, BODY, FOOD, WEIGHT}
 
 	public enum State {PENDING, CLEAN}
 

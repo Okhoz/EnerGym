@@ -17,12 +17,32 @@ public final class CloudDocumentCodec {
 	}
 
 	public static String collection(SyncRecord.Kind kind) {
-		return kind == SyncRecord.Kind.PROFILE ? "profile" : kind == SyncRecord.Kind.ROUTINE ? "routines" : "sessions";
+		switch (kind) {
+			case PROFILE:
+				return "profile";
+			case ROUTINE:
+				return "routines";
+			case BODY:
+				return "body";
+			case FOOD:
+				return "food";
+			case WEIGHT:
+				return "weights";
+			default:
+				return "sessions";
+		}
+	}
+
+	/**
+	 * Perfil y perfil físico son un único documento "current" por cuenta.
+	 */
+	public static boolean singleton(SyncRecord.Kind kind) {
+		return kind == SyncRecord.Kind.PROFILE || kind == SyncRecord.Kind.BODY;
 	}
 
 	public static String documentId(SyncRecord.Kind kind, String syncId) {
 		validateId(syncId);
-		return kind == SyncRecord.Kind.PROFILE ? "current" : syncId;
+		return singleton(kind) ? "current" : syncId;
 	}
 
 	private static void validateId(String id) {
@@ -51,6 +71,20 @@ public final class CloudDocumentCodec {
 				payload = SnapshotCodec.encodeRoutine(routine);
 				identity = hash(payload);
 				terminal = true;
+				break;
+			case BODY:
+				if (!NutritionRepository.BODY_ID.equals(record.getSyncId()))
+					throw new IllegalArgumentException("Identidad de perfil físico inválida");
+				payload = NutritionRepository.encodeBody(NutritionRepository.decodeBody(record.getPayload()));
+				break;
+			case WEIGHT:
+				payload = NutritionRepository.canonicalWeight(record.getSyncId(), record.getPayload());
+				break;
+			case FOOD:
+				// Identidad estable entre alta y lápida; la lápida es definitiva.
+				payload = NutritionRepository.canonicalFood(record.getSyncId(), record.getPayload());
+				identity = hash(record.getSyncId() + ":" + NutritionRepository.foodCreatedAt(payload));
+				terminal = NutritionRepository.deleted(payload);
 				break;
 			default:
 				Session session = SnapshotCodec.decodeSession(record.getPayload());
