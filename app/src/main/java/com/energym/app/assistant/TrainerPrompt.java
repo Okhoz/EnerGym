@@ -39,6 +39,9 @@ public final class TrainerPrompt {
 		StringBuilder p = new StringBuilder();
 		p.append("Eres el entrenador personal de la app EnerGym y hablas con tu cliente dentro de la app. ")
 			.append("Responde en español, cercano y motivador, con frases cortas y concretas. ")
+			.append("Redacta bien: buena ortografía y puntuación (¿?, ¡!, comas y puntos), párrafos cortos separados ")
+			.append("por una línea en blanco (\\n\\n dentro del JSON), listas con «• » y cada punto en su línea (\\n), ")
+			.append("y de 1 a 3 emoticonos que encajen (💪 🔥 ✅ 🧘 👏). Sin Markdown ni asteriscos. ")
 			.append("Ayudas con rutinas, técnica, progresión, motivación, descanso y hábitos. ")
 			.append("No diagnosticas ni tratas lesiones: ante dolor, mareo o una lesión recomienda parar y consultar ")
 			.append("a un profesional sanitario. No inventes datos del cliente ni material que no tenga.\n")
@@ -53,7 +56,8 @@ public final class TrainerPrompt {
 				.append("{\"id\":\"id exacto de EJERCICIOS DISPONIBLES\",\"series\":3,\"repeticiones\":10,")
 				.append("\"motivo\":\"por qué encaja con su perfil\"}]}}\n")
 				.append("Elige de 3 a 5 ejercicios solo de la lista, en buen orden (movilidad o calentamiento primero ")
-				.append("si los hay). Empieza conservador, con un esfuerzo de 6 o 7 sobre 10, para que la app pueda ")
+				.append("si los hay). En \"texto\" explica el enfoque y da consejos de técnica, pero no escribas ")
+				.append("series, repeticiones ni segundos: la app los calcula y los muestra. Empieza conservador, con un esfuerzo de 6 o 7 sobre 10, para que la app pueda ")
 				.append("subir series, repeticiones, carga o tiempo en cada sesión (sobrecarga progresiva). ")
 				.append("Ten en cuenta el nivel, la experiencia, las limitaciones y los datos de su disciplina.\n");
 		p.append("\nPERFIL DEL CLIENTE\n").append(profile(r.profileData)).append('\n');
@@ -94,14 +98,21 @@ public final class TrainerPrompt {
 			text = t instanceof String ? ((String) t).trim() : "";
 			if (parsed.get("rutina") instanceof Map)
 				routine = cast(parsed.get("rutina"));
+		} else if (text.contains("{")) {
+			// JSON roto (p. ej. una llave de más): nunca se enseña crudo; se rescata solo el texto si se puede.
+			java.util.regex.Matcher t = java.util.regex.Pattern.compile("\"texto\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\"")
+				.matcher(text);
+			text = t.find() ? t.group(1).replace("\\n", "\n").replace("\\\"", "\"") : "";
 		} else
 			text = text.replaceAll("```[a-zA-Z]*", "").trim();
+		if (routine == null && r.profile != null)
+			routine = fromNames(text, eligible(r.profile, catalog));
 		Map<String, Object> proposal = r.profile == null || routine == null ? null : proposal(routine, r, catalog);
 		if (text.isEmpty())
 			text = proposal != null ? "Aquí tienes tu entrenamiento de hoy. Revísalo antes de aceptarlo." :
 				"No he podido preparar una respuesta. ¿Puedes repetírmelo con otras palabras?";
 		Map<String, Object> m = new LinkedHashMap<>();
-		m.put("text", cut(text, 4000));
+		m.put("text", cut(plain(text), 4000));
 		m.put("missingFields", r.profile == null ? new ArrayList<Object>(missing(r.profileData)) : new ArrayList<>());
 		m.put("proposal", proposal);
 		m.put("commands", new ArrayList<>());
@@ -111,6 +122,26 @@ public final class TrainerPrompt {
 		m.put("requestId", r.requestId);
 		m.put("exerciseId", r.exerciseId);
 		return StrictJson.write(m);
+	}
+
+	/**
+	 * Los modelos pequeños a veces describen la rutina en el texto sin rellenar «rutina»: si nombra al menos dos
+	 * ejercicios disponibles, se arma con ellos en el orden en que aparecen. Si no, null (solo conversación).
+	 */
+	static Map<String, Object> fromNames(String text, List<Exercise> eligible) {
+		String lower = text.toLowerCase(Locale.ROOT);
+		TreeMap<Integer, Exercise> found = new TreeMap<>();
+		for (Exercise e : eligible) {
+			int at = lower.indexOf(e.getName().toLowerCase(Locale.ROOT));
+			if (at >= 0)
+				found.putIfAbsent(at, e);
+		}
+		if (found.size() < 2)
+			return null;
+		List<Object> items = new ArrayList<>();
+		for (Exercise e : found.values())
+			items.add(StrictJson.map("id", e.getId()));
+		return StrictJson.map("ejercicios", items);
 	}
 
 	private static Map<String, Object> proposal(Map<String, Object> routine, ChatClient.Request r,
@@ -266,6 +297,16 @@ public final class TrainerPrompt {
 		return result;
 	}
 
+	/**
+	 * El chat muestra texto plano: se quitan negritas y viñetas Markdown que los modelos pequeños suelen añadir.
+	 */
+	static String plain(String text) {
+		return text.replaceAll("\\*\\*|__", "").replaceAll("(?m)^\\s*[*-]\\s+", "• ").replaceAll("(?m)^#+\\s*", "")
+			// Listas en línea («… 1. Sentadilla … 2. Puente …» o «… • Técnica …»): cada punto en su propia línea.
+			.replaceAll("([^\\n])\\s+(\\d{1,2}\\.\\s+\\p{Lu})", "$1\n$2").replaceAll("([^\\n])\\s*•\\s*", "$1\n• ")
+			.replaceAll("[ \\t]+\\n", "\n").replaceAll("\\n{3,}", "\n\n").trim();
+	}
+
 	private static String metric(MetricType type) {
 		switch (type) {
 			case STRENGTH:
@@ -285,8 +326,29 @@ public final class TrainerPrompt {
 	 * Primer objeto JSON de la salida (tolera vallas ``` y texto alrededor); null si no hay uno legible.
 	 */
 	private static Map<String, Object> json(String text) {
-		int start = text.indexOf('{'), end = text.lastIndexOf('}');
-		if (start < 0 || end <= start)
+		int start = text.indexOf('{');
+		if (start < 0)
+			return null;
+		// Primer objeto con llaves equilibradas (ignorando las de dentro de cadenas): tolera llaves sobrantes al final.
+		int depth = 0, end = -1;
+		boolean string = false, escaped = false;
+		for (int i = start; i < text.length() && end < 0; i++) {
+			char c = text.charAt(i);
+			if (string) {
+				if (escaped)
+					escaped = false;
+				else if (c == '\\')
+					escaped = true;
+				else if (c == '"')
+					string = false;
+			} else if (c == '"')
+				string = true;
+			else if (c == '{')
+				depth++;
+			else if (c == '}' && --depth == 0)
+				end = i;
+		}
+		if (end < 0)
 			return null;
 		try {
 			Object value = StrictJson.parse(text.substring(start, end + 1));

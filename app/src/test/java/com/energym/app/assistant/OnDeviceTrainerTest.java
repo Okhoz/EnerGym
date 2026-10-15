@@ -122,6 +122,48 @@ public class OnDeviceTrainerTest {
 	}
 
 	@Test
+	public void brokenJsonFromTheModelIsNeverShownRaw() {
+		ChatClient.Request r = request(profile, "rutina", Collections.emptyList());
+		// Llave de más al final, como devolvió Gemma en el S23: se lee igual.
+		ChatProtocol.Reply extra = ChatProtocol.reply(TrainerPrompt.reply("{\"texto\":\"Vamos\",\"rutina\":{\"titulo\":" +
+			"\"Core\",\"ejercicios\":[{\"id\":\"plank\"}]}}}", r, catalog, 2), r, catalog, 2);
+		assertEquals("Vamos", extra.text);
+		assertNotNull(extra.proposal);
+		// JSON sin cerrar: se rescata solo el texto, nunca el JSON.
+		ChatProtocol.Reply cut = ChatProtocol.reply(TrainerPrompt.reply("{\"texto\":\"Hoy toca core\",\"rutina\":" +
+			"{\"titulo\":\"Core\",\"ejercicios\":[{\"id\":", r, catalog, 2), r, catalog, 2);
+		assertEquals("Hoy toca core", cut.text);
+		assertFalse(cut.text.contains("{"));
+	}
+
+	@Test
+	public void routineDescribedOnlyInTheTextStillBecomesAProposal() {
+		ChatClient.Request r = request(profile, "rutina de core", Collections.emptyList());
+		String output = "{\"texto\":\"Hoy: 1. Plancha para el core. 2. Sentadilla con control.\",\"rutina\":null}";
+		ChatProtocol.Reply reply = ChatProtocol.reply(TrainerPrompt.reply(output, r, catalog, 2), r, catalog, 2);
+		assertNotNull(reply.proposal);
+		assertEquals("plank", reply.proposal.getItems().get(0).getExercise().getId());
+		assertEquals("squat", reply.proposal.getItems().get(1).getExercise().getId());
+		ChatClient.Request chat = request(profile, "¿qué tal?", Collections.emptyList());
+		assertNull("Una charla que nombra un solo ejercicio no crea rutina", ChatProtocol.reply(TrainerPrompt.reply(
+			"{\"texto\":\"La plancha va genial para el core\",\"rutina\":null}", chat, catalog, 2), chat, catalog, 2)
+			.proposal);
+	}
+
+	@Test
+	public void inlineListsAreSplitIntoReadableLines() {
+		assertEquals("¡Vamos! 💪 Hoy:\n1. Sentadilla lenta.\n2. Puente de glúteos.\n\nConsejo:\n• Respira.\n• Controla.",
+			TrainerPrompt.plain("¡Vamos! 💪 Hoy: 1. Sentadilla lenta. 2. Puente de glúteos.\n\n\n\nConsejo: • Respira. • Controla."));
+		assertEquals("Haz 3 series de 10.", TrainerPrompt.plain("Haz 3 series de 10."));
+	}
+
+	@Test
+	public void markdownFromTheModelIsShownAsPlainText() {
+		assertEquals("Rutina de piernas:\n• Sentadilla: baja controlado\n• Puente",
+			TrainerPrompt.plain("## **Rutina de piernas:**\n*   **Sentadilla:** baja controlado\n- Puente"));
+	}
+
+	@Test
 	public void bigDownloadWaitsForTheUserAndThenRuns() {
 		FakeModel gemma = new FakeModel(OnDeviceModel.DOWNLOADABLE);
 		gemma.consent = true;
