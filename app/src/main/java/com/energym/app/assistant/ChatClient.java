@@ -46,5 +46,20 @@ public interface ChatClient {
 	void disconnect();
 
 	boolean connected();
+
+	default void activate(String owner) {
+		disconnect();
+	}
+
+	default boolean automaticConnection() {
+		return false;
+	}
+
+	default String unavailableCode() {
+		return connected() ? "" : "UNAUTHORIZED";
+	}
+
+	default void cancelPending() {
+	}
 }
 

@@ -122,8 +122,9 @@ public final class AppState extends AndroidViewModel {
 			new com.energym.app.nutrition.OpenFoodFactsLookup(lookupWorker, main, version), java.time.LocalDate::now,
 			this::changed, message -> app.error(message));
 		assistant = new ProposalController(store, new LocalConversationStore(context, worker),
-			new HttpChatClient(chatWorker, main,
-				(context.getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0),
+			ChatClientFactory.create(chatWorker, main, com.energym.app.BuildConfig.DEBUG,
+				com.energym.app.BuildConfig.BACKEND_BASE_URL,
+				new FirebaseChatTokenSource(gateway::currentFirebaseUser, main)),
 			catalog.getExercises(), catalog.getVersion(), () -> app.profile, this::changed, r -> {
 			app.routineAccepted(r);
 		});

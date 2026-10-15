@@ -14,6 +14,7 @@ plugins {
 // Las entradas privadas de release se suministran fuera del repositorio, nunca como -Pcontraseña.
 val releaseFirebasePath = providers.environmentVariable("ENERGYM_FIREBASE_CONFIG").orElse("").get()
 val releaseBackendUrl = providers.environmentVariable("ENERGYM_BACKEND_URL").orElse("").get()
+val debugBackendUrl = releaseBackendUrl.trim().removeSuffix("/")
 val releaseSigningPath = providers.environmentVariable("ENERGYM_RELEASE_SIGNING_PROPERTIES").orElse("").get()
 val releaseFirebaseFile = releaseFirebasePath.takeIf { it.isNotBlank() }?.let { File(it) }
 val releaseSigningFile = releaseSigningPath.takeIf { it.isNotBlank() }?.let { File(it) }
@@ -135,10 +136,39 @@ val validateReleaseConfiguration = tasks.register<ValidateReleaseConfiguration>(
 	signingPath = releaseSigningPath
 	sourceRoot = rootProject.projectDir.absolutePath
 }
+
+@DisableCachingByDefault(because = "Valida el origen online opcional de cada APK debug")
+abstract class ValidateDebugBackendConfiguration : DefaultTask() {
+	@get:Input var backendUrl = ""
+
+	@TaskAction
+	fun validate() {
+		if (backendUrl.isBlank())
+			return
+		val uri = runCatching { URI(backendUrl) }.getOrNull()
+		val host = uri?.host?.lowercase().orEmpty()
+		val reserved = host == "localhost" || host == "example.com" || host == "example.net" || host == "example.org" ||
+			listOf(".localhost", ".local", ".internal", ".lan", ".home.arpa", ".test", ".invalid", ".example",
+				".example.com", ".example.net", ".example.org").any { host.endsWith(it) }
+		val dns = host.matches(Regex("(?=.{1,253}$)[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+")) &&
+			!host.substringAfterLast('.').all { it.isDigit() } && host.split('.').all { it.length <= 63 }
+		if (uri?.scheme != "https" || !dns || reserved || uri.userInfo != null || uri.rawQuery != null ||
+			uri.rawFragment != null || uri.port !in listOf(-1, 443) || uri.rawPath != "")
+			throw GradleException("ENERGYM_BACKEND_URL debug requiere origen HTTPS público con dominio, sin IP/localhost, credenciales, ruta, query ni fragmento.")
+	}
+}
+
+val validateDebugBackendConfiguration = tasks.register<ValidateDebugBackendConfiguration>("validateDebugBackendConfiguration") {
+	group = "verification"
+	description = "Valida la URL online opcional de debug; vacía conserva el emparejamiento local."
+	backendUrl = debugBackendUrl
+}
 tasks.configureEach {
 	if (name == "preReleaseBuild" || name == "assembleRelease" || name == "bundleRelease" ||
 		name == "processReleaseGoogleServices" || name == "validateSigningRelease")
 		dependsOn(validateReleaseConfiguration)
+	if (name == "preDebugBuild" || name == "generateDebugBuildConfig")
+		dependsOn(validateDebugBackendConfiguration)
 }
 
 android {
@@ -172,7 +202,7 @@ android {
 	buildTypes {
 		debug {
 			buildConfigField("boolean", "DEMO_ENABLED", "true")
-			buildConfigField("String", "BACKEND_BASE_URL", "\"\"")
+			buildConfigField("String", "BACKEND_BASE_URL", "\"${debugBackendUrl.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "").replace("\r", "")}\"")
 		}
 		release {
 			buildConfigField("boolean", "DEMO_ENABLED", "false")

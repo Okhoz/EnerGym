@@ -169,6 +169,29 @@ public final class HttpChatClient implements ChatClient {
 			worker.execute(() -> revoke(address, credential));
 	}
 
+	@Override
+	public synchronized void cancelPending() {
+		epoch++;
+	}
+
+	/** Transporte compartido: la identidad online ya viene acreditada, sin crear sesión de emparejamiento. */
+	static String sendBearer(String address, String credential, Request request) throws IOException {
+		Response response = http(address, "/api/chat", "POST", credential, ChatProtocol.request(request), 90000, 95000, true);
+		if (response.status != 200) {
+			error(response, request);
+			throw new RemoteFailure(code(response));
+		}
+		return response.json;
+	}
+
+	static final class RemoteFailure extends IOException {
+		final String code;
+
+		RemoteFailure(String code) {
+			this.code = code;
+		}
+	}
+
 	private void revoke(String endpoint, String token) {
 		try {
 			http(endpoint, "/api/session", "DELETE", token, null);
@@ -187,12 +210,17 @@ public final class HttpChatClient implements ChatClient {
 
 	private static Response http(String address, String path, String method, String credential,
 		String body) throws IOException {
-		long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(27);
+		return http(address, path, method, credential, body, 22000, 27000, false);
+	}
+
+	private static Response http(String address, String path, String method, String credential,
+		String body, int readTimeout, int totalTimeout, boolean firebaseBearer) throws IOException {
+		long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.MILLISECONDS.toNanos(totalTimeout);
 		HttpURLConnection c = (HttpURLConnection) new URL(address + path).openConnection();
 		try {
 			c.setInstanceFollowRedirects(false);
 			c.setConnectTimeout(5000);
-			c.setReadTimeout(22000);
+			c.setReadTimeout(readTimeout);
 			c.setRequestMethod(method);
 			c.setRequestProperty("Accept", "application/json");
 			if (credential != null)
@@ -209,6 +237,10 @@ public final class HttpChatClient implements ChatClient {
 				}
 			}
 			int status = c.getResponseCode();
+			// HTTP401 ya indica rechazo de sesión; streaming puede ocultar el cuerpo al tratarlo como reto HTTP.
+			// Conservar streaming evita que HttpURLConnection repita automáticamente un POST interrumpido.
+			if (firebaseBearer && status == 401)
+				throw new RemoteFailure("UNAUTHORIZED");
 			String type = c.getContentType();
 			if (type == null || !type.toLowerCase(Locale.ROOT).startsWith("application/json"))
 				throw new IOException();
@@ -222,7 +254,7 @@ public final class HttpChatClient implements ChatClient {
 					long remaining = java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(deadline - System.nanoTime());
 					if (remaining <= 0)
 						throw new SocketTimeoutException();
-					c.setReadTimeout((int) Math.min(22000, Math.max(1, remaining)));
+					c.setReadTimeout((int) Math.min(readTimeout, Math.max(1, remaining)));
 					count = in.read(b);
 					if (count == -1)
 						break;
@@ -262,7 +294,7 @@ public final class HttpChatClient implements ChatClient {
 				StrictJson.set("REQUEST_TOO_LARGE"), 415, StrictJson.set("JSON_REQUIRED"), 429,
 				StrictJson.set("RATE_LIMITED", "SERVER_BUSY"), 502,
 				StrictJson.set("INVALID_PROVIDER_RESPONSE", "PROVIDER_UNAVAILABLE"), 503,
-				StrictJson.set("PROVIDER_NOT_CONFIGURED", "PROVIDER_UNAVAILABLE"), 504,
+				StrictJson.set("PROVIDER_NOT_CONFIGURED", "PROVIDER_UNAVAILABLE", "AUTH_UNAVAILABLE", "QUOTA_UNAVAILABLE"), 504,
 				StrictJson.set("PROVIDER_TIMEOUT"), 500, StrictJson.set("SERVER_ERROR"));
 		if (!allowed.getOrDefault(r.status, Collections.emptySet()).contains(code) ||
 			!Objects.equals(m.get("recoverable"), r.status == 429 || r.status >= 500))

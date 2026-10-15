@@ -57,7 +57,9 @@ public final class AssistantFragment extends ScreenFragment {
 		String text = input.getText().toString();
 		if (text.trim().isEmpty())
 			return;
-		input.setText("");
+		boolean unavailable = c.automaticConnection() && !c.localGuidance() && !c.remoteActive();
+		if (!unavailable)
+			input.setText("");
 		c.send(text);
 	}
 
@@ -72,10 +74,25 @@ public final class AssistantFragment extends ScreenFragment {
 			return;
 		}
 		composer.setVisibility(View.VISIBLE);
-		TextView mode = text(rows, c.remoteActive() ? "Servidor de IA emparejado · conversación" :
-			"Guiado local · sin IA", R.style.EnerGym_FieldCaption, 4);
+		String modeLabel = c.automaticConnection() ?
+			(c.localGuidance() ? "Guiado local · sin IA" : c.remoteActive() ? "IA online · cuenta de Google" : "IA online no disponible") :
+			(c.remoteActive() ? "Servidor de IA emparejado · conversación" : "Guiado local · sin IA");
+		TextView mode = text(rows, modeLabel, R.style.EnerGym_FieldCaption, 4);
 		mode.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
-		if (!c.remoteActive())
+		if (c.automaticConnection()) {
+			if (c.localGuidance())
+				action(rows, "Usar IA online", !c.busy, () -> c.selectLocalGuidance(false));
+			else {
+				if (!c.remoteActive()) {
+					text(rows, c.connectionNotice(), R.style.EnerGym_Body, 8);
+					if (c.connected())
+						action(rows, "Reintentar IA online", !c.busy, () -> c.selectLocalGuidance(false));
+				}
+				action(rows, "Usar guiado local", !c.busy, () -> c.selectLocalGuidance(true));
+			}
+			if (c.busy)
+				action(rows, "Cancelar solicitud", true, c::cancelPending);
+		} else if (!c.remoteActive())
 			action(rows, "Conectar IA en Cuenta", !c.busy, () -> app.navigate(AppController.Screen.ACCOUNT));
 		com.google.android.material.checkbox.MaterialCheckBox context =
 			new com.google.android.material.checkbox.MaterialCheckBox(requireContext());

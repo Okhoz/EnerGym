@@ -44,6 +44,11 @@ public final class GoogleAccountGateway implements AccountGateway, GoogleTokenSo
 		return auth == null || authenticating ? null : fromFirebase(auth.getCurrentUser());
 	}
 
+	/** La IA usa el ID token Firebase de esta misma cuenta, nunca el token del proveedor Google. */
+	public synchronized FirebaseUser currentFirebaseUser() {
+		return auth == null || authenticating ? null : auth.getCurrentUser();
+	}
+
 	private static AccountUser fromFirebase(FirebaseUser user) {
 		return user == null ? null : new AccountUser(user.getUid(), user.getDisplayName(), user.getEmail());
 	}

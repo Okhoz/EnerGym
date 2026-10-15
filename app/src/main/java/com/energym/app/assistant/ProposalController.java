@@ -18,8 +18,9 @@ public final class ProposalController {
 	public String status = "", composer = "", endpoint = "", pairingCode = "";
 	public final List<ConversationStore.Message> messages = new ArrayList<>();
 	public boolean showHistory, showConnection;
-	// El servidor respondió que su IA no está activada: el chat sigue con el guiado local hasta reconectar.
+	// El servidor respondió que su IA no está activada: release requiere elegir el guiado local explícitamente.
 	private boolean remoteDisabled;
+	private boolean localGuidance;
 	private Boolean conversationHistoryConsent;
 	private Boolean lastProfileHistoryConsent;
 	private boolean planningDialogue, pendingHistory;
@@ -58,13 +59,13 @@ public final class ProposalController {
 	}
 
 	/**
-	 * Cambiar cuenta revoca el token y descarta callbacks; cada cuenta recupera únicamente su conversación local.
+	 * Cambiar cuenta invalida el cliente y sus callbacks; cada cuenta recupera únicamente su conversación local.
 	 */
 	public void activate(String next) {
 		if (Objects.equals(owner, next))
 			return;
 		generation++;
-		client.disconnect();
+		client.activate(next);
 		owner = next;
 		clearPreview();
 		accepted = null;
@@ -77,6 +78,7 @@ public final class ProposalController {
 		showHistory = false;
 		showConnection = false;
 		remoteDisabled = false;
+		localGuidance = false;
 		conversationHistoryConsent = null;
 		lastProfileHistoryConsent = null;
 		planningDialogue = false;
@@ -120,6 +122,50 @@ public final class ProposalController {
 		return client.connected();
 	}
 
+	public boolean automaticConnection() {
+		return client.automaticConnection();
+	}
+
+	public boolean localGuidance() {
+		return localGuidance;
+	}
+
+	public String connectionNotice() {
+		String unavailable = client.unavailableCode();
+		if (unavailable.equals("BACKEND_NOT_CONFIGURED"))
+			return "La IA online aún no está disponible en esta versión. Puedes elegir el guiado local, que funciona sin IA.";
+		if (unavailable.equals("CONFIGURACION_INVALIDA"))
+			return "La configuración de la IA online no es válida. Puedes seguir usando las funciones locales.";
+		if (unavailable.equals("SIGN_IN_REQUIRED"))
+			return "Vuelve a iniciar sesión con Google para usar la IA online con tu cuenta.";
+		if (remoteDisabled)
+			return "La IA online no está activada en el servidor. Puedes reintentar más tarde o elegir el guiado local.";
+		return "La IA online usa tu cuenta de Google. No necesitas conectar un ordenador ni introducir códigos.";
+	}
+
+	/** Cambiar de modo es una elección explícita; no envía mensajes ni reintenta una petición. */
+	public void selectLocalGuidance(boolean enabled) {
+		if (!automaticConnection() || busy)
+			return;
+		localGuidance = enabled;
+		if (!enabled)
+			remoteDisabled = false;
+		status = enabled ? "Guiado local seleccionado: respuestas por reglas, sin IA." : connectionNotice();
+		changed.run();
+	}
+
+	/** La cancelación retira la espera local y descarta la respuesta; no vuelve a enviar el mensaje. */
+	public void cancelPending() {
+		if (!busy)
+			return;
+		generation++;
+		busy = false;
+		pendingHistory = false;
+		client.cancelPending();
+		status = "Solicitud cancelada en el chat. Cualquier respuesta pendiente se descartará.";
+		changed.run();
+	}
+
 	/** El permiso del chat es explícito, sólo en memoria y no modifica el perfil ni sus otros datos. */
 	public boolean historyContextEnabled() {
 		TrainingProfile profile = current.get();
@@ -137,6 +183,7 @@ public final class ProposalController {
 		conversationHistoryConsent = enabled;
 		if (!enabled && busy && pendingHistory) {
 			generation++;
+			client.cancelPending();
 			busy = false;
 			pendingHistory = false;
 			status = "Contexto desactivado. Se ha descartado la respuesta pendiente.";
@@ -224,7 +271,8 @@ public final class ProposalController {
 		String text = normalize(raw);
 		add("user", raw.trim());
 		boolean planning = planningTurn(text);
-		status = "Guiado local · sin IA. Conecta tu servidor en Cuenta para conversar con Gemini.";
+		status = automaticConnection() ? "Guiado local seleccionado · respuestas por reglas, sin IA." :
+			"Guiado local · sin IA. Conecta tu servidor en Cuenta para conversar con la IA.";
 		if (exercise != null && !planning && !greeting(text)) {
 			add("assistant", explanation(exercise));
 			persist();
@@ -262,7 +310,7 @@ public final class ProposalController {
 			else if (text.contains("cans") || text.contains("descans"))
 				response = "El descanso también forma parte del entrenamiento. Ajusta la sesión a cómo te encuentres y evita forzar si estás muy cansado. Si hay dolor o malestar persistente, consulta a un profesional sanitario.";
 			else
-				response = "Puedo orientarte con la técnica del catálogo y preparar una rutina si me la pides. En este modo local uso respuestas guiadas; para hablar con libertad y hacer seguimiento, conecta Gemini desde Cuenta.";
+				response = "Puedo orientarte con la técnica del catálogo y preparar una rutina si me la pides. En este modo local uso respuestas guiadas; para conversar con IA, elige el modo online cuando esté disponible.";
 			add("assistant", response);
 			persist();
 			changed.run();
@@ -638,17 +686,26 @@ public final class ProposalController {
 	}
 
 	/**
-	 * Envío del chat: IA del servidor emparejado si está disponible; si no, guiado local gratuito.
+	 * Online usa la cuenta actual; el guiado local se elige explícitamente. Debug vacío conserva pairing.
 	 */
 	public void send(String text) {
-		if (client.connected() && !remoteDisabled)
+		if (automaticConnection() && !localGuidance) {
+			if (!remoteActive()) {
+				status = connectionNotice();
+				changed.run();
+				return;
+			}
+			sendExternal(text);
+			return;
+		}
+		if (!localGuidance && client.connected() && !remoteDisabled)
 			sendExternal(text);
 		else
 			sendLocal(text);
 	}
 
 	public boolean remoteActive() {
-		return client.connected() && !remoteDisabled;
+		return !localGuidance && client.connected() && !remoteDisabled;
 	}
 
 	public void sendExternal(String text) {
@@ -770,7 +827,13 @@ public final class ProposalController {
 				pendingHistory = false;
 				if (code.equals("PROVIDER_NOT_CONFIGURED"))
 					remoteDisabled = true;
-				status = code.equals("PROVIDER_NOT_CONFIGURED") ?
+				if (automaticConnection() && code.equals("PROVIDER_NOT_CONFIGURED"))
+					status = connectionNotice();
+				else if (automaticConnection() && (code.equals("UNAUTHORIZED") || code.equals("SIGN_IN_REQUIRED") ||
+					code.equals("AUTHENTICATION_UNAVAILABLE")))
+					status = "No se pudo verificar tu sesión. Vuelve a iniciar sesión con Google y envía el mensaje de nuevo.";
+				else
+					status = code.equals("PROVIDER_NOT_CONFIGURED") ?
 					"El conector opcional está desactivado en el servidor. Vuelve a enviar tu mensaje y te responderá el asistente guiado local." :
 					"No he podido contactar con la IA (" + code + "). Inténtalo de nuevo en un momento.";
 				changed.run();

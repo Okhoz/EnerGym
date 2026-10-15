@@ -59,6 +59,13 @@ public final class AccountFragment extends ScreenFragment {
 		com.energym.app.assistant.ProposalController c = state.assistant;
 		if (c == null || app.owner() == null)
 			return;
+		if (c.automaticConnection()) {
+			LinearLayout online = card("Asistente con IA", c.connectionNotice());
+			text(online, "Los mensajes se envían al servicio online sólo al usar el chat en modo IA. " +
+				"Puedes elegir el guiado local dentro del chat.", R.style.EnerGym_FieldCaption, 8);
+			if (!c.status.isEmpty()) text(online, c.status, R.style.EnerGym_Body, 12);
+			return;
+		}
 		LinearLayout server = card("Asistente con IA", c.remoteActive() ?
 			"Conectado a tu servidor. Puedes conversar con la IA y activar «Recordar esta conversación» dentro del chat para mantener el hilo." :
 			"Sin servidor, el chat usa el guiado local gratuito por reglas, sin enviar datos. Empareja tu servidor para que responda la IA.");
