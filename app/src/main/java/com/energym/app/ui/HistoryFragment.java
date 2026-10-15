@@ -89,6 +89,7 @@ public final class HistoryFragment extends ScreenFragment {
 			month = month.minusMonths(1);
 			render();
 		}).setContentDescription("Mes anterior");
+		((android.widget.TextView) nav.getChildAt(0)).setTextSize(24);
 		String title = month.format(DateTimeFormatter.ofPattern("MMMM yyyy", NutritionFragment.SPANISH));
 		android.widget.TextView monthTitle = new android.widget.TextView(requireContext());
 		monthTitle.setTextAppearance(R.style.EnerGym_CardTitle);
@@ -102,6 +103,7 @@ public final class HistoryFragment extends ScreenFragment {
 			month = month.plusMonths(1);
 			render();
 		}).setContentDescription("Mes siguiente");
+		((android.widget.TextView) nav.getChildAt(2)).setTextSize(24);
 		add(calendar, new MonthCalendarView(requireContext()), 12).set(month, today, selected,
 			stats.sessionsByDay().keySet(), n == null ? Collections.emptySet() : n.loggedDays(), day -> {
 				selected = day;

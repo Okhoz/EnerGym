@@ -29,6 +29,37 @@ class GroqGatewayTest {
 	static ObjectNode item(ObjectNode answer) { return (ObjectNode) answer.path("proposal").path("items").get(0); }
 
 	@Test
+	void expandedCatalogStaysCompactAndWithinFreePlanGuardForBroadestProfile() throws Exception {
+		GroqGateway provider = (GroqGateway) ProviderFactory.fromEnvironment(GroqProviderFactoryTest.ENV);
+		ObjectNode req = (ObjectNode) ChatServiceTest.request();
+		req.put("exerciseId", "barbell-back-squat");
+		req.put("message", "x".repeat(600));
+		ObjectNode p = (ObjectNode) req.get("profile");
+		p.put("goal", "GENERAL_FITNESS").put("environment", "GYM").put("category", "GYM");
+		p.putArray("resources").add("DUMBBELLS").add("BARBELL").add("BANDS").add("MAT").add("BENCH").add("MACHINE")
+			.add("CHAIR").add("WALL").add("SUPPORT").add("BICYCLE").add("POOL");
+		new ProposalValidator().validateRequest(req);
+		JsonNode request = new ProposalValidator().providerRequest(req);
+		JsonNode eligible = request.path("eligibleExercises");
+		assertEquals(ProposalValidator.MAX_ELIGIBLE, eligible.size());
+		Set<String> groups = new HashSet<>();
+		for (JsonNode e : eligible) {
+			assertEquals(Set.of("id", "metricType", "requiredResources"), Set.copyOf(iterable(e.fieldNames())));
+			groups.add(e.path("requiredResources").toString());
+		}
+		assertTrue(groups.contains("[\"MACHINE\"]"));
+		assertTrue(groups.contains("[\"BANDS\"]"));
+		assertFalse(request.path("exerciseContext").path("description").asText().isEmpty());
+		assertTrue(provider.payload(request).toString().getBytes(StandardCharsets.UTF_8).length < 18000);
+	}
+
+	private static List<String> iterable(Iterator<String> names) {
+		List<String> list = new ArrayList<>();
+		names.forEachRemaining(list::add);
+		return list;
+	}
+
+	@Test
 	void payloadKeepsStrictSchemaConsentAndMetricContractWithoutUnsupportedStore() throws Exception {
 		GroqGateway provider = (GroqGateway) ProviderFactory.fromEnvironment(GroqProviderFactoryTest.ENV);
 		JsonNode request = new ProposalValidator().providerRequest(ChatServiceTest.request());

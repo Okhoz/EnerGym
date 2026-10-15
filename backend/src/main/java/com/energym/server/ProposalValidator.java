@@ -13,6 +13,7 @@ public final class ProposalValidator {
 	private static final Set<String> PROFILE =
 		Set.of("sportId", "goal", "environment", "focus", "category", "resources", "daysPerWeek", "durationMinutes",
 			"level", "experience", "space", "preferences", "limitations");
+	static final int MAX_ELIGIBLE = 48;
 	private final JsonNode catalog = Json.resource("catalog-v2.json");
 	private final Map<String, JsonNode> exercises = new HashMap<>(), sports = new HashMap<>();
 
@@ -91,10 +92,26 @@ public final class ProposalValidator {
 		result.put("catalogVersion", catalogVersion());
 		result.set("exerciseContext",
 			exercises.getOrDefault(request.path("exerciseId").asText(), NullNode.getInstance()));
-		ArrayNode eligible = result.putArray("eligibleExercises");
+		// Forma compacta y acotada: el catálogo ampliado no debe agotar la guarda de bytes del proveedor gratuito.
+		// La técnica completa solo viaja en exerciseContext; la validación posterior usa siempre el catálogo íntegro.
+		// Reparto por grupos de material (round-robin) para que el tope no deje fuera máquinas o bandas declaradas.
+		Map<String, Deque<JsonNode>> groups = new LinkedHashMap<>();
 		for (JsonNode e : catalog.path("exercises"))
 			if (compatible(e, request.path("profile")))
-				eligible.add(e.deepCopy());
+				groups.computeIfAbsent(e.path("metricType").asText() + Json.strings(e.path("requiredResources")),
+					k -> new ArrayDeque<>()).add(e);
+		ArrayNode eligible = result.putArray("eligibleExercises");
+		while (eligible.size() < MAX_ELIGIBLE && !groups.isEmpty())
+			for (Iterator<Deque<JsonNode>> it = groups.values().iterator(); it.hasNext() && eligible.size() < MAX_ELIGIBLE; ) {
+				Deque<JsonNode> group = it.next();
+				JsonNode e = group.poll();
+				ObjectNode compact = eligible.addObject();
+				compact.set("id", e.path("id"));
+				compact.set("metricType", e.path("metricType"));
+				compact.set("requiredResources", e.path("requiredResources"));
+				if (group.isEmpty())
+					it.remove();
+			}
 		return result;
 	}
 

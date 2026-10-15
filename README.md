@@ -12,6 +12,12 @@ El guiado local gratuito se identifica como conversación por reglas. La IA nece
 
 El catálogo v2 añade Flexión estándar (`standard-pushup`), distinta de `knee-pushup`. Su vista previa técnica nativa permite reproducción, pausa, velocidad, marcadores, giro, zoom y vistas. Para otros recursos/dispositivos incompatibles conserva referencia escrita. No hay capas musculares, evaluación personal con cámara ni revisión profesional. Consulta [recursos](docs/resources.md) y [licencias](THIRD_PARTY_NOTICES.md).
 
+## Nutrición, progreso y biblioteca
+
+- **Nutrición** (pestaña propia): escáner de Google Play services para EAN/UPC y QR GS1 (sin permiso de cámara en la app), ficha de [Open Food Facts](https://world.openfoodfacts.org) (ODbL) o entrada manual, cantidad en g o ml según la base de la etiqueta (no convierte ml en g), anillos de kcal/macros, barras de 7 días, déficit/superávit frente al mantenimiento estimado (Mifflin-St Jeor) y registro de peso. Datos locales por cuenta en `energym_nutrition.db`; se borran con «Borrar datos locales». Aún no se sincronizan con Firebase.
+- **Progreso** (antes Historial): resumen global con tendencia de 4 semanas, sesiones y minutos por semana, volumen de fuerza, evolución del peso, calendario mensual (entrenos y días con alimentación) e historial de sesiones.
+- **Biblioteca**: catálogo v2 con 132 ejercicios y su técnica escrita, idéntico en app y backend (`tools/catalog_expansion.py`). El buscador de Entreno ofrece preguntar al asistente cuando un ejercicio no existe; esa respuesta no entra en el catálogo. El backend envía a la IA una lista compacta y acotada (48) de ejercicios elegibles para respetar la guarda de 18 KB del plan gratuito.
+
 ## Compilar y ejecutar
 
 Android Studio, SDK Platform37 y Build Tools36.1.0; Android API26+, compileSdk/targetSdk37. El visor requiere Vulkan1.1. Gradle Wrapper9.6.0/AGP9.4.1, fuentes Java11; JBR25.0.3 ejecuta Gradle. Backend Java17+; pruebas verificadas con Java21. Configura sdk.dir en local.properties y selecciona JBR como Gradle JDK; no publiques esa configuración local.
