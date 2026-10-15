@@ -50,7 +50,16 @@ public final class GoogleAccountGateway implements AccountGateway, GoogleTokenSo
 	}
 
 	private static AccountUser fromFirebase(FirebaseUser user) {
-		return user == null ? null : new AccountUser(user.getUid(), user.getDisplayName(), user.getEmail());
+		if (user == null) return null;
+		android.net.Uri photo = user.getPhotoUrl();
+		// La identidad vinculada a Google conserva su foto, incluso si se enlazan otros proveedores.
+		for (UserInfo provider : user.getProviderData()) {
+			if (GoogleAuthProvider.PROVIDER_ID.equals(provider.getProviderId()) && provider.getPhotoUrl() != null) {
+				photo = provider.getPhotoUrl();
+				break;
+			}
+		}
+		return new AccountUser(user.getUid(), user.getDisplayName(), user.getEmail(), photo == null ? "" : photo.toString());
 	}
 
 	/**

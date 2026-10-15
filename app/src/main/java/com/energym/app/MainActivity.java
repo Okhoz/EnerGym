@@ -86,6 +86,9 @@ public final class MainActivity extends AppCompatActivity {
 			pendingAvatar.restore(saved.getString("avatarOwner"), saved.getLong("avatarRevision", -1),
 				saved.getString("avatarUri"), state.instanceId.equals(saved.getString("avatarStateInstance")));
 		state.bindViewer(viewerLaunch);
+		avatarWorker = java.util.concurrent.Executors.newSingleThreadExecutor();
+		remoteAvatar = new RemoteAvatarController<>(avatarWorker, androidx.core.content.ContextCompat.getMainExecutor(this),
+			GooglePhotoLoader::fetch, this::renderAvatar);
 		findViewById(R.id.avatar).setOnClickListener(this::openMenu);
 		findViewById(R.id.back).setOnClickListener(v -> {
 			if (state.app != null)
@@ -125,15 +128,16 @@ public final class MainActivity extends AppCompatActivity {
 	}
 
 	private void render() {
-		if (state == null || isFinishing() || getSupportFragmentManager().isStateSaved())
-			return;
+		if (state == null || isFinishing()) return;
+		// El avatar se invalida aunque los fragmentos deban esperar a onResume.
+		if (state.app != null) updateAvatar();
+		if (getSupportFragmentManager().isStateSaved()) return;
 		((TextView) findViewById(R.id.status)).setText(
 			state.app == null ? (state.fatal.isEmpty() ? "Preparando tu espacio…" : state.fatal) :
 				state.accountText() + " · " + state.syncText());
 		if (state.app == null)
 			return;
 		queuePendingAvatar();
-		updateAvatar();
 		rendering = true;
 		try {
 			AppController app = state.app;
@@ -191,7 +195,7 @@ public final class MainActivity extends AppCompatActivity {
 			boolean has = avatars().has(owner);
 			menu.getMenu().add(1, PHOTO_PICK, 10, has ? "Cambiar foto de perfil" : "Elegir foto de perfil");
 			if (has)
-				menu.getMenu().add(1, PHOTO_REMOVE, 11, "Quitar foto");
+				menu.getMenu().add(1, PHOTO_REMOVE, 11, googlePhotoUrl(owner).isEmpty() ? "Quitar foto" : "Usar foto de Google");
 		}
 		menu.setOnMenuItemClickListener(item -> {
 			// Un menú abierto antes de cambiar de cuenta no actúa sobre ninguna de las dos cuentas.
@@ -217,6 +221,8 @@ public final class MainActivity extends AppCompatActivity {
 
 	private AvatarStore avatars;
 	private String shownAvatar = "";
+	private java.util.concurrent.ExecutorService avatarWorker;
+	private RemoteAvatarController<android.graphics.Bitmap> remoteAvatar;
 	private final PendingAvatarSelection pendingAvatar = new PendingAvatarSelection();
 	private boolean avatarCheckPosted;
 	private final ActivityResultLauncher<androidx.activity.result.PickVisualMediaRequest> avatarPicker =
@@ -284,23 +290,37 @@ public final class MainActivity extends AppCompatActivity {
 		return avatars;
 	}
 
-	/**
-	 * Muestra la foto de la cuenta activa o, si no hay, el icono de persona. Solo recarga si cambia la cuenta.
-	 */
+	/** Solo usa metadatos de la misma identidad que tiene abierto el almacenamiento. */
+	private String googlePhotoUrl(String owner) {
+		return owner != null && state.user != null && owner.equals(state.user.getUid()) ? state.user.getPhotoUrl() : "";
+	}
+
+	/** La foto manual elegida por el usuario prevalece; en su ausencia se carga la foto de Google. */
 	private void updateAvatar() {
+		if (remoteAvatar == null) return;
 		String owner = state == null || state.app == null ? null : state.app.owner();
-		String key = owner == null ? "-" : owner + (avatars().has(owner) ? ":foto" : ":sin");
-		if (key.equals(shownAvatar))
-			return;
+		long revision = state.app.accountRevision();
+		boolean local = owner != null && avatars().has(owner);
+		String url = local ? "" : googlePhotoUrl(owner);
+		String key = owner + ":" + revision + ":" + local + ":" + url;
+		if (key.equals(shownAvatar)) return;
 		shownAvatar = key;
-		android.widget.ImageView avatar = findViewById(R.id.avatar);
+		remoteAvatar.update(local ? null : owner, revision, url);
+		renderAvatar(remoteAvatar.image());
+	}
+
+	/** La imagen cambia, pero el listener del avatar sigue abriendo el mismo menú. */
+	private void renderAvatar(android.graphics.Bitmap ignored) {
+		if (isFinishing() || isDestroyed()) return;
+		String owner = state == null || state.app == null ? null : state.app.owner();
 		android.graphics.Bitmap photo = owner == null ? null : avatars().load(owner);
+		if (photo == null && owner != null && remoteAvatar != null)
+			photo = remoteAvatar.imageFor(owner, state.app.accountRevision(), googlePhotoUrl(owner));
+		android.widget.ImageView avatar = findViewById(R.id.avatar);
 		int padding = photo == null ? Math.round(10 * getResources().getDisplayMetrics().density) : 0;
 		avatar.setPadding(padding, padding, padding, padding);
-		if (photo == null)
-			avatar.setImageResource(R.drawable.ic_account);
-		else
-			avatar.setImageBitmap(photo);
+		if (photo == null) avatar.setImageResource(R.drawable.ic_account);
+		else avatar.setImageBitmap(photo);
 	}
 
 	/**
@@ -400,6 +420,8 @@ public final class MainActivity extends AppCompatActivity {
 
 	@Override
 	protected void onDestroy() {
+		if (remoteAvatar != null) remoteAvatar.close();
+		if (avatarWorker != null) avatarWorker.shutdownNow();
 		if (isFinishing())
 			releaseAvatarUri(pendingAvatar.uri());
 		if (backdrop != null) {
