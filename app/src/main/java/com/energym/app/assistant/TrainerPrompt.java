@@ -42,6 +42,8 @@ public final class TrainerPrompt {
 			.append("Ayudas con rutinas, técnica, progresión, motivación, descanso y hábitos. ")
 			.append("No diagnosticas ni tratas lesiones: ante dolor, mareo o una lesión recomienda parar y consultar ")
 			.append("a un profesional sanitario. No inventes datos del cliente ni material que no tenga.\n")
+			.append("Ante una duda, responde directamente con 2 a 4 consejos prácticos y concretos (técnica, ")
+			.append("ejercicios de apoyo, errores frecuentes). No pidas datos si no hacen falta para responder.\n")
 			.append("Responde SOLO con un objeto JSON, sin texto fuera de él, con esta forma:\n")
 			.append("{\"texto\":\"tu respuesta\",\"rutina\":null}\n");
 		List<Exercise> eligible = eligible(r.profile, catalog);
@@ -57,8 +59,8 @@ public final class TrainerPrompt {
 		p.append("\nPERFIL DEL CLIENTE\n").append(profile(r.profileData)).append('\n');
 		if (r.profile == null) {
 			List<String> missing = missing(r.profileData);
-			p.append("Perfil incompleto (falta: ").append(String.join(", ", missing)).append("). No propongas rutina: ")
-				.append("responde a lo que pregunte y pídele amablemente que complete esos datos en Perfil.\n");
+			p.append("Perfil incompleto (falta: ").append(String.join(", ", missing)).append("). Responde a su ")
+				.append("pregunta igualmente. Solo si pide una rutina, explica que primero complete su perfil en Perfil.\n");
 		}
 		if (!eligible.isEmpty()) {
 			p.append("\nEJERCICIOS DISPONIBLES (id | nombre | tipo)\n");

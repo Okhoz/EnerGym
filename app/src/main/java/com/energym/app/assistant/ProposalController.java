@@ -133,6 +133,10 @@ public final class ProposalController {
 		return client.onDevice();
 	}
 
+	public String modelLabel() {
+		return client.modelLabel();
+	}
+
 	public String downloadOffer() {
 		return client.downloadOffer();
 	}

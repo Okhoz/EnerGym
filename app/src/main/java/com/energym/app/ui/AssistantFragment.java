@@ -75,7 +75,7 @@ public final class AssistantFragment extends ScreenFragment {
 		}
 		composer.setVisibility(View.VISIBLE);
 		String modeLabel = c.onDevice() ?
-			(c.localGuidance() ? "Guiado local · sin IA" : c.remoteActive() ? "Entrenador IA · Gemini Nano en tu móvil" :
+			(c.localGuidance() ? "Guiado local · sin IA" : c.remoteActive() ? "Entrenador IA · " + c.modelLabel() + " en tu móvil" :
 				"IA del móvil no disponible · guiado local") : c.automaticConnection() ?
 			(c.localGuidance() ? "Guiado local · sin IA" : c.remoteActive() ? "IA online · cuenta de Google" : "IA online no disponible") :
 			(c.remoteActive() ? "Servidor de IA emparejado · conversación" : "Guiado local · sin IA");
