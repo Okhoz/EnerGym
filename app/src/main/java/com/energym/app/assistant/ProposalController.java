@@ -18,6 +18,8 @@ public final class ProposalController {
 	public String status = "", composer = "", endpoint = "", pairingCode = "";
 	public final List<ConversationStore.Message> messages = new ArrayList<>();
 	public boolean showHistory, showConnection;
+	// El servidor respondió que su IA no está activada: el chat sigue con el guiado local hasta reconectar.
+	private boolean remoteDisabled;
 	private final AppStore store;
 	private final ConversationStore conversations;
 	private final ChatClient client;
@@ -71,6 +73,7 @@ public final class ProposalController {
 		endpoint = "";
 		showHistory = false;
 		showConnection = false;
+		remoteDisabled = false;
 		fields.clear();
 		messages.clear();
 		base = null;
@@ -499,11 +502,25 @@ public final class ProposalController {
 			sendLocal("Ajusta la rutina a " + Math.max(5, preview.getProfile().getDurationMinutes() - 5) + " min");
 	}
 
+	/**
+	 * Envío del chat: IA del servidor emparejado si está disponible; si no, guiado local gratuito.
+	 */
+	public void send(String text) {
+		if (client.connected() && !remoteDisabled)
+			sendExternal(text);
+		else
+			sendLocal(text);
+	}
+
+	public boolean remoteActive() {
+		return client.connected() && !remoteDisabled;
+	}
+
 	public void sendExternal(String text) {
 		if (!ready(text))
 			return;
 		if (!client.connected()) {
-			status = "Conecta el servidor opcional primero o usa Enviar local.";
+			status = "Conecta el servidor de IA en Cuenta para usar la IA.";
 			changed.run();
 			return;
 		}
@@ -598,10 +615,11 @@ public final class ProposalController {
 				if (token != generation)
 					return;
 				busy = false;
+				if (code.equals("PROVIDER_NOT_CONFIGURED"))
+					remoteDisabled = true;
 				status = code.equals("PROVIDER_NOT_CONFIGURED") ?
-					"El conector opcional está desactivado. Puedes continuar con Enviar local: asistente guiado gratuito por reglas." :
-					"No se pudo completar la consulta (" + code +
-						"). Puedes continuar en local o reintentar manualmente.";
+					"El conector opcional está desactivado en el servidor. Vuelve a enviar tu mensaje y te responderá el asistente guiado local." :
+					"No he podido contactar con la IA (" + code + "). Inténtalo de nuevo en un momento.";
 				changed.run();
 			}
 		});
@@ -649,8 +667,8 @@ public final class ProposalController {
 				if (token != generation)
 					return;
 				busy = false;
-				status =
-					"Servidor opcional emparejado. Enviar al servidor requiere una pulsación explícita; el modo local sigue disponible.";
+				remoteDisabled = false;
+				status = "Servidor de IA emparejado. El chat responderá con IA.";
 				changed.run();
 			}
 
@@ -658,7 +676,7 @@ public final class ProposalController {
 				if (token != generation)
 					return;
 				busy = false;
-				status = "No se conectó: " + error + ". Continúa con el modo local.";
+				status = "No se conectó: " + error + ". El chat seguirá con el asistente guiado local.";
 				changed.run();
 			}
 		});
@@ -670,7 +688,7 @@ public final class ProposalController {
 		busy = false;
 		client.disconnect();
 		pairingCode = "";
-		status = "Servidor desconectado y revocación solicitada. Continúa en local.";
+		status = "Servidor desconectado y revocación solicitada. El chat sigue con el asistente guiado local.";
 		changed.run();
 	}
 }

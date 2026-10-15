@@ -910,7 +910,7 @@
 							android:layout_height="wrap_content"
 							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
-							tools:text="Permiso opcional para enviar hasta 12 mensajes anteriores al servidor que conectes en Asistente. Solo se envían al pulsar Enviar al servidor; las sesiones históricas no se adjuntan. Puedes revocarlo aquí. El modo guiado local no envía datos." />
+							tools:text="Permiso opcional para enviar hasta 12 mensajes anteriores al servidor de IA que conectes en Cuenta. Solo se envían cuando chateas con la IA conectada; las sesiones históricas no se adjuntan. Puedes revocarlo aquí. El modo guiado local no envía datos." />
 
 						<LinearLayout
 							android:layout_width="match_parent"

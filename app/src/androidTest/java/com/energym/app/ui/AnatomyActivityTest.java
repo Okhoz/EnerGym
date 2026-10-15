@@ -378,13 +378,13 @@ public class AnatomyActivityTest {
 			}
 			assertTrue("Teclado real ausente", visible[0]);
 			parent.onActivity(a -> {
-				android.view.View send = MainFlowTest.text(a.getWindow().getDecorView(), "Enviar local");
+				android.view.View send = MainFlowTest.text(a.getWindow().getDecorView(), "Enviar mensaje");
 				send.requestRectangleOnScreen(new Rect(0, 0, send.getWidth(), send.getHeight()), true);
 			});
 			Thread.sleep(300);
 			save(automation.takeScreenshot(), "viewer-assistant-keyboard-font130.png");
 			parent.onActivity(a -> {
-				android.view.View send = MainFlowTest.text(a.getWindow().getDecorView(), "Enviar local");
+				android.view.View send = MainFlowTest.text(a.getWindow().getDecorView(), "Enviar mensaje");
 				assertTrue(send.getGlobalVisibleRect(new Rect()));
 			});
 			automation.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK);
@@ -430,7 +430,7 @@ public class AnatomyActivityTest {
 			waitAssistant();
 			parent.onActivity(a -> assertTrue(a.state().assistant.connected()));
 			MainFlowTest.edit(parent, "assistant_message", "Abre la referencia");
-			MainFlowTest.click(parent, "Enviar al servidor opcional");
+			MainFlowTest.click(parent, "Enviar mensaje");
 			awaitReady();
 			assertEquals("standard-pushup", fixture.lastExercise);
 			click("viewer_back");
@@ -438,7 +438,7 @@ public class AnatomyActivityTest {
 			parent.onActivity(a -> assertEquals(AppController.Screen.ASSISTANT, a.state().app.screen));
 			fixture.hold = true;
 			MainFlowTest.edit(parent, "assistant_message", "Abre otra vez");
-			MainFlowTest.click(parent, "Enviar al servidor opcional");
+			MainFlowTest.click(parent, "Enviar mensaje");
 			assertTrue(fixture.received.await(8, TimeUnit.SECONDS));
 			parent.onActivity(a -> {
 				a.state().app.navigate(AppController.Screen.TRAINING);

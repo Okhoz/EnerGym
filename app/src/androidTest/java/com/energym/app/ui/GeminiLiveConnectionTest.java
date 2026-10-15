@@ -72,10 +72,11 @@ public class GeminiLiveConnectionTest {
 						R.id.navigation)).setSelectedItemId(R.id.tab_assistant);
 				});
 				MainFlowTest.await();
-				MainFlowTest.click(scenario, "Configurar conexión opcional");
+				MainFlowTest.click(scenario, "Cuenta");
+				MainFlowTest.click(scenario, "Conectar servidor de IA");
 				MainFlowTest.edit(scenario, "assistant_endpoint", url);
 				MainFlowTest.edit(scenario, "assistant_pairing", code);
-				MainFlowTest.click(scenario, "Conectar servidor");
+				MainFlowTest.click(scenario, "Conectar");
 				waitIdle(scenario);
 				scenario.onActivity(a -> {
 					assertTrue("Emparejamiento no completado; revisar estado seguro del servidor",
@@ -83,10 +84,12 @@ public class GeminiLiveConnectionTest {
 					assertEquals("", a.state().assistant.pairingCode);
 					assertNull(a.state().assistant.preview);
 				});
+				scenario.onActivity(a -> ((com.google.android.material.bottomnavigation.BottomNavigationView) a.findViewById(R.id.navigation)).setSelectedItemId(R.id.tab_assistant));
+				MainFlowTest.await();
 				// Una sola pulsación externa; sin guía local ni respuestas prefabricadas.
 				MainFlowTest.edit(scenario, "assistant_message",
 					"Prepara una rutina de ejemplo genérica: 3 días, 20 min, en casa, sin material, fuerza, principiante. Sin datos personales ni historial.");
-				MainFlowTest.click(scenario, "Enviar al servidor opcional");
+				MainFlowTest.click(scenario, "Enviar mensaje");
 				waitIdle(scenario);
 				Routine[] preview = {null};
 				boolean[] remote = {false};
@@ -121,18 +124,18 @@ public class GeminiLiveConnectionTest {
 					assertEquals(baseline, a.state().app.profile);
 					assertNull(a.state().app.routines.accepted);
 					assertTrue(a.state().app.versions.isEmpty());
-					assertTrue(MainFlowTest.textContaining(a.getWindow().getDecorView(), "Vista previa · sin guardar"));
+					assertTrue(MainFlowTest.textContaining(a.getWindow().getDecorView(), "Propuesta · sin guardar"));
 				});
 				try (EnerGymDatabase db = new EnerGymDatabase(context, EnerGymDatabase.DEMO_OWNER_UID)) {
 					assertEquals("La consulta externa escribió antes de aceptar", before, db.exportSnapshot());
 				}
 				scenario.onActivity(a -> {
-					View accept = MainFlowTest.text(a.getWindow().getDecorView(), "Guardar perfil y aceptar");
+					View accept = MainFlowTest.text(a.getWindow().getDecorView(), "Aceptar");
 					assertNotNull(accept);
 					accept.requestRectangleOnScreen(new Rect(0, 0, accept.getWidth(), accept.getHeight()), true);
 				});
 				MainFlowTest.await();
-				MainFlowTest.click(scenario, "Guardar perfil y aceptar");
+				MainFlowTest.click(scenario, "Aceptar");
 				waitIdle(scenario);
 				long[] version = {0};
 				scenario.onActivity(a -> {

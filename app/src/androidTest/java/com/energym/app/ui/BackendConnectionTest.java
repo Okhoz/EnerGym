@@ -32,27 +32,31 @@ public class BackendConnectionTest {
 			MainFlowTest.await();
 			s.onActivity(a -> ((com.google.android.material.bottomnavigation.BottomNavigationView) a.findViewById(R.id.navigation)).setSelectedItemId(R.id.tab_assistant));
 			MainFlowTest.await();
-			MainFlowTest.click(s, "Configurar conexión opcional");
+			MainFlowTest.click(s, "Cuenta");
+			MainFlowTest.click(s, "Conectar servidor de IA");
 			MainFlowTest.edit(s, "assistant_endpoint", url);
 			MainFlowTest.edit(s, "assistant_pairing", code);
-			MainFlowTest.click(s, "Conectar servidor");
+			MainFlowTest.click(s, "Conectar");
 			waitUntil(s, a -> !a.state().assistant.busy);
 			s.onActivity(a -> {
 				assertTrue(a.state().assistant.status, a.state().assistant.connected());
 				assertEquals("", a.state().assistant.pairingCode);
 			});
+			s.onActivity(a -> ((com.google.android.material.bottomnavigation.BottomNavigationView) a.findViewById(R.id.navigation)).setSelectedItemId(R.id.tab_assistant));
+			MainFlowTest.await();
 			MainFlowTest.edit(s, "assistant_message", "¿Puedes ayudarme a preparar una rutina?");
-			MainFlowTest.click(s, "Enviar al servidor opcional");
+			MainFlowTest.click(s, "Enviar mensaje");
 			s.recreate();
 			waitUntil(s, a -> !a.state().assistant.busy);
 			s.onActivity(a -> {
 				assertTrue(a.state().assistant.status, a.state().assistant.status.contains("desactivado"));
-				assertTrue(MainFlowTest.textContaining(a.getWindow().getDecorView(), "continuar con Enviar local"));
+				assertTrue(MainFlowTest.textContaining(a.getWindow().getDecorView(), "asistente guiado local"));
 			});
 			AssistantFlowTest.capture("server-disabled");
 			MainFlowTest.edit(s, "assistant_message", "3 dias en casa sin material 30min fuerza principiante");
-			MainFlowTest.click(s, "Enviar local");
+			MainFlowTest.click(s, "Enviar mensaje");
 			s.onActivity(a -> assertNotNull(a.state().assistant.preview));
+			MainFlowTest.click(s, "Cuenta");
 			MainFlowTest.click(s, "Desconectar y revocar");
 			s.onActivity(a -> {
 				assertFalse(a.state().assistant.connected());

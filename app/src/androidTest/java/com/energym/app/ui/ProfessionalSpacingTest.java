@@ -95,7 +95,7 @@ public final class ProfessionalSpacingTest {
 									.isVisible(WindowInsetsCompat.Type.ime()));
 						}
 						assertTrue("IME real ausente", shown[0]);
-						String label = screen == AppController.Screen.PROFILE ? "Guardar perfil" : "Enviar local";
+						String label = screen == AppController.Screen.PROFILE ? "Guardar perfil" : "Enviar mensaje";
 						scenario.onActivity(a -> {
 							View action = MainFlowTest.text(a.getWindow().getDecorView(), label);
 							assertNotNull(action);

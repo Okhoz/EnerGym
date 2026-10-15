@@ -58,11 +58,7 @@ public final class AssistantFragment extends ScreenFragment {
 		if (text.trim().isEmpty())
 			return;
 		input.setText("");
-		// Con servidor emparejado responde la IA; sin él, el guiado local gratuito.
-		if (c.connected())
-			c.sendExternal(text);
-		else
-			c.sendLocal(text);
+		c.send(text);
 	}
 
 	protected void content() {
@@ -138,5 +134,15 @@ public final class AssistantFragment extends ScreenFragment {
 		LinearLayout tweaks = columns(rows, 8);
 		compact(tweaks, "−5 min", !c.busy, c::reduceTime);
 		compact(tweaks, "Cambiar 1.º", !c.busy, c::substituteFirst).setContentDescription("Sustituir primer ejercicio");
+		TextView hint = text(rows, "Toca un ejercicio para ver su técnica:", R.style.EnerGym_FieldCaption, 14);
+		hint.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+		for (RoutineItem item : routine.getItems()) {
+			MaterialButton open = action(rows, item.getExercise().getName(), true,
+				() -> app.openExercise(item.getExercise()));
+			open.setMinHeight(dp(44));
+			open.setTextSize(14);
+			open.setContentDescription("Consultar técnica de " + item.getExercise().getName());
+			((LinearLayout.LayoutParams) open.getLayoutParams()).topMargin = dp(8);
+		}
 	}
 }

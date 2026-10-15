@@ -96,7 +96,7 @@ public final class HomeNavigationTest {
 						assertEquals(Screen.ASSISTANT, a.state().app.screen);
 						assertEquals(R.id.tab_assistant,
 							((BottomNavigationView) a.findViewById(R.id.navigation)).getSelectedItemId());
-						assertNotNull(MainFlowTest.text(a.getWindow().getDecorView(), "Enviar local"));
+						assertNotNull(MainFlowTest.text(a.getWindow().getDecorView(), "Enviar mensaje"));
 					});
 				}
 			}

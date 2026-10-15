@@ -58,7 +58,7 @@ public final class AccountFragment extends ScreenFragment {
 		com.energym.app.assistant.ProposalController c = state.assistant;
 		if (c == null || app.owner() == null)
 			return;
-		LinearLayout server = card("Asistente con IA", c.connected() ?
+		LinearLayout server = card("Asistente con IA", c.remoteActive() ?
 			"Conectado a tu servidor. Los mensajes del chat se envían a la IA junto con el perfil de la conversación; los anteriores, solo con tu permiso en Tu perfil." :
 			"Sin servidor, el chat usa el guiado local gratuito por reglas, sin enviar datos. Empareja tu servidor para que responda la IA.");
 		if (c.connected()) {

@@ -63,12 +63,12 @@ public class AssistantFlowTest {
 			send(s, "fuerza principiante");
 			s.onActivity(a -> {
 				assertNotNull(a.state().assistant.preview);
-				assertTrue(MainFlowTest.textContaining(a.getWindow().getDecorView(), "Vista previa · sin guardar"));
+				assertTrue(MainFlowTest.textContaining(a.getWindow().getDecorView(), "Propuesta · sin guardar"));
 				assertTrue(a.state().app.versions.isEmpty());
 			});
-			scrollToText(s, "Guardar perfil y aceptar");
+			scrollToText(s, "Aceptar");
 			capture("proposal-actions");
-			MainFlowTest.click(s, "Rechazar propuesta");
+			MainFlowTest.click(s, "Rechazar");
 			s.onActivity(a -> {
 				assertNull(a.state().app.profile);
 				assertTrue(a.state().app.versions.isEmpty());
@@ -78,9 +78,9 @@ public class AssistantFlowTest {
 			s.recreate();
 			MainFlowTest.await();
 			s.onActivity(a -> assertNotNull(a.state().assistant.preview));
-			MainFlowTest.click(s, "Reducir 5 minutos");
+			MainFlowTest.click(s, "−5 min");
 			s.onActivity(a -> assertEquals(25, a.state().assistant.preview.getProfile().getDurationMinutes()));
-			MainFlowTest.click(s, "Guardar perfil y aceptar");
+			MainFlowTest.click(s, "Aceptar");
 			waitUntil(s, a -> a.state().app.profile != null);
 			s.onActivity(a -> {
 				assertEquals(25, a.state().app.profile.getDurationMinutes());
@@ -89,7 +89,9 @@ public class AssistantFlowTest {
 				assertFalse(a.state().app.versions.isEmpty());
 			});
 			send(s, "prepara rutina de fuerza");
-			MainFlowTest.click(s, "Consultar técnica");
+			String[] first = {null};
+			s.onActivity(a -> first[0] = a.state().assistant.preview.getItems().get(0).getExercise().getName());
+			MainFlowTest.click(s, "Consultar técnica de " + first[0]);
 			MainFlowTest.click(s, "Explicación guiada");
 			s.onActivity(a -> {
 				assertEquals(AppController.Screen.ASSISTANT, a.state().app.screen);
@@ -151,14 +153,14 @@ public class AssistantFlowTest {
 			s.onActivity(a -> {
 				float d = a.getResources().getDisplayMetrics().density;
 				assertTrue(a.findViewById(R.id.content).getHeight() > 120 * d);
-				View send = MainFlowTest.text(a.getWindow().getDecorView(), "Enviar local");
+				View send = MainFlowTest.text(a.getWindow().getDecorView(), "Enviar mensaje");
 				Rect box = new Rect();
 				send.requestRectangleOnScreen(new Rect(0, 0, send.getWidth(), send.getHeight()), true);
 			});
 			MainFlowTest.await();
 			capture("keyboard");
 			s.onActivity(a -> {
-				View send = MainFlowTest.text(a.getWindow().getDecorView(), "Enviar local");
+				View send = MainFlowTest.text(a.getWindow().getDecorView(), "Enviar mensaje");
 				Rect box = new Rect();
 				assertTrue(send.getGlobalVisibleRect(box));
 				assertTrue(box.height() > 40 * a.getResources().getDisplayMetrics().density);
@@ -182,10 +184,10 @@ public class AssistantFlowTest {
 				MainFlowTest.await();
 				capture("assistant-font130");
 				send(s, "3 días en casa sin material 30 min fuerza principiante");
-				scrollToText(s, "Guardar perfil y aceptar");
+				scrollToText(s, "Aceptar");
 				capture("proposal-font130");
 				s.onActivity(a -> {
-					View accept = MainFlowTest.text(a.getWindow().getDecorView(), "Guardar perfil y aceptar");
+					View accept = MainFlowTest.text(a.getWindow().getDecorView(), "Aceptar");
 					assertNotNull(accept);
 					assertTrue(accept.getHeight() >= 48 * a.getResources().getDisplayMetrics().density);
 				});
@@ -215,7 +217,7 @@ public class AssistantFlowTest {
 
 	private void send(ActivityScenario<MainActivity> s, String text) {
 		MainFlowTest.edit(s, "assistant_message", text);
-		MainFlowTest.click(s, "Enviar local");
+		MainFlowTest.click(s, "Enviar mensaje");
 	}
 
 	private void scrollToText(ActivityScenario<MainActivity> s, String label) {

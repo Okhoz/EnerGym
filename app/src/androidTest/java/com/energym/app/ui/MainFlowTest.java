@@ -125,8 +125,8 @@ public class MainFlowTest {
 			await();
 			capture("assistant");
 			scenario.onActivity(a -> {
-				assertNotNull(text(a.getWindow().getDecorView(), "Enviar local"));
-				assertTrue(textContaining(a.getWindow().getDecorView(), "Guiado local · gratuito"));
+				assertNotNull(text(a.getWindow().getDecorView(), "Enviar mensaje"));
+				assertTrue(textContaining(a.getWindow().getDecorView(), "Soy tu asistente de EnerGym"));
 			});
 		}
 	}
@@ -198,6 +198,9 @@ public class MainFlowTest {
 
 	static View text(View root, String value) {
 		if (root instanceof TextView && value.contentEquals(((TextView) root).getText()))
+			return root;
+		if (root.getContentDescription() != null && value.contentEquals(root.getContentDescription()) &&
+			root.isClickable())
 			return root;
 		if (root instanceof ViewGroup) {
 			ViewGroup group = (ViewGroup) root;

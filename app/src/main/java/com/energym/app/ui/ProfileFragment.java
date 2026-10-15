@@ -30,7 +30,7 @@ public final class ProfileFragment extends ScreenFragment {
 				resources = true;
 			} else if (f.key.equals("historyConsent"))
 				fields = card("Personalización y privacidad",
-					"Permiso opcional para enviar hasta 12 mensajes anteriores al servidor que conectes en Asistente. Solo se envían al pulsar Enviar al servidor; las sesiones históricas no se adjuntan. Puedes revocarlo aquí. El modo guiado local no envía datos.");
+					"Permiso opcional para enviar hasta 12 mensajes anteriores al servidor de IA que conectes en Cuenta. Solo se envían cuando chateas con la IA conectada; las sesiones históricas no se adjuntan. Puedes revocarlo aquí. El modo guiado local no envía datos.");
 			if (f.bool)
 				check(fields, f);
 			else if (!f.values.isEmpty())
