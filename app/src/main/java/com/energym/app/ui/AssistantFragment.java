@@ -74,19 +74,22 @@ public final class AssistantFragment extends ScreenFragment {
 			return;
 		}
 		composer.setVisibility(View.VISIBLE);
-		String modeLabel = c.automaticConnection() ?
+		String modeLabel = c.onDevice() ?
+			(c.localGuidance() ? "Guiado local · sin IA" : c.remoteActive() ? "Entrenador IA · Gemini Nano en tu móvil" :
+				"IA del móvil no disponible · guiado local") : c.automaticConnection() ?
 			(c.localGuidance() ? "Guiado local · sin IA" : c.remoteActive() ? "IA online · cuenta de Google" : "IA online no disponible") :
 			(c.remoteActive() ? "Servidor de IA emparejado · conversación" : "Guiado local · sin IA");
 		TextView mode = text(rows, modeLabel, R.style.EnerGym_FieldCaption, 4);
 		mode.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
 		if (c.automaticConnection()) {
+			String ai = c.onDevice() ? "IA del móvil" : "IA online";
 			if (c.localGuidance())
-				action(rows, "Usar IA online", !c.busy, () -> c.selectLocalGuidance(false));
+				action(rows, "Usar " + ai, !c.busy, () -> c.selectLocalGuidance(false));
 			else {
 				if (!c.remoteActive()) {
 					text(rows, c.connectionNotice(), R.style.EnerGym_Body, 8);
 					if (c.connected())
-						action(rows, "Reintentar IA online", !c.busy, () -> c.selectLocalGuidance(false));
+						action(rows, "Reintentar " + ai, !c.busy, () -> c.selectLocalGuidance(false));
 				}
 				action(rows, "Usar guiado local", !c.busy, () -> c.selectLocalGuidance(true));
 			}
@@ -94,6 +97,19 @@ public final class AssistantFragment extends ScreenFragment {
 				action(rows, "Cancelar solicitud", true, c::cancelPending);
 		} else if (!c.remoteActive())
 			action(rows, "Conectar IA en Cuenta", !c.busy, () -> app.navigate(AppController.Screen.ACCOUNT));
+		if (c.onDevice())
+			text(rows, "Todo se procesa en tu móvil: ningún mensaje sale del dispositivo, no necesita internet " +
+				"y no tiene coste. Tu entrenador recuerda los últimos mensajes de esta conversación.",
+				R.style.EnerGym_FieldCaption, 4);
+		else
+			historyConsent(c);
+		conversation(c, getView().findViewById(R.id.chat_send));
+	}
+
+	/**
+	 * Permiso para enviar mensajes previos a una IA externa; con la IA del móvil no hace falta.
+	 */
+	private void historyConsent(ProposalController c) {
 		com.google.android.material.checkbox.MaterialCheckBox context =
 			new com.google.android.material.checkbox.MaterialCheckBox(requireContext());
 		context.setTag("assistant_history_context");
@@ -107,7 +123,9 @@ public final class AssistantFragment extends ScreenFragment {
 			"ni tus datos de nutrición o perfil físico. Al pedir una rutina se comparten los filtros y limitaciones que indicaste " +
 			"para adaptarla. El mensaje actual se envía siempre al usar IA.",
 			R.style.EnerGym_FieldCaption, 4);
-		MaterialButton send = getView().findViewById(R.id.chat_send);
+	}
+
+	private void conversation(ProposalController c, MaterialButton send) {
 		send.setEnabled(!c.busy);
 		send.setAlpha(c.busy ? 0.5f : 1f);
 		if (c.exercise != null) {

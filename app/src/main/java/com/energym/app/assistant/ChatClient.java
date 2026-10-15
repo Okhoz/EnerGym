@@ -14,6 +14,10 @@ public interface ChatClient {
 		public final boolean historyConsent;
 		public final List<ConversationStore.Message> history;
 		public final Map<String, Object> profileData;
+		/**
+		 * Últimos mensajes solo para un modelo que corre en el propio móvil: ChatProtocol.request no los envía.
+		 */
+		public final List<ConversationStore.Message> recent;
 
 		public Request(String conversation, String request, String exercise, String message, TrainingProfile profile,
 			boolean consent, List<ConversationStore.Message> history) {
@@ -22,6 +26,13 @@ public interface ChatClient {
 
 		public Request(String conversation, String request, String exercise, String message, TrainingProfile profile,
 			Map<String, Object> partialProfile, boolean consent, List<ConversationStore.Message> history) {
+			this(conversation, request, exercise, message, profile, partialProfile, consent, history,
+				Collections.emptyList());
+		}
+
+		public Request(String conversation, String request, String exercise, String message, TrainingProfile profile,
+			Map<String, Object> partialProfile, boolean consent, List<ConversationStore.Message> history,
+			List<ConversationStore.Message> recent) {
 			conversationId = conversation;
 			requestId = request;
 			exerciseId = exercise;
@@ -30,6 +41,7 @@ public interface ChatClient {
 			profileData = Collections.unmodifiableMap(new LinkedHashMap<>(partialProfile));
 			historyConsent = consent;
 			this.history = Collections.unmodifiableList(new ArrayList<>(consent ? history : Collections.emptyList()));
+			this.recent = Collections.unmodifiableList(new ArrayList<>(recent));
 		}
 	}
 
@@ -52,6 +64,13 @@ public interface ChatClient {
 	}
 
 	default boolean automaticConnection() {
+		return false;
+	}
+
+	/**
+	 * Verdadero si el modelo corre en el propio móvil: nada sale del dispositivo ni tiene coste de servidor.
+	 */
+	default boolean onDevice() {
 		return false;
 	}
 

@@ -126,12 +126,28 @@ public final class ProposalController {
 		return client.automaticConnection();
 	}
 
+	/**
+	 * La IA corre en el propio móvil (Gemini Nano): sin servidor, sin coste y sin enviar mensajes fuera.
+	 */
+	public boolean onDevice() {
+		return client.onDevice();
+	}
+
 	public boolean localGuidance() {
 		return localGuidance;
 	}
 
 	public String connectionNotice() {
 		String unavailable = client.unavailableCode();
+		if (client.onDevice()) {
+			if (unavailable.equals("MODEL_DOWNLOADING"))
+				return "Descargando la IA de tu móvil (Gemini Nano). Mientras tanto te responde el guiado local.";
+			if (unavailable.equals("MODEL_CHECKING"))
+				return "Comprobando si tu móvil puede usar Gemini Nano…";
+			if (unavailable.equals("MODEL_UNAVAILABLE"))
+				return "Este móvil no tiene Gemini Nano. Tu entrenador responde con el guiado local, sin IA y sin coste.";
+			return "Tu entrenador usa Gemini Nano en el propio móvil: sin internet, sin servidor y sin coste.";
+		}
 		if (unavailable.equals("BACKEND_NOT_CONFIGURED"))
 			return "La IA online aún no está disponible en esta versión. Puedes elegir el guiado local, que funciona sin IA.";
 		if (unavailable.equals("CONFIGURACION_INVALIDA"))
@@ -271,7 +287,8 @@ public final class ProposalController {
 		String text = normalize(raw);
 		add("user", raw.trim());
 		boolean planning = planningTurn(text);
-		status = automaticConnection() ? "Guiado local seleccionado · respuestas por reglas, sin IA." :
+		status = client.onDevice() && !localGuidance ? connectionNotice() :
+			automaticConnection() ? "Guiado local seleccionado · respuestas por reglas, sin IA." :
 			"Guiado local · sin IA. Conecta tu servidor en Cuenta para conversar con la IA.";
 		if (exercise != null && !planning && !greeting(text)) {
 			add("assistant", explanation(exercise));
@@ -772,9 +789,14 @@ public final class ProposalController {
 				ConversationStore.Message m = messages.get(i);
 				h.add(new ConversationStore.Message(m.role, m.text.substring(0, Math.min(1000, m.text.length()))));
 			}
+		// Memoria del entrenador local: nunca sale del móvil (el protocolo de red no serializa estos mensajes).
+		List<ConversationStore.Message> recent = new ArrayList<>();
+		if (client.onDevice())
+			for (int i = Math.max(0, messages.size() - TrainerPrompt.MAX_RECENT); i < messages.size(); i++)
+				recent.add(messages.get(i));
 		long requestOrigin = navigationOrigin.getAsLong();
 		ChatClient.Request request = new ChatClient.Request(conversationId, UUID.randomUUID().toString(),
-			exercise == null ? null : exercise.getId(), text.trim(), proposed, data, consent, h);
+			exercise == null ? null : exercise.getId(), text.trim(), proposed, data, consent, h, recent);
 		add("user", text.trim());
 		persist();
 		pendingHistory = consent;
@@ -827,6 +849,13 @@ public final class ProposalController {
 				pendingHistory = false;
 				if (code.equals("PROVIDER_NOT_CONFIGURED"))
 					remoteDisabled = true;
+				if (client.onDevice()) {
+					status = code.equals("MODEL_BUSY_OR_QUOTA") ?
+						"La IA de tu móvil está ocupada o ha llegado a su límite por ahora. Inténtalo en un momento." :
+						"La IA de tu móvil no ha podido responder. Vuelve a enviarlo o usa el guiado local.";
+					changed.run();
+					return;
+				}
 				if (automaticConnection() && code.equals("PROVIDER_NOT_CONFIGURED"))
 					status = connectionNotice();
 				else if (automaticConnection() && (code.equals("UNAUTHORIZED") || code.equals("SIGN_IN_REQUIRED") ||

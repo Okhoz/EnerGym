@@ -59,6 +59,14 @@ public final class AccountFragment extends ScreenFragment {
 		com.energym.app.assistant.ProposalController c = state.assistant;
 		if (c == null || app.owner() == null)
 			return;
+		if (c.onDevice()) {
+			LinearLayout local = card("Entrenador con IA", c.connectionNotice());
+			text(local, "Funciona con Gemini Nano dentro de tu móvil (Android AICore). No usa servidores ni envía " +
+				"tus mensajes fuera del dispositivo. Si tu móvil no lo admite, el chat usa el guiado local.",
+				R.style.EnerGym_FieldCaption, 8);
+			if (!c.status.isEmpty()) text(local, c.status, R.style.EnerGym_Body, 12);
+			return;
+		}
 		if (c.automaticConnection()) {
 			LinearLayout online = card("Asistente con IA", c.connectionNotice());
 			text(online, "Los mensajes se envían al servicio online sólo al usar el chat en modo IA. " +
