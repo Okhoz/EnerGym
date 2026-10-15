@@ -1,0 +1,25 @@
+# Official Docker Hub manifests and Maven distribution verified 2026-10-15.
+# Keep credentials out of ARG, RUN and COPY. Render injects secrets at runtime.
+FROM eclipse-temurin:17.0.20.1_1-jdk-jammy@sha256:43f4431cc895d37ceb115e2e1f160545ec45caee9c1cb4246fc6bb879d58aeda AS build
+WORKDIR /build
+COPY pom.xml mvnw ./
+COPY .mvn .mvn
+COPY src src
+RUN printf '\ndistributionSha256Sum=5af3b743dd8b876b5c45da33b676251e5f1687712644abb4ee519ca56e1d89ce\n' >> .mvn/wrapper/maven-wrapper.properties && \
+    chmod 0555 mvnw && ./mvnw -B -ntp -Dproject.build.outputTimestamp=2026-10-15T00:00:00Z verify
+
+FROM eclipse-temurin:17.0.20.1_1-jre-jammy@sha256:8993f1aed8b25fcea7a7047a7949c1866fa558fc6830d938c22c4f13b26be9d7 AS runtime
+WORKDIR /app
+RUN groupadd --gid 10001 energym && \
+    (getent group 1000 >/dev/null || groupadd --gid 1000 render-secrets) && \
+    useradd --uid 10001 --gid 10001 --groups 1000 --no-create-home --shell /usr/sbin/nologin energym
+COPY --from=build --chown=10001:10001 /build/target/energym-backend-1.0.0.jar /app/backend.jar
+COPY --chown=10001:10001 deploy/entrypoint.sh /app/entrypoint.sh
+RUN chmod 0555 /app/entrypoint.sh && chmod 0444 /app/backend.jar
+USER 10001:10001
+ENV ENERGYM_TRANSPORT=render ENERGYM_AUTH_MODE=firebase ENERGYM_DEV_MODE=false \
+    ENERGYM_AI_PROVIDER=groq GROQ_ENABLED=true GEMINI_ENABLED=false OPENAI_ENABLED=false
+EXPOSE 10000
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD ["java", "-Xmx64m", "-cp", "/app/backend.jar", "com.energym.server.Healthcheck"]
+ENTRYPOINT ["/bin/sh", "/app/entrypoint.sh"]

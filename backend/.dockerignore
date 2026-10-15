@@ -1,6 +1,7 @@
 # Contexto por lista positiva: jamás copia .env, certificados, datos ni target local.
 **
 !Dockerfile
+!Dockerfile.render
 !pom.xml
 !mvnw
 !.mvn/

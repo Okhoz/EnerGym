@@ -1,5 +1,7 @@
 # Backend EnerGym
 
+La versión online elegida usa **Render Free + Groq Free**, Firebase ID tokens y cuotas Firestore persistentes: [configuración y comprobación](docs/render-free.md). `Dockerfile.render` y `render.yaml` preparan ese servicio; todavía necesitan credenciales privadas, despliegue y prueba real. El siguiente launcher conserva la configuración local de depuración.
+
 Java 17+, Maven y JSON. El lanzador local selecciona **Gemini Free** y `gemini-3.5-flash-lite` de forma predeterminada; `-Provider None` desactiva el proveedor. Groq y OpenAI se conservan únicamente como opciones explícitas de compatibilidad. No hay fallback ni reintentos automáticos. La clave permanece en el servidor y nunca viaja a Android.
 
 El servidor Java directo y las bases Compose permanecen desactivados sin selección/configuración completa (`503 PROVIDER_NOT_CONFIGURED`). El predeterminado corresponde a `start-server.ps1`, no a inferir un proveedor desde cualquier clave presente. Las pruebas automáticas usan fixtures de localhost. Véase [Gemini Free](docs/gemini-free.md) para precios, cuotas, privacidad y el límite de publicación en EEE/CH/UK. La nueva prueba sintética con Gemini respondió 200 en 2.508 ms y produjo una propuesta validada de dos ejercicios; fue una comprobación backend, sin nuevo recorrido Android.
@@ -26,17 +28,18 @@ El wrapper de Apache Maven 3.9.16 se copió sin modificar ANKA. La primera compi
 
 ## Desarrollo privado y publicación pendiente
 
-La tabla oficial de precios declara entrada/salida Free para los dos modelos permitidos. Consultar las cuotas efectivas del proyecto en AI Studio; no hay un número universal garantizado. Los términos exigen Paid Services para ofrecer clientes API Gemini a usuarios del EEE, Suiza o Reino Unido. Ese requisito mantiene pendiente la publicación gratuita en esos destinos; esta preparación conserva las pruebas privadas sintéticas por separado y no activa pagos. Autenticación Firebase del backend, cuotas durables por usuario/globales y despliegue HTTPS siguen pendientes.
+La tabla oficial de precios de Gemini declara entrada/salida Free para los dos modelos permitidos. Consultar las cuotas efectivas del proyecto en AI Studio; no hay un número universal garantizado. Los términos exigen Paid Services para ofrecer clientes API Gemini a usuarios del EEE, Suiza o Reino Unido. Por esa restricción, la versión online selecciona Groq explícitamente. Firebase ID tokens y cuotas durables están implementados para Render; quedan pendientes secretos, despliegue HTTPS real y su validación remota. No se activan pagos.
 
 La dirección predeterminada es `127.0.0.1:8080`, HTTP permitido únicamente con `ENERGYM_DEV_MODE=true` y enlace loopback. Para emulador/dispositivo de desarrollo conectado usar `adb reverse tcp:8080 tcp:8080` y URL de app `http://127.0.0.1:8080` solo debug. Release exige HTTPS.
 
-Fuera de desarrollo o para enlace no loopback, configurar `ENERGYM_TLS_KEYSTORE` (PKCS12), `ENERGYM_TLS_PASSWORD` y certificado verificable por el cliente. TLS 1.2/1.3 directo. Cabeceras X-Forwarded-Proto no autorizan HTTP. No se ha desplegado ni probado un certificado real. Emparejamiento local no es autenticación de cuentas de producción.
+Para TLS directo fuera de desarrollo, configurar `ENERGYM_TLS_KEYSTORE` (PKCS12), `ENERGYM_TLS_PASSWORD` y certificado verificable por el cliente. TLS 1.2/1.3 directo; no confía en X-Forwarded-Proto. Render tiene su modo explícito de ingreso administrado documentado en el runbook online. No se ha desplegado ni probado un certificado real. Emparejamiento local no es autenticación de cuentas públicas.
 
 ## Contrato HTTP v1 del cliente Android
 
 Todas las entradas/salidas son JSON UTF-8; POST exige Content-Type application/json. No hay CORS, query parameters ni campos desconocidos admitidos.
 
 - `GET /health` → 200 `{"status":"ok","catalogVersion":2}`. No devuelve clave, token, modelo ni código.
+- Modo Firebase: `/api/chat` exige Firebase ID token; `/api/session` devuelve 404. Su JSON es el mismo. Las dos operaciones siguientes sólo corresponden a pairing de desarrollo.
 - `POST /api/session`, sin Bearer, cuerpo exacto `{"pairingCode":"<codigo-privado>"}` → 201 `{"token":"<token-aleatorio>","expiresAtEpochSeconds":1790000000}`. El código configurado se consume una sola vez, incluso con solicitudes simultáneas; código inválido/usado o pairing deshabilitado → 401. Diez intentos globales/minuto → 429.
 - `DELETE /api/session` con Authorization Bearer → 200 `{"revoked":true}`; token ausente/expirado → 401.
 - `POST /api/chat` con `Authorization: Bearer <token>` y cuerpo con exactamente siete campos:

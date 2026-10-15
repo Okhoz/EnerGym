@@ -1,5 +1,7 @@
 # Gemini Free para EnerGym
 
+Para la versión online el propietario ha elegido **Groq Free en Render** por la restricción regional descrita aquí; ver [runbook online](render-free.md). Esta página conserva la configuración y evidencia del launcher privado de desarrollo.
+
 Estado 15-10-2026: Gemini es la selección predeterminada del lanzador local, con `gemini-3.5-flash-lite`. `None` permite arrancar sin proveedor; Groq y OpenAI requieren selección explícita y no son fallback. La nueva fase pasó 67 pruebas backend, ocho casos del lanzador y una única llamada privada sintética a Gemini 3.5 Flash Lite: respuesta 200 en 2.508 ms y propuesta validada de dos ejercicios. La clave `GEMINI_API_KEY` se mantiene en el entorno privado del propietario; esta documentación no la solicita ni la registra. Si se renueva, la comprobación debe usar la clave vigente guardada por el propietario.
 
 ## Precio, cuotas y alcance

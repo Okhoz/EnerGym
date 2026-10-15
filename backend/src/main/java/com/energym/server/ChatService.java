@@ -17,25 +17,32 @@ public final class ChatService {
 	public record Result(int status, JsonNode body) {
 	}
 
-	private final SessionTokenStore tokens;
+	private final Authenticator authenticator;
+	private final Quota quota;
 	private final Provider provider;
 	private final ProposalValidator validator;
 	private final Semaphore inFlight = new Semaphore(2);
 
 	public ChatService(SessionTokenStore tokens, Provider provider, ProposalValidator validator) {
-		this.tokens = tokens;
+		this(token -> tokens.authenticated(token) ? token : null, tokens::allowChat, provider, validator);
+	}
+
+	public ChatService(Authenticator authenticator, Quota quota, Provider provider, ProposalValidator validator) {
+		this.authenticator = authenticator;
+		this.quota = quota;
 		this.provider = provider;
 		this.validator = validator;
 	}
 
 	/**
-	 * Tokens de backend independientes del UID Google; no guarda conversaciones ni aplica rutinas.
+	 * La identidad procede del autenticador; no guarda conversaciones ni aplica rutinas.
 	 */
 	public Result chat(String token, JsonNode request) {
-		if (!tokens.authenticated(token))
+		final String uid;
+		try { uid = authenticator.uid(token); }
+		catch (Exception unavailable) { return error(503, "AUTH_UNAVAILABLE", true); }
+		if (uid == null)
 			return error(401, "UNAUTHORIZED", false);
-		if (!tokens.allowChat(token))
-			return error(429, "RATE_LIMITED", true);
 		try {
 			validator.validateRequest(request);
 		} catch (IllegalArgumentException e) {
@@ -46,6 +53,11 @@ public final class ChatService {
 		if (!inFlight.tryAcquire())
 			return correlated(error(429, "SERVER_BUSY", true), request);
 		try {
+			try {
+				if (!quota.reserve(uid)) return correlated(error(429, "RATE_LIMITED", true), request);
+			} catch (Exception unavailable) {
+				return correlated(error(503, "QUOTA_UNAVAILABLE", true), request);
+			}
 			JsonNode out = provider.respond(validator.providerRequest(request));
 			validator.validateResponse(out, request);
 			ObjectNode result = out.deepCopy();

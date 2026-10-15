@@ -21,12 +21,18 @@ public final class Server implements AutoCloseable {
 	private final HttpServer server;
 	private final ChatService service;
 	private final SessionTokenStore tokens;
+	private final RenderIngress ingress;
 	private final ThreadPoolExecutor executor = new ThreadPoolExecutor(4, 4, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(16));
 
 	private Server(HttpServer server, ChatService service, SessionTokenStore tokens) {
+		this(server, service, tokens, null);
+	}
+
+	private Server(HttpServer server, ChatService service, SessionTokenStore tokens, RenderIngress ingress) {
 		this.server = server;
 		this.service = service;
 		this.tokens = tokens;
+		this.ingress = ingress;
 		server.setExecutor(executor);
 		server.createContext("/", this::handle);
 	}
@@ -44,6 +50,11 @@ public final class Server implements AutoCloseable {
 	 * Fuera de desarrollo/loopback utiliza TLS directo; no confía en X-Forwarded-Proto del cliente.
 	 */
 	static Server configured(Map<String, String> env, ChatService service, SessionTokenStore tokens) throws Exception {
+		if ("render".equals(env.get("ENERGYM_TRANSPORT"))) {
+			RenderIngress ingress = RenderIngress.fromEnvironment(env);
+			InetSocketAddress bind = new InetSocketAddress("0.0.0.0", Integer.parseInt(env.getOrDefault("PORT", "10000")));
+			return new Server(HttpServer.create(bind, 16), service, null, ingress);
+		}
 		InetSocketAddress bind = new InetSocketAddress(env.getOrDefault("ENERGYM_HOST", "127.0.0.1"), Integer.parseInt(env.getOrDefault("ENERGYM_PORT", "8080")));
 		boolean dev = "true".equals(env.getOrDefault("ENERGYM_DEV_MODE", "true"));
 		String path = env.getOrDefault("ENERGYM_TLS_KEYSTORE", ""), password = env.getOrDefault("ENERGYM_TLS_PASSWORD", "");
@@ -107,6 +118,14 @@ public final class Server implements AutoCloseable {
 				send(exchange, ChatService.error(404, "NOT_FOUND", false));
 				return;
 			}
+			if (ingress != null && !ingress.accepts(exchange.getRequestHeaders())) {
+				send(exchange, ChatService.error(403, "HTTPS_REQUIRED", false));
+				return;
+			}
+			if (path.equals("/api/session") && tokens == null) {
+				send(exchange, ChatService.error(404, "NOT_FOUND", false));
+				return;
+			}
 			String token = bearer(exchange);
 			if (path.equals("/api/session") && method.equals("DELETE")) {
 				if (!tokens.authenticated(token)) {
@@ -119,10 +138,6 @@ public final class Server implements AutoCloseable {
 			}
 			if (!method.equals("POST")) {
 				send(exchange, ChatService.error(405, "METHOD_NOT_ALLOWED", false));
-				return;
-			}
-			if (path.equals("/api/chat") && !tokens.authenticated(token)) {
-				send(exchange, ChatService.error(401, "UNAUTHORIZED", false));
 				return;
 			}
 			if (path.equals("/api/session") && !tokens.allowPairingAttempt()) {
@@ -166,7 +181,8 @@ public final class Server implements AutoCloseable {
 		if (values == null || values.size() != 1)
 			return null;
 		String value = values.get(0);
-		return value.startsWith("Bearer ") && value.length() == 50 ? value.substring(7) : null;
+		return value.startsWith("Bearer ") && value.length() > 7 && value.length() <= 8199 &&
+			!value.substring(7).matches(".*\\s.*") ? value.substring(7) : null;
 	}
 
 	private static void send(HttpExchange exchange, ChatService.Result result) throws IOException {
@@ -181,15 +197,19 @@ public final class Server implements AutoCloseable {
 	}
 
 	public static void main(String[] args) {
+		Map<String, String> env = System.getenv();
 		// Límites del servidor JDK para clientes lentos y cabeceras excesivas; definidos antes de crear el servidor.
 		System.setProperty("sun.net.httpserver.maxReqTime", "10");
-		System.setProperty("sun.net.httpserver.maxRspTime", "25");
+		System.setProperty("sun.net.httpserver.maxRspTime", "render".equals(env.get("ENERGYM_TRANSPORT")) ? "90" : "25");
 		System.setProperty("sun.net.httpserver.maxReqHeaders", "32");
 		System.setProperty("sun.net.httpserver.maxConnections", "32");
 		try {
-			Map<String, String> env = System.getenv();
-			SessionTokenStore tokens = new SessionTokenStore(env.get("ENERGYM_PAIRING_CODE"), Clock.systemUTC(), Duration.ofHours(1), 10);
-			ChatService service = new ChatService(tokens, ProviderFactory.fromEnvironment(env), new ProposalValidator());
+			boolean firebase = "firebase".equals(env.get("ENERGYM_AUTH_MODE"));
+			if ("render".equals(env.get("ENERGYM_TRANSPORT")) && !firebase) throw new IllegalArgumentException("Firebase obligatorio");
+			SessionTokenStore tokens = firebase ? null : new SessionTokenStore(env.get("ENERGYM_PAIRING_CODE"), Clock.systemUTC(), Duration.ofHours(1), 10);
+			ChatService service = firebase ? new ChatService(new FirebaseIdTokenVerifier(env.get("FIREBASE_PROJECT_ID")),
+				FirestoreQuota.fromEnvironment(env), ProviderFactory.fromEnvironment(env), new ProposalValidator()) :
+				new ChatService(tokens, ProviderFactory.fromEnvironment(env), new ProposalValidator());
 			Server server = configured(env, service, tokens);
 			Runtime.getRuntime().addShutdownHook(new Thread(server::close));
 			server.start();

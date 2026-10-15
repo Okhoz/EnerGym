@@ -1,6 +1,6 @@
 # Groq Free opcional para EnerGym
 
-Estado 15-10-2026, tras la selección de Gemini: Groq se conserva como proveedor opcional, únicamente con selección explícita; no es el predeterminado ni un fallback. La llamada real sintética anterior se conserva en «Primera prueba real». [Gemini Free](gemini-free.md) documenta la elección actual y su nueva prueba privada válida de dos ejercicios; esa prueba no sustituye esta evidencia Groq ni demuestra un despliegue. La publicación sigue pendiente de autenticación Firebase, cuotas durables y despliegue HTTPS. La conexión de desarrollo usa emparejamiento privado.
+Estado 15-10-2026: el propietario eligió **Groq Free para la versión online** de [Render Free](render-free.md), con Firebase ID tokens y cuotas durables ya implementados; faltan secretos, despliegue y validación remota. El launcher local conserva Gemini como opción predeterminada para pruebas privadas. La llamada real sintética anterior se conserva en «Primera prueba real» y no demuestra un despliegue. La conexión local de desarrollo sigue usando emparejamiento privado; no hay fallback.
 
 La prueba privada anterior de IA gratuita usó GroqCloud Free con `openai/gpt-oss-120b`; no es ChatGPT. La alternativa permitida es `openai/gpt-oss-20b`. Ambos aparecen en el [plan Free](https://console.groq.com/docs/rate-limits) y admiten [JSON Schema estricto](https://console.groq.com/docs/structured-outputs). El adaptador Groq exige un modelo explícito; no hay selección automática, reintentos ni fallback a un proveedor de pago.
 

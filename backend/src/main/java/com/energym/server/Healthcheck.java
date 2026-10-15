@@ -22,7 +22,13 @@ public final class Healthcheck {
 	static boolean healthy(Map<String, String> env) {
 		HttpURLConnection connection = null;
 		try {
-			URI uri = URI.create(env.getOrDefault("ENERGYM_HEALTH_URL", "http://127.0.0.1:8080/health"));
+			String defaultUrl = "http://127.0.0.1:8080/health";
+			if ("render".equals(env.get("ENERGYM_TRANSPORT")) && "true".equals(env.get("RENDER"))) {
+				int port = Integer.parseInt(env.getOrDefault("PORT", "10000"));
+				if (port < 1 || port > 65535) return false;
+				defaultUrl = "http://127.0.0.1:" + port + "/health";
+			}
+			URI uri = URI.create(env.getOrDefault("ENERGYM_HEALTH_URL", defaultUrl));
 			if (uri.getHost() == null || uri.getUserInfo() != null || uri.getRawQuery() != null
 				|| uri.getFragment() != null || !"/health".equals(uri.getRawPath())) return false;
 			if (!"https".equals(uri.getScheme()) && !("http".equals(uri.getScheme())

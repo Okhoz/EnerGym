@@ -1,0 +1,48 @@
+# No database, disks, paid plan or provider fallback are provisioned.
+services:
+  - type: web
+    name: energym-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    rootDir: backend
+    dockerfilePath: ./Dockerfile.render
+    dockerContext: .
+    autoDeployTrigger: off
+    healthCheckPath: /health
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: ENERGYM_TRANSPORT
+        value: render
+      - key: ENERGYM_AUTH_MODE
+        value: firebase
+      - key: ENERGYM_DEV_MODE
+        value: "false"
+      - key: ENERGYM_AI_PROVIDER
+        value: groq
+      - key: GROQ_ENABLED
+        value: "true"
+      - key: GEMINI_ENABLED
+        value: "false"
+      - key: OPENAI_ENABLED
+        value: "false"
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-120b
+      - key: GROQ_API_KEY
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: /etc/secrets/firebase-service-account.json
+      - key: QUOTA_UID_SALT
+        generateValue: true
+      - key: QUOTA_SCOPE
+        value: energym
+      - key: QUOTA_UID_PER_DAY
+        value: "20"
+      - key: QUOTA_GLOBAL_PER_DAY
+        value: "200"
+      - key: QUOTA_UID_PER_MINUTE
+        value: "3"
+      - key: QUOTA_GLOBAL_PER_MINUTE
+        value: "20"

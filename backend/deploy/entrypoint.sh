@@ -24,7 +24,14 @@ load_file() {
 for secret in ENERGYM_TLS_PASSWORD ENERGYM_PROXY_TOKEN GEMINI_API_KEY GROQ_API_KEY ENERGYM_PAIRING_CODE; do
 	load_file "$secret"
 done
-if [ "${ENERGYM_DEV_MODE:-true}" != 'true' ]; then
+if [ "${ENERGYM_TRANSPORT:-}" = 'render' ]; then
+	[ "${RENDER:-}" = 'true' ] && [ "${ENERGYM_AUTH_MODE:-}" = 'firebase' ] || fail
+	[ "${ENERGYM_DEV_MODE:-true}" = 'false' ] || fail
+	[ -n "${RENDER_EXTERNAL_HOSTNAME:-}" ] && [ -n "${FIREBASE_PROJECT_ID:-}" ] || fail
+	[ -n "${GOOGLE_APPLICATION_CREDENTIALS:-}" ] && [ -r "$GOOGLE_APPLICATION_CREDENTIALS" ] || fail
+	[ "$(wc -c < "$GOOGLE_APPLICATION_CREDENTIALS")" -le 65536 ] || fail
+	[ -n "${QUOTA_UID_SALT:-}" ] && [ "${#QUOTA_UID_SALT}" -ge 32 ] || fail
+elif [ "${ENERGYM_DEV_MODE:-true}" != 'true' ]; then
 	[ -n "${ENERGYM_TLS_KEYSTORE:-}" ] && [ -r "$ENERGYM_TLS_KEYSTORE" ] || fail
 	[ -n "${ENERGYM_TLS_PASSWORD:-}" ] || fail
 	[ -n "${ENERGYM_PROXY_TOKEN:-}" ] || fail

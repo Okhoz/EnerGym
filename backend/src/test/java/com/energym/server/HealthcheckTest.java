@@ -56,6 +56,21 @@ class HealthcheckTest {
 	@Test void acceptsHealthyEndpointWithoutCredentials() throws Exception {
 		assertTrue(response(200, "{\"status\":\"ok\",\"catalogVersion\":2}", false));
 	}
+	@Test void renderChecksAssignedPortOnLoopback() throws Exception {
+		HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+		server.createContext("/health", exchange -> {
+			byte[] body = "{\"status\":\"ok\"}".getBytes(StandardCharsets.UTF_8);
+			exchange.sendResponseHeaders(200, body.length);
+			exchange.getResponseBody().write(body);
+			exchange.close();
+		});
+		server.start();
+		try {
+			assertTrue(healthy(Map.of("ENERGYM_TRANSPORT", "render", "RENDER", "true",
+				"PORT", Integer.toString(server.getAddress().getPort()))));
+			assertFalse(healthy(Map.of("ENERGYM_TRANSPORT", "render", "RENDER", "true", "PORT", "70000")));
+		} finally { server.stop(0); }
+	}
 	@Test void rejectsUnavailableEndpoint() throws Exception { assertFalse(response(503, "{\"status\":\"ok\"}", false)); }
 	@Test void rejectsInvalidBody() throws Exception { assertFalse(response(200, "{\"status\":\"fail\"}", false)); }
 	@Test void rejectsMalformedJson() throws Exception { assertFalse(response(200, "not-json", false)); }
