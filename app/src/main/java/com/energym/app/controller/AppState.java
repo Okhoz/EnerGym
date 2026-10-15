@@ -29,6 +29,9 @@ import java.util.Collections;
  */
 public final class AppState extends AndroidViewModel {
 	public AppController app;
+	// Estado transitorio de vista: sobrevive a técnica/back y se vacía al cambiar de cuenta o borrador.
+	public final com.energym.app.ui.ExerciseBrowserState exerciseBrowser = new com.energym.app.ui.ExerciseBrowserState();
+	public final com.energym.app.ui.ExerciseBrowserState manualExerciseBrowser = new com.energym.app.ui.ExerciseBrowserState();
 	public AccountController accounts;
 	public SyncController sync;
 	public ProposalController assistant;
@@ -185,6 +188,10 @@ public final class AppState extends AndroidViewModel {
 	}
 
 	private void changed() {
+		if (app != null) {
+			exerciseBrowser.resetFor(app.owner(), 0);
+			manualExerciseBrowser.resetFor(app.owner(), app.manual.draftRevision());
+		}
 		if (visualization != null && app != null)
 			visualization.context(app.owner(), app.navigationRevision(), app.screen, app.exercise);
 		observer.run();

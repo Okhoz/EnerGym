@@ -50,6 +50,7 @@ public abstract class ScreenFragment extends Fragment {
 		if (app == null)
 			return;
 		rows = getView().findViewById(R.id.rows);
+		beforeContentReset();
 		rows.removeAllViews();
 		if (app.owner() != null && !app.initialDataReady && app.screen != AppController.Screen.ACCOUNT) {
 			heading("", "Restaurando tus datos", "Estamos comprobando los datos guardados de esta cuenta.");
@@ -62,6 +63,10 @@ public abstract class ScreenFragment extends Fragment {
 	}
 
 	protected abstract void content();
+
+	/** Permite conservar edición transitoria antes de retirar los campos de la vista. */
+	protected void beforeContentReset() {
+	}
 
 	protected void heading(String eyebrow, String title, String subtitle) {
 		// Diseño limpio: sin antetítulo en mayúsculas; el título basta para orientarse.

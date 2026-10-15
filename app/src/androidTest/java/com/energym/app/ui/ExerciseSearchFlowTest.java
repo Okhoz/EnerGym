@@ -112,4 +112,45 @@ public final class ExerciseSearchFlowTest {
 				"No hay ejercicios con esta búsqueda y estos filtros")));
 		}
 	}
+
+	@Test public void filteringKeepsTheInputAndTechniqueBackRestoresTheSearch() throws Exception {
+		try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+			ready(scenario);
+			MainFlowTest.click(scenario, "Filtrar ejercicios");
+			select(scenario, "exercise_filter_environment", "Casa");
+			final EditText[] original = {null};
+			scenario.onActivity(a -> {
+				original[0] = a.getWindow().getDecorView().findViewWithTag("exercise_search");
+				original[0].requestFocus();
+				original[0].setText("sentad");
+				original[0].setSelection(3);
+			});
+			select(scenario, "exercise_filter_material", "Sin material");
+			scenario.onActivity(a -> {
+				EditText current = a.getWindow().getDecorView().findViewWithTag("exercise_search");
+				assertSame("Filtrar conserva el campo que se está editando", original[0], current);
+				assertTrue(current.hasFocus());
+				assertEquals(3, current.getSelectionStart());
+			});
+			MainFlowTest.click(scenario, "Sentadilla sin accesorios");
+			scenario.onActivity(a -> {
+				assertEquals(AppController.Screen.EXERCISE, a.state().app.screen);
+				a.state().app.back();
+			});
+			MainFlowTest.await();
+			scenario.onActivity(a -> {
+				View root = a.getWindow().getDecorView();
+				EditText current = root.findViewWithTag("exercise_search");
+				assertNotNull(current);
+				assertEquals("sentad", current.getText().toString());
+				assertTrue("Volver de técnica conserva el foco de búsqueda", current.hasFocus());
+				assertEquals(3, current.getSelectionStart());
+				Spinner environment = root.findViewWithTag("exercise_filter_environment");
+				Spinner material = root.findViewWithTag("exercise_filter_material");
+				assertEquals("Casa", environment.getSelectedItem().toString());
+				assertEquals("Sin material", material.getSelectedItem().toString());
+				assertNotNull(MainFlowTest.text(root, "Sentadilla sin accesorios"));
+			});
+		}
+	}
 }

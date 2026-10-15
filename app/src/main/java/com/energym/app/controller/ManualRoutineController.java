@@ -134,8 +134,30 @@ public final class ManualRoutineController {
 	}
 
 	public List<Exercise> search(String text) {
+		return search(text, ExerciseSearch.Filters.all(), true);
+	}
+
+	/** La exploración puede ampliar resultados sin alterar el contexto ni la elegibilidad al añadir. */
+	public List<Exercise> search(String text, ExerciseSearch.Filters filters, boolean onlyCompatible) {
 		query = text == null ? "" : text;
-		return new ExerciseSearch(catalog).find(query, ExerciseSearch.Filters.all());
+		List<Exercise> result = new ExerciseSearch(catalog).find(query, filters);
+		if (!onlyCompatible) return result;
+		final TrainingProfile profile;
+		try {
+			profile = context();
+		} catch (RuntimeException invalid) {
+			return Collections.emptyList();
+		}
+		List<Exercise> compatible = new ArrayList<>();
+		CompatibilityEngine eligibility = new CompatibilityEngine();
+		for (Exercise exercise : result)
+			if (eligibility.isCompatible(exercise, profile)) compatible.add(exercise);
+		return Collections.unmodifiableList(compatible);
+	}
+
+	/** Identifica el borrador para reiniciar sólo su estado visual al comenzar otro. */
+	public long draftRevision() {
+		return generation;
 	}
 
 	public String compatibilityMessage(Exercise exercise) {

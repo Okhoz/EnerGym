@@ -1,23 +1,28 @@
 package com.energym.app.ui;
 
+import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.energym.app.R;
 import com.energym.app.controller.AppController;
 import com.energym.app.controller.ManualRoutineController;
+import com.energym.app.catalog.ExerciseSearch;
 import com.energym.app.domain.*;
 import com.energym.app.domain.TrainingProfile.*;
 import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.button.MaterialButton;
 import java.util.*;
 import java.util.function.Consumer;
 
 /** Vista del editor: los datos y la validación pertenecen al controlador, sin escribir el perfil global. */
 public final class ManualRoutineFragment extends ScreenFragment {
-	private static final int PAGE_SIZE = 12;
-	private int visible = PAGE_SIZE;
 	private boolean contextExpanded;
-	public ManualRoutineFragment() { super(R.layout.fragment_manual_routine); }
+	private ExerciseBrowser browser;
+	private Bundle restored;
+	public ManualRoutineFragment() {
+		super(R.layout.fragment_manual_routine);
+	}
 
 	protected void content() {
 		heading("", "Rutina manual", "Elige ejercicios del catálogo y ajusta su prescripción. Sólo se guarda al confirmarlo.");
@@ -27,6 +32,8 @@ public final class ManualRoutineFragment extends ScreenFragment {
 			return;
 		}
 		ManualRoutineController c = app.manual;
+		ExerciseBrowser.restore(restored, "manual.library", state.manualExerciseBrowser, app.owner(), c.draftRevision());
+		restored = null;
 		LinearLayout basics = card("Mi rutina", "Estos ajustes pertenecen a esta rutina. Tu perfil general se conserva.");
 		field(basics, "manual_title", "Nombre de la rutina", c.title(), false, false, c::title);
 		check(basics, "manual_progression", "Progresión automática", c.progression(), c::progression);
@@ -53,16 +60,33 @@ public final class ManualRoutineFragment extends ScreenFragment {
 		}
 		primary(action(save, c.busy ? "Guardando…" : "Guardar mi rutina", !c.busy && !app.loading, c::save));
 		action(save, "Volver a entrenamientos", !c.busy, () -> app.navigate(AppController.Screen.TRAINING));
-		LinearLayout library = card("Añadir del catálogo", "La biblioteca es explorable. Cada ejercicio indica si admite el contexto de esta rutina.");
-		LinearLayout results = new LinearLayout(requireContext());
-		results.setOrientation(LinearLayout.VERTICAL);
-		field(library, "manual_search", "Buscar ejercicio", c.query, false, false, query -> {
-			c.query = query;
-			visible = PAGE_SIZE;
-			catalog(results);
+		LinearLayout library = card("Añadir del catálogo", "Empieza por los ejercicios compatibles. Desmarca la opción para explorar todos y consultar su técnica.");
+		browser = new ExerciseBrowser(this, library, state.manualExerciseBrowser, "manual", true, new ExerciseBrowser.Results() {
+			public List<Exercise> find(String query, ExerciseSearch.Filters filters, boolean onlyCompatible) {
+				return c.search(query, filters, onlyCompatible);
+			}
+			public void row(LinearLayout target, Exercise exercise) {
+				String reason = c.compatibilityMessage(exercise);
+				text(target, exercise.getName(), R.style.EnerGym_Body, 16);
+				text(target, ExerciseBrowser.metadata(exercise), R.style.EnerGym_FieldCaption, 4);
+				LinearLayout actions = columns(target, 4);
+				MaterialButton technique = compact(actions, "Ver técnica", !c.busy, () -> {
+					browser.capture();
+					app.openExercise(exercise);
+				});
+				technique.setContentDescription("Ver técnica de " + exercise.getName());
+				MaterialButton add = compact(actions, "Añadir", !c.busy && reason.isEmpty(), () -> {
+					browser.capture();
+					c.add(exercise.getId());
+				});
+				add.setContentDescription("Añadir " + exercise.getName());
+				if (!reason.isEmpty()) text(target, reason, R.style.EnerGym_FieldCaption, 4);
+			}
+			public void empty(LinearLayout target) {
+				if (state.manualExerciseBrowser.onlyCompatible)
+					text(target, "Puedes ajustar el contexto de esta rutina o desmarcar «Sólo compatibles» para explorar todos.", R.style.EnerGym_FieldCaption, 8);
+			}
 		});
-		add(library, results, 0);
-		catalog(results);
 
 	}
 
@@ -70,7 +94,10 @@ public final class ManualRoutineFragment extends ScreenFragment {
 		ManualRoutineController c = app.manual;
 		LinearLayout box = card("Contexto de esta rutina", "Cambiarlo conserva los ejercicios; deberás resolver los incompatibles antes de guardar.");
 		List<String> ids = new ArrayList<>(), names = new ArrayList<>();
-		for (Sport sport : app.catalog.getSports()) { ids.add(sport.getId()); names.add(sport.getName()); }
+		for (Sport sport : app.catalog.getSports()) {
+			ids.add(sport.getId());
+			names.add(sport.getName());
+		}
 		choose(box, "sportId", "Disciplina", ids, names);
 		enumChoice(box, "goal", "Objetivo", Goal.values());
 		enumChoice(box, "environment", "Entorno", Environment.values());
@@ -110,20 +137,25 @@ public final class ManualRoutineFragment extends ScreenFragment {
 		action(box, "Quitar ejercicio", !c.busy, () -> c.remove(index));
 	}
 
-	private void catalog(LinearLayout results) {
-		results.removeAllViews();
-		ManualRoutineController c = app.manual;
-		List<Exercise> found = c.search(c.query);
-		int shown = Math.min(visible, found.size());
-		text(results, found.size() + " resultados · " + shown + " visibles", R.style.EnerGym_FieldCaption, 12);
-		for (int i = 0; i < shown; i++) {
-			Exercise e = found.get(i);
-			String reason = c.compatibilityMessage(e);
-			action(results, "Añadir " + e.getName(), !c.busy && reason.isEmpty(), () -> c.add(e.getId()));
-			if (!reason.isEmpty()) text(results, e.getName() + ": " + reason, R.style.EnerGym_FieldCaption, 4);
-		}
-		if (shown < found.size()) action(results, "Mostrar más ejercicios", !c.busy, () -> { visible += PAGE_SIZE; catalog(results); });
-		if (found.isEmpty()) text(results, "No hay ejercicios con esta búsqueda. Prueba otro nombre.", R.style.EnerGym_Body, 12);
+	@Override
+	protected void beforeContentReset() {
+		if (browser != null) browser.capture();
+	}
+
+	@Override public void onCreate(Bundle saved) {
+		super.onCreate(saved);
+		restored = saved;
+		if (saved != null) contextExpanded = saved.getBoolean("manual.contextExpanded", false);
+	}
+	@Override public void onSaveInstanceState(Bundle saved) {
+		super.onSaveInstanceState(saved);
+		if (browser != null) browser.capture();
+		saved.putBoolean("manual.contextExpanded", contextExpanded);
+		if (state != null && app != null) ExerciseBrowser.save(saved, "manual.library", state.manualExerciseBrowser, app.owner(), app.manual.draftRevision());
+	}
+	@Override public void onDestroyView() {
+		browser = null;
+		super.onDestroyView();
 	}
 
 	private void field(LinearLayout box, String key, String label, String value, boolean number, boolean integer, Consumer<String> event) {
@@ -142,7 +174,10 @@ public final class ManualRoutineFragment extends ScreenFragment {
 	}
 	private void enumChoice(LinearLayout box, String key, String label, Enum<?>[] options) {
 		List<String> values = new ArrayList<>(), labels = new ArrayList<>();
-		for (Enum<?> option : options) { values.add(option.name()); labels.add(AppController.label(option.name())); }
+		for (Enum<?> option : options) {
+			values.add(option.name());
+			labels.add(AppController.label(option.name()));
+		}
 		choose(box, key, label, values, labels);
 	}
 	private void choose(LinearLayout box, String key, String label, List<String> values, List<String> labels) {
