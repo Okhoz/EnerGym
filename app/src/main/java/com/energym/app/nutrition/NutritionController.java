@@ -130,7 +130,30 @@ public final class NutritionController {
 	}
 
 	public BodyProfile.Targets targets() {
-		return body == null ? null : body.targets();
+		BodyProfile current = effectiveBody();
+		return current == null ? null : current.targets();
+	}
+
+	/** El último peso fechado hasta hoy prevalece sobre una copia antigua del perfil al restaurar. */
+	public BodyProfile effectiveBody() {
+		Map.Entry<LocalDate, Double> last = latestWeight();
+		return body == null || last == null ? body : body.withWeight(last.getValue());
+	}
+
+	public LocalDate targetWeightDay() {
+		Map.Entry<LocalDate, Double> last = latestWeight();
+		return last == null ? null : last.getKey();
+	}
+
+	private Map.Entry<LocalDate, Double> latestWeight() {
+		Map.Entry<LocalDate, Double> last = null;
+		LocalDate today = clock.get();
+		for (Map.Entry<LocalDate, Double> entry : weights.entrySet()) {
+			Double kg = entry.getValue();
+			if (entry.getKey() == null || entry.getKey().isAfter(today) || kg == null || !(kg >= 30 && kg <= 300)) continue;
+			if (last == null || entry.getKey().isAfter(last.getKey())) last = entry;
+		}
+		return last;
 	}
 
 	/**
@@ -155,14 +178,15 @@ public final class NutritionController {
 	 * Balance medio de los días con registros en la última semana. Null si no hay objetivo o registros.
 	 */
 	public Double weeklyBalance() {
-		if (body == null)
+		if (targets() == null)
 			return null;
+		BodyProfile current = effectiveBody();
 		double total = 0;
 		int days = 0;
 		for (int i = 0; i < 7; i++) {
 			double kcal = totals(clock.get().minusDays(i))[0];
 			if (kcal > 0) {
-				total += kcal - body.maintenance();
+				total += kcal - current.maintenance();
 				days++;
 			}
 		}
@@ -181,7 +205,7 @@ public final class NutritionController {
 
 	public void fillBody() {
 		bodyDraft.clear();
-		BodyProfile b = body;
+		BodyProfile b = effectiveBody();
 		bodyDraft.put("sex", b == null ? "FEMALE" : b.sex.name());
 		bodyDraft.put("age", b == null ? "" : Integer.toString(b.age));
 		bodyDraft.put("heightCm", b == null ? "" : format(b.heightCm));
@@ -196,10 +220,9 @@ public final class NutritionController {
 			return;
 		BodyProfile next;
 		try {
-			next = new BodyProfile(BodyProfile.Sex.valueOf(bodyDraft.get("sex")),
-				Integer.parseInt(bodyDraft.getOrDefault("age", "").trim()), number(bodyDraft.get("heightCm")),
-				number(bodyDraft.get("weightKg")), BodyProfile.Activity.valueOf(bodyDraft.get("activity")),
-				BodyProfile.Goal.valueOf(bodyDraft.get("goal")), bodyDraft.get("allergies"));
+			next = bodyFromDraft();
+			if (!next.estimationIssue().isEmpty())
+				throw new IllegalArgumentException(next.estimationIssue());
 		} catch (RuntimeException e) {
 			error.accept("Revisa tus datos: " + message(e, "edad, altura y peso son obligatorios."));
 			return;
@@ -207,6 +230,8 @@ public final class NutritionController {
 		busy = true;
 		long token = generation;
 		LocalDate day = clock.get();
+		loadRequest++;
+		changed.run();
 		store.saveBody(owner, next, new NutritionStore.Callback<Void>() {
 			public void success(Void v) {
 				if (token != generation)
@@ -218,6 +243,7 @@ public final class NutritionController {
 							return;
 						busy = false;
 						weights.put(day, next.weightKg);
+						bodyDraft.clear();
 						status = "Datos guardados. Objetivos diarios recalculados.";
 						done.run();
 						changed.run();
@@ -233,6 +259,74 @@ public final class NutritionController {
 				fail(token, e);
 			}
 		});
+	}
+
+	private BodyProfile bodyFromDraft() {
+		return new BodyProfile(BodyProfile.Sex.valueOf(bodyDraft.get("sex")),
+			Integer.parseInt(bodyDraft.getOrDefault("age", "").trim()), number(bodyDraft.get("heightCm")),
+			number(bodyDraft.get("weightKg")), BodyProfile.Activity.valueOf(bodyDraft.get("activity")),
+			BodyProfile.Goal.valueOf(bodyDraft.get("goal")), bodyDraft.get("allergies"));
+	}
+
+	/** Elegir una opción modifica sólo el borrador; Guardar es la única confirmación durable. */
+	public void selectNutritionGoal(BodyProfile.Goal goal) {
+		if (busy || owner == null || goal == null) return;
+		if (bodyDraft.isEmpty()) fillBody();
+		bodyDraft.put("goal", goal.name());
+		changed.run();
+	}
+
+	public BodyProfile.Targets previewTargets() {
+		try { return bodyFromDraft().targets(); }
+		catch (RuntimeException incomplete) { return null; }
+	}
+
+	public String bodyPreviewIssue() {
+		try { return bodyFromDraft().estimationIssue(); }
+		catch (RuntimeException incomplete) { return "Completa edad, altura, peso, sexo y actividad para ver la estimación."; }
+	}
+
+	/** No cambia el perfil confirmado, las cantidades del diario ni los objetivos ya guardados. */
+	public void cancelBody() {
+		if (!busy) bodyDraft.clear();
+	}
+
+	/** Texto revisable para el chat: consultar esta función no envía mensajes ni guarda datos. */
+	public String coachBrief() {
+		StringBuilder brief = new StringBuilder("Quiero que me ayudes a organizar mi alimentación.\n");
+		BodyProfile current = effectiveBody();
+		if (current == null) brief.append("Todavía tengo que completar mis datos físicos.\n");
+		else {
+			brief.append("Mis datos declarados: ").append(current.age).append(" años, ")
+				.append(format(current.heightCm)).append(" cm, ").append(format(current.weightKg)).append(" kg, ")
+				.append(current.sex == BodyProfile.Sex.FEMALE ? "mujer" : "hombre").append(", actividad ")
+				.append(activityLabel(current.activity)).append(".\n");
+			if (!current.allergies.isEmpty()) brief.append("Alergias o intolerancias declaradas: ").append(current.allergies).append(".\n");
+		}
+		BodyProfile.Targets targets = targets();
+		if (targets != null) brief.append("Objetivo confirmado: ").append(current.goal.label).append(". Estimación: ")
+			.append(Math.round(targets.kcal)).append(" kcal/día, proteínas ").append(Math.round(targets.protein))
+			.append(" g, hidratos ").append(Math.round(targets.carbs)).append(" g y grasas ").append(Math.round(targets.fat)).append(" g.\n");
+		else brief.append("Aún no tengo un objetivo automático válido; ayúdame a revisar la información que falta.\n");
+		Map.Entry<LocalDate, Double> last = latestWeight();
+		if (last != null) brief.append("Último peso registrado: ").append(format(last.getValue()))
+			.append(" kg (").append(last.getKey()).append(").\n");
+		double[] total = totals(selected);
+		brief.append("Consumido el ").append(selected).append(": ").append(Math.round(total[0]))
+			.append(" kcal, proteínas ").append(format(total[1])).append(" g, hidratos ")
+			.append(format(total[2])).append(" g y grasas ").append(format(total[3])).append(" g.\n")
+			.append("Sugiere ideas de comidas y ajustes generales para mi objetivo. Pregúntame mis preferencias o lo que falte antes de concretar. Quiero revisar las propuestas antes de anotar alimentos.");
+		return brief.length() <= 2000 ? brief.toString() : brief.substring(0, 1999) + "…";
+	}
+
+	private static String activityLabel(BodyProfile.Activity activity) {
+		switch (activity) {
+			case SEDENTARY: return "sedentaria";
+			case LIGHT: return "ligera";
+			case HIGH: return "alta";
+			case VERY_HIGH: return "muy alta";
+			default: return "moderada";
+		}
 	}
 
 	public void logWeight(String text) {
@@ -251,6 +345,8 @@ public final class NutritionController {
 		long token = generation;
 		LocalDate day = clock.get();
 		BodyProfile updated = body == null ? null : body.withWeight(kg);
+		loadRequest++;
+		changed.run();
 		store.weight(owner, day, kg, new NutritionStore.Callback<Void>() {
 			public void success(Void v) {
 				if (token != generation)

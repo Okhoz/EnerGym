@@ -56,6 +56,7 @@ public final class NutritionFragment extends ScreenFragment {
 
 		double[] totals = n.totals(day);
 		BodyProfile.Targets targets = n.targets();
+		dailyGoal(n, targets);
 		remaining(n, day, totals, targets);
 
 		// Diario por comidas, como en un registro de calorías: cada comida con su total y su botón de añadir.
@@ -97,9 +98,10 @@ public final class NutritionFragment extends ScreenFragment {
 		add(week, new BarChartView(requireContext()), 8).set(series, n.dayLabels(7), targets == null ? 0 : targets.kcal,
 			"Calorías de los últimos 7 días: " + Arrays.toString(round(series)));
 
-		LinearLayout body = card("Peso y datos físicos", n.body == null ? "Sin datos físicos." :
-			"Peso actual " + NutritionController.format(n.body.weightKg) + " kg · mantenimiento estimado " +
-				Math.round(n.body.maintenance()) + " kcal/día" +
+		BodyProfile current = n.effectiveBody();
+		LinearLayout body = card("Peso y datos físicos", current == null ? "Sin datos físicos." :
+			"Peso actual " + NutritionController.format(current.weightKg) + " kg" + (targets == null ? "" :
+				" · mantenimiento estimado " + Math.round(current.maintenance()) + " kcal/día") +
 				(n.body.allergies.isEmpty() ? "" : "\nAlergias declaradas: " + n.body.allergies));
 		String[] typed = {""};
 		textField(body, "weight", "Peso de hoy (kg)", "", true, false, v -> typed[0] = v);
@@ -110,16 +112,40 @@ public final class NutritionFragment extends ScreenFragment {
 			"dietista o médico.", R.style.EnerGym_FieldCaption, 4);
 	}
 
+	/** Objetivo confirmado y visible; el formulario mantiene su propio borrador hasta pulsar Guardar. */
+	private void dailyGoal(NutritionController n, BodyProfile.Targets targets) {
+		BodyProfile current = n.effectiveBody();
+		LocalDate weightDay = n.targetWeightDay();
+		LinearLayout goal = card("Tu objetivo diario", n.body == null ?
+			"Completa tus datos para calcular tus calorías y macronutrientes." :
+			targets == null ? current.estimationIssue() : current.goal.label + "\nCalculado con " +
+				NutritionController.format(current.weightKg) + " kg · " + (weightDay == null ? "fecha no registrada" :
+					weightDay.format(DateTimeFormatter.ofPattern("d/M/yyyy", SPANISH))));
+		if (targets != null) {
+			TextView kcal = text(goal, Math.round(targets.kcal) + " kcal/día", R.style.EnerGym_StatValue, 4);
+			kcal.setTag("nutrition_daily_target_kcal");
+			LinearLayout macros = columns(goal, 16);
+			stat(macros, Math.round(targets.protein) + " g", "Proteínas");
+			stat(macros, Math.round(targets.carbs) + " g", "Hidratos");
+			stat(macros, Math.round(targets.fat) + " g", "Grasas");
+		}
+		MaterialButton edit = action(goal, n.body == null ? "Configurar mi objetivo" : "Cambiar objetivo", !n.busy, () -> open(Screen.BODY));
+		edit.setTag("nutrition_change_goal");
+		if (targets == null) primary(edit);
+		action(goal, "Consultar mi alimentación con IA", state.assistant != null && !state.assistant.busy, () -> {
+			if (state.assistant == null || state.assistant.busy) return;
+			state.assistant.selectLocalGuidance(false);
+			state.assistant.messageInput(n.coachBrief());
+			app.navigate(Screen.ASSISTANT);
+		}).setTag("nutrition_consult_ai");
+	}
+
 	/**
 	 * Cabecera tipo registro de calorías: Objetivo − Comida + Ejercicio = Restantes, y barras de macros.
 	 */
 	private void remaining(NutritionController n, LocalDate day, double[] totals, BodyProfile.Targets targets) {
-		LinearLayout card = card("Calorías restantes", targets == null ?
-			"Completa tus datos para calcular tu objetivo diario." : "");
-		if (targets == null) {
-			primary(action(card, "Completar mis datos", true, () -> open(Screen.BODY)));
-			return;
-		}
+		if (targets == null) return;
+		LinearLayout card = card("Calorías restantes", "");
 		// Se redondea cada término antes de operar para que la cuenta visible cuadre (2451 − 195 + 0 = 2256).
 		long goal = Math.round(targets.kcal), food = Math.round(totals[0]), exercise = Math.round(exerciseKcal(n, day));
 		long left = goal - food + exercise;
@@ -190,14 +216,15 @@ public final class NutritionFragment extends ScreenFragment {
 	 * Gasto estimado de los entrenos finalizados ese día: MET 5 × peso × horas registradas.
 	 */
 	private double exerciseKcal(NutritionController n, LocalDate day) {
-		if (n.body == null)
+		BodyProfile current = n.effectiveBody();
+		if (current == null)
 			return 0;
 		com.energym.app.progress.ProgressStats stats = new com.energym.app.progress.ProgressStats(app.history,
 			java.time.ZoneId.systemDefault(), n.today());
 		double minutes = 0;
 		for (com.energym.app.domain.Session s : stats.sessionsOn(day))
 			minutes += Math.max(0, s.getCompletedAt() - s.getStartedAt()) / 60000.0;
-		return 5 * n.body.weightKg * Math.min(minutes, 240) / 60.0;
+		return 5 * current.weightKg * Math.min(minutes, 240) / 60.0;
 	}
 
 	private void foodRow(LinearLayout section, FoodEntry e, NutritionController n) {

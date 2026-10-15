@@ -20,12 +20,14 @@ public final class BodyProfile {
 	}
 
 	public enum Goal {
-		LOSE(-0.15), MAINTAIN(0), GAIN(0.10);
+		LOSE(-0.15, "Déficit calórico"), MAINTAIN(0, "Mantenimiento"), GAIN(0.10, "Superávit calórico");
 
 		public final double adjustment;
+		public final String label;
 
-		Goal(double adjustment) {
+		Goal(double adjustment, String label) {
 			this.adjustment = adjustment;
+			this.label = label;
 		}
 	}
 
@@ -74,6 +76,27 @@ public final class BodyProfile {
 	}
 
 	public Targets targets() {
+		return estimationIssue().isEmpty() ? calculateTargets() : null;
+	}
+
+	/**
+	 * Conserva perfiles antiguos de 16–17 años para el diario, sin prescribirles objetivos automáticos.
+	 * No ajusta silenciosamente resultados fuera del alcance de esta estimación para adultos.
+	 */
+	public String estimationIssue() {
+		if (age < 18)
+			return "El cálculo automático de objetivos está disponible a partir de los 18 años.";
+		Targets value = calculateTargets();
+		if (!Double.isFinite(value.kcal) || value.kcal < 1000)
+			return "El cálculo resulta demasiado bajo. Revisa tus datos con un profesional antes de fijar un objetivo.";
+		double energy = value.protein * 4 + value.carbs * 4 + value.fat * 9;
+		// El redondeo de hidratos puede desplazar hasta 2 kcal; una discrepancia mayor no es un plan válido.
+		if (!Double.isFinite(energy) || Math.abs(energy - value.kcal) > 3)
+			return "No se puede calcular un reparto coherente con estos datos. Revisa tu perfil con un profesional.";
+		return "";
+	}
+
+	private Targets calculateTargets() {
 		double kcal = Math.round(maintenance() * (1 + goal.adjustment));
 		// Proteína 1,6–2,0 g/kg y grasa ≥ 0,8 g/kg; los hidratos completan las calorías restantes.
 		double protein = Math.round(weightKg * (goal == Goal.MAINTAIN ? 1.6 : 2.0));
