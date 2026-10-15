@@ -10,6 +10,260 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 public class ProposalControllerTest {
+	private void assertGeneralQuestionDoesNotAuthorizePlanning(String message) {
+		profile[0] = new TrainingProfile.Builder().limitations("Restricción privada").build();
+		ProposalController c = controller();
+		c.sendExternal(message);
+		assertNull(client.request.profile);
+		assertFalse(client.request.profileData.containsKey("limitations"));
+		assertNull(c.preview);
+		assertEquals(0, store.writes);
+	}
+
+	@Test public void whyMyRoutineLeavesMeTiredIsAConversation() {
+		assertGeneralQuestionDoesNotAuthorizePlanning("Dime por qué mi rutina me deja tan cansado");
+	}
+
+	@Test public void askingWhetherRestIsNeededIsAConversation() {
+		assertGeneralQuestionDoesNotAuthorizePlanning("¿Necesito descansar entre entrenamientos?");
+	}
+
+	@Test
+	public void routineDefinitionsAndNegationsAreConversationWithoutPrivatePlanningData() {
+		profile[0] = new TrainingProfile.Builder().limitations("Restricción privada")
+			.details(Collections.singletonMap("privateDetail", "No enviar")).build();
+		ProposalController c = controller();
+		for (String message : Arrays.asList("Dime qué es una rutina", "No quiero una rutina",
+			"No prepares una rutina", "Quiero entender qué es una rutina",
+			"Dime por qué mi rutina me deja tan cansado", "¿Necesito descansar entre entrenamientos?",
+			"Quiero entrenar más pero no sé por dónde empezar")) {
+			c.sendExternal(message);
+			assertNull("No se ha pedido crear un plan: " + message, client.request.profile);
+			assertFalse(client.request.profileData.containsKey("limitations"));
+			assertFalse(client.request.profileData.containsKey("details"));
+			client.callback.success(validReply(client.request));
+		}
+		assertEquals(0, store.writes);
+	}
+
+	@Test
+	public void explicitRoutineIntakeAcceptsShortAnswersAndAllowsGeneralQuestionsBetweenThem() {
+		ProposalController c = controller();
+		c.sendExternal("Prepara una rutina");
+		client.callback.success(validReply(client.request));
+		c.sendExternal("20 min");
+		assertEquals(20, client.request.profileData.get("durationMinutes"));
+		assertNull(client.request.profile);
+		client.callback.success(validReply(client.request));
+		c.sendExternal("¿Por qué conviene descansar?");
+		assertNull(client.request.profile);
+		assertTrue(client.request.profileData.isEmpty());
+		client.callback.success(validReply(client.request));
+		c.sendExternal("en casa");
+		assertEquals("HOME", client.request.profileData.get("environment"));
+		assertEquals(20, client.request.profileData.get("durationMinutes"));
+		client.callback.success(validReply(client.request));
+		c.sendExternal("sin material");
+		client.callback.success(validReply(client.request));
+		c.sendExternal("3 días");
+		assertEquals(3, client.request.profileData.get("daysPerWeek"));
+		client.callback.success(validReply(client.request));
+		c.sendExternal("fuerza principiante");
+		assertNotNull(client.request.profile);
+		assertEquals(20, client.request.profile.getDurationMinutes());
+		assertEquals(0, store.writes);
+	}
+
+	@Test
+	public void decliningRoutineStopsItsPendingIntakeBeforeLaterTimeComments() {
+		ProposalController c = controller();
+		c.sendExternal("Quiero una rutina");
+		client.callback.success(validReply(client.request));
+		c.sendExternal("No quiero una rutina");
+		assertNull(client.request.profile);
+		client.callback.success(validReply(client.request));
+		c.sendExternal("20 min");
+		assertTrue(client.request.profileData.isEmpty());
+		assertNull(client.request.profile);
+	}
+
+	@Test
+	public void casualThreeTurnConversationDoesNotStartRoutineIntakeFromTimeOrPreferences() {
+		ProposalController c = controller();
+		c.historyContext(true);
+		for (String message : Arrays.asList("Hola", "Hoy tengo 20 min", "Prefiero piernas")) {
+			c.sendExternal(message);
+			assertNull(client.request.profile);
+			assertTrue(client.request.profileData.isEmpty());
+			assertNull(c.preview);
+			client.callback.success(validReply(client.request));
+		}
+		assertTrue(client.request.history.stream().anyMatch(m -> m.text.equals("Hoy tengo 20 min")));
+		client.callback.success(validReply(client.request));
+		c.sendExternal("en casa");
+		assertTrue(client.request.profileData.isEmpty());
+		assertNull(client.request.profile);
+		assertEquals(0, store.writes);
+	}
+
+	@Test
+	public void laterProfileRevocationAlsoOverridesAnEarlierChatOptIn() {
+		profile[0] = new TrainingProfile.Builder().historyConsent(true).build();
+		ProposalController c = controller();
+		c.historyContext(true);
+		c.sendExternal("Hablemos de mi constancia");
+		ChatClient.Request request = client.request;
+		int count = c.messages.size();
+		profile[0] = profile[0].toBuilder().historyConsent(false).build();
+		client.callback.success(validReply(request));
+		assertEquals(count, c.messages.size());
+		assertFalse(c.historyContextEnabled());
+		assertFalse(c.busy);
+	}
+
+	@Test
+	public void conversationOptInIsNotRestoredWithTheLocalConversationSnapshot() {
+		ProposalController c = controller();
+		c.historyContext(true);
+		c.sendExternal("Hola, hablemos de hábitos");
+		client.callback.success(validReply(client.request));
+		ProposalController recreated = controller();
+		assertFalse(recreated.historyContextEnabled());
+		recreated.sendExternal("Sigamos");
+		assertTrue(client.request.history.isEmpty());
+	}
+
+	@Test
+	public void greetingLeavesExerciseContextButTechniqueQuestionsKeepTheirGuard() {
+		ProposalController c = controller();
+		c.explain(exercise("squat", "Técnica histórica distinta"));
+		c.sendExternal("Hola, ¿cómo estás?");
+		assertNull(c.exercise);
+		assertNull(client.request.exerciseId);
+		assertNull(client.request.profile);
+	}
+
+	@Test
+	public void explicitConversationOptInWorksWithoutCreatingAProfileAndResetsOnAccountChange() {
+		ProposalController c = controller();
+		assertFalse(c.historyContextEnabled());
+		c.historyContext(true);
+		c.sendExternal("Hola, quiero hablar sobre constancia");
+		assertTrue(client.request.historyConsent);
+		assertFalse(client.request.history.isEmpty());
+		assertNull(profile[0]);
+		assertEquals(0, store.writes);
+		client.callback.success(validReply(client.request));
+		c.activate("uid-b");
+		assertFalse(c.historyContextEnabled());
+		c.sendExternal("Hola desde otra cuenta");
+		assertFalse(client.request.historyConsent);
+		assertTrue(client.request.history.isEmpty());
+	}
+
+	@Test
+	public void chatOptOutOverridesSavedProfileConsentAndDropsPendingContextReply() {
+		profile[0] = new TrainingProfile.Builder().historyConsent(true).build();
+		ProposalController c = controller();
+		assertTrue(c.historyContextEnabled());
+		c.sendExternal("Hoy me cuesta empezar");
+		ChatClient.Callback pending = client.callback;
+		ChatClient.Request request = client.request;
+		int count = c.messages.size();
+		c.historyContext(false);
+		assertFalse(c.historyContextEnabled());
+		pending.success(validReply(request));
+		assertFalse(c.busy);
+		assertEquals(count, c.messages.size());
+		c.sendExternal("Sigamos sin compartir mensajes anteriores");
+		assertFalse(client.request.historyConsent);
+		assertTrue(client.request.history.isEmpty());
+		assertTrue(profile[0].isHistoryConsent());
+	}
+
+	@Test
+	public void localGreetingWithoutProfileDoesNotTurnIntoRoutineIntake() {
+		ProposalController c = controller();
+		c.sendLocal("Hola, ¿qué tal?");
+		assertNull(c.preview);
+		assertFalse(c.messages.get(c.messages.size() - 1).text.contains("me falta"));
+		assertTrue(c.status.contains("Guiado local"));
+		assertEquals(0, store.writes);
+	}
+
+	@Test
+	public void localGeneralQuestionWithSavedProfileDoesNotCreateAnUnrequestedRoutine() {
+		profile[0] = new TrainingProfile.Builder().build();
+		ProposalController c = controller();
+		c.sendLocal("¿Cómo puedo ser más constante con el ejercicio?");
+		assertNull(c.preview);
+		assertEquals(0, store.writes);
+		assertTrue(c.status.contains("sin IA"));
+	}
+
+	@Test
+	public void genericRemoteConversationUsesOnlyMinimalProfileAndCannotPropose() {
+		profile[0] = new TrainingProfile.Builder().limitations("Dato médico privado")
+			.preferences("Texto privado").experience("Historial privado").space("Dirección privada")
+			.details(Collections.singletonMap("privateDetail", "No enviar")).build();
+		ProposalController c = controller();
+		c.sendExternal("Hola, hoy me cuesta mantener la constancia");
+		assertNotNull(client.request);
+		assertNull("Una conversación no autoriza propuestas", client.request.profile);
+		assertEquals("strength", client.request.profileData.get("sportId"));
+		for (String field : Arrays.asList("limitations", "preferences", "experience", "space", "details"))
+			assertFalse("No enviar datos privados del perfil en conversación: " + field,
+				client.request.profileData.containsKey(field));
+		assertFalse(client.request.historyConsent);
+		assertTrue(client.request.history.isEmpty());
+		assertEquals(0, store.writes);
+	}
+
+	@Test
+	public void twoConversationalTurnsKeepOptionalContextAndNeverSaveARoutine() {
+		profile[0] = new TrainingProfile.Builder().historyConsent(true).build();
+		ProposalController c = controller();
+		c.sendExternal("Quiero mejorar mi constancia");
+		String firstConversation = client.request.conversationId;
+		client.callback.success(validReply(client.request));
+		c.sendExternal("¿Y cómo puedo mantener ese hábito?");
+		assertEquals(firstConversation, client.request.conversationId);
+		assertTrue(client.request.history.stream().anyMatch(m -> m.text.equals("Quiero mejorar mi constancia")));
+		assertTrue(client.request.history.stream().anyMatch(m -> m.text.equals("Respuesta válida.")));
+		assertTrue(client.request.history.size() <= 12);
+		assertNull(client.request.profile);
+		client.callback.success(validReply(client.request));
+		profile[0] = profile[0].toBuilder().historyConsent(false).build();
+		c.sendExternal("Sigamos hablando");
+		assertFalse(client.request.historyConsent);
+		assertTrue(client.request.history.isEmpty());
+		assertEquals(0, store.writes);
+	}
+
+	@Test
+	public void greetingWithoutProfileCanReceiveTextWithoutMissingRoutineFields() {
+		ProposalController c = controller();
+		c.sendExternal("Hola, ¿en qué puedes ayudarme?");
+		assertTrue(client.request.profileData.isEmpty());
+		assertNull(client.request.profile);
+		client.callback.success(validReply(client.request));
+		assertEquals("Respuesta válida.", c.messages.get(c.messages.size() - 1).text);
+		assertNull(c.preview);
+		assertEquals(0, store.writes);
+	}
+
+	@Test
+	public void genericConversationDoesNotTreatAPlanningWordInsideAGeneralQuestionAsRoutineRequest() {
+		profile[0] = new TrainingProfile.Builder().build();
+		ProposalController c = controller();
+		c.sendExternal("¿Es buena idea entrenar si estoy muy cansado?");
+		assertNull(client.request.profile);
+		assertNull(c.preview);
+		client.callback.success(validReply(client.request));
+		c.sendExternal("Quiero saber si entrenar todos los días es adecuado");
+		assertNull(client.request.profile);
+	}
+
 	private static Exercise plank(String description) {
 		return new Exercise("forearm-plank", "Plancha sobre antebrazos", MetricType.ISOMETRIC,
 			EnumSet.of(TrainingProfile.Goal.STRENGTH), EnumSet.of(TrainingProfile.Environment.HOME),
@@ -208,14 +462,14 @@ public class ProposalControllerTest {
 	}
 
 	void propose(ProposalController c) {
-		c.sendLocal("Quiero entrenar tres días en casa sin material, 30min");
+		c.sendLocal("Quiero una rutina para entrenar tres días en casa sin material, 30min");
 		c.sendLocal("fuerza principiante");
 	}
 
 	@Test
 	public void localSpanishProgressionCreatesCompatiblePreview() {
 		ProposalController c = controller();
-		c.sendLocal("3 días en casa sin material 30 min");
+		c.sendLocal("Prepara una rutina de 3 días en casa sin material 30 min");
 		assertNull(c.preview);
 		assertFalse(c.messages.isEmpty());
 		assertTrue(c.messages.get(c.messages.size() - 1).text.contains("objetivo"));
@@ -232,7 +486,7 @@ public class ProposalControllerTest {
 		profile[0] = new TrainingProfile.Builder().sportId("swimming").environment(TrainingProfile.Environment.POOL)
 			.category(TrainingProfile.Category.SPORT).details(Collections.singletonMap("stroke", "FREESTYLE")).build();
 		ProposalController c = controller();
-		c.sendExternal("quiero fuerza");
+		c.sendExternal("Prepara una rutina de fuerza");
 		assertEquals("swimming", client.request.profileData.get("sportId"));
 		assertEquals(Collections.singletonMap("stroke", "FREESTYLE"), client.request.profileData.get("details"));
 	}
@@ -242,7 +496,7 @@ public class ProposalControllerTest {
 		profile[0] = new TrainingProfile.Builder().sportId("swimming").environment(TrainingProfile.Environment.POOL)
 			.category(TrainingProfile.Category.SPORT).details(Collections.singletonMap("stroke", "FREESTYLE")).build();
 		ProposalController c = controller();
-		c.sendExternal("ahora quiero hacer yoga");
+		c.sendExternal("Prepara una rutina de yoga");
 		assertEquals("yoga", client.request.profileData.get("sportId"));
 		assertFalse(client.request.profileData.containsKey("details"));
 	}
@@ -353,7 +607,7 @@ public class ProposalControllerTest {
 	@Test
 	public void equipmentNegationCannotAddResource() {
 		ProposalController c = controller();
-		c.sendLocal("3 dias en casa 30min fuerza principiante. No tengo mancuernas");
+		c.sendLocal("Prepara una rutina de 3 dias en casa 30min fuerza principiante. No tengo mancuernas");
 		assertNull(c.preview);
 		assertTrue(c.messages.get(c.messages.size() - 1).text.contains("material"));
 		c.sendLocal("sin equipo");
@@ -365,10 +619,10 @@ public class ProposalControllerTest {
 	public void contradictoryPlaceAndInvalidDaysRequireCorrection() {
 		profile[0] = new TrainingProfile.Builder().build();
 		ProposalController c = controller();
-		c.sendLocal("quiero casa y gimnasio");
+		c.sendLocal("Prepara una rutina para casa y gimnasio");
 		assertNull(c.preview);
 		assertTrue(c.status.contains("lugar"));
-		c.sendLocal("8 dias en casa sin material 30min");
+		c.sendLocal("Prepara una rutina de 8 dias en casa sin material 30min");
 		assertNull(c.preview);
 		assertTrue(c.status.contains("días"));
 		assertEquals(0, store.writes);
@@ -419,11 +673,11 @@ public class ProposalControllerTest {
 	@Test
 	public void conflictingEquipmentCannotSilentlyChooseNoEquipment() {
 		ProposalController c = controller();
-		c.sendLocal("3 días en casa sin material pero tengo mancuernas, 30min fuerza principiante");
+		c.sendLocal("Prepara una rutina de 3 días en casa sin material pero tengo mancuernas, 30min fuerza principiante");
 		assertNull(c.preview);
 		assertTrue(c.status.contains("material"));
 		assertEquals(0, store.writes);
-		c.sendExternal("3 días en casa sin material pero tengo mancuernas, 30min fuerza principiante");
+		c.sendExternal("Prepara una rutina de 3 días en casa sin material pero tengo mancuernas, 30min fuerza principiante");
 		assertNull(client.request);
 	}
 
@@ -543,7 +797,7 @@ public class ProposalControllerTest {
 	@Test
 	public void externalPartialProfileAccumulatesWithoutSendingHistoryOrSavingProfile() {
 		ProposalController c = controller();
-		c.sendExternal("tres días en casa sin material 30min");
+		c.sendExternal("Prepara una rutina de tres días en casa sin material 30min");
 		assertEquals(3, client.request.profileData.get("daysPerWeek"));
 		assertEquals("HOME", client.request.profileData.get("environment"));
 		assertEquals("NO_EQUIPMENT", client.request.profileData.get("category"));

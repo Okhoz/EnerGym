@@ -72,6 +72,24 @@ public final class AssistantFragment extends ScreenFragment {
 			return;
 		}
 		composer.setVisibility(View.VISIBLE);
+		TextView mode = text(rows, c.remoteActive() ? "Servidor de IA emparejado · conversación" :
+			"Guiado local · sin IA", R.style.EnerGym_FieldCaption, 4);
+		mode.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+		if (!c.remoteActive())
+			action(rows, "Conectar IA en Cuenta", !c.busy, () -> app.navigate(AppController.Screen.ACCOUNT));
+		com.google.android.material.checkbox.MaterialCheckBox context =
+			new com.google.android.material.checkbox.MaterialCheckBox(requireContext());
+		context.setTag("assistant_history_context");
+		context.setText("Recordar esta conversación (hasta 12 mensajes)");
+		context.setChecked(c.historyContextEnabled());
+		context.setMinHeight(dp(48));
+		context.setOnCheckedChangeListener((button, enabled) -> c.historyContext(enabled));
+		add(rows, context, 4);
+		text(rows, "Al activar contexto se comparten con la IA hasta 12 mensajes anteriores de este chat. " +
+			"El permiso del chat dura esta conversación y no cambia tu perfil. No se adjuntan tu historial de entrenamientos " +
+			"ni tus datos de nutrición o perfil físico. Al pedir una rutina se comparten los filtros y limitaciones que indicaste " +
+			"para adaptarla. El mensaje actual se envía siempre al usar IA.",
+			R.style.EnerGym_FieldCaption, 4);
 		MaterialButton send = getView().findViewById(R.id.chat_send);
 		send.setEnabled(!c.busy);
 		send.setAlpha(c.busy ? 0.5f : 1f);

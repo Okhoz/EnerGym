@@ -20,6 +20,9 @@ public final class ProposalController {
 	public boolean showHistory, showConnection;
 	// El servidor respondió que su IA no está activada: el chat sigue con el guiado local hasta reconectar.
 	private boolean remoteDisabled;
+	private Boolean conversationHistoryConsent;
+	private Boolean lastProfileHistoryConsent;
+	private boolean planningDialogue, pendingHistory;
 	private final AppStore store;
 	private final ConversationStore conversations;
 	private final ChatClient client;
@@ -74,6 +77,10 @@ public final class ProposalController {
 		showHistory = false;
 		showConnection = false;
 		remoteDisabled = false;
+		conversationHistoryConsent = null;
+		lastProfileHistoryConsent = null;
+		planningDialogue = false;
+		pendingHistory = false;
 		fields.clear();
 		messages.clear();
 		base = null;
@@ -91,7 +98,7 @@ public final class ProposalController {
 			}
 			if (messages.isEmpty())
 				add("assistant",
-					"¡Hola! Soy tu asistente de EnerGym. Cuéntame tu objetivo, cuántos días y minutos tienes, dónde entrenas y qué material usas, y te preparo una rutina. También puedo explicarte cualquier ejercicio.");
+					"¡Hola! Soy tu asistente de entrenamiento. Podemos hablar de tus dudas, técnica, hábitos y cómo te va entrenando. Si quieres una rutina, pídemela y la revisamos antes de guardarla.");
 		}
 		changed.run();
 	}
@@ -111,6 +118,30 @@ public final class ProposalController {
 
 	public boolean connected() {
 		return client.connected();
+	}
+
+	/** El permiso del chat es explícito, sólo en memoria y no modifica el perfil ni sus otros datos. */
+	public boolean historyContextEnabled() {
+		TrainingProfile profile = current.get();
+		boolean saved = profile != null && profile.isHistoryConsent();
+		// Revocar después en el perfil invalida también un permiso anterior del chat.
+		if (Boolean.TRUE.equals(lastProfileHistoryConsent) && !saved)
+			conversationHistoryConsent = false;
+		lastProfileHistoryConsent = saved;
+		return conversationHistoryConsent == null ? saved :
+			conversationHistoryConsent;
+	}
+
+	public void historyContext(boolean enabled) {
+		historyContextEnabled();
+		conversationHistoryConsent = enabled;
+		if (!enabled && busy && pendingHistory) {
+			generation++;
+			busy = false;
+			pendingHistory = false;
+			status = "Contexto desactivado. Se ha descartado la respuesta pendiente.";
+		}
+		changed.run();
 	}
 
 	/**
@@ -192,7 +223,9 @@ public final class ProposalController {
 			return;
 		String text = normalize(raw);
 		add("user", raw.trim());
-		if (exercise != null && !planningIntent(text)) {
+		boolean planning = planningTurn(text);
+		status = "Guiado local · sin IA. Conecta tu servidor en Cuenta para conversar con Gemini.";
+		if (exercise != null && !planning && !greeting(text)) {
 			add("assistant", explanation(exercise));
 			persist();
 			changed.run();
@@ -208,7 +241,7 @@ public final class ProposalController {
 			if (base != null)
 				seed(base);
 		}
-		String conflict = conflict(text);
+		String conflict = planning ? conflict(text) : "";
 		if (!conflict.isEmpty()) {
 			clearPreview();
 			status = conflict;
@@ -220,6 +253,22 @@ public final class ProposalController {
 			substituteFirst();
 			return;
 		}
+		if (!planning) {
+			String response;
+			if (greeting(text))
+				response = "¡Hola! Podemos hablar de tus entrenamientos. ¿Qué te gustaría mejorar o qué duda tienes hoy?";
+			else if (text.contains("constan") || text.contains("habito") || text.contains("motiv"))
+				response = "Para ganar constancia, prueba una meta pequeña que puedas repetir y reserva un momento concreto. Si un día no sale, retoma en la siguiente ocasión sin intentar compensarlo todo. ¿Qué suele dificultarte empezar?";
+			else if (text.contains("cans") || text.contains("descans"))
+				response = "El descanso también forma parte del entrenamiento. Ajusta la sesión a cómo te encuentres y evita forzar si estás muy cansado. Si hay dolor o malestar persistente, consulta a un profesional sanitario.";
+			else
+				response = "Puedo orientarte con la técnica del catálogo y preparar una rutina si me la pides. En este modo local uso respuestas guiadas; para hablar con libertad y hacer seguimiento, conecta Gemini desde Cuenta.";
+			add("assistant", response);
+			persist();
+			changed.run();
+			return;
+		}
+		planningDialogue = true;
 		parse(text);
 		List<String> missing = missing();
 		if (!missing.isEmpty()) {
@@ -230,6 +279,7 @@ public final class ProposalController {
 			try {
 				TrainingProfile proposed = build();
 				setPreview(new RoutinePlanner().create(proposed, catalog), base);
+				planningDialogue = false;
 				add("assistant", preview.isEmpty() ? preview.getExplanation() :
 					"He preparado una vista previa: " + proposed.getDaysPerWeek() + " días por semana, " +
 						proposed.getDurationMinutes() + " min disponibles, " +
@@ -279,10 +329,52 @@ public final class ProposalController {
 		return Normalizer.normalize(text.toLowerCase(Locale.ROOT), Normalizer.Form.NFD).replaceAll("\\p{M}", "");
 	}
 
-	private static final Pattern PLANNING_WORDS = Pattern.compile("\\b(?:rutinas?|plan(?:es)?|entrenar)\\b");
+	private static final Pattern PLANNING_WORDS = Pattern.compile("\\b(?:rutinas?|plan(?:es)?|entrenamientos?)\\b");
 
 	private static boolean planningIntent(String text) {
 		return PLANNING_WORDS.matcher(text).find();
+	}
+
+	private static boolean greeting(String text) {
+		return text.matches("\\s*(?:hola|buenos dias|buenas tardes|buenas noches|gracias|que tal)[\\s,!.¿?¡]*.*");
+	}
+
+	private boolean planningTurn(String text) {
+		boolean namedPlan = planningIntent(text);
+		if (namedPlan && Pattern.compile(
+			"\\bno\\s+(?:quiero|necesito|prepares?|crees?|hagas?|generes?|me\\s+(?:prepares?|hagas?|crees?))\\b")
+			.matcher(text).find()) {
+			planningDialogue = false;
+			return false;
+		}
+		// Preguntar qué significa una rutina no autoriza a crearla ni a adjuntar sus datos privados.
+		if (namedPlan && Pattern.compile("\\b(?:que\\s+(?:es|son|significa)|por que|definicion|entender|entiendo|" +
+			"como\\s+(?:se\\s+)?(?:hace|hacer|crea|crear|prepara|preparar|adapta|adaptar|ajusta|ajustar))\\b")
+			.matcher(text).find())
+			return false;
+		// El verbo debe pedir el plan como objeto: «necesito descansar» o «dime por qué» no lo hacen.
+		String planObject = "(?:(?:un|una|el|la|mi|mis|otro|otra|nuevo|nueva|este|esta)\\s+){0,3}" +
+			"(?:rutinas?|plan(?:es)?|entrenamientos?)\\b";
+		boolean request = Pattern.compile("\\b(?:prepar[ae]\\w*|cre[ae]\\w*|haz\\w*|haces?|disen[ae]\\w*|" +
+			"gener[ae]\\w*|ajust[ae]\\w*|modifi[qc]\\w*|quiero|necesito|dame|recomiend[ae]\\w*|propon\\w*|elabor[ae]\\w*)\\s+" +
+			planObject).matcher(text).find();
+		request |= Pattern.compile("\\b(?:puedes|podrias)\\s+(?:hacer(?:me)?|preparar(?:me)?|crear(?:me)?|darme|" +
+			"proponer(?:me)?|disenar(?:me)?)\\s+" + planObject).matcher(text).find();
+		request |= Pattern.compile("^\\s*(?:un\\s+|una\\s+)?(?:plan|rutina)\\s+para\\s+mi\\b").matcher(text).find();
+		boolean parameters = !text.contains("?") && Pattern.compile(
+			"\\b(?:[0-9]+|uno|dos|tres|cuatro|cinco|seis|siete)\\s*(?:dias?|veces|min(?:utos?)?)\\b")
+			.matcher(text).find();
+		boolean answer = planningDialogue && !text.contains("?") && Pattern.compile(
+			"\\b(?:fuerza|resistencia|movilidad|principiante|intermedio|avanzado|casa|gimnasio|sin|material|equipo|minutos|dias)\\b")
+			.matcher(text).find();
+		return request || (planningDialogue && parameters) || answer;
+	}
+
+	private Map<String, Object> conversationalProfile(TrainingProfile profile) {
+		Map<String, Object> data = new LinkedHashMap<>(ChatProtocol.profile(profile));
+		for (String key : Arrays.asList("experience", "space", "preferences", "limitations", "details"))
+			data.remove(key);
+		return data;
 	}
 
 	private static String conflict(String text) {
@@ -568,7 +660,8 @@ public final class ProposalController {
 			return;
 		}
 		String normalized = normalize(text);
-		if (exercise != null && planningIntent(normalized)) {
+		boolean planning = planningTurn(normalized);
+		if (exercise != null && (planning || greeting(normalized))) {
 			generation++;
 			exercise = null;
 			persist();
@@ -586,31 +679,37 @@ public final class ProposalController {
 			if (base != null)
 				seed(base);
 		}
-		String conflict = conflict(normalized);
+		String conflict = planning ? conflict(normalized) : "";
 		if (!conflict.isEmpty()) {
 			status = conflict;
 			changed.run();
 			return;
 		}
-		parse(normalized);
 		final TrainingProfile proposed;
 		final Map<String, Object> data;
 		try {
-			Map<String, Object> partial = partialProfile();
-			if ((partial.containsKey("daysPerWeek") &&
-				((Integer) partial.get("daysPerWeek") < 1 || (Integer) partial.get("daysPerWeek") > 7)) ||
-				(partial.containsKey("durationMinutes") &&
-					((Integer) partial.get("durationMinutes") < 5 || (Integer) partial.get("durationMinutes") > 240)))
-				throw new IllegalArgumentException();
-			proposed = missing().isEmpty() ? build() : null;
-			data = proposed == null ? partial : ChatProtocol.profile(proposed);
+			if (planning) {
+				planningDialogue = true;
+				parse(normalized);
+				Map<String, Object> partial = partialProfile();
+				if ((partial.containsKey("daysPerWeek") &&
+					((Integer) partial.get("daysPerWeek") < 1 || (Integer) partial.get("daysPerWeek") > 7)) ||
+					(partial.containsKey("durationMinutes") &&
+						((Integer) partial.get("durationMinutes") < 5 || (Integer) partial.get("durationMinutes") > 240)))
+					throw new IllegalArgumentException();
+				proposed = missing().isEmpty() ? build() : null;
+				data = proposed == null ? partial : ChatProtocol.profile(proposed);
+			} else {
+				proposed = null;
+				data = conversationalProfile(observed);
+			}
 		} catch (RuntimeException e) {
 			status = "Aclara los días (1–7), tiempo (5–240 min) y material antes de enviar a IA.";
 			changed.run();
 			return;
 		}
 		List<ConversationStore.Message> h = new ArrayList<>();
-		boolean consent = observed != null && observed.isHistoryConsent();
+		boolean consent = historyContextEnabled();
 		if (consent)
 			for (int i = Math.max(0, messages.size() - 12); i < messages.size(); i++) {
 				ConversationStore.Message m = messages.get(i);
@@ -621,25 +720,28 @@ public final class ProposalController {
 			exercise == null ? null : exercise.getId(), text.trim(), proposed, data, consent, h);
 		add("user", text.trim());
 		persist();
+		pendingHistory = consent;
 		busy = true;
 		long token = ++generation;
 		changed.run();
 		client.send(request, new ChatClient.Callback() {
 			private boolean live() {
 				return token == generation &&
-					(!request.historyConsent || (current.get() != null && current.get().isHistoryConsent()));
+					(!request.historyConsent || historyContextEnabled());
 			}
 
 			public void success(String json) {
 				if (!live()) {
 					if (token == generation) {
 						busy = false;
+						pendingHistory = false;
 						status = "Respuesta descartada: revocaste el consentimiento.";
 						changed.run();
 					}
 					return;
 				}
 				busy = false;
+				pendingHistory = false;
 				try {
 					ChatProtocol.Reply reply = ChatProtocol.reply(json, request, catalog, catalogVersion);
 					if (reply.proposal != null && !Objects.equals(observed, current.get()))
@@ -647,6 +749,7 @@ public final class ProposalController {
 					addRemote(reply.text);
 					if (reply.proposal != null) {
 						setPreview(reply.proposal, observed);
+						planningDialogue = false;
 						base = observed;
 					}
 					persist();
@@ -663,6 +766,7 @@ public final class ProposalController {
 				if (token != generation)
 					return;
 				busy = false;
+				pendingHistory = false;
 				if (code.equals("PROVIDER_NOT_CONFIGURED"))
 					remoteDisabled = true;
 				status = code.equals("PROVIDER_NOT_CONFIGURED") ?
