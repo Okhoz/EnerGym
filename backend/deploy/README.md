@@ -98,8 +98,11 @@ La revisión estática local de `validate-infra.ps1` comprueba guardas, **no es 
 
 `compose.groq.yaml` es una superposición opcional sobre `compose.preview.yaml` o `compose.production.pending.yaml`. Fija `ENERGYM_AI_PROVIDER=groq`, `GROQ_ENABLED=true`, el modelo Free `openai/gpt-oss-120b` (o `openai/gpt-oss-20b` mediante `GROQ_MODEL`) y monta la clave como secreto `GROQ_API_KEY_FILE`; el entrypoint la carga sin imprimirla y rechaza definir a la vez `GROQ_API_KEY` directa.
 
-1. Crear en el host, **fuera del repositorio**, un archivo UTF-8 sin BOM con la clave en una línea, legible solo por UID 10001.
-2. `ENERGYM_GROQ_KEY_FILE=<ruta absoluta> docker compose -f compose.preview.yaml -f compose.groq.yaml up -d`.
-3. Comprobar con la sonda interna. La primera llamada real (15/10/2026, perfil sintético, ejecución local sin Docker) respondió 200 en 2,3 s; ver `docs/groq-free.md`.
+1. Crear en el host, **fuera del repositorio**, un archivo UTF-8 sin BOM con la clave en una línea, legible solo por UID 10001. Definir `ENERGYM_GROQ_KEY_FILE` con su ruta absoluta.
+2. Crear otro archivo privado UTF-8 sin BOM con un código aleatorio nuevo de al menos 32 caracteres. Definir `ENERGYM_PAIRING_CODE_FILE` con su ruta absoluta. La superposición lo monta en `/run/secrets/pairing_code`; el entrypoint ya admite ese secreto. No introducir el código en YAML, argumentos visibles ni logs. Se consume una sola vez; para una conexión nueva hay que renovar el archivo y recrear el backend. No reutilizar la clave Groq como código.
+3. Con ambas variables definidas en el entorno privado del operador: `docker compose -f compose.preview.yaml -f compose.groq.yaml config --quiet`, seguido de `docker compose -f compose.preview.yaml -f compose.groq.yaml up -d`.
+4. Comprobar con la sonda interna. La vista HTTP no publica puertos: este comando prepara el proveedor y el emparejamiento dentro del contenedor, sin crear un endpoint accesible desde Android. Para comprobar la conexión privada HTTPS, usar la vista TLS pendiente con certificados reales y conservar sus restricciones loopback. El código se usa exclusivamente en «Cuenta → Conectar servidor de IA» cuando exista esa conexión privada válida. La primera llamada real (15/10/2026, perfil sintético, ejecución local sin Docker) respondió 200 en 2,3 s; ver `docs/groq-free.md`.
+
+Sin `ENERGYM_PAIRING_CODE_FILE`, Compose rechaza esta superposición antes de arrancar. Antes se habilitaba el proveedor sin proporcionar al contenedor ningún código, por lo que todos los emparejamientos devolvían 401 aunque la sonda de salud pasara. La comprobación YAML local del 15-10-2026 verifica la sintaxis y el montaje declarado; Docker sigue sin estar instalado aquí, así que el parser Compose y el arranque real deben comprobarse en el host.
 
 Antes de usuarios reales: ZDR activado en Groq, autenticación Firebase y cuotas por usuario (Task16). Mientras falten, mantener la vista sin publicar a Internet.

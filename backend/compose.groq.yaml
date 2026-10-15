@@ -8,7 +8,10 @@ services:
       GROQ_ENABLED: "true"
       GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-120b}
       GROQ_API_KEY_FILE: /run/secrets/groq_api_key
-    secrets: [groq_api_key]
+      ENERGYM_PAIRING_CODE_FILE: /run/secrets/pairing_code
+    secrets: [groq_api_key, pairing_code]
 secrets:
   groq_api_key:
     file: ${ENERGYM_GROQ_KEY_FILE:?Archivo privado con la clave Groq fuera del repositorio obligatorio}
+  pairing_code:
+    file: ${ENERGYM_PAIRING_CODE_FILE:?Archivo privado de emparejamiento obligatorio para la vista previa}
