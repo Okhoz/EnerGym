@@ -35,12 +35,17 @@ public final class TrainingFragment extends ScreenFragment {
 					" min");
 			primary(action(p, "Revisar propuesta", true, () -> app.navigate(Screen.ROUTINE)));
 		}
+		com.energym.app.domain.ProgressionEngine.Plan level = app.progression();
+		if (level != null && app.routines.preview == null) {
+			LinearLayout up = card("Sobrecarga progresiva", HomeFragment.summary(level));
+			primary(action(up, "Revisar progresión", !app.routines.busy, app::reviewProgression));
+		}
 		if (app.routines.accepted != null) {
 			LinearLayout accepted = card("Tu rutina", app.routines.accepted.getTitle() + " · " +
 				app.routines.accepted.getItems().size() + " ejercicios · " + app.routines.accepted.getEstimatedMinutes() +
 				" min");
 			MaterialButton start = action(accepted, "Empezar sesión", !app.sessions.busy, app::startSession);
-			if (app.routines.preview == null)
+			if (app.routines.preview == null && level == null)
 				primary(start);
 			action(accepted, "Ver ejercicios", true, () -> app.navigate(Screen.ROUTINE));
 		}

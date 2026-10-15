@@ -78,6 +78,13 @@ public final class HomeFragment extends ScreenFragment {
 			}));
 			return;
 		}
+		com.energym.app.domain.ProgressionEngine.Plan level = app.progression();
+		if (level != null && app.routines.preview == null) {
+			LinearLayout up = card("Sube de nivel", summary(level));
+			primary(action(up, "Revisar progresión", !app.routines.busy, app::reviewProgression));
+			action(up, "Repetir rutina actual", !app.sessions.busy, app::startSession);
+			return;
+		}
 		if (app.routines.accepted != null) {
 			LinearLayout ready = card("Tu entreno de hoy", app.routines.accepted.getTitle() + " · " +
 				app.routines.accepted.getItems().size() + " ejercicios · " + app.routines.accepted.getEstimatedMinutes() +
@@ -115,6 +122,15 @@ public final class HomeFragment extends ScreenFragment {
 		MaterialButton open = action(progress, getString(R.string.home_view_history), true,
 			() -> app.navigate(Screen.HISTORY));
 		open.setContentDescription(getString(R.string.home_view_history));
+	}
+
+	static String summary(com.energym.app.domain.ProgressionEngine.Plan plan) {
+		StringBuilder text = new StringBuilder("Tu última sesión permite avanzar:");
+		for (int i = 0; i < Math.min(3, plan.changes.size()); i++)
+			text.append("\n• ").append(plan.changes.get(i));
+		if (plan.changes.size() > 3)
+			text.append("\n• y ").append(plan.changes.size() - 3).append(" cambios más");
+		return text.toString();
 	}
 
 	private static String greeting() {

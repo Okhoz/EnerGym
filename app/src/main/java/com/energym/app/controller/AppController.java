@@ -38,6 +38,22 @@ public final class AppController {
 	public final CatalogRepository catalog;
 	public List<Session> history = Collections.emptyList(), pending = Collections.emptyList();
 	public List<Routine> versions = Collections.emptyList();
+	private ProgressionEngine.Plan progression;
+	private Routine progressionBase;
+	private List<Session> progressionHistory;
+
+	/**
+	 * Siguiente nivel de la rutina aceptada calculado con la última sesión; null si no hay cambios.
+	 * Se recalcula cuando cambia la rutina aceptada o el historial.
+	 */
+	public ProgressionEngine.Plan progression() {
+		if (routines.accepted != progressionBase || history != progressionHistory) {
+			progressionBase = routines.accepted;
+			progressionHistory = history;
+			progression = new ProgressionEngine().next(routines.accepted, history);
+		}
+		return progression;
+	}
 	public Screen screen = Screen.HOME, tab = Screen.HOME;
 	public Exercise exercise;
 	public String error = "", notice = "";
@@ -155,6 +171,9 @@ public final class AppController {
 		history = Collections.emptyList();
 		pending = Collections.emptyList();
 		versions = Collections.emptyList();
+		progression = null;
+		progressionBase = null;
+		progressionHistory = null;
 		profileDraft.clear();
 		backStack.clear();
 		profileDirty = false;
@@ -244,6 +263,17 @@ public final class AppController {
 			sessions.start(routines.accepted);
 		if (sessions.session != null)
 			navigate(Screen.SESSION);
+	}
+
+	/**
+	 * Abre la progresión como propuesta: se revisa y acepta igual que cualquier otra versión.
+	 */
+	public void reviewProgression() {
+		ProgressionEngine.Plan plan = progression();
+		if (plan == null || routines.busy)
+			return;
+		routines.preview = plan.routine;
+		navigate(Screen.ROUTINE);
 	}
 
 	public void resume(Session draft) {
