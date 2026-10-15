@@ -137,7 +137,10 @@ public final class AppState extends AndroidViewModel {
 			catalog.getExercises(), catalog.getVersion(), () -> app.profile, this::changed, r -> {
 			app.routineAccepted(r);
 		});
-		assistant.trainingContext(app::trainingSummary);
+		assistant.trainingContext(() -> {
+			String training = app.trainingSummary(), food = nutrition.summary();
+			return training.isEmpty() ? food : food.isEmpty() ? training : food + "\n" + training;
+		});
 		ExerciseResourcePolicy resourcePolicy;
 		try {
 			resourcePolicy = new ExerciseResourcePolicy(catalog, PackagedResources.load(context).all());

@@ -97,12 +97,19 @@ public final class GemmaModel implements OnDeviceModel {
 
 	public void status(Result<Integer> result) {
 		worker.execute(() -> {
-			if (verified().isFile() && model().length() == BYTES)
-				result.success(AVAILABLE);
-			else if (prefs().getLong(DOWNLOAD, -1) >= 0 && running(prefs().getLong(DOWNLOAD, -1)))
-				result.success(DOWNLOADING);
-			else
-				result.success(supported() ? DOWNLOADABLE : UNAVAILABLE);
+			int value;
+			// Un fallo al leer el almacenamiento no debe dejar el chat esperando para siempre.
+			try {
+				if (verified().isFile() && model().length() == BYTES)
+					value = AVAILABLE;
+				else if (prefs().getLong(DOWNLOAD, -1) >= 0 && running(prefs().getLong(DOWNLOAD, -1)))
+					value = DOWNLOADING;
+				else
+					value = supported() ? DOWNLOADABLE : UNAVAILABLE;
+			} catch (RuntimeException e) {
+				value = UNAVAILABLE;
+			}
+			result.success(value);
 		});
 	}
 

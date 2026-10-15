@@ -65,7 +65,7 @@ public final class TrainerPrompt {
 		if (!r.training.isEmpty())
 			p.append("\nSU ENTRENAMIENTO (datos reales de la app)\n").append(cut(r.training, 1400)).append('\n')
 				.append("Úsalo para responder sobre su progreso, comentar sus últimas sesiones y ajustar lo que ")
-				.append("propongas (no repitas lo que ya le cuesta, sube poco a poco lo que domina). Si hay una ")
+				.append("propongas (no repitas lo que ya le cuesta, sube poco a poco lo que domina; relaciona su dieta con su objetivo). Si hay una ")
 				.append("progresión lista o un entreno a medias, díselo: puede usar los botones del chat para ")
 				.append("aplicarla, continuar o empezar el entreno.\n");
 		if (r.profile == null) {

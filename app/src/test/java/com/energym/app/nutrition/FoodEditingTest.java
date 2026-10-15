@@ -33,6 +33,18 @@ public final class FoodEditingTest {
 		assertFalse(c.editingFood());
 	}
 
+	@Test public void progressSeesTheFoodLoggedTodayEvenWhenAnotherDayIsSelected() {
+		Store store = new Store();
+		store.entries.add(entry("one", 150));
+		NutritionController c = controller(store);
+		c.selected = DAY.minusDays(5);
+		double[] kcal = c.recentSeries(3, 0);
+		assertArrayEquals(new double[]{0, 0, 540}, kcal, 0.001);
+		assertEquals("15/10", c.recentLabels(3)[2]);
+		assertEquals(540, NutritionController.loggedAverage(kcal, kcal), 0.001);
+		assertEquals(0, NutritionController.loggedAverage(new double[3], new double[3]), 0.001);
+	}
+
 	@Test public void cancelOrSwitchingAccountCannotOverwriteThePreviousFood() {
 		Store store = new Store();
 		FoodEntry original = entry("one", 150);

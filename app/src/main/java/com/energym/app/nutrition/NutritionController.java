@@ -179,6 +179,59 @@ public final class NutritionController {
 		return values;
 	}
 
+	/**
+	 * Serie de los últimos {@code days} días hasta hoy (antiguo → reciente) para Progreso: 0 kcal, 1 proteínas,
+	 * 2 hidratos, 3 grasas. No depende del día elegido en Alimentación.
+	 */
+	public double[] recentSeries(int days, int macro) {
+		double[] values = new double[days];
+		LocalDate today = clock.get();
+		for (int i = 0; i < days; i++) {
+			LocalDate day = today.minusDays(days - 1 - i);
+			values[i] = macro == 0 ? Math.max(totals(day)[0], historyCalories(day)) : totals(day)[macro];
+		}
+		return values;
+	}
+
+	public String[] recentLabels(int days) {
+		String[] labels = new String[days];
+		LocalDate today = clock.get();
+		for (int i = 0; i < days; i++) {
+			LocalDate day = today.minusDays(days - 1 - i);
+			labels[i] = day.getDayOfMonth() + "/" + day.getMonthValue();
+		}
+		return labels;
+	}
+
+	/** Resumen breve para el entrenador IA del móvil; vacío si no hay comidas anotadas esta semana. */
+	public String summary() {
+		if (owner == null)
+			return "";
+		double[] kcal = recentSeries(7, 0), protein = recentSeries(7, 1);
+		int logged = 0;
+		for (double v : kcal)
+			if (v > 0) logged++;
+		if (logged == 0)
+			return "";
+		BodyProfile.Targets t = targets();
+		return "Alimentación (últimos 7 días, " + logged + " anotados): media " +
+			Math.round(loggedAverage(kcal, kcal)) + " kcal y " + Math.round(loggedAverage(protein, kcal)) +
+			" g de proteína al día" + (t == null ? "" : "; objetivo " + Math.round(t.kcal) + " kcal y " +
+			Math.round(t.protein) + " g de proteína") + ".";
+	}
+
+	/** Media de los días con comida anotada en la serie; 0 si no hay ninguno. */
+	public static double loggedAverage(double[] values, double[] kcal) {
+		double total = 0;
+		int days = 0;
+		for (int i = 0; i < values.length; i++)
+			if (kcal[i] > 0) {
+				total += values[i];
+				days++;
+			}
+		return days == 0 ? 0 : total / days;
+	}
+
 	public String[] dayLabels(int days) {
 		String[] labels = new String[days];
 		String[] names = {"L", "M", "X", "J", "V", "S", "D"};

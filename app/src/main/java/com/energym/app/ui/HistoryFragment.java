@@ -66,6 +66,8 @@ public final class HistoryFragment extends ScreenFragment {
 		stat(row2, BarChartView.compact(stats.totalDistance()), "km");
 		stat(row2, Integer.toString(n == null ? 0 : n.loggedDays().size()), "días con dieta");
 
+		inProgress();
+
 		if (stats.total() > 0) {
 			LinearLayout trend = card("Tu mejora", "Últimas 4 semanas frente a las 4 anteriores");
 			text(trend, "Sesiones: " + trend(stats.sessionsTrend(), ""), R.style.EnerGym_Body, 8);
@@ -98,6 +100,7 @@ public final class HistoryFragment extends ScreenFragment {
 						new String[]{"1.ª vez", "última"}, "kg", "Evolución de carga en " + top.name);
 			}
 		}
+		nutrition(n);
 		if (n != null && n.weights.size() > 1) {
 			List<LocalDate> days = new ArrayList<>(n.weights.keySet());
 			double[] kg = new double[days.size()];
@@ -112,6 +115,58 @@ public final class HistoryFragment extends ScreenFragment {
 				new String[]{short_(days.get(0)), short_(days.get(days.size() - 1))}, "kg", "Evolución del peso");
 		}
 		calendar(stats, n);
+	}
+
+	/** Lo guardado en una sesión sin finalizar también cuenta como avance visible. */
+	private void inProgress() {
+		for (Session s : app.pending) {
+			if (s.getStatus() != Session.Status.DRAFT)
+				continue;
+			int total = s.getRoutine().getItems().size(), saved = s.getResults().size();
+			StringBuilder done = new StringBuilder(saved + " de " + total + " ejercicios guardados");
+			for (RoutineItem item : s.getRoutine().getItems()) {
+				Map<String, String> values = s.getResults().get(item.getExercise().getId());
+				if (values != null)
+					done.append("\n✓ ").append(item.getExercise().getName()).append(" · ")
+						.append(com.energym.app.controller.AppController.metrics(item.getExercise().getMetricType(), values));
+			}
+			LinearLayout card = card("Entreno en curso: " + s.getRoutine().getTitle(), done.toString());
+			add(card, new ProgressBarView(requireContext()), 12).set(total == 0 ? 0 : saved / (double) total,
+				saved + " de " + total + " ejercicios");
+			primary(action(card, "▶ Continuar entreno", !app.trainingMutation, () -> app.resume(s)));
+			return;
+		}
+	}
+
+	/** Alimentación en Progreso: calorías y proteínas de las dos últimas semanas frente al objetivo. */
+	private void nutrition(NutritionController n) {
+		if (n == null || app.owner() == null)
+			return;
+		final int days = 14;
+		double[] kcal = n.recentSeries(days, 0), protein = n.recentSeries(days, 1);
+		int logged = 0;
+		for (double v : kcal)
+			if (v > 0) logged++;
+		com.energym.app.nutrition.BodyProfile.Targets targets = n.targets();
+		LinearLayout card = card("Alimentación", logged == 0 ?
+			"Anota comidas en Alimentación y aquí verás tu evolución." : "Últimos " + days + " días");
+		if (logged == 0)
+			return;
+		LinearLayout figures = columns(card, 4);
+		stat(figures, Integer.toString(logged), logged == 1 ? "día anotado" : "días anotados");
+		stat(figures, Long.toString(Math.round(NutritionController.loggedAverage(kcal, kcal))), "kcal de media");
+		stat(figures, Long.toString(Math.round(NutritionController.loggedAverage(protein, kcal))), "g proteína/día");
+		if (targets != null) {
+			int onTarget = 0;
+			for (double v : kcal)
+				if (v > 0 && Math.abs(v - targets.kcal) <= targets.kcal * 0.1) onTarget++;
+			text(card, "🎯 " + onTarget + " de " + logged + " días dentro de tu objetivo (±10 % de " +
+				Math.round(targets.kcal) + " kcal)", R.style.EnerGym_Body, 12);
+		}
+		add(card, new BarChartView(requireContext()), 12).set(kcal, n.recentLabels(days),
+			targets == null ? 0 : targets.kcal, "Calorías de los últimos " + days + " días: " + Arrays.toString(kcal));
+		add(card, new LineChartView(requireContext()), 12).set(protein,
+			new String[]{n.recentLabels(days)[0], "hoy"}, "g", "Proteínas por día");
 	}
 
 	private void bars(String title, double[] values, ProgressStats stats) {

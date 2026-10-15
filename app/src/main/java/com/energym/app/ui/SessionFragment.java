@@ -4,7 +4,9 @@ import com.energym.app.R;
 import com.energym.app.controller.AppController;
 import com.energym.app.domain.*;
 
+import android.os.*;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.*;
 
@@ -12,8 +14,21 @@ import java.util.*;
  * VISTA de registro: el esquema viene de MetricValidator; no asume kg/repeticiones para todas las actividades.
  */
 public final class SessionFragment extends ScreenFragment {
+	/** Fin del descanso en curso (reloj del sistema); sobrevive a los repintados y al giro de pantalla. */
+	private static long restEndsAt;
+	private final Handler ticker = new Handler(Looper.getMainLooper());
+	private TextView restLabel;
+	private final Runnable tick = this::tick;
+
 	public SessionFragment() {
 		super(R.layout.fragment_session);
+	}
+
+	@Override
+	public void onDestroyView() {
+		ticker.removeCallbacks(tick);
+		restLabel = null;
+		super.onDestroyView();
 	}
 
 	protected void content() {
@@ -54,6 +69,7 @@ public final class SessionFragment extends ScreenFragment {
 				choice(fields, f.key, f.label, f.choices, f.choices, inputs.getOrDefault(f.key, ""),
 					v -> app.sessions.input(f.key, v));
 		primary(action(rows, "Guardar ejercicio", !app.sessions.busy, app.sessions::record));
+		rest();
 		if (app.sessions.selected + 1 < ids.size())
 			action(rows, "Siguiente ejercicio", !app.sessions.busy,
 				() -> app.sessions.select(app.sessions.selected + 1));
@@ -73,5 +89,54 @@ public final class SessionFragment extends ScreenFragment {
 				}).show();
 		});
 	}
-}
 
+	/** Temporizador de descanso entre series: cuenta atrás visible y vibración al terminar. */
+	private void rest() {
+		LinearLayout card = card("⏱ Descanso", "");
+		restLabel = text(card, "", R.style.EnerGym_CardTitle, 0);
+		LinearLayout presets = columns(card, 8);
+		for (int seconds : new int[]{60, 90, 120})
+			compact(presets, seconds < 120 ? seconds + " s" : "2 min", true, () -> {
+				restEndsAt = SystemClock.elapsedRealtime() + seconds * 1000L;
+				tick();
+			});
+		compact(presets, "Parar", true, () -> {
+			restEndsAt = 0;
+			tick();
+		});
+		tick();
+	}
+
+	private void tick() {
+		ticker.removeCallbacks(tick);
+		if (restLabel == null)
+			return;
+		long left = restEndsAt - SystemClock.elapsedRealtime();
+		if (restEndsAt == 0) {
+			restLabel.setText("Elige un descanso tras cada serie.");
+			return;
+		}
+		if (left <= 0) {
+			restEndsAt = 0;
+			restLabel.setText("💪 ¡A por la siguiente serie!");
+			vibrate();
+			return;
+		}
+		long secs = (left + 999) / 1000;
+		restLabel.setText(String.format(java.util.Locale.ROOT, "%d:%02d", secs / 60, secs % 60));
+		ticker.postDelayed(tick, Math.min(1000, left));
+	}
+
+	private void vibrate() {
+		try {
+			Vibrator v = Build.VERSION.SDK_INT >= 31 ?
+				((VibratorManager) requireContext().getSystemService(android.content.Context.VIBRATOR_MANAGER_SERVICE))
+					.getDefaultVibrator() :
+				(Vibrator) requireContext().getSystemService(android.content.Context.VIBRATOR_SERVICE);
+			if (v != null && v.hasVibrator())
+				v.vibrate(VibrationEffect.createWaveform(new long[]{0, 250, 150, 250}, -1));
+		} catch (RuntimeException ignored) {
+			// Sin vibración el aviso en pantalla basta.
+		}
+	}
+}
