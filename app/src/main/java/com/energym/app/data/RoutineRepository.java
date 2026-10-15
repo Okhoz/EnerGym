@@ -1,6 +1,7 @@
 package com.energym.app.data;
 
 import com.energym.app.domain.*;
+import com.energym.app.assistant.ChatProtocol;
 
 import java.util.*;
 
@@ -38,6 +39,28 @@ public final class RoutineRepository {
 	public Routine load(long id) {
 		EnerGymDatabase.Row row = database.find(SyncRecord.Kind.ROUTINE, id);
 		return row == null ? null : decode(row);
+	}
+
+	/** Aceptación manual independiente: conserva el perfil general y crea una versión inmutable. */
+	public long saveManual(Routine routine) {
+		Objects.requireNonNull(routine, "routine");
+		if (routine.getMetadata() == null || routine.getMetadata().getOrigin() != RoutineMetadata.Origin.MANUAL)
+			throw new IllegalArgumentException("Se requiere una rutina manual explícita");
+		if (!routine.isValidFor(routine.getProfile()))
+			throw new IllegalArgumentException("Rutina manual incompatible, vacía o fuera del tiempo disponible");
+		for (RoutineItem item : routine.getItems())
+			ChatProtocol.validatePrescription(item.getExercise(), item.getPrescription(), item.getEstimatedMinutes());
+		return database.transaction(() -> {
+			EnerGymDatabase.Row old = database.find(SyncRecord.Kind.ROUTINE, routine.getProposalId());
+			String payload = SnapshotCodec.encodeRoutine(routine.withVersionId(0));
+			if (old != null) {
+				if (!SnapshotCodec.encodeRoutine(SnapshotCodec.decodeRoutine(old.record.getPayload()).withVersionId(0))
+					.equals(payload))
+					throw new IllegalArgumentException("Una versión aceptada no se puede modificar");
+				return old.id;
+			}
+			return database.writeLocal(SyncRecord.Kind.ROUTINE, routine.getProposalId(), payload);
+		});
 	}
 
 	/**

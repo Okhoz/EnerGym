@@ -51,6 +51,13 @@ public final class AndroidAppStore implements AppStore {
 		sync.withDatabase(db -> new RoutineRepository(db).acceptProposal(r, expected), callback(c, true));
 	}
 
+	public void acceptManual(Routine r, Callback<Routine> c) {
+		sync.withDatabase(db -> {
+			RoutineRepository repo = new RoutineRepository(db);
+			return repo.load(repo.saveManual(r));
+		}, callback(c, true));
+	}
+
 	public void draft(Session s, Callback<Long> c) {
 		sync.withDatabase(db -> new SessionRepository(db).saveDraft(s), callback(c, true));
 	}

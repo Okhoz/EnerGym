@@ -10,6 +10,116 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 public class ProposalControllerTest {
+	@Test
+	public void manualReplacementDropsExternalLoadForBodyweightAndKeepsItsOriginalSnapshot() {
+		Exercise loaded = new Exercise("loaded", "Sentadilla con mancuernas", MetricType.STRENGTH,
+			EnumSet.of(TrainingProfile.Goal.STRENGTH), EnumSet.of(TrainingProfile.Environment.HOME),
+			EnumSet.of(TrainingProfile.Resource.DUMBBELLS), Collections.singleton("strength"),
+			Exercise.Coverage.SPECIFIC, false, "Fixture", Collections.emptyList());
+		catalog = Arrays.asList(loaded, exercise("body", "Fixture"));
+		profile[0] = new TrainingProfile.Builder().category(TrainingProfile.Category.HOME_EQUIPMENT)
+			.resources(EnumSet.of(TrainingProfile.Resource.DUMBBELLS)).build();
+		Map<String, String> values = new LinkedHashMap<>(originFixture().getItems().get(0).getPrescription());
+		values.put("loadKg", "5");
+		Routine original = new Routine("manual-loaded", 0, "Manual", profile[0],
+			Collections.singletonList(new RoutineItem(loaded, values, 5, "Fixture")), "Fixture",
+			new RoutineMetadata(RoutineMetadata.Origin.MANUAL, false));
+		RoutineController c = new RoutineController(store, () -> profile[0], catalog, () -> {}, e -> fail(e));
+		c.preview = original;
+		c.substitute(0, "body");
+		assertEquals("body", c.preview.getItems().get(0).getExercise().getId());
+		assertEquals("0", c.preview.getItems().get(0).getPrescription().get("loadKg"));
+		assertEquals("5", original.getItems().get(0).getPrescription().get("loadKg"));
+		assertEquals(RoutineMetadata.Origin.MANUAL, c.preview.getMetadata().getOrigin());
+		assertFalse(c.preview.isProgressionEnabled());
+		ChatProtocol.validatePrescription(c.preview.getItems().get(0).getExercise(),
+			c.preview.getItems().get(0).getPrescription(), 5);
+	}
+
+	@Test
+	public void manualProgressionUsesItsOwnContextAndManualPort() {
+		catalog = Arrays.asList(exercise("one", "One"), exercise("two", "Two"));
+		profile[0] = new TrainingProfile.Builder().build();
+		Routine manual = originFixture().withMetadata(new RoutineMetadata(RoutineMetadata.Origin.MANUAL, true));
+		profile[0] = profile[0].toBuilder().environment(TrainingProfile.Environment.GYM)
+			.category(TrainingProfile.Category.GYM).build();
+		int[] manualWrites = {0};
+		Store ownStore = new Store() {
+			@Override public void acceptManual(Routine value, Callback<Routine> callback) {
+				manualWrites[0]++;
+				callback.success(value.withVersionId(1));
+			}
+		};
+		List<String> errors = new ArrayList<>();
+		RoutineController c = new RoutineController(ownStore, () -> profile[0], catalog, () -> {}, errors::add);
+		c.preview = manual;
+		c.accept();
+		assertEquals("Una progresión manual no depende del perfil general", 1, manualWrites[0]);
+		assertEquals(0, ownStore.writes);
+		assertTrue(errors.isEmpty());
+		assertEquals(RoutineMetadata.Origin.MANUAL, c.accepted.getMetadata().getOrigin());
+		assertEquals(TrainingProfile.Environment.HOME, c.accepted.getProfile().getEnvironment());
+		assertEquals(TrainingProfile.Environment.GYM, profile[0].getEnvironment());
+	}
+
+	@Test
+	public void manualSubstitutionUsesTheRoutineContextInsteadOfTheGeneralProfile() {
+		catalog = Arrays.asList(exercise("one", "One"), exercise("two", "Two"));
+		profile[0] = new TrainingProfile.Builder().build();
+		Routine manual = originFixture().withMetadata(new RoutineMetadata(RoutineMetadata.Origin.MANUAL, true));
+		profile[0] = profile[0].toBuilder().environment(TrainingProfile.Environment.GYM)
+			.category(TrainingProfile.Category.GYM).build();
+		RoutineController c = new RoutineController(store, () -> profile[0], catalog, () -> {}, e -> fail(e));
+		c.preview = manual;
+		assertEquals(1, c.alternatives(0).size());
+		assertEquals("two", c.alternatives(0).get(0).getId());
+	}
+
+	@Test
+	public void localPlanningRecordsItsRealOrigin() {
+		Routine routine = new RoutinePlanner().create(new TrainingProfile.Builder().build(), catalog);
+		assertNotNull(routine.getMetadata());
+		assertEquals(RoutineMetadata.Origin.LOCAL_RULES, routine.getMetadata().getOrigin());
+		assertTrue(routine.isProgressionEnabled());
+	}
+
+	@Test
+	public void assistantSubstitutionRetainsOriginAndDisabledProgression() {
+		catalog = Arrays.asList(exercise("one", "One"), exercise("two", "Two"));
+		profile[0] = new TrainingProfile.Builder().build();
+		ProposalController c = controller();
+		c.preview = originFixture();
+		c.substituteFirst();
+		assertEquals("two", c.preview.getItems().get(0).getExercise().getId());
+		assertNotNull(c.preview.getMetadata());
+		assertEquals(RoutineMetadata.Origin.AI, c.preview.getMetadata().getOrigin());
+		assertFalse(c.preview.isProgressionEnabled());
+	}
+
+	@Test
+	public void routineSubstitutionRetainsOriginAndDisabledProgression() {
+		catalog = Arrays.asList(exercise("one", "One"), exercise("two", "Two"));
+		profile[0] = new TrainingProfile.Builder().build();
+		RoutineController c = new RoutineController(store, () -> profile[0], catalog, () -> {}, e -> fail(e));
+		c.preview = originFixture();
+		c.substitute(0, "two");
+		assertEquals("two", c.preview.getItems().get(0).getExercise().getId());
+		assertNotNull(c.preview.getMetadata());
+		assertEquals(RoutineMetadata.Origin.AI, c.preview.getMetadata().getOrigin());
+		assertFalse(c.preview.isProgressionEnabled());
+	}
+
+	private Routine originFixture() {
+		Map<String, String> values = new LinkedHashMap<>();
+		values.put("sets", "2");
+		values.put("repetitions", "8");
+		values.put("loadKg", "0");
+		values.put("restSeconds", "60");
+		return new Routine("origin-fixture", 0, "Origin fixture", profile[0],
+			Collections.singletonList(new RoutineItem(catalog.get(0), values, 5, "Fixture")), "Fixture",
+			new RoutineMetadata(RoutineMetadata.Origin.AI, false));
+	}
+
 	private void assertGeneralQuestionDoesNotAuthorizePlanning(String message) {
 		profile[0] = new TrainingProfile.Builder().limitations("Restricción privada").build();
 		ProposalController c = controller();
@@ -476,6 +586,8 @@ public class ProposalControllerTest {
 		c.sendLocal("fuerza principiante");
 		assertNotNull(c.preview);
 		assertEquals(3, c.preview.getProfile().getDaysPerWeek());
+		assertNotNull(c.preview.getMetadata());
+		assertEquals(RoutineMetadata.Origin.LOCAL_RULES, c.preview.getMetadata().getOrigin());
 		assertEquals(30, c.preview.getProfile().getDurationMinutes());
 		assertTrue(c.preview.isValidFor(c.preview.getProfile()));
 		assertEquals(0, store.writes);
@@ -820,6 +932,8 @@ public class ProposalControllerTest {
 		client.callback.success(StrictJson.write(reply));
 		assertNotNull(c.preview);
 		assertEquals(3, c.preview.getProfile().getDaysPerWeek());
+		assertNotNull(c.preview.getMetadata());
+		assertEquals(RoutineMetadata.Origin.AI, c.preview.getMetadata().getOrigin());
 		assertEquals(0, store.writes);
 		c.accept();
 		assertEquals(1, store.writes);

@@ -52,6 +52,11 @@ public interface AppStore {
 
 	void accept(Routine value, Callback<Routine> callback);
 
+	/** No delegar una aceptación manual al puerto que puede depender del perfil general. */
+	default void acceptManual(Routine value, Callback<Routine> callback) {
+		callback.failure(new UnsupportedOperationException("Este almacén no admite rutinas manuales"));
+	}
+
 	/**
 	 * Aceptación explícita de perfil propuesto y rutina juntos, comparando el perfil vigente.
 	 */

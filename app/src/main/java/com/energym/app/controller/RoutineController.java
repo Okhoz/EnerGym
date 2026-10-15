@@ -1,6 +1,7 @@
 package com.energym.app.controller;
 
 import com.energym.app.domain.*;
+import com.energym.app.assistant.ChatProtocol;
 
 import java.util.*;
 import java.util.function.*;
@@ -54,7 +55,7 @@ public final class RoutineController {
 	public void accept() {
 		if (busy)
 			return;
-		if (preview == null || !preview.isValidFor(profile.get())) {
+		if (preview == null || !preview.isValidFor(previewProfile())) {
 			error.accept("La propuesta está vacía o el perfil ha cambiado. Crea una nueva propuesta.");
 			return;
 		}
@@ -62,7 +63,7 @@ public final class RoutineController {
 		long token = generation;
 		Routine proposal = preview;
 		changed.run();
-		store.accept(proposal, new AppStore.Callback<Routine>() {
+		AppStore.Callback<Routine> callback = new AppStore.Callback<Routine>() {
 			public void success(Routine value) {
 				if (token != generation)
 					return;
@@ -79,7 +80,21 @@ public final class RoutineController {
 				error.accept(e.getMessage());
 				changed.run();
 			}
-		});
+		};
+		// Una rutina manual tiene contexto propio; las demás conservan la validación del perfil general.
+		if (manual(proposal))
+			store.acceptManual(proposal, callback);
+		else
+			store.accept(proposal, callback);
+	}
+
+	private static boolean manual(Routine value) {
+		return value != null && value.getMetadata() != null &&
+			value.getMetadata().getOrigin() == RoutineMetadata.Origin.MANUAL;
+	}
+
+	private TrainingProfile previewProfile() {
+		return manual(preview) ? preview.getProfile() : profile.get();
 	}
 
 	/**
@@ -95,7 +110,7 @@ public final class RoutineController {
 	public List<Exercise> alternatives(int index) {
 		if (preview == null || index < 0 || index >= preview.getItems().size())
 			return Collections.emptyList();
-		List<Exercise> result = new ArrayList<>(new CompatibilityEngine().alternatives(preview.getItems().get(index).getExercise(), profile.get(), catalog));
+		List<Exercise> result = new ArrayList<>(new CompatibilityEngine().alternatives(preview.getItems().get(index).getExercise(), previewProfile(), catalog));
 		Set<String> used = new HashSet<>();
 		for (RoutineItem item : preview.getItems())
 			used.add(item.getExercise().getId());
@@ -110,8 +125,19 @@ public final class RoutineController {
 			if (e.getId().equals(exerciseId)) {
 				List<RoutineItem> items = new ArrayList<>(preview.getItems());
 				RoutineItem old = items.get(index);
-				items.set(index, new RoutineItem(e, old.getPrescription(), old.getEstimatedMinutes(), "Sustitución compatible con el mismo objetivo, métrica, recursos y cobertura."));
-				preview = new Routine(UUID.randomUUID().toString(), 0, preview.getTitle(), preview.getProfile(), items, preview.getExplanation());
+				Map<String, String> prescription = new LinkedHashMap<>(old.getPrescription());
+				if (e.getMetricType() == MetricType.STRENGTH && Collections.disjoint(e.getRequiredResources(),
+					EnumSet.of(TrainingProfile.Resource.DUMBBELLS, TrainingProfile.Resource.BARBELL,
+						TrainingProfile.Resource.MACHINE)))
+					prescription.put("loadKg", "0");
+				try {
+					ChatProtocol.validatePrescription(e, prescription, old.getEstimatedMinutes());
+				} catch (IllegalArgumentException invalid) {
+					error.accept("La prescripción no es compatible con la sustitución. Revisa el ejercicio y su duración.");
+					return;
+				}
+				items.set(index, new RoutineItem(e, prescription, old.getEstimatedMinutes(), "Sustitución compatible con el mismo objetivo, métrica, recursos y cobertura."));
+				preview = new Routine(UUID.randomUUID().toString(), 0, preview.getTitle(), preview.getProfile(), items, preview.getExplanation(), preview.getMetadata());
 				changed.run();
 				return;
 			}

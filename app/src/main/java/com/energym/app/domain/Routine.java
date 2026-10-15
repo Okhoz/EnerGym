@@ -7,8 +7,14 @@ public final class Routine {
 	private final long versionId;
 	private final TrainingProfile profile;
 	private final List<RoutineItem> items;
+	private final RoutineMetadata metadata;
 
 	public Routine(String proposalId, long versionId, String title, TrainingProfile profile, List<RoutineItem> items, String explanation) {
+		this(proposalId, versionId, title, profile, items, explanation, null);
+	}
+
+	public Routine(String proposalId, long versionId, String title, TrainingProfile profile, List<RoutineItem> items,
+		String explanation, RoutineMetadata metadata) {
 		this.proposalId = TrainingProfile.required(proposalId, "proposalId");
 		if (versionId < 0)
 			throw new IllegalArgumentException("Versión negativa");
@@ -19,6 +25,7 @@ public final class Routine {
 		for (RoutineItem item : this.items)
 			Objects.requireNonNull(item, "item");
 		this.explanation = TrainingProfile.required(explanation, "explanation");
+		this.metadata = metadata;
 	}
 
 	public String getProposalId() {
@@ -45,6 +52,15 @@ public final class Routine {
 		return explanation;
 	}
 
+	/** Null conserva la forma exacta de los snapshots anteriores. */
+	public RoutineMetadata getMetadata() {
+		return metadata;
+	}
+
+	public boolean isProgressionEnabled() {
+		return metadata == null || metadata.isProgressionEnabled();
+	}
+
 	public boolean isEmpty() {
 		return items.isEmpty();
 	}
@@ -57,7 +73,11 @@ public final class Routine {
 	}
 
 	public Routine withVersionId(long id) {
-		return new Routine(proposalId, id, title, profile, items, explanation);
+		return new Routine(proposalId, id, title, profile, items, explanation, metadata);
+	}
+
+	public Routine withMetadata(RoutineMetadata value) {
+		return new Routine(proposalId, versionId, title, profile, items, explanation, value);
 	}
 
 	/**

@@ -29,7 +29,7 @@ public final class ProgressionEngine {
 	 * @return null si no hay sesiones finalizadas de esta rutina o ningún ejercicio cambia.
 	 */
 	public Plan next(Routine accepted, List<Session> history) {
-		if (accepted == null || accepted.isEmpty())
+		if (accepted == null || accepted.isEmpty() || !accepted.isProgressionEnabled())
 			return null;
 		Session last = null;
 		for (Session s : history)
@@ -51,6 +51,21 @@ public final class ProgressionEngine {
 			if (!validator.validate(item.getExercise().getMetricType(), next).isEmpty())
 				next = item.getPrescription();
 			int minutes = item.getEstimatedMinutes();
+			if (item.getExercise().getMetricType() == MetricType.STRENGTH ||
+				item.getExercise().getMetricType() == MetricType.ISOMETRIC) {
+				int required = Math.max(minutes, minimumMinutes(item.getExercise().getMetricType(), next));
+				if (required - minutes > remaining) {
+					// Mantener el volumen anterior no puede recuperar una carga que no se hizo.
+					next = new LinkedHashMap<>(item.getPrescription());
+					if (item.getExercise().getMetricType() == MetricType.STRENGTH && done != null)
+						next.put("loadKg", fmt(number(done.get("loadKg"))));
+					required = Math.max(minutes, minimumMinutes(item.getExercise().getMetricType(), next));
+				}
+				if (required - minutes > remaining)
+					return null;
+				remaining -= required - minutes;
+				minutes = required;
+			}
 			if (item.getExercise().getMetricType() == MetricType.ENDURANCE) {
 				int extra = (int) Math.ceil(number(next.get("timeMinutes")) - number(item.getPrescription().get("timeMinutes")));
 				if (extra > 0 && extra <= remaining) {
@@ -69,8 +84,18 @@ public final class ProgressionEngine {
 			return null;
 		Routine routine = new Routine(UUID.randomUUID().toString(), 0, title(accepted.getTitle()), profile, items,
 			"Sobrecarga progresiva calculada con tu última sesión: sube solo lo que completaste con un esfuerzo " +
-				"asumible y mantiene lo que costó. Ejemplo sin revisión profesional; ajusta si notas molestias.");
+				"asumible y mantiene lo que costó. Ejemplo sin revisión profesional; ajusta si notas molestias.",
+			accepted.getMetadata());
 		return routine.isValidFor(profile) ? new Plan(routine, changes) : null;
+	}
+
+	/** Mismo mínimo explícito de descansos/duración que el contrato de prescripción; no inventa un tempo. */
+	private static int minimumMinutes(MetricType type, Map<String, String> prescription) {
+		double sets = number(prescription.get("sets"));
+		double seconds = Math.max(0, sets - 1) * number(prescription.get("restSeconds"));
+		if (type == MetricType.ISOMETRIC)
+			seconds += sets * number(prescription.get("durationSeconds"));
+		return Math.max(1, (int) Math.ceil(seconds / 60));
 	}
 
 	private Map<String, String> step(RoutineItem item, Map<String, String> done, TrainingProfile.Goal goal,

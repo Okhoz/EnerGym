@@ -620,7 +620,7 @@ public final class ProposalController {
 				items.set(0, new RoutineItem(e, prescription, first.getEstimatedMinutes(),
 					"Sustitución compatible del primer ejercicio; pendiente de aceptación."));
 				preview = new Routine(UUID.randomUUID().toString(), 0, preview.getTitle(), preview.getProfile(), items,
-					preview.getExplanation());
+					preview.getExplanation(), preview.getMetadata());
 				add("assistant",
 					"He sustituido " + first.getExercise().getName() + " por " + e.getName() + " en la vista previa.");
 				persist();
@@ -748,7 +748,8 @@ public final class ProposalController {
 						throw new IllegalArgumentException("Perfil cambiado");
 					addRemote(reply.text);
 					if (reply.proposal != null) {
-						setPreview(reply.proposal, observed);
+						setPreview(reply.proposal.withMetadata(
+							new RoutineMetadata(RoutineMetadata.Origin.AI, true)), observed);
 						planningDialogue = false;
 						base = observed;
 					}

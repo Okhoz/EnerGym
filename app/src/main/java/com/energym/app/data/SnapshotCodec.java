@@ -138,9 +138,14 @@ public final class SnapshotCodec {
 			items.put(new JSONObject().put("exercise", exercise(item.getExercise()))
 				.put("prescription", strings(item.getPrescription()))
 				.put("estimatedMinutes", item.getEstimatedMinutes()).put("justification", item.getJustification()));
-		return new JSONObject().put("proposalId", r.getProposalId()).put("versionId", r.getVersionId())
+		JSONObject result = new JSONObject().put("proposalId", r.getProposalId()).put("versionId", r.getVersionId())
 			.put("title", r.getTitle()).put("profile", profile(r.getProfile())).put("items", items)
 			.put("explanation", r.getExplanation());
+		// Los snapshots anteriores no adquieren defaults nuevos: su identidad histórica depende de estos bytes.
+		if (r.getMetadata() != null)
+			result.put("metadata", new JSONObject().put("origin", r.getMetadata().getOrigin().name())
+				.put("progressionEnabled", r.getMetadata().isProgressionEnabled()));
+		return result;
 	}
 
 	private static Routine routine(JSONObject o) throws JSONException {
@@ -153,7 +158,21 @@ public final class SnapshotCodec {
 					row.getInt("estimatedMinutes"), row.getString("justification")));
 		}
 		return new Routine(o.getString("proposalId"), o.getLong("versionId"), o.getString("title"),
-			profile(o.getJSONObject("profile")), items, o.getString("explanation"));
+			profile(o.getJSONObject("profile")), items, o.getString("explanation"), metadata(o));
+	}
+
+	private static RoutineMetadata metadata(JSONObject routine) throws JSONException {
+		if (!routine.has("metadata"))
+			return null;
+		Object value = routine.get("metadata");
+		if (!(value instanceof JSONObject))
+			throw new IllegalArgumentException("Metadatos de rutina inválidos");
+		JSONObject metadata = (JSONObject) value;
+		if (metadata.length() != 2 || !metadata.has("origin") || !metadata.has("progressionEnabled") ||
+			!(metadata.get("origin") instanceof String) || !(metadata.get("progressionEnabled") instanceof Boolean))
+			throw new IllegalArgumentException("Metadatos de rutina inválidos");
+		return new RoutineMetadata(RoutineMetadata.Origin.valueOf(metadata.getString("origin")),
+			(Boolean) metadata.get("progressionEnabled"));
 	}
 
 	private static JSONObject exercise(Exercise e) throws JSONException {
