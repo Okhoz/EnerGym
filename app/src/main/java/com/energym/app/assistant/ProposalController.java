@@ -192,7 +192,7 @@ public final class ProposalController {
 			return;
 		String text = normalize(raw);
 		add("user", raw.trim());
-		if (exercise != null && !text.contains("rutina") && !text.contains("plan") && !text.contains("entrenar")) {
+		if (exercise != null && !planningIntent(text)) {
 			add("assistant", explanation(exercise));
 			persist();
 			changed.run();
@@ -277,6 +277,12 @@ public final class ProposalController {
 
 	private static String normalize(String text) {
 		return Normalizer.normalize(text.toLowerCase(Locale.ROOT), Normalizer.Form.NFD).replaceAll("\\p{M}", "");
+	}
+
+	private static final Pattern PLANNING_WORDS = Pattern.compile("\\b(?:rutinas?|plan(?:es)?|entrenar)\\b");
+
+	private static boolean planningIntent(String text) {
+		return PLANNING_WORDS.matcher(text).find();
 	}
 
 	private static String conflict(String text) {
@@ -508,8 +514,18 @@ public final class ProposalController {
 			used.add(i.getExercise().getId());
 		for (Exercise e : new CompatibilityEngine().alternatives(first.getExercise(), preview.getProfile(), catalog))
 			if (!used.contains(e.getId())) {
+				Map<String, String> prescription = new LinkedHashMap<>(first.getPrescription());
+				if (e.getMetricType() == MetricType.STRENGTH && Collections.disjoint(e.getRequiredResources(),
+					EnumSet.of(TrainingProfile.Resource.DUMBBELLS, TrainingProfile.Resource.BARBELL,
+						TrainingProfile.Resource.MACHINE)))
+					prescription.put("loadKg", "0");
+				try {
+					ChatProtocol.validatePrescription(e, prescription, first.getEstimatedMinutes());
+				} catch (IllegalArgumentException invalid) {
+					continue;
+				}
 				List<RoutineItem> items = new ArrayList<>(preview.getItems());
-				items.set(0, new RoutineItem(e, first.getPrescription(), first.getEstimatedMinutes(),
+				items.set(0, new RoutineItem(e, prescription, first.getEstimatedMinutes(),
 					"Sustitución compatible del primer ejercicio; pendiente de aceptación."));
 				preview = new Routine(UUID.randomUUID().toString(), 0, preview.getTitle(), preview.getProfile(), items,
 					preview.getExplanation());
@@ -551,6 +567,12 @@ public final class ProposalController {
 			changed.run();
 			return;
 		}
+		String normalized = normalize(text);
+		if (exercise != null && planningIntent(normalized)) {
+			generation++;
+			exercise = null;
+			persist();
+		}
 		if (exercise != null && !sameExercise(exercise, ChatProtocol.find(catalog, exercise.getId()))) {
 			status =
 				"Esta versión histórica del ejercicio difiere del catálogo vigente del servidor. Consulta su explicación guiada original o selecciona un ejercicio actual antes de enviar a IA.";
@@ -564,7 +586,6 @@ public final class ProposalController {
 			if (base != null)
 				seed(base);
 		}
-		String normalized = normalize(text);
 		String conflict = conflict(normalized);
 		if (!conflict.isEmpty()) {
 			status = conflict;

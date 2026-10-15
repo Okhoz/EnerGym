@@ -10,6 +10,96 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 public class ProposalControllerTest {
+	private static Exercise plank(String description) {
+		return new Exercise("forearm-plank", "Plancha sobre antebrazos", MetricType.ISOMETRIC,
+			EnumSet.of(TrainingProfile.Goal.STRENGTH), EnumSet.of(TrainingProfile.Environment.HOME),
+			Collections.emptySet(), Collections.singleton("strength"), Exercise.Coverage.SPECIFIC, false,
+			description, Collections.emptyList());
+	}
+
+	@Test
+	public void plankTechniqueQuestionKeepsCurrentExerciseContext() {
+		Exercise currentPlank = plank("Técnica vigente");
+		catalog = Collections.singletonList(currentPlank);
+		ProposalController c = controller();
+		c.explain(currentPlank);
+
+		c.sendExternal("Explica la plancha y dónde colocar las manos");
+
+		assertNotNull(client.request);
+		assertEquals("forearm-plank", client.request.exerciseId);
+		assertSame(currentPlank, c.exercise);
+	}
+
+	@Test
+	public void historicalPlankTechniqueQuestionCannotBypassSnapshotGuard() {
+		catalog = Collections.singletonList(plank("Técnica vigente"));
+		Exercise historical = plank("Técnica histórica distinta");
+		ProposalController c = controller();
+		c.explain(historical);
+
+		c.sendExternal("Explica la plancha y dónde colocar las manos");
+
+		assertNull(client.request);
+		assertSame(historical, c.exercise);
+		assertTrue(c.status.contains("versión histórica"));
+	}
+
+	@Test
+	public void explicitRoutineRequestLeavesHistoricalExerciseContextBeforeContactingAi() {
+		ProposalController c = controller();
+		c.explain(exercise("squat", "Técnica histórica distinta"));
+
+		c.sendExternal("Prepara una rutina de fuerza, 3 días en casa sin material 30 min principiante");
+
+		assertNotNull(client.request);
+		assertNull(client.request.exerciseId);
+		assertNull(c.exercise);
+		assertNull(memory.load("uid-a").exercise);
+		assertEquals(0, store.writes);
+	}
+
+	@Test
+	public void replacingLoadedExerciseWithBodyweightRemovesLoadWithoutChangingOriginalSnapshot() {
+		Exercise bodyweight = exercise("bodyweight-squat", "Sin accesorios");
+		Exercise loaded = new Exercise("dumbbell-squat", "Sentadilla con mancuernas", MetricType.STRENGTH,
+			EnumSet.of(TrainingProfile.Goal.STRENGTH), EnumSet.of(TrainingProfile.Environment.HOME),
+			EnumSet.of(TrainingProfile.Resource.DUMBBELLS), Collections.singleton("strength"),
+			Exercise.Coverage.SPECIFIC, false, "Con mancuernas", Collections.singletonList(bodyweight.getId()));
+		catalog = Arrays.asList(loaded, bodyweight);
+		profile[0] = new TrainingProfile.Builder().category(TrainingProfile.Category.HOME_EQUIPMENT)
+			.resources(EnumSet.of(TrainingProfile.Resource.DUMBBELLS)).build();
+		ProposalController c = controller();
+		c.sendExternal("Prepara una rutina de fuerza");
+		Map<String, Object> reply = StrictJson.object(StrictJson.parse(validReply(client.request)));
+		reply.put("proposal", Map.of("title", "Propuesta con carga", "items", Collections.singletonList(
+			Map.of("exerciseId", loaded.getId(), "estimatedMinutes", 5, "prescription",
+				Arrays.asList(Map.of("key", "sets", "value", "2"), Map.of("key", "repetitions", "value", "8"),
+					Map.of("key", "loadKg", "value", "5"), Map.of("key", "restSeconds", "value", "60")),
+				"justification", "Compatible con el material declarado."))));
+		client.callback.success(StrictJson.write(reply));
+		assertNotNull(c.preview);
+		Routine original = c.preview;
+		Session historical = new Session(original);
+
+		c.substituteFirst();
+
+		RoutineItem replacement = c.preview.getItems().get(0);
+		assertEquals("bodyweight-squat", replacement.getExercise().getId());
+		assertEquals("0", replacement.getPrescription().get("loadKg"));
+		assertEquals("2", replacement.getPrescription().get("sets"));
+		assertEquals("8", replacement.getPrescription().get("repetitions"));
+		ChatProtocol.validatePrescription(replacement.getExercise(), replacement.getPrescription(),
+			replacement.getEstimatedMinutes());
+		assertEquals("5", original.getItems().get(0).getPrescription().get("loadKg"));
+		assertSame(original, historical.getRoutine());
+		assertEquals(0, store.writes);
+		c.accept();
+		assertEquals(1, store.writes);
+		assertEquals("bodyweight-squat", store.saved.getItems().get(0).getExercise().getId());
+		assertEquals("0", store.saved.getItems().get(0).getPrescription().get("loadKg"));
+	}
+
 	@Test
 	public void localEraseClearsPreviewConversationAndRejectsRetainedReplyOnlyForSelectedOwner() {
 		ProposalController c = controller();
