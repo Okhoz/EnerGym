@@ -26,6 +26,7 @@ public final class BodyFragment extends ScreenFragment {
 			card("Entra para empezar", "");
 			return;
 		}
+		WeightHistorySection.render(this, n);
 		if (n.bodyDraft.isEmpty())
 			n.fillBody();
 		Map<String, String> d = n.bodyDraft;

@@ -145,15 +145,28 @@ public final class NutritionController {
 		return last == null ? null : last.getKey();
 	}
 
+	/** Historial completo confirmado, reciente primero, sin permitir editar el estado desde la vista. */
+	public SortedMap<LocalDate, Double> weightHistory() {
+		SortedMap<LocalDate, Double> history = new TreeMap<>(Collections.reverseOrder());
+		LocalDate today = clock.get();
+		for (Map.Entry<LocalDate, Double> entry : weights.entrySet())
+			if (validWeight(entry.getKey(), entry.getValue(), today))
+				history.put(entry.getKey(), entry.getValue());
+		return Collections.unmodifiableSortedMap(history);
+	}
+
 	private Map.Entry<LocalDate, Double> latestWeight() {
 		Map.Entry<LocalDate, Double> last = null;
 		LocalDate today = clock.get();
 		for (Map.Entry<LocalDate, Double> entry : weights.entrySet()) {
-			Double kg = entry.getValue();
-			if (entry.getKey() == null || entry.getKey().isAfter(today) || kg == null || !(kg >= 30 && kg <= 300)) continue;
+			if (!validWeight(entry.getKey(), entry.getValue(), today)) continue;
 			if (last == null || entry.getKey().isAfter(last.getKey())) last = entry;
 		}
 		return last;
+	}
+
+	private static boolean validWeight(LocalDate day, Double kg, LocalDate today) {
+		return day != null && !day.isAfter(today) && kg != null && kg >= 30 && kg <= 300;
 	}
 
 	/**
