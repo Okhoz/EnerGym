@@ -295,7 +295,7 @@ public final class TrainerPrompt {
 		}
 	}
 
-	private static boolean beginner(String level) {
+	static boolean beginner(String level) {
 		String l = level == null ? "" : level.toLowerCase(Locale.ROOT);
 		return l.isEmpty() || l.contains("princip") || l.contains("inici") || l.contains("novat");
 	}

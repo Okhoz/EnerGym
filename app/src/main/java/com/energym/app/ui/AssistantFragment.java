@@ -181,6 +181,7 @@ public final class AssistantFragment extends ScreenFragment {
 		compact(choices, "Rechazar", !c.busy, c::reject);
 		LinearLayout tweaks = columns(rows, 8);
 		compact(tweaks, "−5 min", !c.busy, c::reduceTime);
+		compact(tweaks, "+5 min", !c.busy, c::extendTime);
 		TextView hint = text(rows, "Toca un ejercicio para ver su técnica o 🔄 para cambiarlo:",
 			R.style.EnerGym_FieldCaption, 14);
 		hint.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
