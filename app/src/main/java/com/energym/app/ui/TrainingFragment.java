@@ -7,6 +7,8 @@ import com.energym.app.catalog.ExerciseSearch;
 import com.energym.app.domain.Exercise;
 import com.energym.app.domain.Session;
 import com.energym.app.domain.Sport;
+import com.energym.app.domain.Routine;
+import com.energym.app.domain.RoutineMetadata;
 import com.energym.app.domain.TrainingProfile.*;
 import com.google.android.material.button.MaterialButton;
 
@@ -26,7 +28,18 @@ public final class TrainingFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		heading("TU PLAN", "Entreno", "");
+		heading("TU PLAN", "Entrenamientos", "");
+		// 2. Dos formas explícitas de crear y elegir rutinas. Abrir el chat no envía datos.
+		LinearLayout ai = card("Con IA", "Habla con tu entrenador personal y revisa cualquier propuesta antes de aceptarla.");
+		primary(action(ai, "Crear rutina con IA", app.owner() != null && !app.loading, () -> {
+			state.assistant.messageInput("Prepara una rutina para mí.");
+			app.navigate(Screen.ASSISTANT);
+		}));
+		routineList(ai, true);
+		LinearLayout mine = card("Mis rutinas", "Crea tu propia rutina con ejercicios del catálogo y su contexto independiente.");
+		primary(action(mine, "Crear rutina manual", !app.loading && !app.manual.busy, app::createManualRoutine));
+		routineList(mine, false);
+
 		// 1. Lo que puedes hacer ahora: continuar, empezar o revisar.
 		if (app.sessions.session != null && app.sessions.session.getStatus() == Session.Status.DRAFT) {
 			LinearLayout active = card("Sesión abierta", "Tus valores se conservan aunque cambies de pantalla.");
@@ -55,10 +68,11 @@ public final class TrainingFragment extends ScreenFragment {
 			MaterialButton start = action(accepted, "Empezar sesión", !app.sessions.busy, app::startSession);
 			if (app.routines.preview == null && level == null)
 				primary(start);
-			action(accepted, "Ver ejercicios", true, () -> app.navigate(Screen.ROUTINE));
+			text(accepted, origin(app.routines.accepted) + " · Progresión " +
+				(app.routines.accepted.isProgressionEnabled() ? "activada" : "desactivada"), R.style.EnerGym_FieldCaption, 8);
+			action(accepted, "Ver ejercicios", !app.routines.busy && app.routines.preview == null, app::viewSelectedRoutine);
 		}
-		// 2. Plan: perfil resumido y nueva propuesta.
-		LinearLayout profile = card("Tu plan", app.profile == null ?
+		LinearLayout profile = card("Propuesta local", app.profile == null ?
 			"Dinos tu objetivo, tiempo y material para crear tu rutina." : app.profileSummary());
 		MaterialButton create = action(profile, "Crear propuesta",
 			!app.loading && !app.profileSaving() && !app.routines.busy, app::createRoutine);
@@ -140,6 +154,32 @@ public final class TrainingFragment extends ScreenFragment {
 		}
 		text(rows, "Rutinas de ejemplo sin revisión profesional: adapta la intensidad a tu situación.",
 			R.style.EnerGym_FieldCaption, 4);
+	}
+
+	private void routineList(LinearLayout box, boolean ai) {
+		int count = 0;
+		for (Routine routine : app.versions) {
+			boolean generated = routine.getMetadata() != null && routine.getMetadata().getOrigin() == RoutineMetadata.Origin.AI;
+			if (generated != ai) continue;
+			count++;
+			boolean selected = app.routines.accepted != null &&
+				app.routines.accepted.getProposalId().equals(routine.getProposalId());
+			action(box, routine.getTitle() + (selected ? " · seleccionada" : ""), !app.routines.busy,
+				() -> app.selectRoutine(routine.getProposalId()));
+			text(box, origin(routine) + " · " + routine.getEstimatedMinutes() + " min · Progresión " +
+				(routine.isProgressionEnabled() ? "activada" : "desactivada"), R.style.EnerGym_FieldCaption, 4);
+		}
+		if (count == 0) text(box, ai ? "Todavía no has aceptado rutinas con IA." : "Aquí aparecerán tus rutinas manuales, locales y anteriores.",
+			R.style.EnerGym_FieldCaption, 8);
+	}
+
+	private String origin(Routine routine) {
+		if (routine.getMetadata() == null) return "Rutina anterior · origen no registrado";
+		switch (routine.getMetadata().getOrigin()) {
+			case AI: return "Creada con IA";
+			case MANUAL: return "Creada por ti";
+			default: return "Reglas locales";
+		}
 	}
 
 	private String query = "";

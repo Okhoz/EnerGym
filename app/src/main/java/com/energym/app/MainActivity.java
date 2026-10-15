@@ -183,6 +183,8 @@ public final class MainActivity extends AppCompatActivity {
 				return new ProfileFragment();
 			case ROUTINE:
 				return new RoutineFragment();
+			case MANUAL_ROUTINE:
+				return new ManualRoutineFragment();
 			case SESSION:
 				return new SessionFragment();
 			case EXERCISE:

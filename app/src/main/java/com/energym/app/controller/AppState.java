@@ -121,8 +121,7 @@ public final class AppState extends AndroidViewModel {
 			new HttpChatClient(chatWorker, main,
 				(context.getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0),
 			catalog.getExercises(), catalog.getVersion(), () -> app.profile, this::changed, r -> {
-			app.routines.accepted = r;
-			app.reload();
+			app.routineAccepted(r);
 		});
 		ExerciseResourcePolicy resourcePolicy;
 		try {

@@ -11,7 +11,7 @@ import java.util.*;
 public final class AppController {
 	public TrainingProfile profile;
 
-	public enum Screen {HOME, TRAINING, ASSISTANT, HISTORY, PROFILE, ROUTINE, SESSION, EXERCISE, ACCOUNT, NUTRITION, FOOD, BODY}
+	public enum Screen {HOME, TRAINING, ASSISTANT, HISTORY, PROFILE, ROUTINE, MANUAL_ROUTINE, SESSION, EXERCISE, ACCOUNT, NUTRITION, FOOD, BODY}
 
 	/**
 	 * Descriptor de edición: la vista infla XML y remite texto, no interpreta enums ni reglas.
@@ -34,6 +34,7 @@ public final class AppController {
 	}
 
 	public final RoutineController routines;
+	public final ManualRoutineController manual;
 	public final SessionController sessions;
 	public final CatalogRepository catalog;
 	public List<Session> history = Collections.emptyList(), pending = Collections.emptyList();
@@ -62,6 +63,9 @@ public final class AppController {
 	public boolean initialDataReady = true;
 	private final AppStore store;
 	private String owner;
+	/** Null conserva la elección automática; sólo elegir o aceptar fija un identificador. */
+	private String selectedRoutineId;
+	private Routine lastLoadedRoutine;
 	private long generation, loadRequest;
 	private boolean profileDirty, profileSaving;
 	private final Map<String, String> profileDraft = new LinkedHashMap<>();
@@ -141,6 +145,13 @@ public final class AppController {
 		this.store = store;
 		this.catalog = catalog;
 		routines = new RoutineController(store, () -> profile, catalog.getExercises(), this::changed, this::error);
+		manual = new ManualRoutineController(store, catalog.getExercises(), this::changed, saved -> {
+			routines.accepted = saved;
+			selectedRoutineId = saved.getProposalId();
+			notice = "Rutina manual guardada. Tu perfil global no ha cambiado.";
+			reload();
+			navigate(Screen.TRAINING);
+		});
 		sessions = new SessionController(store, this::changed, this::error, () -> {
 			notice = "Sesión finalizada y guardada localmente.";
 			reload();
@@ -186,6 +197,8 @@ public final class AppController {
 		history = Collections.emptyList();
 		pending = Collections.emptyList();
 		versions = Collections.emptyList();
+		selectedRoutineId = null;
+		lastLoadedRoutine = null;
 		progression = null;
 		progressionBase = null;
 		progressionHistory = null;
@@ -194,6 +207,7 @@ public final class AppController {
 		profileDirty = false;
 		profileSaving = false;
 		routines.reset();
+		manual.activate(next);
 		sessions.reset();
 		exercise = null;
 		error = "";
@@ -228,7 +242,22 @@ public final class AppController {
 				versions = snapshot.routines;
 				if (!profileDirty)
 					fillProfile(profile == null ? new TrainingProfile.Builder().build() : profile);
-				routines.accepted = versions.isEmpty() ? null : versions.get(0);
+				// RoutineController también acepta directamente: una instancia nueva procede de esa aceptación,
+				// mientras que una recarga previa dejó exactamente lastLoadedRoutine como selección automática.
+				if (routines.accepted != null && routines.accepted != lastLoadedRoutine)
+					selectedRoutineId = routines.accepted.getProposalId();
+				Routine selected = null;
+				for (Routine version : versions)
+					if (version.getProposalId().equals(selectedRoutineId)) {
+						selected = version;
+						break;
+					}
+				// Sin elección explícita se sigue el orden restaurado; una elección humana ausente permanece pendiente.
+				if (selectedRoutineId == null && !versions.isEmpty()) {
+					selected = versions.get(0);
+				}
+				routines.accepted = selected;
+				lastLoadedRoutine = selected;
 				changed();
 			}
 
@@ -275,10 +304,56 @@ public final class AppController {
 	}
 
 	public void startSession() {
+		if (sessions.session != null && sessions.session.getStatus() == Session.Status.DRAFT &&
+			routines.accepted != null && !sessions.session.getRoutine().getProposalId().equals(routines.accepted.getProposalId())) {
+			error("Ya hay una sesión de otra rutina abierta. Continúala o finalízala antes de empezar la seleccionada.");
+			return;
+		}
 		if (sessions.session == null || sessions.session.getStatus() == Session.Status.FINISHED)
 			sessions.start(routines.accepted);
 		if (sessions.session != null)
 			navigate(Screen.SESSION);
+	}
+
+	public void createManualRoutine() {
+		if (owner == null) {
+			navigate(Screen.ACCOUNT);
+			return;
+		}
+		if (loading || !initialDataReady) {
+			error("Espera a que termine de restaurarse tu cuenta antes de crear una rutina.");
+			return;
+		}
+		manual.begin(profile);
+		navigate(Screen.MANUAL_ROUTINE);
+	}
+
+	public void selectRoutine(String proposalId) {
+		if (routines.busy)
+			return;
+		for (Routine version : versions)
+			if (version.getProposalId().equals(proposalId)) {
+				selectedRoutineId = proposalId;
+				routines.accepted = version;
+				changed();
+				return;
+			}
+		error("Esta rutina ya no está disponible en la cuenta actual.");
+	}
+
+	/** Punto único de selección tras una aceptación nueva, antes de refrescar la lista. */
+	public void routineAccepted(Routine routine) {
+		if (routine == null)
+			return;
+		routines.accepted = routine;
+		selectedRoutineId = routine.getProposalId();
+		reload();
+	}
+
+	public void viewSelectedRoutine() {
+		if (routines.busy || routines.accepted == null || routines.preview != null)
+			return;
+		navigate(Screen.ROUTINE);
 	}
 
 	/**
