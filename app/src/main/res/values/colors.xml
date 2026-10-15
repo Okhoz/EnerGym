@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!-- Estilo limpio (tipo Instagram/Spotify): negro, superficies grises sin bordes y dorado solo para lo importante. El verde queda reservado al logo. -->
+	<!-- Estilo limpio (tipo Instagram/Spotify): negro, superficies grises sin bordes y dorado solo para lo importante. La marca y los iconos usan el mismo dorado. -->
 	<color name="surface">#0A0A0A</color>
 	<color name="surface_card">#FF161616</color>
 	<color name="glass_highlight">#1FFFFFFF</color>
