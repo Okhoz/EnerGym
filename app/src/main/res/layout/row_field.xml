@@ -15,7 +15,7 @@
 		android:layout_height="wrap_content"
 		android:layout_marginBottom="@dimen/label_gap"
 		android:labelFor="@id/field_input"
-		tools:text="Etiqueta del campo" />
+		tools:text="Edad (años)" />
 
 	<com.google.android.material.textfield.TextInputLayout
 		style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -23,6 +23,8 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		app:hintEnabled="false"
+		app:helperTextTextAppearance="@style/EnerGym.FieldCaption"
+		app:helperTextTextColor="@color/text_secondary"
 		app:boxBackgroundColor="@color/glass_field"
 		app:boxStrokeColor="@color/field_outline"
 		app:boxStrokeWidth="1dp"
@@ -41,8 +43,9 @@
 			android:paddingVertical="16dp"
 			android:inputType="textCapSentences"
 			android:textColor="@color/white"
+			android:textColorHint="@color/text_secondary"
 			android:textSize="16sp"
 			android:saveEnabled="false"
-			tools:text="Valor de ejemplo" />
+			tools:hint="Ej.: 30" />
 	</com.google.android.material.textfield.TextInputLayout>
 </LinearLayout>

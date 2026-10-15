@@ -41,7 +41,7 @@
 			android:layout_marginTop="@dimen/space_inline"
 			android:layout_marginBottom="@dimen/section_gap"
 			style="@style/EnerGym.Body"
-			tools:text="Elige lo que tienes y el tiempo disponible. Tus textos se guardan, pero el plan local aún no los interpreta." />
+			tools:text="Define cómo quieres entrenar. Guardar conserva tu perfil; después podrás crear una rutina desde Entrenamiento." />
 
 		<LinearLayout
 			android:id="@+id/rows"
@@ -189,7 +189,7 @@
 										android:paddingVertical="16dp"
 										android:textColor="@color/white"
 										android:textSize="16sp"
-										tools:text="Ejemplo de disciplina"
+										tools:text="Fuerza"
 										android:layout_marginEnd="40dp"
 										android:visibility="gone"
 										tools:visibility="visible"
@@ -262,7 +262,7 @@
 									android:layout_height="wrap_content"
 									android:layout_marginBottom="@dimen/label_gap"
 									style="@style/EnerGym.FieldCaption"
-									tools:text="Entorno real" />
+									tools:text="Dónde entrenas" />
 
 								<FrameLayout
 									android:layout_width="match_parent"
@@ -316,7 +316,7 @@
 									android:layout_height="wrap_content"
 									android:layout_marginBottom="@dimen/label_gap"
 									style="@style/EnerGym.FieldCaption"
-									tools:text="Cobertura" />
+									tools:text="Qué quieres trabajar" />
 
 								<FrameLayout
 									android:layout_width="match_parent"
@@ -386,7 +386,7 @@
 							android:layout_height="wrap_content"
 							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
-							tools:text="Organiza el tiempo que puedes dedicar." />
+							tools:text="Usa una disponibilidad que puedas mantener." />
 
 						<LinearLayout
 							android:layout_width="match_parent"
@@ -412,6 +412,9 @@
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
 									app:hintEnabled="false"
+									tools:helperTextEnabled="true"
+									tools:helperTextTextAppearance="@style/EnerGym.FieldCaption"
+									tools:helperText="Indica cuántos días podrás entrenar cada semana."
 									app:boxBackgroundColor="@color/glass_field"
 									app:boxStrokeColor="@color/field_outline"
 									app:boxStrokeWidth="1dp"
@@ -431,7 +434,9 @@
 										android:textColor="@color/white"
 										android:textSize="16sp"
 										android:saveEnabled="false"
-										tools:text="Ejemplo: 3" />
+										tools:text=""
+										tools:textColorHint="@color/text_secondary"
+										tools:hint="Ej.: 3" />
 								</com.google.android.material.textfield.TextInputLayout>
 							</LinearLayout>
 
@@ -446,13 +451,16 @@
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
 									android:layout_marginBottom="@dimen/label_gap"
-									tools:text="Tiempo disponible (5–240 min)" />
+									tools:text="Tiempo por sesión (5–240 min)" />
 
 								<com.google.android.material.textfield.TextInputLayout
 									style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
 									app:hintEnabled="false"
+									tools:helperTextEnabled="true"
+									tools:helperTextTextAppearance="@style/EnerGym.FieldCaption"
+									tools:helperText="Es el tiempo disponible para cada sesión, en minutos."
 									app:boxBackgroundColor="@color/glass_field"
 									app:boxStrokeColor="@color/field_outline"
 									app:boxStrokeWidth="1dp"
@@ -472,7 +480,9 @@
 										android:textColor="@color/white"
 										android:textSize="16sp"
 										android:saveEnabled="false"
-										tools:text="Ejemplo: 30" />
+										tools:text=""
+										tools:textColorHint="@color/text_secondary"
+										tools:hint="Ej.: 45" />
 								</com.google.android.material.textfield.TextInputLayout>
 							</LinearLayout>
 						</LinearLayout>
@@ -496,14 +506,14 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							style="@style/EnerGym.CardTitle"
-							tools:text="Tu contexto" />
+							tools:text="Sobre ti" />
 
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
-							tools:text="Añade tu experiencia, preferencias y limitaciones." />
+							tools:text="Indica tu nivel. Los demás datos de este bloque son opcionales." />
 
 						<LinearLayout
 							android:layout_width="match_parent"
@@ -529,6 +539,9 @@
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
 									app:hintEnabled="false"
+									tools:helperTextEnabled="true"
+									tools:helperTextTextAppearance="@style/EnerGym.FieldCaption"
+									tools:helperText="Describe tu nivel actual para orientar la dificultad."
 									app:boxBackgroundColor="@color/glass_field"
 									app:boxStrokeColor="@color/field_outline"
 									app:boxStrokeWidth="1dp"
@@ -548,7 +561,9 @@
 										android:textColor="@color/white"
 										android:textSize="16sp"
 										android:saveEnabled="false"
-										tools:text="Ejemplo de diseño" />
+										tools:text=""
+										tools:textColorHint="@color/text_secondary"
+										tools:hint="Ej.: principiante" />
 								</com.google.android.material.textfield.TextInputLayout>
 							</LinearLayout>
 
@@ -563,13 +578,16 @@
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
 									android:layout_marginBottom="@dimen/label_gap"
-									tools:text="Experiencia previa" />
+									tools:text="Experiencia previa (opcional)" />
 
 								<com.google.android.material.textfield.TextInputLayout
 									style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
 									app:hintEnabled="false"
+									tools:helperTextEnabled="true"
+									tools:helperTextTextAppearance="@style/EnerGym.FieldCaption"
+									tools:helperText="Cuenta qué has practicado y durante cuánto tiempo."
 									app:boxBackgroundColor="@color/glass_field"
 									app:boxStrokeColor="@color/field_outline"
 									app:boxStrokeWidth="1dp"
@@ -589,7 +607,9 @@
 										android:textColor="@color/white"
 										android:textSize="16sp"
 										android:saveEnabled="false"
-										tools:text="Ejemplo de diseño" />
+										tools:text=""
+										tools:textColorHint="@color/text_secondary"
+										tools:hint="Ej.: 6 meses de entrenamiento de fuerza" />
 								</com.google.android.material.textfield.TextInputLayout>
 							</LinearLayout>
 
@@ -604,13 +624,16 @@
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
 									android:layout_marginBottom="@dimen/label_gap"
-									tools:text="Espacio disponible" />
+									tools:text="Espacio disponible (opcional)" />
 
 								<com.google.android.material.textfield.TextInputLayout
 									style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
 									app:hintEnabled="false"
+									tools:helperTextEnabled="true"
+									tools:helperTextTextAppearance="@style/EnerGym.FieldCaption"
+									tools:helperText="Describe el espacio libre en el que podrás moverte."
 									app:boxBackgroundColor="@color/glass_field"
 									app:boxStrokeColor="@color/field_outline"
 									app:boxStrokeWidth="1dp"
@@ -630,7 +653,9 @@
 										android:textColor="@color/white"
 										android:textSize="16sp"
 										android:saveEnabled="false"
-										tools:text="Ejemplo de diseño" />
+										tools:text=""
+										tools:textColorHint="@color/text_secondary"
+										tools:hint="Ej.: una habitación despejada" />
 								</com.google.android.material.textfield.TextInputLayout>
 							</LinearLayout>
 
@@ -645,13 +670,16 @@
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
 									android:layout_marginBottom="@dimen/label_gap"
-									tools:text="Preferencias" />
+									tools:text="Preferencias (opcional)" />
 
 								<com.google.android.material.textfield.TextInputLayout
 									style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
 									app:hintEnabled="false"
+									tools:helperTextEnabled="true"
+									tools:helperTextTextAppearance="@style/EnerGym.FieldCaption"
+									tools:helperText="Indica ejercicios o formas de entrenar que disfrutas."
 									app:boxBackgroundColor="@color/glass_field"
 									app:boxStrokeColor="@color/field_outline"
 									app:boxStrokeWidth="1dp"
@@ -671,7 +699,9 @@
 										android:textColor="@color/white"
 										android:textSize="16sp"
 										android:saveEnabled="false"
-										tools:text="Ejemplo de diseño" />
+										tools:text=""
+										tools:textColorHint="@color/text_secondary"
+										tools:hint="Ej.: prefiero ejercicios con mancuernas" />
 								</com.google.android.material.textfield.TextInputLayout>
 							</LinearLayout>
 
@@ -686,13 +716,16 @@
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
 									android:layout_marginBottom="@dimen/label_gap"
-									tools:text="Limitaciones que quieras declarar" />
+									tools:text="Limitaciones que quieras declarar (opcional)" />
 
 								<com.google.android.material.textfield.TextInputLayout
 									style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
 									app:hintEnabled="false"
+									tools:helperTextEnabled="true"
+									tools:helperTextTextAppearance="@style/EnerGym.FieldCaption"
+									tools:helperText="Señala movimientos o actividades que prefieres evitar."
 									app:boxBackgroundColor="@color/glass_field"
 									app:boxStrokeColor="@color/field_outline"
 									app:boxStrokeWidth="1dp"
@@ -712,7 +745,9 @@
 										android:textColor="@color/white"
 										android:textSize="16sp"
 										android:saveEnabled="false"
-										tools:text="Ejemplo de diseño" />
+										tools:text=""
+										tools:textColorHint="@color/text_secondary"
+										tools:hint="Ej.: evitar saltos" />
 								</com.google.android.material.textfield.TextInputLayout>
 							</LinearLayout>
 						</LinearLayout>
@@ -743,7 +778,7 @@
 							android:layout_height="wrap_content"
 							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
-							tools:text="Los recursos son independientes del lugar. Selecciona solo los disponibles." />
+							tools:text="Marca solo el material que podrás usar en las sesiones." />
 
 						<LinearLayout
 							android:layout_width="match_parent"
@@ -903,7 +938,7 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							style="@style/EnerGym.CardTitle"
-							tools:text="Personalización y privacidad" />
+							tools:text="Privacidad" />
 
 						<TextView
 							android:layout_width="match_parent"

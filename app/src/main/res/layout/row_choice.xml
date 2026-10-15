@@ -14,7 +14,7 @@
 		android:layout_marginBottom="@dimen/label_gap"
 		style="@style/EnerGym.FieldCaption"
 		android:labelFor="@id/choice_input"
-		tools:text="Selecciona una opción" />
+		tools:text="Actividad habitual" />
 
 	<FrameLayout
 		android:layout_width="match_parent"
@@ -50,10 +50,22 @@
 			android:paddingVertical="16dp"
 			android:textColor="@color/white"
 			android:textSize="16sp"
-			tools:text="Opción de ejemplo"
+			tools:text="Moderada (3–5 entrenos/semana)"
 			android:layout_marginEnd="40dp"
 			android:visibility="gone"
 			tools:visibility="visible"
 			android:importantForAccessibility="noHideDescendants" />
 	</FrameLayout>
+
+	<!-- Ayuda independiente: conserva todas las opciones reales del selector y envuelve texto grande. -->
+	<TextView
+		android:id="@+id/choice_helper"
+		style="@style/EnerGym.FieldCaption"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="@dimen/label_gap"
+		android:paddingHorizontal="16dp"
+		android:visibility="gone"
+		tools:text="Elige la opción que mejor refleje una semana habitual."
+		tools:visibility="visible" />
 </LinearLayout>

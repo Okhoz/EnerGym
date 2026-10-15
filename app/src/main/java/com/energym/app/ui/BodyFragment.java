@@ -21,7 +21,7 @@ public final class BodyFragment extends ScreenFragment {
 	protected void content() {
 		NutritionController n = state.nutrition;
 		heading("NUTRICIÓN", "Tus datos físicos",
-			"Para calcular tus calorías y macros diarios.");
+			"Completa tus datos para estimar calorías y macros. Al guardar confirmas tu objetivo; después puedes pedir a la IA ideas de comidas.");
 		if (n == null || app.owner() == null) {
 			card("Entra para empezar", "");
 			return;
@@ -30,14 +30,18 @@ public final class BodyFragment extends ScreenFragment {
 			n.fillBody();
 		Map<String, String> d = n.bodyDraft;
 		Runnable[] refresh = {() -> {}};
-		LinearLayout basics = card("Sobre ti", "");
+		LinearLayout basics = card("Sobre ti", "Escribe solo las cifras; las unidades aparecen en cada etiqueta.");
 		choice(basics, "sex", "Sexo biológico (para la fórmula)", Arrays.asList("FEMALE", "MALE"),
-			Arrays.asList("Mujer", "Hombre"), d.get("sex"), v -> { d.put("sex", v); refresh[0].run(); });
+			Arrays.asList("Mujer", "Hombre"), d.get("sex"), "La fórmula usa este dato para estimar tu gasto en reposo.",
+			v -> { d.put("sex", v); refresh[0].run(); });
 		textField(basics, "age", "Edad (años)", d.get("age"), true, true,
+			"Tu edad actual ayuda a estimar el gasto de energía en reposo.",
 			v -> { d.put("age", v); refresh[0].run(); });
 		textField(basics, "heightCm", "Altura (cm)", d.get("heightCm"), true, false,
+			"Se usa junto a tu edad y peso para estimar el gasto diario.",
 			v -> { d.put("heightCm", v); refresh[0].run(); });
 		textField(basics, "weightKg", "Peso actual (kg)", d.get("weightKg"), true, false,
+			"Es la referencia para estimar calorías, proteínas y grasas.",
 			v -> { d.put("weightKg", v); refresh[0].run(); });
 
 		LinearLayout plan = card("Tu actividad", "Incluye tu movimiento habitual y tus entrenamientos.");
@@ -45,24 +49,28 @@ public final class BodyFragment extends ScreenFragment {
 			Arrays.asList("SEDENTARY", "LIGHT", "MODERATE", "HIGH", "VERY_HIGH"),
 			Arrays.asList("Sedentaria (poco movimiento)", "Ligera (1–3 entrenos/semana)",
 				"Moderada (3–5 entrenos/semana)", "Alta (6–7 entrenos/semana)", "Muy alta (trabajo físico + entreno)"),
-			d.get("activity"), v -> { d.put("activity", v); refresh[0].run(); });
-		LinearLayout goals = card("¿Qué quieres conseguir?", "Elige una opción. Los cambios se aplican al guardar.");
+			d.get("activity"), "Elige la opción que mejor refleje una semana habitual, incluido el entrenamiento.",
+			v -> { d.put("activity", v); refresh[0].run(); });
+		textField(plan, "allergies", "Alergias o intolerancias (opcional)", d.get("allergies"), false, false,
+			"Anota los alimentos que necesitas evitar. Puedes dejarlo vacío.", v -> d.put("allergies", v));
+		LinearLayout goals = card("¿Qué quieres conseguir?", "Elige el ajuste de calorías. Se confirma al guardar tus datos.");
 		for (BodyProfile.Goal goal : BodyProfile.Goal.values()) {
 			boolean selected = goal.name().equals(d.get("goal"));
-			String description = goal == BodyProfile.Goal.LOSE ? "Perder grasa" :
-				goal == BodyProfile.Goal.GAIN ? "Ganar masa muscular" : "Mantener tu peso";
+			String description = goal == BodyProfile.Goal.LOSE ? "Reducir calorías para perder grasa." :
+				goal == BodyProfile.Goal.GAIN ? "Aumentar calorías para apoyar la ganancia muscular." :
+					"Cubrir tu gasto para mantener el peso.";
 			MaterialButton button = action(goals, goal.label + "\n" + description, !n.busy,
 				() -> n.selectNutritionGoal(goal));
 			button.setTag("nutrition_goal_" + goal.name().toLowerCase(Locale.ROOT));
-			button.setMaxLines(3);
+			// El nombre y la explicación deben leerse completos también con fuentes grandes.
+			button.setSingleLine(false);
+			button.setMaxLines(Integer.MAX_VALUE);
+			button.setEllipsize(null);
 			button.setCheckable(true);
 			button.setChecked(selected);
-			button.setContentDescription(goal.label + (selected ? ", seleccionado" : ""));
+			button.setContentDescription(goal.label + ". " + description + (selected ? " Seleccionado." : ""));
 			if (selected) primary(button);
 		}
-		textField(plan, "allergies", "Alergias o intolerancias (opcional)", d.get("allergies"), false, false,
-			v -> d.put("allergies", v));
-
 		LinearLayout preview = card("Tu estimación diaria", "Revisa las calorías y macronutrientes antes de guardar.");
 		TextView kcal = text(preview, "", R.style.EnerGym_CardTitle, 4);
 		kcal.setTag("nutrition_goal_preview_kcal");

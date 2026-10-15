@@ -195,6 +195,18 @@ public abstract class ScreenFragment extends Fragment {
 
 	protected void textField(LinearLayout target, String key, String label, String value, boolean number,
 		boolean integer, Consumer<String> event) {
+		textField(target, key, label, value, number, integer,
+			FormFieldGuidance.placeholder(key, label, number, integer), "", event);
+	}
+
+	protected void textField(LinearLayout target, String key, String label, String value, boolean number,
+		boolean integer, String helper, Consumer<String> event) {
+		textField(target, key, label, value, number, integer,
+			FormFieldGuidance.placeholder(key, label, number, integer), helper, event);
+	}
+
+	protected void textField(LinearLayout target, String key, String label, String value, boolean number,
+		boolean integer, String placeholder, String helper, Consumer<String> event) {
 		View row = getLayoutInflater().inflate(R.layout.row_field, target, false);
 		TextInputLayout field = row.findViewById(R.id.field_label);
 		TextView caption = row.findViewById(R.id.field_caption);
@@ -207,6 +219,19 @@ public abstract class ScreenFragment extends Fragment {
 			edit.setInputType(
 				android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED |
 					(integer ? 0 : android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL));
+		// El ejemplo es un hint del EditText: la etiqueta externa no desaparece ni pasa al valor editable.
+		edit.setHint(placeholder == null || placeholder.isEmpty() ?
+			FormFieldGuidance.placeholder(key, label, number, integer) : placeholder);
+		if (helper != null && !helper.isEmpty()) {
+			field.setHelperText(helper);
+			TextView help = field.findViewById(com.google.android.material.R.id.textinput_helper_text);
+			if (help != null) {
+				// La ayuda de Material conserva su relación accesible y admite fuentes grandes sin truncar.
+				help.setSingleLine(false);
+				help.setMaxLines(Integer.MAX_VALUE);
+				help.setEllipsize(null);
+			}
+		}
 		edit.setText(value);
 		edit.addTextChangedListener(new TextWatcher() {
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -224,6 +249,11 @@ public abstract class ScreenFragment extends Fragment {
 
 	protected void choice(LinearLayout target, String key, String label, List<String> values, List<String> labels,
 		String value, Consumer<String> event) {
+		choice(target, key, label, values, labels, value, "", event);
+	}
+
+	protected void choice(LinearLayout target, String key, String label, List<String> values, List<String> labels,
+		String value, String helper, Consumer<String> event) {
 		View field = getLayoutInflater().inflate(R.layout.row_choice, target, false);
 		TextView text = field.findViewById(R.id.choice_label);
 		text.setText(label);
@@ -232,6 +262,10 @@ public abstract class ScreenFragment extends Fragment {
 		spinner.setTag(key);
 		text.setLabelFor(spinner.getId());
 		spinner.setContentDescription(label);
+		spinner.setPrompt(label);
+		TextView help = field.findViewById(R.id.choice_helper);
+		help.setText(helper);
+		help.setVisibility(helper == null || helper.isEmpty() ? View.GONE : View.VISIBLE);
 		ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.row_choice_text, labels);
 		adapter.setDropDownViewResource(R.layout.row_choice_option);
 		spinner.setAdapter(adapter);
@@ -254,6 +288,10 @@ public abstract class ScreenFragment extends Fragment {
 	}
 
 	protected void check(LinearLayout target, AppController.InputField field) {
+		check(target, field, "");
+	}
+
+	protected void check(LinearLayout target, AppController.InputField field, String helper) {
 		MaterialCheckBox box = (MaterialCheckBox) getLayoutInflater().inflate(R.layout.row_check, target, false);
 		box.setId(View.generateViewId());
 		box.setTag(field.key);
@@ -261,5 +299,15 @@ public abstract class ScreenFragment extends Fragment {
 		box.setChecked(Boolean.parseBoolean(field.value));
 		box.setOnCheckedChangeListener((button, value) -> app.profileInput(field.key, Boolean.toString(value)));
 		target.addView(box);
+		if (helper != null && !helper.isEmpty()) {
+			LinearLayout.LayoutParams boxParams = (LinearLayout.LayoutParams) box.getLayoutParams();
+			boxParams.bottomMargin = dp(4);
+			box.setLayoutParams(boxParams);
+			TextView help = text(target, helper, R.style.EnerGym_FieldCaption, 0);
+			help.setPadding(dp(16), 0, 0, 0);
+			LinearLayout.LayoutParams helpParams = (LinearLayout.LayoutParams) help.getLayoutParams();
+			helpParams.bottomMargin = dp(16);
+			help.setLayoutParams(helpParams);
+		}
 	}
 }
