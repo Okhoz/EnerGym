@@ -47,10 +47,10 @@ public final class GlassVisualCaptureTest {
 				MainFlowTest.await();
 				scenario.onActivity(a -> {
 					a.state().app.navigate(AppController.Screen.TRAINING);
-					GlassButton account = a.findViewById(R.id.account);
-					account.setPressed(true);
-					assertEquals(1f, account.getScaleX(), 0f);
-					account.setPressed(false);
+					GlassButton back = a.findViewById(R.id.back);
+					back.setPressed(true);
+					assertEquals(1f, back.getScaleX(), 0f);
+					back.setPressed(false);
 				});
 				MainFlowTest.await();
 				scenario.onActivity(a -> assertEquals(1f, ((MotionLayout) a.findViewById(R.id.screen_motion)).getProgress(), 0f));

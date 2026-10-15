@@ -68,10 +68,10 @@ public final class ProfessionalSpacingTest {
 						MainFlowTest.await();
 						scenario.onActivity(a -> {
 							inspect(a.findViewById(R.id.main), screen + "-" + scale, 12);
-							TextView account = a.findViewById(R.id.account);
-							check("Cuenta".contentEquals(
-									account.getContentDescription() == null ? "" : account.getContentDescription()),
-								"Cuenta debe conservar nombre accesible");
+							View menu = a.findViewById(R.id.avatar);
+							check("Menú".contentEquals(
+									menu.getContentDescription() == null ? "" : menu.getContentDescription()),
+								"El botón de menú (foto) debe conservar nombre accesible");
 						});
 						capture(screen.name().toLowerCase(Locale.ROOT) + "-" + scale);
 					}

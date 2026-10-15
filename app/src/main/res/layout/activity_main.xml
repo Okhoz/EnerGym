@@ -53,38 +53,21 @@
 			android:textColor="@color/white"
 			android:layout_marginEnd="@dimen/space_inline" />
 
-		<!-- Foto de perfil (o icono de persona): al tocarla se elige, cambia o quita la foto. -->
+		<!-- Foto de perfil (o icono de persona): es el botón del menú con perfil, datos, cuenta y foto. -->
 		<com.google.android.material.imageview.ShapeableImageView
 			android:id="@+id/avatar"
-			android:layout_width="44dp"
-			android:layout_height="44dp"
-			android:layout_marginEnd="8dp"
+			android:layout_width="48dp"
+			android:layout_height="48dp"
 			android:padding="10dp"
 			android:background="@color/glass_button"
 			android:scaleType="centerCrop"
 			android:src="@drawable/ic_account"
 			android:clickable="true"
 			android:focusable="true"
-			android:contentDescription="@string/avatar_description"
-			android:tooltipText="@string/avatar_description"
-			app:shapeAppearanceOverlay="@style/EnerGym.Circle" />
-
-		<com.energym.app.ui.effects.GlassButton
-			android:id="@+id/account"
-			style="@style/EnerGym.IconButton"
-			android:layout_width="@dimen/touch_target"
-			android:layout_height="wrap_content"
-			android:minHeight="@dimen/touch_target"
-			android:minWidth="@dimen/touch_target"
-			android:paddingHorizontal="12dp"
-			android:paddingVertical="12dp"
-			android:textSize="14sp"
 			android:contentDescription="@string/menu"
 			android:tooltipText="@string/menu"
-			app:icon="@drawable/ic_menu"
-			app:iconSize="24dp"
-			app:iconPadding="0dp"
-			app:iconGravity="textStart" />
+			app:shapeAppearanceOverlay="@style/EnerGym.Circle" />
+
 	</LinearLayout>
 
 	<TextView

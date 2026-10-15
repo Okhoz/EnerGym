@@ -2,7 +2,6 @@
 	<string name="app_name">EnerGym</string>
 	<string name="account">Cuenta</string>
 	<string name="menu">Menú</string>
-	<string name="avatar_description">Foto de perfil</string>
 	<string name="menu_profile">Mi perfil de entrenamiento</string>
 	<string name="menu_body">Datos físicos y peso</string>
 	<string name="menu_account">Cuenta, respaldo y entrenador IA</string>

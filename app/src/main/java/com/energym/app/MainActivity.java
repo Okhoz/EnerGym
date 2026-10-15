@@ -82,8 +82,7 @@ public final class MainActivity extends AppCompatActivity {
 		});
 		state = new ViewModelProvider(this).get(AppState.class);
 		state.bindViewer(viewerLaunch);
-		findViewById(R.id.account).setOnClickListener(this::openMenu);
-		findViewById(R.id.avatar).setOnClickListener(this::openAvatarMenu);
+		findViewById(R.id.avatar).setOnClickListener(this::openMenu);
 		findViewById(R.id.back).setOnClickListener(v -> {
 			if (state.app != null)
 				state.app.back();
@@ -180,9 +179,30 @@ public final class MainActivity extends AppCompatActivity {
 		androidx.appcompat.widget.PopupMenu menu = new androidx.appcompat.widget.PopupMenu(
 			new android.view.ContextThemeWrapper(this, R.style.EnerGym_PopupMenu), anchor, android.view.Gravity.END);
 		menu.inflate(R.menu.main_menu);
-		menu.setOnMenuItemClickListener(item -> menuSelected(item.getItemId()));
+		String owner = state.app.owner();
+		// La foto es el propio botón del menú: con cuenta, aquí se elige, cambia o quita.
+		if (owner != null) {
+			boolean has = avatars().has(owner);
+			menu.getMenu().add(1, PHOTO_PICK, 10, has ? "Cambiar foto de perfil" : "Elegir foto de perfil");
+			if (has)
+				menu.getMenu().add(1, PHOTO_REMOVE, 11, "Quitar foto");
+		}
+		menu.setOnMenuItemClickListener(item -> {
+			if (item.getItemId() == PHOTO_PICK)
+				avatarPicker.launch(new androidx.activity.result.PickVisualMediaRequest.Builder()
+					.setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build());
+			else if (item.getItemId() == PHOTO_REMOVE) {
+				avatars().delete(owner);
+				shownAvatar = "";
+				updateAvatar();
+			} else
+				return menuSelected(item.getItemId());
+			return true;
+		});
 		menu.show();
 	}
+
+	private static final int PHOTO_PICK = 101, PHOTO_REMOVE = 102;
 
 	private AvatarStore avatars;
 	private String shownAvatar = "";
@@ -205,39 +225,6 @@ public final class MainActivity extends AppCompatActivity {
 		if (avatars == null)
 			avatars = new AvatarStore(this);
 		return avatars;
-	}
-
-	/**
-	 * Toque en la foto: sin cuenta lleva a Cuenta; con cuenta, elegir o cambiar la foto, quitarla o abrir el perfil.
-	 */
-	private void openAvatarMenu(View anchor) {
-		if (state.app == null)
-			return;
-		String owner = state.app.owner();
-		if (owner == null) {
-			state.app.navigate(AppController.Screen.ACCOUNT);
-			return;
-		}
-		androidx.appcompat.widget.PopupMenu menu = new androidx.appcompat.widget.PopupMenu(
-			new android.view.ContextThemeWrapper(this, R.style.EnerGym_PopupMenu), anchor, android.view.Gravity.END);
-		boolean has = avatars().has(owner);
-		menu.getMenu().add(0, 1, 0, has ? "Cambiar foto de perfil" : "Elegir foto de perfil");
-		if (has)
-			menu.getMenu().add(0, 2, 1, "Quitar foto");
-		menu.getMenu().add(0, 3, 2, getString(R.string.menu_profile));
-		menu.setOnMenuItemClickListener(item -> {
-			if (item.getItemId() == 1)
-				avatarPicker.launch(new androidx.activity.result.PickVisualMediaRequest.Builder()
-					.setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build());
-			else if (item.getItemId() == 2) {
-				avatars().delete(owner);
-				shownAvatar = "";
-				updateAvatar();
-			} else
-				menuSelected(R.id.menu_profile);
-			return true;
-		});
-		menu.show();
 	}
 
 	/**
