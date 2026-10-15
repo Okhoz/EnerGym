@@ -349,6 +349,7 @@ EXERCISES = [
 
 
 def entry(row):
+	row = tuple(row)
 	(id_, name, metric, goals, envs, resources, sports, coverage, alternatives, technique) = row
 	return {
 		"id": id_, "name": name, "metricType": metric, "goals": list(dict.fromkeys(goals)),
@@ -360,7 +361,8 @@ def entry(row):
 def main():
 	catalog = json.loads(TARGETS[0].read_text(encoding="utf-8"))
 	existing = {e["id"] for e in catalog["exercises"]}
-	added = [entry(r) for r in EXERCISES if r[0] not in existing]
+	from catalog_more import MORE
+	added = [entry(r) for r in EXERCISES + MORE if r[0] not in existing]
 	catalog["exercises"].extend(added)
 	ids = {e["id"] for e in catalog["exercises"]}
 	sports = {s["id"]: s for s in catalog["sports"]}

@@ -3511,6 +3511,3994 @@
 			"alternativeIds": [
 				"sport-complementary-mobility"
 			]
+		},
+		{
+			"id": "smith-squat",
+			"name": "Sentadilla en máquina Smith",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Barra guiada sobre la espalda alta y pies algo adelantados. Baja con el tronco firme hasta donde mantengas la espalda neutra y sube empujando con todo el pie. Usa los topes de seguridad. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-back-squat",
+				"leg-press"
+			]
+		},
+		{
+			"id": "smith-bench-press",
+			"name": "Press de banca en máquina Smith",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE",
+				"BENCH"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tumbado con la barra guiada sobre la parte baja del pecho. Escápulas juntas, baja controlado y empuja sin rebotar. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-bench-press",
+				"machine-chest-press"
+			]
+		},
+		{
+			"id": "hack-squat",
+			"name": "Sentadilla hack",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Espalda apoyada en el respaldo y pies a la anchura de caderas. Baja hasta que los muslos queden paralelos o lo que permita tu movilidad y sube sin bloquear las rodillas. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"leg-press",
+				"smith-squat"
+			]
+		},
+		{
+			"id": "seated-leg-curl",
+			"name": "Curl femoral sentado",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Rodilla alineada con el eje y rodillo sobre los tobillos. Flexiona llevando los talones hacia abajo y atrás, pausa y vuelve lento. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"leg-curl"
+			]
+		},
+		{
+			"id": "machine-hip-adduction",
+			"name": "Aducción de cadera en máquina",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sentado con las almohadillas por dentro de las rodillas. Junta las piernas contra la resistencia, pausa y abre controlado. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"machine-hip-abduction"
+			]
+		},
+		{
+			"id": "machine-hip-thrust",
+			"name": "Hip thrust en máquina",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Espalda apoyada y cinturón o almohadilla sobre la cadera. Empuja con los talones hasta alinear rodillas, cadera y hombros y aprieta glúteos arriba. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-hip-thrust",
+				"glute-bridge"
+			]
+		},
+		{
+			"id": "machine-glute-kickback",
+			"name": "Patada de glúteo en máquina",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tronco apoyado y pie en la plataforma. Extiende la cadera llevando la pierna atrás sin arquear la zona lumbar y vuelve controlado. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"glute-kickback"
+			]
+		},
+		{
+			"id": "seated-calf-raise",
+			"name": "Gemelo sentado",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Almohadilla sobre los muslos y punta de los pies en el borde. Baja los talones y sube al máximo. Trabaja el sóleo. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"machine-calf-raise"
+			]
+		},
+		{
+			"id": "machine-shoulder-press",
+			"name": "Press de hombros en máquina",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Agarres a la altura de los hombros y espalda apoyada. Empuja hacia arriba sin bloquear y baja hasta la altura de las orejas. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-shoulder-press"
+			]
+		},
+		{
+			"id": "machine-lateral-raise",
+			"name": "Elevación lateral en máquina",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Brazos contra las almohadillas. Eleva hasta la altura de los hombros sin encogerlos y baja lento. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-lateral-raise"
+			]
+		},
+		{
+			"id": "reverse-pec-deck",
+			"name": "Pájaros en máquina (contractor inverso)",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Pecho contra el respaldo y brazos al frente. Abre hacia atrás juntando escápulas y vuelve controlado. Deltoides posterior. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-reverse-fly",
+				"cable-face-pull"
+			]
+		},
+		{
+			"id": "machine-row",
+			"name": "Remo en máquina con apoyo de pecho",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Pecho apoyado y agarres al frente. Tira llevando los codos atrás y juntando escápulas, sin despegar el pecho. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"seated-cable-row"
+			]
+		},
+		{
+			"id": "cable-crossover",
+			"name": "Cruce de poleas",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "De pie entre dos poleas altas, un paso adelante. Junta las manos delante del pecho en arco con codos semiflexionados y abre controlado. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"pec-deck",
+				"dumbbell-fly"
+			]
+		},
+		{
+			"id": "cable-low-fly",
+			"name": "Aperturas en polea baja",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Poleas abajo. Lleva las manos de abajo hacia arriba hasta la altura del pecho en arco. Enfatiza el pecho superior. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"cable-crossover"
+			]
+		},
+		{
+			"id": "cable-lateral-raise",
+			"name": "Elevación lateral en polea",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "De lado a la polea baja, agarre con la mano contraria. Eleva el brazo hasta la altura del hombro y baja lento manteniendo la tensión. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-lateral-raise"
+			]
+		},
+		{
+			"id": "cable-overhead-triceps",
+			"name": "Extensión de tríceps sobre la cabeza en polea",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "De espaldas a la polea con la cuerda tras la cabeza. Extiende los codos hacia delante y arriba sin mover los hombros. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-overhead-triceps"
+			]
+		},
+		{
+			"id": "cable-crunch",
+			"name": "Crunch en polea",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "De rodillas frente a la polea alta con la cuerda junto a la cabeza. Flexiona el tronco llevando los codos a los muslos y vuelve lento. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"crunch"
+			]
+		},
+		{
+			"id": "cable-pull-through",
+			"name": "Pull-through en polea",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "De espaldas a la polea baja con la cuerda entre las piernas. Bisagra de cadera atrás y extiende apretando glúteos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-romanian-deadlift"
+			]
+		},
+		{
+			"id": "cable-glute-kickback",
+			"name": "Patada de glúteo en polea",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tobillera en polea baja. Con el tronco algo inclinado, lleva la pierna atrás extendiendo la cadera y vuelve. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"glute-kickback"
+			]
+		},
+		{
+			"id": "straight-arm-pulldown",
+			"name": "Jalón con brazos rectos",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Frente a la polea alta con brazos casi estirados. Lleva la barra hasta los muslos en arco activando dorsales y vuelve. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"lat-pulldown"
+			]
+		},
+		{
+			"id": "close-grip-pulldown",
+			"name": "Jalón agarre estrecho",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Agarre neutro estrecho. Tira hacia la parte alta del pecho llevando los codos pegados al cuerpo y sube controlado. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"lat-pulldown"
+			]
+		},
+		{
+			"id": "machine-preacher-curl",
+			"name": "Curl predicador en máquina",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Brazos sobre el apoyo. Flexiona los codos sin despegarlos y baja hasta casi extender. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-biceps-curl"
+			]
+		},
+		{
+			"id": "machine-dip",
+			"name": "Fondos en máquina",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sentado con los agarres a los lados. Empuja hacia abajo extendiendo los codos y vuelve controlado. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"parallel-bar-dips",
+				"bench-dips"
+			]
+		},
+		{
+			"id": "back-extension",
+			"name": "Hiperextensiones lumbares",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Cadera apoyada en el banco romano. Baja el tronco con la espalda neutra y sube hasta alinear tronco y piernas, sin pasar de esa línea. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"superman",
+				"barbell-romanian-deadlift"
+			]
+		},
+		{
+			"id": "machine-ab-crunch",
+			"name": "Crunch abdominal en máquina",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sentado con los agarres en el pecho. Flexiona el tronco contra la resistencia y vuelve lento. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"crunch"
+			]
+		},
+		{
+			"id": "treadmill-incline-walk",
+			"name": "Caminata inclinada en cinta",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Cinta con 8–12 % de pendiente a paso vivo, sin agarrarte a las barras. Registra minutos y distancia. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"brisk-walk"
+			]
+		},
+		{
+			"id": "stair-climber",
+			"name": "Escaladora",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Postura erguida y pasos completos. Mantén un ritmo constante o por intervalos sin apoyar el peso en los brazos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"treadmill-incline-walk"
+			]
+		},
+		{
+			"id": "air-bike",
+			"name": "Bicicleta de aire",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Empuja y tira de los brazos mientras pedaleas. Ideal para intervalos cortos e intensos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"stationary-bike"
+			]
+		},
+		{
+			"id": "ski-erg",
+			"name": "Ski erg",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"MACHINE"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tira de los agarres desde arriba flexionando cadera y tronco como un esquiador de fondo y vuelve a la extensión. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"rowing-machine"
+			]
+		},
+		{
+			"id": "barbell-sumo-deadlift",
+			"name": "Peso muerto sumo",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Pies muy abiertos y manos por dentro de las rodillas. Pecho arriba, empuja el suelo y sube la barra pegada al cuerpo. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-deadlift"
+			]
+		},
+		{
+			"id": "barbell-good-morning",
+			"name": "Buenos días con barra",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Barra en la espalda alta, rodillas suaves. Lleva la cadera atrás inclinando el tronco con la espalda neutra y vuelve. Carga ligera. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-romanian-deadlift"
+			]
+		},
+		{
+			"id": "barbell-lunge",
+			"name": "Zancada con barra",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Barra en la espalda alta. Paso adelante y baja hasta que la rodilla trasera casi roce el suelo; vuelve empujando con la pierna delantera. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-walking-lunge"
+			]
+		},
+		{
+			"id": "pendlay-row",
+			"name": "Remo Pendlay",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tronco paralelo al suelo y barra apoyada en cada repetición. Tira explosivo hacia el abdomen y devuelve la barra al suelo. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-row"
+			]
+		},
+		{
+			"id": "t-bar-row",
+			"name": "Remo en T",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Barra anclada en una esquina o soporte. Bisagra de cadera y tira del extremo hacia el pecho juntando escápulas. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-row"
+			]
+		},
+		{
+			"id": "barbell-upright-row",
+			"name": "Remo al mentón con barra",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Agarre a la anchura de hombros. Sube la barra pegada al cuerpo hasta el pecho llevando los codos arriba, sin pasar de la altura de los hombros. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-lateral-raise"
+			]
+		},
+		{
+			"id": "barbell-skull-crusher",
+			"name": "Press francés con barra",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL",
+				"BENCH"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tumbado en banco con la barra sobre la frente. Flexiona solo los codos y extiende sin abrirlos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-overhead-triceps"
+			]
+		},
+		{
+			"id": "barbell-shrug",
+			"name": "Encogimientos con barra",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Barra delante de los muslos. Eleva los hombros hacia las orejas, pausa y baja. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-shrug"
+			]
+		},
+		{
+			"id": "barbell-floor-press",
+			"name": "Press en el suelo con barra",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tumbado en el suelo, baja la barra hasta que los codos toquen el suelo y empuja. Limita el recorrido para cuidar el hombro. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-bench-press"
+			]
+		},
+		{
+			"id": "barbell-push-press",
+			"name": "Push press",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Barra en los hombros. Pequeña flexión de rodillas y extiende piernas y brazos a la vez para llevar la barra arriba. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-overhead-press"
+			]
+		},
+		{
+			"id": "power-clean",
+			"name": "Cargada de potencia",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Desde el suelo, extiende piernas y cadera con fuerza, encoge y recibe la barra sobre los hombros con los codos al frente. Técnica avanzada: aprende con poco peso. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-deadlift"
+			]
+		},
+		{
+			"id": "landmine-press",
+			"name": "Press landmine",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Barra anclada en un extremo. Empuja el otro extremo desde el hombro hacia delante y arriba con el tronco firme. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-shoulder-press"
+			]
+		},
+		{
+			"id": "barbell-calf-raise",
+			"name": "Gemelo de pie con barra",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Barra en la espalda alta. Sube a la punta de los pies, pausa y baja lento. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-calf-raise"
+			]
+		},
+		{
+			"id": "barbell-reverse-curl",
+			"name": "Curl inverso con barra",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Agarre prono a la anchura de hombros. Flexiona los codos sin moverlos. Trabaja antebrazo y braquial. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-hammer-curl"
+			]
+		},
+		{
+			"id": "barbell-wrist-curl",
+			"name": "Curl de muñeca con barra",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM"
+			],
+			"requiredResources": [
+				"BARBELL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Antebrazos apoyados en los muslos y palmas arriba. Flexiona solo las muñecas y baja controlado. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "dumbbell-deadlift",
+			"name": "Peso muerto con mancuernas",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Mancuernas junto a los pies. Espalda neutra, empuja el suelo y sube extendiendo cadera y rodillas. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-deadlift",
+				"dumbbell-romanian-deadlift"
+			]
+		},
+		{
+			"id": "dumbbell-sumo-squat",
+			"name": "Sentadilla sumo con mancuerna",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Pies muy abiertos y puntas hacia fuera con una mancuerna colgando entre las piernas. Baja con el torso erguido y sube apretando glúteos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-goblet-squat"
+			]
+		},
+		{
+			"id": "dumbbell-static-lunge",
+			"name": "Zancada estática con mancuernas",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Posición de zancada fija con una mancuerna en cada mano. Baja en vertical y sube sin mover los pies. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"split-squat"
+			]
+		},
+		{
+			"id": "dumbbell-lateral-lunge",
+			"name": "Zancada lateral con mancuerna",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Mancuerna en el pecho. Paso lateral amplio llevando la cadera atrás y vuelve al centro. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"side-lunge"
+			]
+		},
+		{
+			"id": "dumbbell-single-leg-rdl",
+			"name": "Peso muerto a una pierna con mancuerna",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Mancuerna en la mano contraria a la pierna de apoyo. Inclina el tronco llevando la otra pierna atrás y vuelve con la cadera nivelada. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-romanian-deadlift"
+			]
+		},
+		{
+			"id": "dumbbell-hip-thrust",
+			"name": "Hip thrust con mancuerna",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS",
+				"BENCH"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Escápulas en el banco y mancuerna sobre la cadera. Empuja con los talones hasta alinear el cuerpo. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-hip-thrust"
+			]
+		},
+		{
+			"id": "dumbbell-chest-supported-row",
+			"name": "Remo con apoyo en banco inclinado",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS",
+				"BENCH"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Pecho sobre un banco inclinado y mancuernas colgando. Tira llevando los codos atrás y baja estirando. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-row"
+			]
+		},
+		{
+			"id": "renegade-row",
+			"name": "Remo renegado",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "En plancha alta sobre dos mancuernas. Rema con un brazo sin girar la cadera y alterna. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-row",
+				"forearm-plank"
+			]
+		},
+		{
+			"id": "dumbbell-upright-row",
+			"name": "Remo al mentón con mancuernas",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Mancuernas delante de los muslos. Súbelas pegadas al cuerpo hasta el pecho con los codos altos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-upright-row"
+			]
+		},
+		{
+			"id": "dumbbell-front-raise",
+			"name": "Elevación frontal",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Brazos estirados delante de los muslos. Eleva al frente hasta la altura de los hombros y baja lento. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-lateral-raise"
+			]
+		},
+		{
+			"id": "dumbbell-concentration-curl",
+			"name": "Curl concentrado",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sentado con el codo apoyado en el interior del muslo. Flexiona el codo y baja controlado. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-biceps-curl"
+			]
+		},
+		{
+			"id": "dumbbell-incline-curl",
+			"name": "Curl inclinado",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS",
+				"BENCH"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sentado en banco inclinado con brazos colgando. Flexiona sin adelantar los codos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-biceps-curl"
+			]
+		},
+		{
+			"id": "dumbbell-zottman-curl",
+			"name": "Curl Zottman",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sube con palmas arriba, gira arriba a palmas abajo y baja lento. Bíceps y antebrazo. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-hammer-curl"
+			]
+		},
+		{
+			"id": "dumbbell-skull-crusher",
+			"name": "Press francés con mancuernas",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS",
+				"BENCH"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tumbado con mancuernas sobre el pecho. Flexiona los codos llevándolas junto a la cabeza y extiende. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-skull-crusher"
+			]
+		},
+		{
+			"id": "dumbbell-close-grip-press",
+			"name": "Press cerrado con mancuernas",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS",
+				"BENCH"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tumbado, mancuernas juntas con agarre neutro. Baja al pecho con los codos pegados y empuja. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-close-grip-press"
+			]
+		},
+		{
+			"id": "dumbbell-snatch",
+			"name": "Arrancada con mancuerna",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Mancuerna entre los pies. Extiende cadera con fuerza y llévala por encima de la cabeza en un solo movimiento. Técnica avanzada. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-thruster"
+			]
+		},
+		{
+			"id": "dumbbell-clean-press",
+			"name": "Cargada y press con mancuernas",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sube las mancuernas a los hombros con un impulso de cadera y empújalas por encima de la cabeza. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-thruster"
+			]
+		},
+		{
+			"id": "farmers-walk",
+			"name": "Paseo del granjero",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Una mancuerna pesada en cada mano, hombros abajo y tronco erguido. Camina con pasos cortos y controlados. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"suitcase-carry"
+			]
+		},
+		{
+			"id": "suitcase-carry",
+			"name": "Paseo de maleta",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Una sola mancuerna a un lado. Camina sin inclinarte hacia el peso. Trabaja oblicuos y agarre. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"farmers-walk"
+			]
+		},
+		{
+			"id": "dumbbell-side-bend",
+			"name": "Inclinación lateral con mancuerna",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "De pie con una mancuerna a un lado. Inclina el tronco hacia ese lado y vuelve con el oblicuo contrario. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"side-plank"
+			]
+		},
+		{
+			"id": "dumbbell-russian-twist",
+			"name": "Giro ruso con mancuerna",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS",
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sentado con el tronco inclinado y pies apoyados o elevados. Gira llevando la mancuerna de un lado a otro. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"russian-twist"
+			]
+		},
+		{
+			"id": "dumbbell-swing",
+			"name": "Swing con mancuerna",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sujeta la mancuerna con ambas manos. Bisagra de cadera atrás y proyecta la cadera para balancearla hasta el pecho. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"cable-pull-through"
+			]
+		},
+		{
+			"id": "dumbbell-woodchop",
+			"name": "Leñador con mancuerna",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"DUMBBELLS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Mancuerna con ambas manos junto a una cadera. Llévala en diagonal por encima del hombro contrario girando el tronco. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"cable-woodchop"
+			]
+		},
+		{
+			"id": "band-squat",
+			"name": "Sentadilla con banda",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [
+				"BANDS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Pisa la banda y sujeta los extremos en los hombros. Haz una sentadilla manteniendo la tensión. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"bodyweight-squat"
+			]
+		},
+		{
+			"id": "band-deadlift",
+			"name": "Peso muerto con banda",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [
+				"BANDS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Pisa la banda y sujeta los extremos. Bisagra de cadera y sube extendiendo cadera. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-deadlift"
+			]
+		},
+		{
+			"id": "band-good-morning",
+			"name": "Buenos días con banda",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [
+				"BANDS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Banda bajo los pies y tras el cuello. Lleva la cadera atrás inclinando el tronco y vuelve. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"barbell-good-morning"
+			]
+		},
+		{
+			"id": "band-glute-bridge",
+			"name": "Puente de glúteo con banda",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"BANDS",
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Banda sobre las rodillas. Haz el puente empujando las rodillas hacia fuera. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"glute-bridge"
+			]
+		},
+		{
+			"id": "band-kickback",
+			"name": "Patada de glúteo con banda",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [
+				"BANDS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Banda anclada al tobillo. Lleva la pierna atrás extendiendo la cadera. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"glute-kickback"
+			]
+		},
+		{
+			"id": "band-lat-pulldown",
+			"name": "Jalón con banda",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [
+				"BANDS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Banda anclada arriba. Tira hacia el pecho llevando los codos abajo. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"lat-pulldown"
+			]
+		},
+		{
+			"id": "band-overhead-press",
+			"name": "Press de hombros con banda",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [
+				"BANDS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Pisa la banda y empuja los extremos por encima de la cabeza. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dumbbell-shoulder-press"
+			]
+		},
+		{
+			"id": "band-pallof-press",
+			"name": "Press Pallof",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [
+				"BANDS"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "De lado al anclaje, banda en el pecho. Extiende los brazos al frente sin dejar que el tronco gire y vuelve. Antirrotación. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"cable-woodchop"
+			]
+		},
+		{
+			"id": "band-hamstring-curl",
+			"name": "Curl femoral con banda",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"BANDS",
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Boca abajo con la banda en los tobillos anclada delante. Flexiona las rodillas llevando talones al glúteo. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"leg-curl"
+			]
+		},
+		{
+			"id": "band-clamshell",
+			"name": "Almeja con banda",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"BANDS",
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tumbado de lado con rodillas flexionadas y banda sobre ellas. Abre la rodilla de arriba sin girar la pelvis. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"band-lateral-walk"
+			]
+		},
+		{
+			"id": "bodyweight-sumo-squat",
+			"name": "Sentadilla sumo",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Pies muy abiertos y puntas hacia fuera. Baja con el torso erguido y sube apretando glúteos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"bodyweight-squat"
+			]
+		},
+		{
+			"id": "pulse-squat",
+			"name": "Sentadilla con rebotes cortos",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Baja a media sentadilla y haz pequeños rebotes sin subir del todo. Mantén la tensión en piernas. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"bodyweight-squat"
+			]
+		},
+		{
+			"id": "cossack-squat",
+			"name": "Sentadilla cosaca",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Piernas muy abiertas. Baja sobre una pierna mientras la otra queda estirada con la punta arriba y cambia de lado. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"side-lunge"
+			]
+		},
+		{
+			"id": "pistol-squat-assisted",
+			"name": "Sentadilla a una pierna asistida",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"SUPPORT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sujétate a un apoyo y baja sobre una pierna con la otra adelantada. Sube sin perder el control. Progresión hacia la pistol. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"split-squat"
+			]
+		},
+		{
+			"id": "curtsy-lunge",
+			"name": "Zancada cruzada",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Lleva una pierna en diagonal por detrás de la otra y baja como en una reverencia. Vuelve y alterna. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"reverse-lunge"
+			]
+		},
+		{
+			"id": "single-leg-calf-raise",
+			"name": "Gemelo a una pierna",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"SUPPORT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Apoyado ligeramente, sube a la punta de un pie y baja en tres segundos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"supported-calf-raise"
+			]
+		},
+		{
+			"id": "glute-bridge-march",
+			"name": "Puente con marcha",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "En puente, levanta alternativamente un pie del suelo sin que la cadera caiga. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"glute-bridge"
+			]
+		},
+		{
+			"id": "frog-pump",
+			"name": "Frog pump",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tumbado con plantas de los pies juntas y rodillas abiertas. Eleva la cadera apretando glúteos en repeticiones rápidas. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"glute-bridge"
+			]
+		},
+		{
+			"id": "donkey-kick",
+			"name": "Patada de burro",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "A cuatro patas, con la rodilla a 90° empuja la planta del pie hacia el techo y vuelve. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"glute-kickback"
+			]
+		},
+		{
+			"id": "fire-hydrant",
+			"name": "Fire hydrant",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "A cuatro patas, abre la rodilla hacia el lado sin girar la pelvis y vuelve. Glúteo medio. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"band-clamshell"
+			]
+		},
+		{
+			"id": "clamshell",
+			"name": "Almeja",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tumbado de lado con rodillas flexionadas. Abre la rodilla de arriba manteniendo los pies juntos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"band-clamshell"
+			]
+		},
+		{
+			"id": "jump-lunge",
+			"name": "Zancadas con salto",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Desde zancada, salta y cambia de pierna en el aire aterrizando suave. Requiere buen control. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"reverse-lunge"
+			]
+		},
+		{
+			"id": "tuck-jump",
+			"name": "Salto con rodillas al pecho",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Salta llevando las rodillas al pecho y aterriza suave con las rodillas alineadas. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"jump-squat"
+			]
+		},
+		{
+			"id": "box-jump-low",
+			"name": "Salto a escalón bajo",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Salta con ambos pies a un escalón estable y bajo, aterriza suave y baja andando. Solo superficies seguras. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"jump-squat"
+			]
+		},
+		{
+			"id": "wide-pushup",
+			"name": "Flexión con agarre ancho",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Manos más abiertas que los hombros y cuerpo en línea. Baja el pecho y empuja. Más pecho. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"standard-pushup"
+			]
+		},
+		{
+			"id": "decline-pushup",
+			"name": "Flexión declinada",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"CHAIR"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Pies sobre una silla estable y manos en el suelo. Baja con el cuerpo recto y empuja. Más hombro y pecho superior. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"pike-pushup",
+				"standard-pushup"
+			]
+		},
+		{
+			"id": "incline-pushup",
+			"name": "Flexión inclinada",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"CHAIR"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Manos sobre una silla estable o un banco y cuerpo recto. Más fácil que la flexión en el suelo. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"knee-pushup",
+				"wall-pushup"
+			]
+		},
+		{
+			"id": "archer-pushup",
+			"name": "Flexión arquero",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Manos muy abiertas; baja hacia un lado manteniendo el otro brazo estirado y alterna. Avanzado. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"wide-pushup"
+			]
+		},
+		{
+			"id": "hindu-pushup",
+			"name": "Flexión hindú",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Desde perro boca abajo, baja el pecho rozando el suelo en arco y termina en cobra; vuelve. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"pike-pushup"
+			]
+		},
+		{
+			"id": "negative-pull-up",
+			"name": "Dominada negativa",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Requiere barra fija. Sube con ayuda de un salto o apoyo y baja en 3–5 segundos con control. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"pull-up",
+				"assisted-pull-up"
+			]
+		},
+		{
+			"id": "scapular-pull-up",
+			"name": "Dominada escapular",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Colgado de la barra con brazos estirados, baja y junta las escápulas elevando el cuerpo unos centímetros. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"dead-hang"
+			]
+		},
+		{
+			"id": "hanging-knee-raise",
+			"name": "Elevación de rodillas colgado",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Colgado de una barra fija, sube las rodillas al pecho sin balanceo y baja lento. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"lying-leg-raise"
+			]
+		},
+		{
+			"id": "hanging-leg-raise",
+			"name": "Elevación de piernas colgado",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Colgado de la barra, sube las piernas estiradas hasta la horizontal o más y baja controlado. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"hanging-knee-raise"
+			]
+		},
+		{
+			"id": "muscle-up",
+			"name": "Muscle-up",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "En barra fija: dominada explosiva que pasa por encima de la barra y termina con un fondo. Muy avanzado. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"pull-up",
+				"parallel-bar-dips"
+			]
+		},
+		{
+			"id": "wall-handstand-hold",
+			"name": "Pino contra la pared",
+			"metricType": "ISOMETRIC",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"WALL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Manos a un palmo de la pared y piernas apoyadas. Empuja el suelo con brazos estirados y mantén. Avanzado. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"pike-pushup"
+			]
+		},
+		{
+			"id": "l-sit",
+			"name": "L-sit",
+			"metricType": "ISOMETRIC",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"SUPPORT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "En paralelas o dos apoyos estables, eleva el cuerpo y mantén las piernas estiradas al frente. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"hollow-hold"
+			]
+		},
+		{
+			"id": "reverse-plank",
+			"name": "Plancha invertida",
+			"metricType": "ISOMETRIC",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sentado con manos detrás, eleva la cadera hasta alinear el cuerpo mirando al techo y mantén. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"forearm-plank"
+			]
+		},
+		{
+			"id": "plank-shoulder-taps",
+			"name": "Plancha con toques de hombro",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "En plancha alta, toca el hombro contrario alternando manos sin balancear la cadera. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"forearm-plank"
+			]
+		},
+		{
+			"id": "plank-jacks",
+			"name": "Plancha con saltos",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "En plancha, abre y cierra las piernas con pequeños saltos manteniendo la cadera estable. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"mountain-climbers"
+			]
+		},
+		{
+			"id": "bear-crawl",
+			"name": "Gateo del oso",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "A cuatro patas con rodillas a un palmo del suelo. Avanza mano y pie contrarios a la vez sin subir la cadera. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"mountain-climbers"
+			]
+		},
+		{
+			"id": "inchworm",
+			"name": "Gusano",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "De pie, apoya las manos y camina con ellas hasta la plancha; vuelve caminando hacia los pies y levántate. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"worlds-greatest-stretch"
+			]
+		},
+		{
+			"id": "flutter-kicks",
+			"name": "Patadas de tijera vertical",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Boca arriba con zona lumbar pegada, alterna pequeñas patadas arriba y abajo con piernas estiradas. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"lying-leg-raise"
+			]
+		},
+		{
+			"id": "scissor-kicks",
+			"name": "Tijeras",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Boca arriba con piernas elevadas, crúzalas horizontalmente alternando arriba y abajo. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"flutter-kicks"
+			]
+		},
+		{
+			"id": "v-up",
+			"name": "V-up",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tumbado estirado, sube a la vez tronco y piernas hasta tocar los pies formando una V y baja controlado. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"crunch"
+			]
+		},
+		{
+			"id": "russian-twist",
+			"name": "Giro ruso",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sentado con el tronco inclinado, gira llevando las manos de un lado a otro de la cadera. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"bicycle-crunch"
+			]
+		},
+		{
+			"id": "heel-touches",
+			"name": "Toques de talón",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tumbado con rodillas flexionadas, eleva hombros y lleva la mano a cada talón alternando. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"crunch"
+			]
+		},
+		{
+			"id": "reverse-crunch",
+			"name": "Crunch inverso",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Tumbado con rodillas a 90°, lleva las rodillas al pecho despegando ligeramente la cadera y baja lento. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"lying-leg-raise"
+			]
+		},
+		{
+			"id": "toe-touch-crunch",
+			"name": "Toques de punta",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Piernas estiradas hacia el techo; eleva el tronco intentando tocar las puntas de los pies. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"crunch"
+			]
+		},
+		{
+			"id": "side-plank-dips",
+			"name": "Plancha lateral con elevaciones",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "En plancha lateral, baja la cadera unos centímetros y súbela. Alterna lados. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"side-plank"
+			]
+		},
+		{
+			"id": "stir-the-pot",
+			"name": "Plancha con círculos",
+			"metricType": "ISOMETRIC",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "En plancha de antebrazos, dibuja pequeños círculos con los codos sin mover la cadera. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"forearm-plank"
+			]
+		},
+		{
+			"id": "high-knees",
+			"name": "Rodillas arriba",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Corre en el sitio subiendo las rodillas a la altura de la cadera y braceando. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"jumping-jacks"
+			]
+		},
+		{
+			"id": "butt-kicks",
+			"name": "Talones al glúteo",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Corre en el sitio llevando los talones hacia los glúteos con ritmo ágil. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"high-knees"
+			]
+		},
+		{
+			"id": "shadow-boxing",
+			"name": "Boxeo de sombra",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Guardia alta y golpes al aire (directos, crochés y uppercuts) con desplazamientos. Controla el gesto sin bloquear los codos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"jumping-jacks"
+			]
+		},
+		{
+			"id": "squat-thrust",
+			"name": "Squat thrust",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Agáchate, lleva los pies atrás a plancha y vuelve a la sentadilla. Un burpee sin salto. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"burpee"
+			]
+		},
+		{
+			"id": "skater-jumps",
+			"name": "Saltos de patinador",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Salta lateralmente de un pie al otro aterrizando suave y con la rodilla alineada. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"jump-squat"
+			]
+		},
+		{
+			"id": "stair-run",
+			"name": "Subir escaleras",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"running"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sube escaleras a buen ritmo pisando con todo el pie y baja andando para recuperar. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"running-intervals"
+			]
+		},
+		{
+			"id": "fartlek-run",
+			"name": "Fartlek",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"running"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Carrera continua alternando cambios de ritmo libres (rápido–suave) según el terreno o sensaciones. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"running-intervals"
+			]
+		},
+		{
+			"id": "long-run",
+			"name": "Tirada larga",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"running"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Carrera continua larga a ritmo cómodo que permita conversar. Base aeróbica. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"running-easy"
+			]
+		},
+		{
+			"id": "hill-sprints",
+			"name": "Cuestas cortas",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"running"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sprints de 10–20 s cuesta arriba con recuperación caminando hacia abajo. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"running-intervals"
+			]
+		},
+		{
+			"id": "cycling-hills",
+			"name": "Subidas en bicicleta",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"OUTDOORS"
+			],
+			"requiredResources": [
+				"BICYCLE"
+			],
+			"sportIds": [
+				"cycling"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Busca una subida segura y alterna tramos sentado y de pie, manteniendo una cadencia controlada. Casco obligatorio. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"cycling-intervals"
+			]
+		},
+		{
+			"id": "swimming-backstroke",
+			"name": "Espalda (natación)",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"POOL"
+			],
+			"requiredResources": [
+				"POOL"
+			],
+			"sportIds": [
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Cuerpo horizontal boca arriba, brazada alterna entrando por encima del hombro y patada constante. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"swimming-easy"
+			]
+		},
+		{
+			"id": "aqua-jogging",
+			"name": "Correr en el agua",
+			"metricType": "ENDURANCE",
+			"goals": [
+				"ENDURANCE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"POOL"
+			],
+			"requiredResources": [
+				"POOL"
+			],
+			"sportIds": [
+				"swimming",
+				"running"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Corre en la piscina sin tocar el fondo o con el agua a la cintura, con braceo de carrera. Bajo impacto. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": [
+				"swimming-easy"
+			]
+		},
+		{
+			"id": "wall-angels",
+			"name": "Ángeles en la pared",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"WALL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Espalda, cabeza y brazos contra la pared. Desliza los brazos arriba y abajo sin despegarlos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "doorway-chest-stretch",
+			"name": "Estiramiento de pecho en marco de puerta",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"WALL"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Antebrazo apoyado en el marco a la altura del hombro. Avanza el cuerpo hasta notar estiramiento en el pecho. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "quad-stretch",
+			"name": "Estiramiento de cuádriceps",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "De pie con apoyo, lleva el talón al glúteo sujetando el tobillo y mantén las rodillas juntas. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "figure-four-stretch",
+			"name": "Estiramiento del glúteo en 4",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Boca arriba, cruza un tobillo sobre la rodilla contraria y acerca esa pierna al pecho. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "cobra-stretch",
+			"name": "Cobra",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Boca abajo, apoya las manos bajo los hombros y eleva el pecho estirando el abdomen, sin forzar la zona lumbar. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "downward-dog",
+			"name": "Perro boca abajo",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Desde cuatro apoyos, eleva la cadera formando una V invertida y empuja los talones hacia el suelo. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "thread-the-needle",
+			"name": "Enhebrar la aguja",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "A cuatro patas, pasa un brazo por debajo del otro girando el tronco y vuelve abriéndolo al techo. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "hip-circles",
+			"name": "Círculos de cadera",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "De pie con manos en la cintura, dibuja círculos amplios con la cadera en ambos sentidos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "arm-circles",
+			"name": "Círculos de brazos",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Brazos en cruz, haz círculos de pequeños a grandes hacia delante y hacia atrás. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "leg-swings",
+			"name": "Balanceos de pierna",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Con apoyo, balancea una pierna adelante y atrás y luego lateralmente, sin forzar el final. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "shoulder-rolls",
+			"name": "Rotaciones de hombros",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Lleva los hombros arriba, atrás y abajo en círculos lentos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "wrist-mobility",
+			"name": "Movilidad de muñecas",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "A cuatro apoyos o de pie, rota las muñecas y balancea el peso suavemente sobre las manos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "frog-stretch",
+			"name": "Estiramiento de rana",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "A cuatro patas con las rodillas muy abiertas, lleva la cadera atrás hasta notar estiramiento en los aductores. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "couch-stretch",
+			"name": "Estiramiento del sofá",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"WALL",
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Rodilla trasera junto a la pared con el empeine apoyado en ella y pie delantero adelante. Eleva el tronco para estirar el cuádriceps. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "seated-forward-fold",
+			"name": "Flexión sentada",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sentado con piernas estiradas, inclina el tronco desde la cadera hacia los pies con la espalda larga. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "butterfly-stretch",
+			"name": "Mariposa",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Sentado con las plantas de los pies juntas, deja caer las rodillas y lleva el tronco suavemente adelante. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "supine-spinal-twist",
+			"name": "Torsión tumbado",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Boca arriba, lleva las rodillas flexionadas a un lado manteniendo los hombros en el suelo y cambia. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "scorpion-stretch",
+			"name": "Escorpión",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM"
+			],
+			"requiredResources": [
+				"MAT"
+			],
+			"sportIds": [
+				"strength",
+				"calisthenics",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "SPECIFIC",
+			"reviewed": false,
+			"description": "Boca abajo con brazos en cruz, lleva un pie hacia la mano contraria girando la cadera y alterna. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "prep-lateral-shuffle",
+			"name": "Desplazamientos laterales",
+			"metricType": "SPORT_PRACTICE",
+			"goals": [
+				"SPORT_PRACTICE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"football",
+				"basketball",
+				"other",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "COMPLEMENTARY",
+			"reviewed": false,
+			"description": "En posición atlética, desplázate lateralmente sin cruzar los pies y frena con la pierna exterior. Cambios de dirección. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "prep-short-sprints",
+			"name": "Sprints cortos",
+			"metricType": "SPORT_PRACTICE",
+			"goals": [
+				"SPORT_PRACTICE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"football",
+				"basketball",
+				"other",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "COMPLEMENTARY",
+			"reviewed": false,
+			"description": "Aceleraciones de 10–20 m con recuperación completa caminando. Calienta antes. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "prep-pogo-jumps",
+			"name": "Saltos pogo",
+			"metricType": "SPORT_PRACTICE",
+			"goals": [
+				"SPORT_PRACTICE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"football",
+				"basketball",
+				"other",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "COMPLEMENTARY",
+			"reviewed": false,
+			"description": "Saltos pequeños y rápidos sobre la punta de los pies con rodillas casi estiradas. Rigidez de tobillo. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "prep-deceleration",
+			"name": "Frenadas controladas",
+			"metricType": "SPORT_PRACTICE",
+			"goals": [
+				"SPORT_PRACTICE",
+				"GENERAL_FITNESS"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"football",
+				"basketball",
+				"other",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "COMPLEMENTARY",
+			"reviewed": false,
+			"description": "Corre 5–10 m y frena en dos o tres pasos bajando la cadera y con las rodillas alineadas. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "prep-copenhagen-plank",
+			"name": "Plancha Copenhague asistida",
+			"metricType": "ISOMETRIC",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS",
+				"SPORT_PRACTICE"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"football",
+				"basketball",
+				"other",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "COMPLEMENTARY",
+			"reviewed": false,
+			"description": "Plancha lateral con la pierna de arriba apoyada en una superficie baja y la rodilla flexionada. Fortalece aductores. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "prep-nordic-assisted",
+			"name": "Nórdico asistido",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS",
+				"SPORT_PRACTICE"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"football",
+				"basketball",
+				"other",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "COMPLEMENTARY",
+			"reviewed": false,
+			"description": "De rodillas con los tobillos sujetos de forma segura, inclínate hacia delante lo que controles y vuelve ayudándote con las manos. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "prep-hip-airplane",
+			"name": "Avión de cadera",
+			"metricType": "MOBILITY",
+			"goals": [
+				"MOBILITY",
+				"GENERAL_FITNESS",
+				"SPORT_PRACTICE"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"football",
+				"basketball",
+				"other",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "COMPLEMENTARY",
+			"reviewed": false,
+			"description": "Sobre una pierna con el tronco inclinado, abre y cierra la cadera girando el tronco con control. Estabilidad. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
+		},
+		{
+			"id": "prep-bird-dog",
+			"name": "Bird dog de preparación",
+			"metricType": "STRENGTH",
+			"goals": [
+				"STRENGTH",
+				"GENERAL_FITNESS",
+				"SPORT_PRACTICE"
+			],
+			"environments": [
+				"HOME",
+				"GYM",
+				"OUTDOORS"
+			],
+			"requiredResources": [],
+			"sportIds": [
+				"football",
+				"basketball",
+				"other",
+				"running",
+				"cycling",
+				"swimming"
+			],
+			"coverage": "COMPLEMENTARY",
+			"reviewed": false,
+			"description": "A cuatro patas, extiende brazo y pierna contrarios sin girar la cadera y alterna. Control del tronco. Sin revisión profesional: adapta carga y recorrido a tu situación.",
+			"alternativeIds": []
 		}
 	]
 }
