@@ -74,6 +74,27 @@ public interface ChatClient {
 		return false;
 	}
 
+	/**
+	 * Texto del botón para descargar el modelo del móvil, o vacío si no hay nada que pedir al usuario.
+	 */
+	default String downloadOffer() {
+		return "";
+	}
+
+	default void startDownload() {
+	}
+
+	/**
+	 * Progreso 0–100 de la descarga del modelo, o -1 si no hay ninguna.
+	 */
+	default int downloadProgress() {
+		return -1;
+	}
+
+	default String modelLabel() {
+		return "";
+	}
+
 	default String unavailableCode() {
 		return connected() ? "" : "UNAUTHORIZED";
 	}

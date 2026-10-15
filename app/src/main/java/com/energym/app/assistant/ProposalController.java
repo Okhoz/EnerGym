@@ -133,6 +133,19 @@ public final class ProposalController {
 		return client.onDevice();
 	}
 
+	public String downloadOffer() {
+		return client.downloadOffer();
+	}
+
+	/**
+	 * Descarga del modelo pedida por el usuario; el chat sigue con el guiado local mientras tanto.
+	 */
+	public void downloadModel() {
+		client.startDownload();
+		status = connectionNotice();
+		changed.run();
+	}
+
 	public boolean localGuidance() {
 		return localGuidance;
 	}
@@ -140,13 +153,20 @@ public final class ProposalController {
 	public String connectionNotice() {
 		String unavailable = client.unavailableCode();
 		if (client.onDevice()) {
+			String model = client.modelLabel();
+			int progress = client.downloadProgress();
+			if (unavailable.equals("MODEL_NEEDS_DOWNLOAD"))
+				return "Tu móvil no trae Gemini Nano, pero puede usar " + model + " sin internet. Descárgalo una vez " +
+					"(por Wi-Fi, gratis) y tu entrenador usará IA en el propio móvil. Mientras, responde el guiado local.";
 			if (unavailable.equals("MODEL_DOWNLOADING"))
-				return "Descargando la IA de tu móvil (Gemini Nano). Mientras tanto te responde el guiado local.";
+				return "Descargando la IA de tu móvil (" + model + (progress >= 0 ? ", " + progress + " %" : "") +
+					"). Mientras tanto te responde el guiado local.";
 			if (unavailable.equals("MODEL_CHECKING"))
-				return "Comprobando si tu móvil puede usar Gemini Nano…";
+				return "Comprobando qué IA puede usar tu móvil…";
 			if (unavailable.equals("MODEL_UNAVAILABLE"))
-				return "Este móvil no tiene Gemini Nano. Tu entrenador responde con el guiado local, sin IA y sin coste.";
-			return "Tu entrenador usa Gemini Nano en el propio móvil: sin internet, sin servidor y sin coste.";
+				return "Este móvil no puede ejecutar la IA en el dispositivo. Tu entrenador responde con el guiado " +
+					"local, sin IA y sin coste.";
+			return "Tu entrenador usa " + model + " en el propio móvil: sin internet, sin servidor y sin coste.";
 		}
 		if (unavailable.equals("BACKEND_NOT_CONFIGURED"))
 			return "La IA online aún no está disponible en esta versión. Puedes elegir el guiado local, que funciona sin IA.";

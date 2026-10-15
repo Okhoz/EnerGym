@@ -238,6 +238,8 @@ dependencies {
 	implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
 	// Gemini Nano en el propio móvil (AICore): el chat funciona sin servidor cuando el dispositivo lo admite.
 	implementation("com.google.mlkit:genai-prompt:1.0.0-beta4")
+	// Sin Gemini Nano: Gemma 4 E2B (Apache 2.0) descargado una vez y ejecutado con LiteRT-LM en el móvil.
+	implementation("com.google.ai.edge.litertlm:litertlm-android:0.18.0")
 	implementation(libs.material)
 	testImplementation(libs.junit)
 	androidTestImplementation(libs.espresso.core)

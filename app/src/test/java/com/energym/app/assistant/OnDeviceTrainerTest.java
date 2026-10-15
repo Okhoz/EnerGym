@@ -121,6 +121,60 @@ public class OnDeviceTrainerTest {
 		assertEquals("MODEL_UNAVAILABLE", client.unavailableCode());
 	}
 
+	@Test
+	public void bigDownloadWaitsForTheUserAndThenRuns() {
+		FakeModel gemma = new FakeModel(OnDeviceModel.DOWNLOADABLE);
+		gemma.consent = true;
+		OnDeviceChatClient client = new OnDeviceChatClient(gemma, catalog, 2, Runnable::run, Runnable::run);
+		client.activate("uid");
+		assertEquals("Sin pedirlo no se descargan 2,6 GB", 0, gemma.downloads);
+		assertEquals("MODEL_NEEDS_DOWNLOAD", client.unavailableCode());
+		assertTrue(client.downloadOffer(), client.downloadOffer().contains("2,6 GB"));
+		client.startDownload();
+		client.startDownload();
+		assertEquals("Un segundo toque no duplica la descarga", 1, gemma.downloads);
+		assertEquals("", client.downloadOffer());
+		assertEquals("MODEL_DOWNLOADING", client.unavailableCode());
+		gemma.download.failure("MODEL_DOWNLOAD_FAILED");
+		assertEquals("Tras un fallo se puede reintentar", "MODEL_NEEDS_DOWNLOAD", client.unavailableCode());
+		client.startDownload();
+		gemma.download.success(null);
+		assertTrue(client.connected());
+	}
+
+	@Test
+	public void chainedModelPrefersGeminiNanoAndFallsBackToGemma() {
+		FakeModel nano = new FakeModel(OnDeviceModel.AVAILABLE), gemma = new FakeModel(OnDeviceModel.DOWNLOADABLE);
+		nano.name = "Gemini Nano";
+		gemma.name = "Gemma";
+		gemma.consent = true;
+		ChainedModel withNano = new ChainedModel(nano, gemma);
+		int[] status = {-1};
+		withNano.status(new OnDeviceModel.Result<Integer>() {
+			public void success(Integer value) {
+				status[0] = value;
+			}
+
+			public void failure(String code) {
+			}
+		});
+		assertEquals(OnDeviceModel.AVAILABLE, status[0]);
+		assertEquals("Gemini Nano", withNano.label());
+		assertFalse(withNano.downloadNeedsConsent());
+		ChainedModel withoutNano = new ChainedModel(new FakeModel(OnDeviceModel.UNAVAILABLE), gemma);
+		withoutNano.status(new OnDeviceModel.Result<Integer>() {
+			public void success(Integer value) {
+				status[0] = value;
+			}
+
+			public void failure(String code) {
+			}
+		});
+		assertEquals(OnDeviceModel.DOWNLOADABLE, status[0]);
+		assertEquals("Gemma", withoutNano.label());
+		assertTrue(withoutNano.downloadNeedsConsent());
+	}
+
 	private ChatClient.Request request(TrainingProfile p, String message, List<ConversationStore.Message> recent) {
 		return new ChatClient.Request("c", "r", null, message, p, ChatProtocol.profile(p), false,
 			Collections.emptyList(), recent);
@@ -134,6 +188,8 @@ public class OnDeviceTrainerTest {
 
 	private static final class FakeModel implements OnDeviceModel {
 		final int status;
+		boolean consent;
+		String name = "IA";
 		int downloads;
 		Result<Void> download;
 		String prompt;
@@ -149,6 +205,18 @@ public class OnDeviceTrainerTest {
 		public void download(Result<Void> result) {
 			downloads++;
 			download = result;
+		}
+
+		public boolean downloadNeedsConsent() {
+			return consent;
+		}
+
+		public long downloadBytes() {
+			return consent ? 2588147712L : 0;
+		}
+
+		public String label() {
+			return name;
 		}
 
 		public void generate(String prompt, Result<String> result) {

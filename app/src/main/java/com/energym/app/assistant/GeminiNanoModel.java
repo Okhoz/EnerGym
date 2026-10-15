@@ -35,6 +35,10 @@ public final class GeminiNanoModel implements OnDeviceModel {
 		return model;
 	}
 
+	public String label() {
+		return "Gemini Nano";
+	}
+
 	public void status(Result<Integer> result) {
 		try {
 			listen(model().checkStatus(), value -> {

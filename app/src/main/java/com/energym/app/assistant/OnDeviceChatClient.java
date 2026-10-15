@@ -28,6 +28,13 @@ public final class OnDeviceChatClient implements ChatClient {
 		this.catalogVersion = catalogVersion;
 		this.worker = Objects.requireNonNull(worker);
 		this.delivery = Objects.requireNonNull(delivery);
+		model.onProgress(() -> {
+			Runnable notify;
+			synchronized (this) {
+				notify = listener;
+			}
+			delivery.execute(notify);
+		});
 	}
 
 	/**
@@ -39,41 +46,81 @@ public final class OnDeviceChatClient implements ChatClient {
 	}
 
 	/**
-	 * Consulta (una vez) si el modelo está en el móvil y, si se puede descargar, lo pide a AICore en segundo plano.
+	 * Consulta si el modelo está en el móvil. Lo que gestiona el sistema (Gemini Nano) se descarga solo; una
+	 * descarga grande (Gemma) espera a que el usuario la pida con startDownload().
 	 */
 	public void activate(String owner) {
 		synchronized (this) {
 			epoch++;
-			if (checking || state == OnDeviceModel.AVAILABLE || state == OnDeviceModel.UNAVAILABLE)
+			if (checking || state == OnDeviceModel.AVAILABLE || state == OnDeviceModel.UNAVAILABLE ||
+				state == OnDeviceModel.DOWNLOADING)
 				return;
 			checking = true;
 		}
 		model.status(new OnDeviceModel.Result<Integer>() {
 			public void success(Integer value) {
-				if (value != OnDeviceModel.DOWNLOADABLE && value != OnDeviceModel.DOWNLOADING) {
+				// Una descarga ya en curso (p. ej. tras reabrir la app) se sigue sin volver a preguntar.
+				if (value == OnDeviceModel.DOWNLOADING ||
+					(value == OnDeviceModel.DOWNLOADABLE && !model.downloadNeedsConsent()))
+					download();
+				else
 					update(value);
-					return;
-				}
-				// Sigue «comprobando» hasta que termine la descarga: otra activación no lanza una segunda.
-				synchronized (OnDeviceChatClient.this) {
-					state = OnDeviceModel.DOWNLOADING;
-				}
-				model.download(new OnDeviceModel.Result<Void>() {
-					public void success(Void ignored) {
-						update(OnDeviceModel.AVAILABLE);
-					}
-
-					public void failure(String code) {
-						// Se reintentará en la próxima activación (p. ej. al volver a abrir la app).
-						update(OnDeviceModel.DOWNLOADABLE);
-					}
-				});
 			}
 
 			public void failure(String code) {
 				update(OnDeviceModel.UNAVAILABLE);
 			}
 		});
+	}
+
+	/**
+	 * Descarga pedida por el usuario (Gemma). No hace nada si no hay nada que descargar o ya se está descargando.
+	 */
+	public void startDownload() {
+		synchronized (this) {
+			if (state != OnDeviceModel.DOWNLOADABLE || checking)
+				return;
+			checking = true;
+		}
+		download();
+	}
+
+	private void download() {
+		Runnable notify;
+		synchronized (this) {
+			// Sigue «comprobando» hasta que termine: otra activación no lanza una segunda descarga.
+			state = OnDeviceModel.DOWNLOADING;
+			notify = listener;
+		}
+		delivery.execute(notify);
+		model.download(new OnDeviceModel.Result<Void>() {
+			public void success(Void ignored) {
+				update(OnDeviceModel.AVAILABLE);
+			}
+
+			public void failure(String code) {
+				// Se puede volver a intentar desde el chat o en la próxima activación.
+				update(OnDeviceModel.DOWNLOADABLE);
+			}
+		});
+	}
+
+	/**
+	 * Texto del botón para descargar el modelo, o vacío si no hace falta que el usuario lo pida.
+	 */
+	public synchronized String downloadOffer() {
+		if (state != OnDeviceModel.DOWNLOADABLE || !model.downloadNeedsConsent())
+			return "";
+		return String.format(java.util.Locale.forLanguageTag("es-ES"), "Descargar el entrenador IA (%.1f GB, por Wi-Fi)",
+			model.downloadBytes() / 1e9);
+	}
+
+	public int downloadProgress() {
+		return model.downloadProgress();
+	}
+
+	public String modelLabel() {
+		return model.label();
 	}
 
 	private void update(int value) {
@@ -105,6 +152,8 @@ public final class OnDeviceChatClient implements ChatClient {
 	public synchronized String unavailableCode() {
 		if (state == OnDeviceModel.AVAILABLE)
 			return "";
+		if (state == OnDeviceModel.DOWNLOADABLE && model.downloadNeedsConsent())
+			return "MODEL_NEEDS_DOWNLOAD";
 		if (state == OnDeviceModel.DOWNLOADABLE || state == OnDeviceModel.DOWNLOADING)
 			return "MODEL_DOWNLOADING";
 		return state == OnDeviceModel.UNAVAILABLE ? "MODEL_UNAVAILABLE" : "MODEL_CHECKING";

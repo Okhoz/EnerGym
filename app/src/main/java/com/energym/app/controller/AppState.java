@@ -123,8 +123,9 @@ public final class AppState extends AndroidViewModel {
 			this::changed, message -> app.error(message));
 		// Entrenador personal con Gemini Nano en el propio móvil: sin servidor de IA ni coste. Si el móvil no lo
 		// admite, el chat usa el guiado local por reglas (los clientes online quedan sin usar).
-		OnDeviceChatClient trainer = new OnDeviceChatClient(new GeminiNanoModel(chatWorker), catalog.getExercises(),
-			catalog.getVersion(), chatWorker, main);
+		OnDeviceChatClient trainer = new OnDeviceChatClient(
+			new ChainedModel(new GeminiNanoModel(chatWorker), new GemmaModel(context, chatWorker)),
+			catalog.getExercises(), catalog.getVersion(), chatWorker, main);
 		trainer.listen(this::changed);
 		assistant = new ProposalController(store, new LocalConversationStore(context, worker), trainer,
 			catalog.getExercises(), catalog.getVersion(), () -> app.profile, this::changed, r -> {

@@ -88,6 +88,8 @@ public final class AssistantFragment extends ScreenFragment {
 			else {
 				if (!c.remoteActive()) {
 					text(rows, c.connectionNotice(), R.style.EnerGym_Body, 8);
+					if (!c.downloadOffer().isEmpty())
+						primary(action(rows, c.downloadOffer(), !c.busy, c::downloadModel));
 					if (c.connected())
 						action(rows, "Reintentar " + ai, !c.busy, () -> c.selectLocalGuidance(false));
 				}

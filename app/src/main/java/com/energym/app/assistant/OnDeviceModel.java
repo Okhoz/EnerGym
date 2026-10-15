@@ -1,8 +1,8 @@
 package com.energym.app.assistant;
 
 /**
- * Puerto del modelo de lenguaje que corre en el propio móvil (Gemini Nano vía AICore). Sin red ni servidor:
- * los callbacks pueden llegar en cualquier hilo; quien lo usa decide dónde entregarlos.
+ * Puerto del modelo de lenguaje que corre en el propio móvil (Gemini Nano vía AICore o Gemma descargado).
+ * Sin servidor: los callbacks pueden llegar en cualquier hilo; quien lo usa decide dónde entregarlos.
  */
 public interface OnDeviceModel {
 	int UNAVAILABLE = 0, DOWNLOADABLE = 1, DOWNLOADING = 2, AVAILABLE = 3;
@@ -19,7 +19,7 @@ public interface OnDeviceModel {
 	void status(Result<Integer> result);
 
 	/**
-	 * Pide a AICore que descargue el modelo; termina cuando está listo para generar.
+	 * Descarga el modelo; termina cuando está listo para generar.
 	 */
 	void download(Result<Void> result);
 
@@ -27,4 +27,38 @@ public interface OnDeviceModel {
 	 * Genera texto a partir de un único prompt (instrucciones y datos ya incluidos).
 	 */
 	void generate(String prompt, Result<String> result);
+
+	/**
+	 * Verdadero si la descarga es grande y debe pedirla el usuario (no la gestiona el sistema).
+	 */
+	default boolean downloadNeedsConsent() {
+		return false;
+	}
+
+	/**
+	 * Tamaño de la descarga en bytes, o 0 si lo gestiona el sistema.
+	 */
+	default long downloadBytes() {
+		return 0;
+	}
+
+	/**
+	 * Progreso de la descarga en curso, 0–100, o -1 si no se conoce.
+	 */
+	default int downloadProgress() {
+		return -1;
+	}
+
+	/**
+	 * Aviso (desde cualquier hilo) cada vez que avanza la descarga.
+	 */
+	default void onProgress(Runnable listener) {
+	}
+
+	/**
+	 * Nombre que ve el usuario («Gemini Nano», «Gemma»).
+	 */
+	default String label() {
+		return "IA del móvil";
+	}
 }
