@@ -137,6 +137,19 @@ public class OnDeviceTrainerTest {
 	}
 
 	@Test
+	public void askingForARoutineAlwaysShowsACard() {
+		ChatClient.Request ask = request(profile, "Hazme una rutina de fuerza para hoy", Collections.emptyList());
+		// Caso real del S23: buen texto, pero sin «rutina» ni nombres de ejercicios.
+		ChatProtocol.Reply reply = ChatProtocol.reply(TrainerPrompt.reply("{\"texto\":\"¡Vamos! 🔥 Hoy, cuerpo completo.\"," +
+			"\"rutina\":null}", ask, catalog, 2), ask, catalog, 2);
+		assertNotNull(reply.proposal);
+		assertFalse(reply.proposal.getItems().isEmpty());
+		ChatClient.Request chat = request(profile, "¿Cómo me motivo por la mañana?", Collections.emptyList());
+		assertNull(ChatProtocol.reply(TrainerPrompt.reply("{\"texto\":\"Prepara la ropa la noche antes.\"," +
+			"\"rutina\":null}", chat, catalog, 2), chat, catalog, 2).proposal);
+	}
+
+	@Test
 	public void routineCardIsCompactAndReadable() {
 		ChatClient.Request r = request(profile, "rutina", Collections.emptyList());
 		Routine routine = ChatProtocol.reply(TrainerPrompt.reply("{\"texto\":\"Vamos\",\"rutina\":{\"titulo\":\"Piernas\"," +

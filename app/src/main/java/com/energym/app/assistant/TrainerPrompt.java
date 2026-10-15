@@ -119,6 +119,9 @@ public final class TrainerPrompt {
 		}
 		if (routine == null && r.profile != null)
 			routine = fromNames(source, eligible(r.profile, catalog));
+		// Si pidió una rutina y el modelo no la dio, se arma con los primeros ejercicios compatibles del catálogo.
+		if (routine == null && r.profile != null && asksForRoutine(r.message))
+			routine = new LinkedHashMap<>();
 		Map<String, Object> proposal = r.profile == null || routine == null ? null : proposal(routine, r, catalog);
 		if (text.isEmpty())
 			text = proposal != null ? "Aquí tienes tu entrenamiento de hoy. Revísalo antes de aceptarlo." :
@@ -134,6 +137,12 @@ public final class TrainerPrompt {
 		m.put("requestId", r.requestId);
 		m.put("exerciseId", r.exerciseId);
 		return StrictJson.write(m);
+	}
+
+	static boolean asksForRoutine(String message) {
+		String m = java.text.Normalizer.normalize(message == null ? "" : message.toLowerCase(Locale.ROOT),
+			java.text.Normalizer.Form.NFD).replaceAll("\\p{M}", "");
+		return m.matches(".*\\b(rutina|entrenamiento|entreno|sesion|que (hago|entreno) hoy|plan de)\\b.*");
 	}
 
 	/**
