@@ -28,6 +28,7 @@ public final class ExerciseBrowserRefreshTest {
 		assertTrue("La cuenta y los datos han terminado de restaurarse", ready[0]);
 		scenario.onActivity(activity -> activity.state().app.navigate(AppController.Screen.TRAINING));
 		MainFlowTest.await();
+		MainFlowTest.trainingPane(scenario, "exercises");
 		scenario.onActivity(activity -> assertNotNull(
 			activity.getWindow().getDecorView().findViewWithTag("exercise_search")));
 	}

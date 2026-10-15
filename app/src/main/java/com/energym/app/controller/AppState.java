@@ -30,6 +30,7 @@ import java.util.Collections;
 public final class AppState extends AndroidViewModel {
 	public AppController app;
 	// Estado transitorio de vista: sobrevive a técnica/back y se vacía al cambiar de cuenta o borrador.
+	public final com.energym.app.ui.TrainingViewState training = new com.energym.app.ui.TrainingViewState();
 	public final com.energym.app.ui.ExerciseBrowserState exerciseBrowser = new com.energym.app.ui.ExerciseBrowserState();
 	public final com.energym.app.ui.ExerciseBrowserState manualExerciseBrowser = new com.energym.app.ui.ExerciseBrowserState();
 	public AccountController accounts;
@@ -189,6 +190,7 @@ public final class AppState extends AndroidViewModel {
 
 	private void changed() {
 		if (app != null) {
+			training.resetFor(app.owner());
 			exerciseBrowser.resetFor(app.owner(), 0);
 			manualExerciseBrowser.resetFor(app.owner(), app.manual.draftRevision());
 		}

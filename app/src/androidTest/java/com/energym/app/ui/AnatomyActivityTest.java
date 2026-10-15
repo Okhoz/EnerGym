@@ -301,6 +301,7 @@ public class AnatomyActivityTest {
 
 		parent.onActivity(a -> a.state().app.navigate(AppController.Screen.TRAINING));
 		Thread.sleep(400);
+		MainFlowTest.trainingPane(parent, "exercises");
 		save(automation.takeScreenshot(), "viewer-training.png");
 
 		MainFlowTest.edit(parent, "exercise_search", "Flexión estándar");
@@ -369,6 +370,7 @@ public class AnatomyActivityTest {
 			Thread.sleep(1200);
 			parent.onActivity(a -> a.state().app.navigate(AppController.Screen.TRAINING));
 			Thread.sleep(300);
+			MainFlowTest.trainingPane(parent, "exercises");
 			save(automation.takeScreenshot(), "viewer-training-font130.png");
 			MainFlowTest.edit(parent, "exercise_search", "Flexión estándar");
 			MainFlowTest.click(parent, "Abrir técnica de Flexión estándar");

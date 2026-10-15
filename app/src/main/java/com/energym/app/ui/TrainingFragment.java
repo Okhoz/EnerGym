@@ -1,104 +1,210 @@
 package com.energym.app.ui;
 
-import com.energym.app.R;
-import com.energym.app.controller.AppController.Screen;
-import com.energym.app.catalog.ExerciseSearch;
-import com.energym.app.domain.Exercise;
-import com.energym.app.domain.Session;
-import com.energym.app.domain.Routine;
-import com.energym.app.domain.RoutineMetadata;
-import com.google.android.material.button.MaterialButton;
-
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
-
+import androidx.core.content.ContextCompat;
+import com.energym.app.R;
+import com.energym.app.catalog.ExerciseSearch;
+import com.energym.app.controller.AppController.Screen;
+import com.energym.app.domain.Exercise;
+import com.energym.app.domain.ProgressionEngine;
+import com.energym.app.domain.Routine;
+import com.energym.app.domain.RoutineMetadata;
+import com.energym.app.domain.Session;
+import com.google.android.material.button.MaterialButton;
 import java.util.*;
 
-/**
- * VISTA de preparación: presenta filtros y rutinas aceptadas sin generarlas por sí misma.
- */
+/** Vista MVC de Entreno: una sección visible y una acción principal según el estado actual. */
 public final class TrainingFragment extends ScreenFragment {
+
+	private ExerciseBrowser browser;
+	private Bundle restored;
+	private String featuredDraftId = "";
+
 	public TrainingFragment() {
 		super(R.layout.fragment_training);
 	}
 
+	@Override
 	protected void content() {
-		heading("TU PLAN", "Entrenamientos", "");
-		ExerciseBrowser.restore(restored, "library", state.exerciseBrowser, app.owner(), 0);
-		restored = null;
-		LinearLayout discover = card("Ejercicios", "Busca por nombre o material y afina con filtros.");
-		MaterialButton shortcut = action(discover, "Buscar ejercicios", true, () -> {
-			View search = getView().findViewWithTag("exercise_search");
-			if (search != null) {
-				search.requestFocus();
-				search.requestRectangleOnScreen(new android.graphics.Rect(0, 0, search.getWidth(), search.getHeight()), true);
-				search.post(() -> {
-					android.view.inputmethod.InputMethodManager keyboard = (android.view.inputmethod.InputMethodManager)
-						requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
-					if (keyboard != null) keyboard.showSoftInput(search, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
-				});
-			}
-		});
-		shortcut.setTag("exercise_search_shortcut");
-		primary(shortcut);
-		// 2. Dos formas explícitas de crear y elegir rutinas. Abrir el chat no envía datos.
-		LinearLayout ai = card("Con IA", "Habla con tu entrenador personal y revisa cualquier propuesta antes de aceptarla.");
-		primary(action(ai, "Crear rutina con IA", app.owner() != null && !app.loading, () -> {
-			state.assistant.messageInput("Prepara una rutina para mí.");
-			app.navigate(Screen.ASSISTANT);
-		}));
-		routineList(ai, true);
-		LinearLayout mine = card("Mis rutinas", "Crea tu propia rutina con ejercicios del catálogo y su contexto independiente.");
-		primary(action(mine, "Crear rutina manual", !app.loading && !app.manual.busy, app::createManualRoutine));
-		routineList(mine, false);
-
-		// 1. Lo que puedes hacer ahora: continuar, empezar o revisar.
-		if (app.sessions.session != null && app.sessions.session.getStatus() == Session.Status.DRAFT) {
-			LinearLayout active = card("Sesión abierta", "Tus valores se conservan aunque cambies de pantalla.");
-			primary(action(active, "Volver a mi sesión", true, () -> app.navigate(Screen.SESSION)));
+		heading("", "Entreno", "");
+		restoreSelection();
+		// La referencia anterior se captura antes de retirar las filas y después se libera.
+		browser = null;
+		featuredDraftId = "";
+		sections();
+		if (state.training.pane == TrainingViewState.Pane.EXERCISES) {
+			library();
+			return;
 		}
-		for (Session draft : app.pending) {
-			LinearLayout row = card("Borrador recuperable",
-				draft.getRoutine().getTitle() + " · " + draft.getResults().size() + " ejercicios registrados");
-			action(row, "Continuar borrador", !app.sessions.busy, () -> app.resume(draft));
+		boolean hasNextStep = nextStep();
+		routines(state.training.pane == TrainingViewState.Pane.AI, hasNextStep);
+		otherDrafts();
+		moreOptions();
+	}
+
+	private void sections() {
+		LinearLayout tabs = columns(rows, 0);
+		tab(tabs, "Mis rutinas", "mine", TrainingViewState.Pane.MINE);
+		tab(tabs, "Con IA", "ai", TrainingViewState.Pane.AI);
+		tab(tabs, "Ejercicios", "exercises", TrainingViewState.Pane.EXERCISES);
+		((LinearLayout.LayoutParams) tabs.getLayoutParams()).bottomMargin = dp(16);
+	}
+
+	private void tab(LinearLayout tabs, String label, String key, TrainingViewState.Pane pane) {
+		boolean selected = state.training.pane == pane;
+		MaterialButton button = new MaterialButton(requireContext(), null,
+			com.google.android.material.R.attr.materialButtonOutlinedStyle);
+		button.setText(label);
+		button.setTag("training_tab_" + key);
+		button.setTextSize(14);
+		button.setMinWidth(0);
+		button.setMinHeight(dp(48));
+		button.setMaxLines(2);
+		button.setPadding(dp(6), dp(4), dp(6), dp(4));
+		button.setInsetTop(0);
+		button.setInsetBottom(0);
+		button.setCornerRadius(dp(16));
+		button.setCheckable(true);
+		button.setChecked(selected);
+		button.setBackgroundTintList(ColorStateList.valueOf(color(selected ? R.color.surface_selected : R.color.surface)));
+		button.setStrokeColor(ColorStateList.valueOf(color(selected ? R.color.gold : R.color.divider)));
+		button.setStrokeWidth(dp(1));
+		button.setTextColor(color(selected ? R.color.gold : R.color.text_secondary));
+		button.setOnClickListener(view -> {
+			if (browser != null) browser.capture();
+			state.training.select(pane);
+			InputMethodManager keyboard = (InputMethodManager) requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+			if (keyboard != null) keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
+			render();
+			getView().post(() -> {
+				if (getView() instanceof android.widget.ScrollView)
+					((android.widget.ScrollView) getView()).smoothScrollTo(0, 0);
+			});
+		});
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(56), 1);
+		if (tabs.getChildCount() > 0) params.setMarginStart(dp(6));
+		tabs.addView(button, params);
+	}
+
+	/** Continuar tiene prioridad; cada propuesta sigue siendo revisable antes de aceptarse. */
+	private boolean nextStep() {
+		if (app.owner() == null) {
+			LinearLayout account = card("Tu espacio de entrenamiento", "Conecta tu cuenta para crear y guardar tus rutinas.");
+			primary(action(account, "Elegir cuenta", true, () -> app.navigate(Screen.ACCOUNT)));
+			return true;
+		}
+		Session active = app.sessions.session != null && app.sessions.session.getStatus() == Session.Status.DRAFT ?
+			app.sessions.session : null;
+		List<Session> pending = distinctDrafts();
+		Session draft = active != null ? active : pending.isEmpty() ? null : pending.get(0);
+		if (draft != null) {
+			featuredDraftId = draft.getSyncId();
+			LinearLayout resume = card("Continúa tu entreno", draft.getRoutine().getTitle() + "\n" +
+				draft.getResults().size() + " de " + draft.getRoutine().getItems().size() + " ejercicios registrados");
+			primary(action(resume, active != null ? "Volver a mi sesión" : "Continuar borrador", !app.sessions.busy,
+				() -> {
+					if (active != null) app.navigate(Screen.SESSION);
+					else app.resume(draft);
+				}));
+			if (app.routines.preview != null)
+				action(resume, "Revisar propuesta", !app.routines.busy, () -> app.navigate(Screen.ROUTINE));
+			return true;
 		}
 		if (app.routines.preview != null) {
-			LinearLayout p = card("Propuesta sin aceptar",
-				app.routines.preview.getItems().size() + " ejercicios · " + app.routines.preview.getEstimatedMinutes() +
-					" min");
-			primary(action(p, "Revisar propuesta", true, () -> app.navigate(Screen.ROUTINE)));
+			Routine preview = app.routines.preview;
+			LinearLayout proposal = card("Propuesta pendiente", preview.getTitle() + "\n" + summary(preview));
+			primary(action(proposal, "Revisar propuesta", !app.routines.busy, () -> app.navigate(Screen.ROUTINE)));
+			return true;
 		}
-		com.energym.app.domain.ProgressionEngine.Plan level = app.progression();
-		if (level != null && app.routines.preview == null) {
-			LinearLayout up = card("Sobrecarga progresiva", HomeFragment.summary(level));
-			primary(action(up, "Revisar progresión", !app.routines.busy, app::reviewProgression));
+		ProgressionEngine.Plan progression = app.progression();
+		if (progression != null) {
+			LinearLayout next = card("Tu próxima progresión", "Hay ajustes de sobrecarga progresiva para tu rutina seleccionada.");
+			primary(action(next, "Revisar progresión", !app.routines.busy, app::reviewProgression));
+			action(next, "Repetir rutina actual", !app.sessions.busy, app::startSession);
+			return true;
 		}
-		if (app.routines.accepted != null) {
-			LinearLayout accepted = card("Tu rutina", app.routines.accepted.getTitle() + " · " +
-				app.routines.accepted.getItems().size() + " ejercicios · " + app.routines.accepted.getEstimatedMinutes() +
-				" min");
-			MaterialButton start = action(accepted, "Empezar sesión", !app.sessions.busy, app::startSession);
-			if (app.routines.preview == null && level == null)
-				primary(start);
-			text(accepted, origin(app.routines.accepted) + " · Progresión " +
-				(app.routines.accepted.isProgressionEnabled() ? "activada" : "desactivada"), R.style.EnerGym_FieldCaption, 8);
-			action(accepted, "Ver ejercicios", !app.routines.busy && app.routines.preview == null, app::viewSelectedRoutine);
+		if (app.routines.accepted == null) return false;
+		Routine selected = app.routines.accepted;
+		LinearLayout ready = card("Tu rutina seleccionada", selected.getTitle() + "\n" + summary(selected));
+		primary(action(ready, "Empezar sesión", !app.sessions.busy, app::startSession));
+		action(ready, "Ver ejercicios", !app.routines.busy, app::viewSelectedRoutine);
+		return true;
+	}
+
+	private void routines(boolean ai, boolean hasNextStep) {
+		List<Routine> routines = new ArrayList<>();
+		for (Routine routine : app.versions) {
+			boolean generated = routine.getMetadata() != null && routine.getMetadata().getOrigin() == RoutineMetadata.Origin.AI;
+			if (generated == ai) routines.add(routine);
 		}
-		LinearLayout profile = card("Propuesta local", app.profile == null ?
-			"Dinos tu objetivo, tiempo y material para crear tu rutina." : app.profileSummary());
-		MaterialButton create = action(profile, "Crear propuesta",
-			!app.loading && !app.profileSaving() && !app.routines.busy, app::createRoutine);
-		if (app.routines.accepted == null && app.routines.preview == null && app.profile != null)
-			primary(create);
-		action(profile, app.profile == null ? "Configurar mi perfil" : "Editar perfil",
-			() -> app.navigate(Screen.PROFILE));
-		// 3. Explorar: biblioteca con buscador y animaciones 3D.
-		int total = app.catalog.getExercises().size(), animated = app.availableAnimations().size();
-		LinearLayout library = card("Biblioteca", total + " ejercicios con su técnica" +
-			(animated == 0 ? "." : animated == total ? " y vista 3D." : "; " + animated + " con vista 3D."));
+		LinearLayout list = card(ai ? "Rutinas con IA" : "Tus rutinas", routines.isEmpty() ?
+			(ai ? "Habla con tu entrenador para preparar un plan." : "Elige ejercicios y ajusta tus series, repeticiones y cargas.") :
+			"Selecciona la rutina que quieras entrenar.");
+		MaterialButton create = action(list, ai ? "Crear rutina con IA" : "Crear rutina manual",
+			app.owner() != null && !app.loading && !app.manual.busy, () -> {
+				if (ai) {
+					state.assistant.messageInput("Prepara una rutina para mí.");
+					app.navigate(Screen.ASSISTANT);
+				} else app.createManualRoutine();
+			});
+		if (!hasNextStep) primary(create);
+		for (Routine routine : routines) {
+			boolean selected = app.routines.accepted != null &&
+				app.routines.accepted.getProposalId().equals(routine.getProposalId());
+			MaterialButton choose = action(list, routine.getTitle() + (selected ? " · seleccionada" : ""), !app.routines.busy,
+				() -> app.selectRoutine(routine.getProposalId()));
+			choose.setTextColor(color(selected ? R.color.gold : R.color.white));
+			text(list, origin(routine) + " · " + summary(routine) + "\nProgresión " +
+				(routine.isProgressionEnabled() ? "activada" : "desactivada"), R.style.EnerGym_FieldCaption, 4);
+		}
+	}
+
+	private List<Session> distinctDrafts() {
+		Map<String, Session> unique = new LinkedHashMap<>();
+		for (Session draft : app.pending)
+			if (draft.getStatus() == Session.Status.DRAFT) unique.putIfAbsent(draft.getSyncId(), draft);
+		return new ArrayList<>(unique.values());
+	}
+
+	private void otherDrafts() {
+		List<Session> others = distinctDrafts();
+		others.removeIf(draft -> featuredDraftId.equals(draft.getSyncId()));
+		if (others.isEmpty()) return;
+		MaterialButton toggle = action(rows, "Otros borradores (" + others.size() + ")", true, () -> {
+			state.training.draftsExpanded = !state.training.draftsExpanded;
+			render();
+		});
+		toggle.setTag("training_drafts_toggle");
+		toggle.setContentDescription(toggle.getText() + (state.training.draftsExpanded ? ", desplegados" : ", plegados"));
+		if (!state.training.draftsExpanded) return;
+		LinearLayout drafts = card("Sesiones pendientes", "Cada borrador conserva sus propios registros.");
+		for (Session draft : others) {
+			text(drafts, draft.getRoutine().getTitle() + " · " + draft.getResults().size() + " ejercicios registrados",
+				R.style.EnerGym_FieldCaption, 12);
+			action(drafts, "Continuar borrador", !app.sessions.busy, () -> app.resume(draft));
+		}
+	}
+
+	private void moreOptions() {
+		MaterialButton toggle = action(rows, state.training.optionsExpanded ? "Menos opciones" : "Más opciones", true, () -> {
+			state.training.optionsExpanded = !state.training.optionsExpanded;
+			render();
+		});
+		toggle.setTag("training_more_options");
+		if (!state.training.optionsExpanded) return;
+		LinearLayout options = card("Perfil y propuesta local", "Genera una propuesta por reglas locales, sin IA, o ajusta tu perfil.");
+		action(options, "Crear propuesta", !app.loading && !app.profileSaving() && !app.routines.busy, app::createRoutine);
+		action(options, app.profile == null ? "Configurar mi perfil" : "Editar perfil", true,
+			() -> app.navigate(app.owner() == null ? Screen.ACCOUNT : Screen.PROFILE));
+	}
+
+	private void library() {
+		LinearLayout library = card("Biblioteca de ejercicios", app.catalog.getExercises().size() + " ejercicios del catálogo. Toca uno para ver su técnica.");
 		ExerciseSearch search = new ExerciseSearch(app.catalog.getExercises());
-		text(library, "Toca un ejercicio para ver su técnica.", R.style.EnerGym_FieldCaption, 8);
 		browser = new ExerciseBrowser(this, library, state.exerciseBrowser, "exercise", false, new ExerciseBrowser.Results() {
 			public List<Exercise> find(String query, ExerciseSearch.Filters filters, boolean onlyCompatible) {
 				return search.find(query, filters);
@@ -113,42 +219,26 @@ public final class TrainingFragment extends ScreenFragment {
 			}
 			public void empty(LinearLayout target) {
 				String query = state.exerciseBrowser.query.trim();
-				if (!query.isEmpty()) action(target, "Preguntar al asistente por este ejercicio", app.owner() != null, () -> {
+				if (query.isEmpty()) return;
+				action(target, "Preguntar al asistente por este ejercicio", app.owner() != null, () -> {
 					state.assistant.messageInput("Explícame la técnica del ejercicio «" + query +
 						"»: posición inicial, ejecución, errores comunes y qué ejercicio del catálogo se parece más.");
 					app.navigate(Screen.ASSISTANT);
 				});
 			}
 		});
-		// Con la biblioteca casi completa en 3D, la lista dejaría de ser un atajo útil.
-		if (animated > 0 && animated <= 12) {
-			LinearLayout movement = card("Con vista 3D", "");
-			for (com.energym.app.domain.Exercise exercise : app.availableAnimations())
-				action(movement, exercise.getName(), () -> app.openExercise(exercise));
-		}
-		text(rows, "Rutinas de ejemplo sin revisión profesional: adapta la intensidad a tu situación.",
-			R.style.EnerGym_FieldCaption, 4);
 	}
 
-	private void routineList(LinearLayout box, boolean ai) {
-		int count = 0;
-		for (Routine routine : app.versions) {
-			boolean generated = routine.getMetadata() != null && routine.getMetadata().getOrigin() == RoutineMetadata.Origin.AI;
-			if (generated != ai) continue;
-			count++;
-			boolean selected = app.routines.accepted != null &&
-				app.routines.accepted.getProposalId().equals(routine.getProposalId());
-			action(box, routine.getTitle() + (selected ? " · seleccionada" : ""), !app.routines.busy,
-				() -> app.selectRoutine(routine.getProposalId()));
-			text(box, origin(routine) + " · " + routine.getEstimatedMinutes() + " min · Progresión " +
-				(routine.isProgressionEnabled() ? "activada" : "desactivada"), R.style.EnerGym_FieldCaption, 4);
-		}
-		if (count == 0) text(box, ai ? "Todavía no has aceptado rutinas con IA." : "Aquí aparecerán tus rutinas manuales, locales y anteriores.",
-			R.style.EnerGym_FieldCaption, 8);
+	private int color(int resource) {
+		return ContextCompat.getColor(requireContext(), resource);
+	}
+
+	private String summary(Routine routine) {
+		return routine.getItems().size() + " ejercicios · " + routine.getEstimatedMinutes() + " min";
 	}
 
 	private String origin(Routine routine) {
-		if (routine.getMetadata() == null) return "Rutina anterior · origen no registrado";
+		if (routine.getMetadata() == null) return "Rutina anterior";
 		switch (routine.getMetadata().getOrigin()) {
 			case AI: return "Creada con IA";
 			case MANUAL: return "Creada por ti";
@@ -156,26 +246,47 @@ public final class TrainingFragment extends ScreenFragment {
 		}
 	}
 
-	private ExerciseBrowser browser;
-	private Bundle restored;
+	private void restoreSelection() {
+		if (restored != null && Objects.equals(app.owner(), restored.getString("training.owner")) &&
+			restored.getLong("training.binding", -1) == state.training.bindingRevision()) {
+			ExerciseBrowser.restore(restored, "library", state.exerciseBrowser, app.owner(), 0);
+			try {
+				state.training.select(TrainingViewState.Pane.valueOf(restored.getString("training.pane", "MINE")));
+			} catch (IllegalArgumentException ignored) {
+				state.training.select(TrainingViewState.Pane.MINE);
+			}
+			state.training.draftsExpanded = restored.getBoolean("training.drafts", false);
+			state.training.optionsExpanded = restored.getBoolean("training.options", false);
+		}
+		restored = null;
+	}
 
 	@Override
 	protected void beforeContentReset() {
 		if (browser != null) browser.capture();
 	}
 
-	@Override public void onCreate(Bundle saved) {
+	@Override
+	public void onCreate(Bundle saved) {
 		super.onCreate(saved);
 		restored = saved;
 	}
 
-	@Override public void onSaveInstanceState(Bundle saved) {
+	@Override
+	public void onSaveInstanceState(Bundle saved) {
 		super.onSaveInstanceState(saved);
 		if (browser != null) browser.capture();
-		if (state != null && app != null) ExerciseBrowser.save(saved, "library", state.exerciseBrowser, app.owner(), 0);
+		if (state == null || app == null) return;
+		ExerciseBrowser.save(saved, "library", state.exerciseBrowser, app.owner(), 0);
+		saved.putString("training.owner", app.owner());
+		saved.putLong("training.binding", state.training.bindingRevision());
+		saved.putString("training.pane", state.training.pane.name());
+		saved.putBoolean("training.drafts", state.training.draftsExpanded);
+		saved.putBoolean("training.options", state.training.optionsExpanded);
 	}
 
-	@Override public void onDestroyView() {
+	@Override
+	public void onDestroyView() {
 		browser = null;
 		super.onDestroyView();
 	}

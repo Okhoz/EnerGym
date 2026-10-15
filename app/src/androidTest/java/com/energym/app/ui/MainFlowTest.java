@@ -56,6 +56,8 @@ public class MainFlowTest {
 			click(scenario, "Guardar perfil");
 			await();
 			capture("training");
+			trainingPane(scenario, "mine");
+			click(scenario, "Más opciones");
 			click(scenario, "Crear propuesta");
 			capture("proposal");
 			click(scenario, "Aceptar propuesta");
@@ -157,14 +159,14 @@ public class MainFlowTest {
 			await();
 			assertSavedSquat(context, "8");
 			training(scenario);
-			click(scenario, "Continuar borrador");
+			click(scenario, "Volver a mi sesión");
 			await();
 			assertSavedSquat(context, "8");
 			scenario.onActivity(a -> assertEquals("8",
 				((EditText) a.getWindow().getDecorView().findViewWithTag("repetitions")).getText().toString()));
 			edit(scenario, "repetitions", "9");
 			training(scenario);
-			click(scenario, "Continuar borrador");
+			click(scenario, "Volver a mi sesión");
 			scenario.recreate();
 			await();
 			scenario.onActivity(a -> assertEquals("9",
@@ -185,6 +187,7 @@ public class MainFlowTest {
 		scenario.onActivity(a -> ((com.google.android.material.bottomnavigation.BottomNavigationView) a.findViewById(
 			R.id.navigation)).setSelectedItemId(R.id.tab_training));
 		await();
+		trainingPane(scenario, "mine");
 	}
 
 	private void fillMetrics(ActivityScenario<MainActivity> s) {
@@ -236,6 +239,16 @@ public class MainFlowTest {
 			assertNotNull("Botón ausente: " + label, v);
 			assertTrue("Botón deshabilitado: " + label, v.isEnabled());
 			v.performClick();
+		});
+		await();
+	}
+
+	static void trainingPane(ActivityScenario<MainActivity> scenario, String pane) {
+		scenario.onActivity(activity -> {
+			View tab = activity.getWindow().getDecorView().findViewWithTag("training_tab_" + pane);
+			assertNotNull("Vista de Entreno disponible: " + pane, tab);
+			assertTrue(tab.isEnabled());
+			tab.performClick();
 		});
 		await();
 	}

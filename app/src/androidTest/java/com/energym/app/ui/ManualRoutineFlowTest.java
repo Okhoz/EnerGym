@@ -45,6 +45,7 @@ public final class ManualRoutineFlowTest {
 			a.state().app.navigate(AppController.Screen.TRAINING);
 		});
 		MainFlowTest.await();
+		MainFlowTest.trainingPane(scenario, "mine");
 	}
 
 	private View described(View view, String description) {
@@ -93,7 +94,7 @@ public final class ManualRoutineFlowTest {
 			controller.contextInput("resource." + resource.name(), "true");
 	}
 
-	@Test public void trainingOffersBothSectionsAndEditorKeepsGlobalProfile() {
+	@Test public void trainingOffersSeparatePanesAndEditorKeepsGlobalProfile() {
 		try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
 			waitReady(scenario);
 			TrainingProfile[] original = {null};
@@ -103,6 +104,9 @@ public final class ManualRoutineFlowTest {
 				owner[0] = a.state().app.owner();
 				assertNotNull(MainFlowTest.text(a.getWindow().getDecorView(), "Con IA"));
 				assertNotNull(MainFlowTest.text(a.getWindow().getDecorView(), "Mis rutinas"));
+				assertNotNull(a.getWindow().getDecorView().findViewWithTag("training_tab_exercises"));
+				assertNull("La creación con IA pertenece a su propia vista",
+					MainFlowTest.text(a.getWindow().getDecorView(), "Crear rutina con IA"));
 			});
 			try {
 				MainFlowTest.click(scenario, "Crear rutina manual");

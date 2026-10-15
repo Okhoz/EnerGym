@@ -28,6 +28,8 @@ public final class ExerciseSearchFlowTest {
 		}
 		assertTrue("El catálogo y la cuenta deben terminar de restaurarse", ready[0]);
 		scenario.onActivity(a -> a.state().app.navigate(AppController.Screen.TRAINING));
+		MainFlowTest.await();
+		MainFlowTest.trainingPane(scenario, "exercises");
 		boolean[] searchReady = {false};
 		for (int i = 0; i < 30 && !searchReady[0]; i++) {
 			scenario.onActivity(a -> searchReady[0] = stableAccountAndCatalog(a) &&
