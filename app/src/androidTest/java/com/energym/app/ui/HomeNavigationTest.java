@@ -66,7 +66,8 @@ public final class HomeNavigationTest {
 						assertEquals("0", ((TextView) a.findViewById(R.id.home_sessions)).getText().toString());
 					});
 					capture("home-signed-out-" + scale);
-					click(scenario, R.id.quick_profile);
+					scenario.onActivity(a -> a.menuSelected(R.id.menu_profile));
+					MainFlowTest.await();
 					scenario.onActivity(a -> assertEquals(Screen.ACCOUNT, a.state().app.screen));
 					scenario.onActivity(a -> a.state().accounts.enterDemo());
 					MainFlowTest.await();
@@ -76,7 +77,8 @@ public final class HomeNavigationTest {
 						assertEquals("0", ((TextView) a.findViewById(R.id.home_sessions)).getText().toString());
 					});
 					capture("home-demo-" + scale);
-					click(scenario, R.id.quick_profile);
+					scenario.onActivity(a -> a.menuSelected(R.id.menu_profile));
+					MainFlowTest.await();
 					scenario.onActivity(a -> {
 						assertEquals(Screen.PROFILE, a.state().app.screen);
 						assertEquals(R.id.tab_home,
@@ -84,14 +86,14 @@ public final class HomeNavigationTest {
 					});
 					click(scenario, R.id.back);
 					scenario.onActivity(a -> assertEquals(Screen.HOME, a.state().app.screen));
-					click(scenario, R.id.quick_training);
+					click(scenario, R.id.tab_training);
 					scenario.onActivity(a -> {
 						assertEquals(Screen.TRAINING, a.state().app.screen);
 						assertEquals(R.id.tab_training,
 							((BottomNavigationView) a.findViewById(R.id.navigation)).getSelectedItemId());
 					});
 					home(scenario);
-					click(scenario, R.id.quick_assistant);
+					click(scenario, R.id.tab_assistant);
 					scenario.onActivity(a -> {
 						assertEquals(Screen.ASSISTANT, a.state().app.screen);
 						assertEquals(R.id.tab_assistant,
@@ -106,7 +108,7 @@ public final class HomeNavigationTest {
 	}
 
 	@Test
-	public void quickActionsAndCountersFit320And360AtLargeFont() {
+	public void countersFit320And360AtLargeFont() {
 		InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
 			for (int width : new int[]{320, 360}) {
 				Configuration config = new Configuration(context.getResources().getConfiguration());
@@ -121,17 +123,11 @@ public final class HomeNavigationTest {
 					View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
 				view.layout(0, 0, w, view.getMeasuredHeight());
 				inspect(view);
-				int previousRight = -1;
-				for (int id : new int[]{R.id.quick_profile, R.id.quick_training, R.id.quick_assistant}) {
-					View button = view.findViewById(id);
-					Rect bounds = new Rect(0, 0, button.getWidth(), button.getHeight());
-					((ViewGroup) view).offsetDescendantRectToMyCoords(button, bounds);
-					assertTrue(bounds.width() >= dp(themed, 48) && bounds.height() >= dp(themed, 48));
+				for (int id : new int[]{R.id.home_sessions, R.id.home_drafts}) {
+					View counter = view.findViewById(id);
+					Rect bounds = new Rect(0, 0, counter.getWidth(), counter.getHeight());
+					((ViewGroup) view).offsetDescendantRectToMyCoords(counter, bounds);
 					assertTrue(bounds.left >= 0 && bounds.right <= w);
-					assertNotNull(button.getContentDescription());
-					if (previousRight >= 0)
-						assertTrue(bounds.left - previousRight >= dp(themed, 12));
-					previousRight = bounds.right;
 				}
 			}
 		});

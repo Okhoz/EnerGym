@@ -178,22 +178,28 @@ public final class MainActivity extends AppCompatActivity {
 		androidx.appcompat.widget.PopupMenu menu = new androidx.appcompat.widget.PopupMenu(
 			new android.view.ContextThemeWrapper(this, R.style.EnerGym_PopupMenu), anchor, android.view.Gravity.END);
 		menu.inflate(R.menu.main_menu);
-		menu.setOnMenuItemClickListener(item -> {
-			AppController app = state.app;
-			int id = item.getItemId();
-			if (id != R.id.menu_account && app.owner() == null)
-				app.navigate(AppController.Screen.ACCOUNT);
-			else if (id == R.id.menu_profile)
-				app.navigate(AppController.Screen.PROFILE);
-			else if (id == R.id.menu_body) {
-				if (state.nutrition != null)
-					state.nutrition.fillBody();
-				app.navigate(AppController.Screen.BODY);
-			} else
-				app.navigate(AppController.Screen.ACCOUNT);
-			return true;
-		});
+		menu.setOnMenuItemClickListener(item -> menuSelected(item.getItemId()));
 		menu.show();
+	}
+
+	/**
+	 * Destino de cada opción del menú ☰ (también lo usan las pruebas instrumentadas).
+	 */
+	public boolean menuSelected(int id) {
+		AppController app = state.app;
+		if (app == null)
+			return false;
+		if (id != R.id.menu_account && app.owner() == null)
+			app.navigate(AppController.Screen.ACCOUNT);
+		else if (id == R.id.menu_profile)
+			app.navigate(AppController.Screen.PROFILE);
+		else if (id == R.id.menu_body) {
+			if (state.nutrition != null)
+				state.nutrition.fillBody();
+			app.navigate(AppController.Screen.BODY);
+		} else
+			app.navigate(AppController.Screen.ACCOUNT);
+		return true;
 	}
 
 	private Fragment fragment(AppController.Screen screen) {

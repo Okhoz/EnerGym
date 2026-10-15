@@ -235,7 +235,12 @@ public class MainFlowTest {
 
 	static void click(ActivityScenario<MainActivity> s, String label) {
 		s.onActivity(a -> {
-			View v = "Cuenta".equals(label) ? a.findViewById(R.id.account) : text(a.getWindow().getDecorView(), label);
+			// «Cuenta» está en el menú ☰ de arriba a la derecha.
+			if ("Cuenta".equals(label)) {
+				a.menuSelected(R.id.menu_account);
+				return;
+			}
+			View v = text(a.getWindow().getDecorView(), label);
 			assertNotNull("Botón ausente: " + label, v);
 			assertTrue("Botón deshabilitado: " + label, v.isEnabled());
 			v.performClick();

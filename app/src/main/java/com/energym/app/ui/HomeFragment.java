@@ -37,12 +37,6 @@ public final class HomeFragment extends ScreenFragment {
 		NumberFormat counts = NumberFormat.getIntegerInstance(locale);
 		((TextView) overview.findViewById(R.id.home_sessions)).setText(counts.format(app.history.size()));
 		((TextView) overview.findViewById(R.id.home_drafts)).setText(counts.format(app.pending.size()));
-		View profileShortcut = overview.findViewById(R.id.quick_profile);
-		profileShortcut.setContentDescription(getString(app.owner() == null ?
-			R.string.profile_shortcut_signed_out : R.string.profile_shortcut_description));
-		profileShortcut.setOnClickListener(v -> app.navigate(app.owner() == null ? Screen.ACCOUNT : Screen.PROFILE));
-		overview.findViewById(R.id.quick_training).setOnClickListener(v -> app.navigate(Screen.TRAINING));
-		overview.findViewById(R.id.quick_assistant).setOnClickListener(v -> app.navigate(Screen.ASSISTANT));
 		rows.addView(overview);
 
 		if (app.owner() == null) {

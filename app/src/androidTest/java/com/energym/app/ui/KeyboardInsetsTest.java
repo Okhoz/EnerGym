@@ -43,8 +43,8 @@ public class KeyboardInsetsTest {
 				MainFlowTest.click(scenario, "Entrar en demo local");
 			scenario.onActivity(a -> a.findViewById(R.id.back).performClick());
 			MainFlowTest.await();
-			// Inicio ofrece el acceso directo de perfil aunque ya exista uno guardado.
-			scenario.onActivity(a -> a.findViewById(R.id.quick_profile).performClick());
+			// El perfil se abre desde el menú ☰ aunque ya exista uno guardado.
+			scenario.onActivity(a -> a.menuSelected(R.id.menu_profile));
 			MainFlowTest.await();
 			scenario.onActivity(a -> {
 				EditText field = a.getWindow().getDecorView().findViewWithTag("preferences");
