@@ -4,6 +4,7 @@ import com.energym.app.auth.*;
 import com.energym.app.BuildConfig;
 
 import android.app.Activity;
+import androidx.credentials.exceptions.GetCredentialCancellationException;
 
 import java.util.Objects;
 import java.util.concurrent.Executor;
@@ -110,14 +111,15 @@ public final class AccountController {
 			emit(Status.CONFIGURATION_NEEDED, null, null);
 			return;
 		}
-		if (!(gateway instanceof GoogleAccountGateway)) {
+		if (!(gateway instanceof GoogleTokenSource)) {
 			emit(Status.ERROR, null, new IllegalStateException("Proveedor Google no disponible"));
 			return;
 		}
-		demo = false;
+		boolean previousDemo = demo;
+		// El selector aún no cambia Firebase; conservar demo ignora su signOut demorado hasta recibir token.
 		long request = ++generation;
 		emit(Status.SIGNING_IN, null, null);
-		((GoogleAccountGateway) gateway).requestGoogleIdToken(activity, authorizedOnly, new GoogleAccountGateway.TokenCallback() {
+		((GoogleTokenSource) gateway).requestGoogleIdToken(activity, authorizedOnly, new GoogleTokenSource.TokenCallback() {
 			public void onToken(String token) {
 				synchronized (AccountController.this) {
 					if (!closed && request == generation)
@@ -127,7 +129,20 @@ public final class AccountController {
 
 			public void onFailure(Exception error) {
 				synchronized (AccountController.this) {
-					if (!closed && request == generation)
+					if (closed || request != generation)
+						return;
+					if (error instanceof GetCredentialCancellationException) {
+						// Cancelar el selector conserva la sesión previa, sin inventar una identidad Google.
+						generation++;
+						if (previousDemo) {
+							demo = true;
+							applied = true;
+							scope = "demo:local";
+							target.demo();
+							emit(Status.DEMO_LOCAL, null, null);
+						} else
+							apply(gateway.getCurrentUser(), true);
+					} else
 						emit(Status.ERROR, gateway.getCurrentUser(), error);
 				}
 			}

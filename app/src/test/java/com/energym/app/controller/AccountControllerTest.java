@@ -3,6 +3,7 @@ package com.energym.app.controller;
 import com.energym.app.auth.*;
 import com.energym.app.sync.*;
 import com.energym.app.data.SyncRecord;
+import androidx.credentials.exceptions.GetCredentialCancellationException;
 
 import java.util.*;
 
@@ -17,6 +18,120 @@ public class AccountControllerTest {
 
 	private AccountController controller() {
 		return new AccountController(gateway, target, Runnable::run, (s, u, e) -> statuses.add(s));
+	}
+
+	@Test
+	public void googleSelectorIncludesAccountsThatHaveNotRegisteredYet() {
+		AccountController c = controller();
+		c.start();
+		c.signInWithGoogle(null, false);
+		assertNotNull(gateway.tokenCallback);
+		assertFalse(gateway.authorizedOnly);
+		assertEquals(AccountController.Status.SIGNING_IN, statuses.get(statuses.size() - 1));
+	}
+
+	@Test
+	public void cancellingGoogleSelectorFromDemoRestoresDemoWithoutError() {
+		AccountController c = controller();
+		c.start();
+		c.enterDemo();
+		c.signInWithGoogle(null, false);
+		assertNotNull(gateway.tokenCallback);
+		gateway.tokenCallback.onFailure(new GetCredentialCancellationException("Cancelación de la persona"));
+		assertEquals("demo:local", target.scope);
+		assertEquals(2, target.demos);
+		assertEquals(AccountController.Status.DEMO_LOCAL, statuses.get(statuses.size() - 1));
+		assertFalse(statuses.contains(AccountController.Status.ERROR));
+		assertEquals(0, gateway.signins);
+	}
+
+	@Test
+	public void delayedDemoSignOutObserverCannotCancelTheActiveGoogleSelector() {
+		AccountController c = controller();
+		c.start();
+		c.enterDemo();
+		c.signInWithGoogle(null, false);
+		assertNotNull(gateway.tokenCallback);
+		gateway.listener.onAccountChanged(null);
+		gateway.tokenCallback.onFailure(new GetCredentialCancellationException("Cancelación tras la notificación demorada"));
+		assertEquals("demo:local", target.scope);
+		assertEquals(2, target.demos);
+		assertEquals(AccountController.Status.DEMO_LOCAL, statuses.get(statuses.size() - 1));
+		assertFalse(statuses.contains(AccountController.Status.ERROR));
+	}
+
+	@Test
+	public void delayedDemoSignOutObserverDoesNotDiscardTheSelectedGoogleToken() {
+		AccountController c = controller();
+		c.start();
+		c.enterDemo();
+		c.signInWithGoogle(null, false);
+		assertNotNull(gateway.tokenCallback);
+		gateway.listener.onAccountChanged(null);
+		gateway.tokenCallback.onToken("selected-google-token");
+		assertNotNull(gateway.callback);
+		assertEquals(1, gateway.signins);
+		gateway.user = new AccountUser("firebase-uid", "", "");
+		gateway.callback.onSuccess(new AccountUser("ignored-callback-uid", "", ""));
+		assertEquals("firebase-uid", target.scope);
+		assertEquals(AccountController.Status.AUTHENTICATED, statuses.get(statuses.size() - 1));
+		assertFalse(statuses.contains(AccountController.Status.ERROR));
+	}
+
+	@Test
+	public void cancellingGoogleSelectorResumesThePreviousAuthenticatedAccount() {
+		gateway.user = new AccountUser("alice", "", "");
+		AccountController c = controller();
+		c.start();
+		c.signInWithGoogle(null, false);
+		assertNotNull(gateway.tokenCallback);
+		gateway.tokenCallback.onFailure(new GetCredentialCancellationException("Cancelación de la persona"));
+		assertEquals("alice", target.scope);
+		assertEquals(2, target.authentications);
+		assertEquals(AccountController.Status.AUTHENTICATED, statuses.get(statuses.size() - 1));
+		assertFalse(statuses.contains(AccountController.Status.ERROR));
+	}
+
+	@Test
+	public void cancelledSelectorReadsTheCurrentFirebaseUidInsteadOfRestoringAnOldIdentity() {
+		gateway.user = new AccountUser("alice", "", "");
+		AccountController c = controller();
+		c.start();
+		c.signInWithGoogle(null, false);
+		assertNotNull(gateway.tokenCallback);
+		gateway.user = new AccountUser("bob", "", "");
+		gateway.tokenCallback.onFailure(new GetCredentialCancellationException("Cancelación de la persona"));
+		assertEquals("bob", target.scope);
+		assertEquals(AccountController.Status.AUTHENTICATED, statuses.get(statuses.size() - 1));
+		assertFalse(statuses.contains(AccountController.Status.ERROR));
+	}
+
+	@Test
+	public void cancellingGoogleSelectorWhileSignedOutRemainsSignedOutWithoutError() {
+		AccountController c = controller();
+		c.start();
+		c.signInWithGoogle(null, false);
+		assertNotNull(gateway.tokenCallback);
+		gateway.tokenCallback.onFailure(new GetCredentialCancellationException("Cancelación de la persona"));
+		assertNull(target.scope);
+		assertEquals(AccountController.Status.SIGNED_OUT, statuses.get(statuses.size() - 1));
+		assertFalse(statuses.contains(AccountController.Status.ERROR));
+		assertEquals(0, gateway.signins);
+	}
+
+	@Test
+	public void retainedSelectorCancellationAfterSignOutCannotRestoreDemo() {
+		AccountController c = controller();
+		c.start();
+		c.enterDemo();
+		c.signInWithGoogle(null, false);
+		assertNotNull(gateway.tokenCallback);
+		GoogleTokenSource.TokenCallback retained = gateway.tokenCallback;
+		c.signOut();
+		retained.onFailure(new GetCredentialCancellationException("Cancelación tardía"));
+		assertNull(target.scope);
+		assertEquals(1, target.demos);
+		assertEquals(AccountController.Status.SIGNED_OUT, statuses.get(statuses.size() - 1));
 	}
 
 	@Test
@@ -200,12 +315,15 @@ public class AccountControllerTest {
 
 	static final class Target implements AccountController.SessionTarget {
 		String scope;
+		int demos, authentications;
 
 		public void authenticated(AccountUser u) {
+			authentications++;
 			scope = u.getUid();
 		}
 
 		public void demo() {
+			demos++;
 			scope = "demo:local";
 		}
 
@@ -214,12 +332,19 @@ public class AccountControllerTest {
 		}
 	}
 
-	static final class Gateway implements AccountGateway {
+	static final class Gateway implements AccountGateway, GoogleTokenSource {
 		boolean configured = true, unsubscribed;
 		AccountUser user;
 		int signins;
 		Callback callback;
 		Listener listener;
+		TokenCallback tokenCallback;
+		boolean authorizedOnly = true;
+
+		public void requestGoogleIdToken(android.app.Activity activity, boolean onlyAuthorized, TokenCallback cb) {
+			authorizedOnly = onlyAuthorized;
+			tokenCallback = cb;
+		}
 
 		public boolean isConfigured() {
 			return configured;

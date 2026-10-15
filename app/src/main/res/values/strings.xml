@@ -1,6 +1,11 @@
 <resources>
 	<string name="app_name">EnerGym</string>
 	<string name="account">Cuenta</string>
+	<string name="google_continue">Continuar con Google</string>
+	<string name="google_switch_account">Cambiar cuenta de Google</string>
+	<string name="google_connecting">Conectando con Google…</string>
+	<string name="google_configuration_title">Google: configuración pendiente</string>
+	<string name="google_configuration_missing">Falta la configuración Firebase de esta instalación. No se puede iniciar sesión ni respaldar datos en la nube todavía.</string>
 	<string name="home">Inicio</string>
 	<string name="training">Entrenamiento</string>
 	<string name="training_navigation">Entreno</string>
@@ -17,9 +22,9 @@
 	<string name="home_eyebrow">TU ACTIVIDAD</string>
 	<string name="home_title">Tu día, a tu ritmo</string>
 	<string name="home_next_step">Tu próximo paso</string>
-	<string name="home_account_prompt">Entra con tu cuenta o prueba la demo local para empezar.</string>
+	<string name="home_account_prompt">La primera vez creas tu cuenta con Google. Las siguientes recuperas los datos respaldados al entrar con la misma cuenta.</string>
 	<string name="home_profile_prompt">Cuéntanos tu objetivo y material para crear tu rutina.</string>
-	<string name="home_choose_account">Elegir cuenta o demo</string>
+	<string name="home_choose_account">Ver opciones de cuenta</string>
 	<string name="home_configure_profile">Configurar mi perfil</string>
 	<string name="home_edit_profile">Editar mi perfil</string>
 	<string name="home_training_title">Entrenamiento a tu medida</string>
@@ -28,8 +33,8 @@
 	<string name="home_record_title">Tu registro</string>
 	<string name="home_view_history">Ver progreso</string>
 	<string name="home_last_action">Última acción</string>
-	<string name="account_intro">Tu cuenta guarda y respalda tus datos.</string>
-	<string name="account_signed_out">Elige cómo quieres entrar.</string>
+	<string name="account_intro">Tu cuenta de Google guarda y respalda tus datos.</string>
+	<string name="account_signed_out">La primera vez se crea tu cuenta automáticamente con Google, sin otra contraseña. Al volver, recuperas los datos respaldados de esa cuenta.</string>
 	<string name="account_sign_out">Salir de la cuenta / demo</string>
 	<string name="account_separation">Cada cuenta tiene sus propios datos. La demo no se copia a Google.</string>
 	<string name="account_local_data">Borrar elimina el perfil, las rutinas, las sesiones, la conversación y las propuestas locales de la cuenta o demo actual, y cierra su sesión. No borra otras cuentas ni datos de Firebase. Si vuelves a conectar Google, se restaurarán los datos ya confirmados en Firebase; los pendientes solo locales se perderán.</string>

@@ -32,7 +32,7 @@
 			android:layout_height="wrap_content"
 			android:layout_marginTop="@dimen/space_inline"
 			style="@style/EnerGym.ScreenTitle"
-			tools:text="Tus datos, contigo" />
+			tools:text="Cuenta" />
 
 		<TextView
 			android:id="@+id/screen_subtitle"
@@ -41,7 +41,7 @@
 			android:layout_marginTop="@dimen/space_inline"
 			android:layout_marginBottom="@dimen/section_gap"
 			style="@style/EnerGym.Body"
-			tools:text="Conecta Google para activar el respaldo Firebase. La demo permanece solo en este dispositivo." />
+			tools:text="@string/account_intro" />
 
 		<LinearLayout
 			android:id="@+id/rows"
@@ -74,14 +74,14 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							style="@style/EnerGym.CardTitle"
-							tools:text="Sin cuenta" />
+							tools:text="Cuenta sin conectar" />
 
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:layout_marginTop="@dimen/space_inline"
 							style="@style/EnerGym.Body"
-							tools:text="Elige cómo quieres entrar." />
+							tools:text="@string/account_signed_out" />
 
 						<LinearLayout
 							android:layout_width="match_parent"
@@ -90,14 +90,14 @@
 							android:layout_marginTop="@dimen/space_inline">
 
 							<com.energym.app.ui.effects.GlassButton
-								style="@style/EnerGym.Button"
+								style="@style/EnerGym.PrimaryButton"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:minHeight="@dimen/primary_touch_target"
 								android:layout_marginTop="@dimen/action_gap"
 								android:layout_marginBottom="0dp"
 								android:textSize="16sp"
-								tools:text="Conectar con Google" />
+								tools:text="@string/google_continue" />
 
 							<com.energym.app.ui.effects.GlassButton
 								style="@style/EnerGym.Button"
@@ -109,40 +109,6 @@
 								android:textSize="16sp"
 								tools:text="Entrar en demo local" />
 						</LinearLayout>
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-
-				<com.google.android.material.card.MaterialCardView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="@dimen/section_gap"
-					style="@style/EnerGym.GlassCard">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="@dimen/card_padding"
-						android:background="@drawable/glass_panel">
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							style="@style/EnerGym.CardTitle"
-							tools:text="Google: configuración pendiente" />
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="@dimen/space_inline"
-							style="@style/EnerGym.Body"
-							tools:text="Falta la configuración Firebase de esta instalación. No se puede iniciar sesión ni respaldar datos en la nube todavía." />
-
-						<LinearLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:orientation="vertical"
-							android:layout_marginTop="@dimen/space_inline" />
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>
 

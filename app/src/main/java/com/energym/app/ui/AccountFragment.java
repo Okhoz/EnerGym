@@ -20,10 +20,11 @@ public final class AccountFragment extends ScreenFragment {
 		LinearLayout account = card(state.accountText(), user == null ? getString(R.string.account_signed_out) : user.getEmail());
 		boolean signing = state.accountStatus == AccountController.Status.SIGNING_IN || state.deletingLocalData;
 		if (state.accountStatus == AccountController.Status.CONFIGURATION_NEEDED)
-			card("Google: configuración pendiente",
-				"Falta la configuración Firebase de esta instalación. No se puede iniciar sesión ni respaldar datos en la nube todavía.");
-		action(account, "Conectar con Google", !signing,
-			() -> state.accounts.signInWithGoogle(requireActivity(), false));
+			card(getString(R.string.google_configuration_title), getString(R.string.google_configuration_missing));
+		int googleLabel = state.accountStatus == AccountController.Status.SIGNING_IN ? R.string.google_connecting :
+			user == null ? R.string.google_continue : R.string.google_switch_account;
+		primary(action(account, getString(googleLabel), !signing,
+			() -> state.accounts.signInWithGoogle(requireActivity(), false)));
 		if (app.owner() == null && state.accounts.isDemoEnabled())
 			action(account, "Entrar en demo local", !signing, () -> {
 				state.accounts.enterDemo();

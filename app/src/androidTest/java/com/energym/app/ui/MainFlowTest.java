@@ -114,7 +114,8 @@ public class MainFlowTest {
 					com.energym.app.controller.AccountController.Status.CONFIGURATION_NEEDED;
 				assertEquals("La advertencia debe corresponder a la configuración de esta instalación", missing,
 					text(a.getWindow().getDecorView(), "Google: configuración pendiente") != null);
-				assertNotNull(text(a.getWindow().getDecorView(), "Conectar con Google"));
+				assertNotNull(text(a.getWindow().getDecorView(), a.getString(a.state().user == null ?
+					R.string.google_continue : R.string.google_switch_account)));
 			});
 			click(scenario, "Entrar en demo local");
 			scenario.recreate();

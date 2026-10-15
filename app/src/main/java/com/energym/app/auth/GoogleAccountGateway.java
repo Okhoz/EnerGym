@@ -17,13 +17,7 @@ import java.util.concurrent.Executor;
  * MODEL Android: Credential Manager obtiene el token y Firebase autentica la identidad final.
  * La ausencia de google-services.json/client web se representa sin inicializar servicios de nube.
  */
-public final class GoogleAccountGateway implements AccountGateway {
-	public interface TokenCallback {
-		void onToken(String idToken);
-
-		void onFailure(Exception error);
-	}
-
+public final class GoogleAccountGateway implements AccountGateway, GoogleTokenSource {
 	private final CredentialManager credentials;
 	private final Executor callbacks;
 	private final FirebaseAuth auth;

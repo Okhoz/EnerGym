@@ -6,6 +6,18 @@ La app usa Google Credential Manager → Firebase Authentication → UID Firebas
 
 Proyecto **`energym-e4699`** (plan Spark, sin facturación) creado el 15-10-2026: app Android `com.energym.app` con SHA-1/SHA-256 del keystore de depuración, proveedor Google habilitado y Firestore Standard en **eur3** con las reglas de `firestore.rules` publicadas desde la consola. Los `fieldOverrides` de `firestore.indexes.json` aún no se han desplegado. Cada desarrollador guarda su `app/google-services.json` (excluido de Git); sin él, el build sigue funcionando con `CONFIGURATION_NEEDED` y la demo `demo:local`. Verificado en emulador: inicio de sesión con Google, persistencia de la sesión tras reiniciar y «Respaldo confirmado» sin errores de permisos. Falta añadir las huellas de release/Play App Signing antes de distribuir.
 
+## Registro e inicio de sesión con Google
+
+En **Inicio**, «Continuar con Google» abre el selector de cuentas directamente. También está disponible en **Cuenta**, desde el icono de persona superior. El selector incluye cuentas que nunca han utilizado EnerGym. No se pide una contraseña dentro de la app: Google obtiene el consentimiento y Firebase crea la cuenta de EnerGym en el primer acceso válido; los siguientes accesos usan el UID existente.
+
+La pantalla explica la primera alta y el retorno a los datos respaldados. Una sesión Google activa ofrece «Cambiar cuenta de Google». Durante el acceso los botones quedan desactivados para evitar solicitudes duplicadas. Cancelar el selector conserva el estado anterior (sesión local, cuenta Google actual o salida), sin presentar la cancelación como un error. Los errores reales siguen mostrándose y no crean usuarios ficticios.
+
+Perfil, entrenamiento, nutrición y progreso permanecen separados por UID. Volver a entrar con la misma cuenta solicita la restauración del respaldo confirmado en Firestore; cambiar de cuenta no copia datos de otra cuenta ni de la sesión local de desarrollo. Las comprobaciones de release deben usar las huellas de su firma definitiva, además de la configuración debug ya comprobada.
+
+Este recorrido mantiene Credential Manager y Firebase Authentication existentes, sin activar facturación, crear proyectos nuevos o guardar contraseñas/tokens en el código. [Comportamiento documentado de Firebase para el primer acceso](https://firebase.google.com/docs/auth/android/google-signin#next_steps), consultado el 15-10-2026.
+
+Verificación de este cambio (15-10-2026): firma de la APK debug coincidente con el cliente OAuth Android configurado y cliente OAuth web presente; **164 pruebas unitarias, 0 fallos/errores/omitidas**, APK debug y de pruebas compiladas; **2 pruebas de presentación Android, 0 fallos**; lint **0 errores y 100 avisos**. Las regresiones cubren cuentas nuevas, cancelación desde sesión local/Google/sin sesión, callbacks tardíos y una notificación atrasada al abrir el selector. Las pruebas de presentación no seleccionaron cuentas Google ni borraron datos locales; no se ha creado una cuenta real nueva como parte de esta verificación. La comprobación remota de inicio/respaldo de la fase anterior permanece identificada en Estado actual.
+
 ## Crear la configuración real
 
 1. Cuando la consola permita continuar, crear un proyecto con **Spark**, sin cuenta de facturación. No activar Blaze, Cloud Functions, Storage, extensiones ni servicios IA de pago. Se puede omitir Analytics: no hay SDK de Analytics en la app.

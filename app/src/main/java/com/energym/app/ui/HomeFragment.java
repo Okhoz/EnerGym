@@ -2,6 +2,7 @@ package com.energym.app.ui;
 
 import com.energym.app.R;
 import com.energym.app.controller.AppController.Screen;
+import com.energym.app.controller.AccountController;
 import com.energym.app.domain.Session;
 import com.energym.app.nutrition.BodyProfile;
 import com.energym.app.progress.ProgressStats;
@@ -46,7 +47,13 @@ public final class HomeFragment extends ScreenFragment {
 
 		if (app.owner() == null) {
 			LinearLayout start = card(getString(R.string.home_next_step), getString(R.string.home_account_prompt));
-			primary(action(start, getString(R.string.home_choose_account), true, () -> app.navigate(Screen.ACCOUNT)));
+			boolean signing = state.accountStatus == AccountController.Status.SIGNING_IN;
+			boolean busy = signing || state.deletingLocalData;
+			if (state.accountStatus == AccountController.Status.CONFIGURATION_NEEDED)
+				text(start, getString(R.string.google_configuration_missing), R.style.EnerGym_FieldCaption, 8);
+			primary(action(start, getString(signing ? R.string.google_connecting : R.string.google_continue), !busy,
+				() -> state.accounts.signInWithGoogle(requireActivity(), false)));
+			action(start, getString(R.string.home_choose_account), !busy, () -> app.navigate(Screen.ACCOUNT));
 			return;
 		}
 		today();
