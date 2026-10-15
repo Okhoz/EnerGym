@@ -138,6 +138,26 @@ public class ProposalControllerTest {
 	}
 
 	@Test
+	public void goalWordsKeepTheSavedDisciplineAndItsDetailsReachTheAi() {
+		profile[0] = new TrainingProfile.Builder().sportId("swimming").environment(TrainingProfile.Environment.POOL)
+			.category(TrainingProfile.Category.SPORT).details(Collections.singletonMap("stroke", "FREESTYLE")).build();
+		ProposalController c = controller();
+		c.sendExternal("quiero fuerza");
+		assertEquals("swimming", client.request.profileData.get("sportId"));
+		assertEquals(Collections.singletonMap("stroke", "FREESTYLE"), client.request.profileData.get("details"));
+	}
+
+	@Test
+	public void namingAnotherDisciplineSwitchesItAndDropsTheOldDetails() {
+		profile[0] = new TrainingProfile.Builder().sportId("swimming").environment(TrainingProfile.Environment.POOL)
+			.category(TrainingProfile.Category.SPORT).details(Collections.singletonMap("stroke", "FREESTYLE")).build();
+		ProposalController c = controller();
+		c.sendExternal("ahora quiero hacer yoga");
+		assertEquals("yoga", client.request.profileData.get("sportId"));
+		assertFalse(client.request.profileData.containsKey("details"));
+	}
+
+	@Test
 	public void rejectConservesRoutineVersionAndSessionSnapshot() {
 		ProposalController c = controller();
 		propose(c);

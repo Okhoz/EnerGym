@@ -13,6 +13,16 @@ public final class ProposalValidator {
 	private static final Set<String> PROFILE =
 		Set.of("sportId", "goal", "environment", "focus", "category", "resources", "daysPerWeek", "durationMinutes",
 			"level", "experience", "space", "preferences", "limitations");
+	/**
+	 * Datos opcionales de la disciplina (posición, distancia objetivo...): solo contexto para el proveedor.
+	 */
+	private static final Set<String> PROFILE_ALLOWED;
+
+	static {
+		Set<String> allowed = new HashSet<>(PROFILE);
+		allowed.add("details");
+		PROFILE_ALLOWED = Set.copyOf(allowed);
+	}
 	static final int MAX_ELIGIBLE = 48;
 	private final JsonNode catalog = Json.resource("catalog-v2.json");
 	private final Map<String, JsonNode> exercises = new HashMap<>(), sports = new HashMap<>();
@@ -50,7 +60,17 @@ public final class ProposalValidator {
 			Json.text(h.get("text"), 1000, false);
 		}
 		JsonNode p = r.get("profile");
-		Json.keys(p, PROFILE, Set.of());
+		Json.keys(p, PROFILE_ALLOWED, Set.of());
+		if (p.has("details")) {
+			JsonNode details = p.get("details");
+			if (!details.isObject() || details.size() > 12)
+				throw new IllegalArgumentException("Detalles inválidos");
+			details.fields().forEachRemaining(d -> {
+				if (!d.getKey().matches("[a-zA-Z]{1,32}"))
+					throw new IllegalArgumentException("Detalle inválido");
+				Json.text(d.getValue(), 120, false);
+			});
+		}
 		for (String key : List.of("level", "experience", "space", "preferences", "limitations"))
 			if (p.has(key))
 				Json.text(p.get(key), 500, !key.equals("level"));
@@ -138,7 +158,7 @@ public final class ProposalValidator {
 		JsonNode proposal = out.get("proposal");
 		if (proposal.isNull())
 			return;
-		Json.keys(request.path("profile"), PROFILE, PROFILE);
+		Json.keys(request.path("profile"), PROFILE_ALLOWED, PROFILE);
 		Json.keys(proposal, Set.of("title", "items"), Set.of("title", "items"));
 		Json.text(proposal.get("title"), 120, false);
 		Json.array(proposal.get("items"), 5);

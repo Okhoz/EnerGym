@@ -284,13 +284,44 @@ public final class AppController {
 	public void profileInput(String key, String value) {
 		profileDraft.put(key, value);
 		profileDirty = true;
-		if (key.equals("category")) {
-			if (value.equals("GYM"))
-				profileDraft.put("environment", "GYM");
-			else if (!value.equals("SPORT"))
-				profileDraft.put("environment", "HOME");
+		// Cambiar disciplina o tipo cambia qué se pregunta: se ajusta el borrador y se redibuja el formulario.
+		if (key.equals("sportId") || key.equals("category") || key.equals("focus")) {
+			normalizeProfileDraft();
 			changed();
 		}
+	}
+
+	private DisciplineForm disciplineForm() {
+		return DisciplineForm.of(profileDraft.getOrDefault("sportId", "strength"));
+	}
+
+	/**
+	 * Deja cada opción dentro de lo que admite la disciplina; los textos y datos ya escritos se conservan.
+	 */
+	private void normalizeProfileDraft() {
+		DisciplineForm form = disciplineForm();
+		TrainingProfile.Category category = allowed("category", form.categories);
+		TrainingProfile.Focus focus = allowed("focus", form.focuses);
+		allowed("environment", form.environments(category, focus));
+		allowed("goal", form.goals(focus, catalog.getExercises()));
+		for (TrainingProfile.Resource r : form.includedResources)
+			profileDraft.put("resource." + r.name(), "true");
+	}
+
+	private <E extends Enum<E>> E allowed(String key, List<E> options) {
+		for (E option : options)
+			if (option.name().equals(profileDraft.get(key)))
+				return option;
+		profileDraft.put(key, options.get(0).name());
+		return options.get(0);
+	}
+
+	/**
+	 * Nombre de la disciplina elegida en el borrador, para titular sus preguntas propias.
+	 */
+	public String disciplineName() {
+		Sport s = catalog.findSport(profileDraft.getOrDefault("sportId", ""));
+		return s == null ? "tu disciplina" : s.getName();
 	}
 
 	/**
@@ -304,10 +335,18 @@ public final class AppController {
 		if (profileSaving)
 			return;
 		try {
+			normalizeProfileDraft();
+			DisciplineForm form = disciplineForm();
+			TrainingProfile.Category category = TrainingProfile.Category.valueOf(profileDraft.get("category"));
+			// Solo cuenta el material que el formulario de esta disciplina pregunta (o incluye de serie).
 			Set<TrainingProfile.Resource> resources = EnumSet.noneOf(TrainingProfile.Resource.class);
-			for (TrainingProfile.Resource resource : TrainingProfile.Resource.values())
+			resources.addAll(form.includedResources);
+			for (TrainingProfile.Resource resource : form.askedResources(category))
 				if (Boolean.parseBoolean(profileDraft.get("resource." + resource.name())))
 					resources.add(resource);
+			Map<String, String> details = new LinkedHashMap<>();
+			for (DisciplineForm.Detail d : form.details)
+				details.put(d.key, profileDraft.getOrDefault("detail." + d.key, ""));
 			TrainingProfile p = new TrainingProfile.Builder().sportId(profileDraft.get("sportId"))
 				.goal(TrainingProfile.Goal.valueOf(profileDraft.get("goal")))
 				.environment(TrainingProfile.Environment.valueOf(profileDraft.get("environment")))
@@ -317,7 +356,7 @@ public final class AppController {
 				.durationMinutes(Integer.parseInt(profileDraft.get("durationMinutes"))).level(profileDraft.get("level"))
 				.experience(profileDraft.get("experience")).space(profileDraft.get("space"))
 				.preferences(profileDraft.get("preferences")).limitations(profileDraft.get("limitations"))
-				.historyConsent(Boolean.parseBoolean(profileDraft.get("historyConsent"))).build();
+				.historyConsent(Boolean.parseBoolean(profileDraft.get("historyConsent"))).details(details).build();
 			if (catalog.findSport(p.getSportId()) == null)
 				throw new IllegalArgumentException("Selecciona un deporte del catálogo.");
 			profileSaving = true;
@@ -367,50 +406,78 @@ public final class AppController {
 		profileDraft.put("historyConsent", Boolean.toString(p.isHistoryConsent()));
 		for (TrainingProfile.Resource r : TrainingProfile.Resource.values())
 			profileDraft.put("resource." + r.name(), Boolean.toString(p.getResources().contains(r)));
+		for (Map.Entry<String, String> d : p.getDetails().entrySet())
+			profileDraft.put("detail." + d.getKey(), d.getValue());
+		normalizeProfileDraft();
 	}
 
 	public List<InputField> profileFields() {
 		if (profileDraft.isEmpty())
 			fillProfile(profile == null ? new TrainingProfile.Builder().build() : profile);
+		DisciplineForm form = disciplineForm();
+		TrainingProfile.Category category = TrainingProfile.Category.valueOf(profileDraft.get("category"));
 		List<InputField> f = new ArrayList<>();
-		f.add(choice("category", "Tipo de entrenamiento",
-			"GYM,Gimnasio|HOME_EQUIPMENT,Casa con material|NO_EQUIPMENT,Sin equipamiento|SPORT,Deporte"));
 		List<String> ids = new ArrayList<>(), names = new ArrayList<>();
 		for (Sport s : catalog.getSports()) {
 			ids.add(s.getId());
 			names.add(s.getName());
 		}
 		f.add(new InputField("sportId", "Disciplina", profileDraft.get("sportId"), ids, names, false, false));
-		f.add(choice("goal", "Objetivo",
-			"STRENGTH,Fuerza|GENERAL_FITNESS,Condición general|ENDURANCE,Resistencia|MOBILITY,Movilidad|SPORT_PRACTICE,Práctica deportiva"));
-		f.add(choice("environment", "Entorno real", "GYM,Gimnasio|HOME,Casa|OUTDOORS,Exterior|POOL,Piscina"));
-		f.add(choice("focus", "Cobertura", "SPECIFIC,Específica|COMPLEMENTARY,Preparación complementaria"));
+		// Las preguntas con una sola respuesta posible para esta disciplina no se muestran: ya están fijadas.
+		if (form.categories.size() > 1)
+			f.add(options("category", "Tipo de entrenamiento", form.categories));
+		TrainingProfile.Focus focus = TrainingProfile.Focus.valueOf(profileDraft.get("focus"));
+		if (form.focuses.size() > 1)
+			f.add(new InputField("focus", "Qué quieres trabajar", profileDraft.get("focus"),
+				Arrays.asList("SPECIFIC", "COMPLEMENTARY"), Arrays.asList(form.specificLabel, form.complementaryLabel),
+				false, false));
+		if (form.environments(category, focus).size() > 1)
+			f.add(options("environment", "Dónde entrenas", form.environments(category, focus)));
+		List<TrainingProfile.Goal> goals = form.goals(focus, catalog.getExercises());
+		if (goals.size() > 1)
+			f.add(options("goal", "Objetivo", goals));
+		for (DisciplineForm.Detail d : form.details) {
+			String key = "detail." + d.key;
+			if (d.options.isEmpty()) {
+				f.add(field(key, d.label, false, d.number));
+				continue;
+			}
+			List<String> v = new ArrayList<>(), t = new ArrayList<>();
+			v.add("");
+			t.add("Sin indicar");
+			for (String option : d.options) {
+				String[] e = option.split("\\|", 2);
+				v.add(e[0]);
+				t.add(e[1]);
+			}
+			f.add(new InputField(key, d.label, profileDraft.getOrDefault(key, ""), v, t, false, false));
+		}
 		f.add(field("daysPerWeek", "Días por semana (1–7)", false, true));
-		f.add(field("durationMinutes", "Tiempo disponible (5–240 min)", false, true));
+		f.add(field("durationMinutes", form.durationLabel + " (5–240 min)", false, true));
 		f.add(field("level", "Nivel", false, false));
 		f.add(field("experience", "Experiencia previa", false, false));
-		f.add(field("space", "Espacio disponible", false, false));
+		if (form.asksSpace)
+			f.add(field("space", "Espacio disponible", false, false));
 		f.add(field("preferences", "Preferencias", false, false));
 		f.add(field("limitations", "Limitaciones que quieras declarar", false, false));
-		for (TrainingProfile.Resource r : TrainingProfile.Resource.values())
+		for (TrainingProfile.Resource r : form.askedResources(category))
 			f.add(field("resource." + r.name(), "Disponible: " + label(r.name()), true, false));
 		f.add(field("historyConsent", "Permitir enviar mensajes anteriores al servidor opcional", true, false));
 		return f;
 	}
 
+	private InputField options(String key, String label, List<? extends Enum<?>> values) {
+		List<String> v = new ArrayList<>(), t = new ArrayList<>();
+		for (Enum<?> value : values) {
+			v.add(value.name());
+			t.add(label(value.name()));
+		}
+		return new InputField(key, label, profileDraft.getOrDefault(key, ""), v, t, false, false);
+	}
+
 	private InputField field(String k, String l, boolean b, boolean n) {
 		return new InputField(k, l, profileDraft.getOrDefault(k, ""), Collections.emptyList(), Collections.emptyList(),
 			b, n);
-	}
-
-	private InputField choice(String k, String l, String options) {
-		List<String> v = new ArrayList<>(), t = new ArrayList<>();
-		for (String entry : options.split("\\|")) {
-			String[] e = entry.split(",", 2);
-			v.add(e[0]);
-			t.add(e[1]);
-		}
-		return new InputField(k, l, profileDraft.getOrDefault(k, ""), v, t, false, false);
 	}
 
 	public String profileSummary() {
@@ -428,7 +495,24 @@ public final class AppController {
 			label(profile.getGoal().name()) + " · " + label(profile.getEnvironment().name()) + " · " +
 			profile.getDurationMinutes() + " min · " + profile.getDaysPerWeek() + " días/semana\nRecursos: " +
 			(profile.getResources().isEmpty() ? "ninguno" : labels(profile.getResources())) + "\n" +
-			(s == null ? "" : s.getCoverageMessage(profile.getFocus()));
+			details(profile) + (s == null ? "" : s.getCoverageMessage(profile.getFocus()));
+	}
+
+	/**
+	 * Datos propios de la disciplina con las etiquetas del formulario, una línea; vacío si no hay ninguno.
+	 */
+	private static String details(TrainingProfile profile) {
+		List<String> parts = new ArrayList<>();
+		for (DisciplineForm.Detail d : DisciplineForm.of(profile.getSportId()).details) {
+			String value = profile.getDetails().get(d.key);
+			if (value == null)
+				continue;
+			for (String option : d.options)
+				if (option.startsWith(value + "|"))
+					value = option.substring(value.length() + 1);
+			parts.add(d.label + ": " + value);
+		}
+		return parts.isEmpty() ? "" : String.join(" · ", parts) + "\n";
 	}
 
 	public static String labels(Collection<?> values) {

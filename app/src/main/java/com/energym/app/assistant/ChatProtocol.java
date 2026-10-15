@@ -41,6 +41,8 @@ public final class ChatProtocol {
 		m.put("space", p.getSpace());
 		m.put("preferences", p.getPreferences());
 		m.put("limitations", p.getLimitations());
+		if (!p.getDetails().isEmpty())
+			m.put("details", new LinkedHashMap<>(p.getDetails()));
 		return m;
 	}
 

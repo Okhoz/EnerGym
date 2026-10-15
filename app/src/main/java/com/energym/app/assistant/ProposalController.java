@@ -258,6 +258,23 @@ public final class ProposalController {
 		fields.put("resources", String.join(",", rs));
 	}
 
+	/**
+	 * Palabras (ya sin tildes) que nombran una disciplina del catálogo; la primera coincidencia la fija.
+	 */
+	private static final Map<String, String> DISCIPLINES = new LinkedHashMap<>();
+
+	static {
+		String[][] words = {{"calistenia", "calisthenics"}, {"crossfit", "functional"}, {"funcional", "functional"},
+			{"natacion", "swimming"}, {"nadar", "swimming"}, {"ciclismo", "cycling"}, {"bici", "cycling"},
+			{"futbol", "football"}, {"baloncesto", "basketball"}, {"basket", "basketball"}, {"padel", "padel"},
+			{"tenis", "tennis"}, {"voleibol", "volleyball"}, {"voley", "volleyball"}, {"boxeo", "combat"},
+			{"artes marciales", "combat"}, {"kickboxing", "combat"}, {"muay thai", "combat"}, {"mma", "combat"},
+			{"yoga", "yoga"}, {"pilates", "pilates"}, {"senderismo", "hiking"}, {"montana", "hiking"},
+			{"escalada", "climbing"}, {"escalar", "climbing"}};
+		for (String[] w : words)
+			DISCIPLINES.put(w[0], w[1]);
+	}
+
 	private static String normalize(String text) {
 		return Normalizer.normalize(text.toLowerCase(Locale.ROOT), Normalizer.Form.NFD).replaceAll("\\p{M}", "");
 	}
@@ -319,22 +336,28 @@ public final class ProposalController {
 			} else if (negative)
 				fields.remove("resources");
 		}
+		// El objetivo no cambia la disciplina guardada: solo la elige si aún no hay ninguna.
 		if (t.contains("fuerza")) {
 			fields.put("goal", "STRENGTH");
-			fields.put("sport", "strength");
+			fields.putIfAbsent("sport", "strength");
 		} else if (t.contains("movilidad")) {
 			fields.put("goal", "MOBILITY");
-			fields.put("sport", "strength");
+			fields.putIfAbsent("sport", "strength");
 		} else if (t.contains("condicion") || t.contains("estar en forma")) {
 			fields.put("goal", "GENERAL_FITNESS");
-			fields.put("sport", "strength");
+			fields.putIfAbsent("sport", "strength");
 		} else if (t.contains("correr") || t.contains("running")) {
 			fields.put("goal", "ENDURANCE");
 			fields.put("sport", "running");
 		} else if (t.contains("resistencia")) {
 			fields.put("goal", "ENDURANCE");
-			fields.put("sport", "running");
+			fields.putIfAbsent("sport", "running");
 		}
+		for (Map.Entry<String, String> d : DISCIPLINES.entrySet())
+			if (t.contains(d.getKey())) {
+				fields.put("sport", d.getValue());
+				break;
+			}
 		if (t.contains("principiante") || t.contains("empiezo"))
 			fields.put("level", "Principiante");
 		else if (t.contains("intermedio"))
@@ -359,7 +382,11 @@ public final class ProposalController {
 			if (!r.isEmpty())
 				rs.add(TrainingProfile.Resource.valueOf(r));
 		TrainingProfile.Builder b = base == null ? new TrainingProfile.Builder() : base.toBuilder();
-		return b.sportId(fields.getOrDefault("sport", "strength"))
+		String sport = fields.getOrDefault("sport", "strength");
+		// Los datos propios de la disciplina guardada no se aplican si en el chat se pide otra.
+		if (base != null && !base.getSportId().equals(sport))
+			b.details(Collections.emptyMap());
+		return b.sportId(sport)
 			.goal(TrainingProfile.Goal.valueOf(fields.get("goal")))
 			.environment(TrainingProfile.Environment.valueOf(fields.get("environment")))
 			.category(TrainingProfile.Category.valueOf(fields.getOrDefault("category", "NO_EQUIPMENT"))).resources(rs)

@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 
 /**
  * VISTA del perfil: cada campo remite texto/selección; construcción y validación pertenecen al controlador.
+ * Los campos cambian con la disciplina; al elegir otra, el controlador vuelve a pintar el formulario.
  */
 public final class ProfileFragment extends ScreenFragment {
 	public ProfileFragment() {
@@ -17,10 +18,13 @@ public final class ProfileFragment extends ScreenFragment {
 		heading("PERSONALIZA", "Tu perfil",
 			"Así adaptamos tu rutina.");
 		LinearLayout fields = card("Tu entrenamiento", "");
-		boolean resources = false;
+		boolean resources = false, details = false;
 		// Secciones de presentación: conservan el orden y los eventos de todos los campos del controlador.
 		for (InputField f : app.profileFields()) {
-			if (f.key.equals("daysPerWeek"))
+			if (f.key.startsWith("detail.") && !details) {
+				fields = card(app.disciplineName(), "Opcional. Afina la propuesta a tu disciplina.");
+				details = true;
+			} else if (f.key.equals("daysPerWeek"))
 				fields = card("Tu disponibilidad", "");
 			else if (f.key.equals("level"))
 				fields = card("Sobre ti", "Opcional.");

@@ -64,6 +64,11 @@ public final class GroqGateway implements Provider {
 		"daysPerWeek, durationMinutes y level. " +
 		"Si falta alguno de esos campos pregunta en missingFields y no propongas una rutina. resources=[] es válido para NO_EQUIPMENT. " +
 		"experience, space, preferences y limitations son voluntarios y pueden estar vacíos; nunca los exijas para producir un ejemplo genérico. " +
+		"details (opcional) recoge datos propios de la disciplina (posición, distancia objetivo, estilo, modalidad...): úsalos, " +
+		"junto con level y experience, para elegir y ordenar ejercicios y ajustar volumen e intensidad; no los exijas. " +
+		"Diseña el punto de partida para sobrecarga progresiva: cargas y repeticiones conservadoras (esfuerzo 6-7 de 10) y " +
+		"deja unos minutos libres dentro de durationMinutes para que la app pueda aumentar series, repeticiones, carga o " +
+		"tiempo tras cada sesión completada. " +
 		"No infieras hechos médicos ni ausencia de limitaciones por datos vacíos. Respeta exclusivamente el material declarado y la " +
 		"elegibilidad del catálogo. " +
 		"Las propuestas son ejemplos no revisados profesionalmente. " +

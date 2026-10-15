@@ -2,8 +2,10 @@ package com.energym.app.domain;
 
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Entrada inmutable de planificación; los recursos incluyen explícitamente mobiliario y apoyos.
@@ -25,6 +27,7 @@ public final class TrainingProfile {
 	private final Focus focus;
 	private final Category category;
 	private final Set<Resource> resources;
+	private final Map<String, String> details;
 	private final int daysPerWeek, durationMinutes;
 	private final boolean historyConsent;
 
@@ -48,7 +51,30 @@ public final class TrainingProfile {
 		preferences = Objects.requireNonNull(builder.preferences, "preferences").trim();
 		limitations = Objects.requireNonNull(builder.limitations, "limitations").trim();
 		historyConsent = builder.historyConsent;
+		details = details(builder.details);
 	}
+
+	/**
+	 * Datos propios de la disciplina (p. ej. distancia objetivo o posición): claves simples, textos cortos y sin vacíos.
+	 */
+	private static Map<String, String> details(Map<String, String> values) {
+		Map<String, String> result = new TreeMap<>();
+		for (Map.Entry<String, String> e : Objects.requireNonNull(values, "details").entrySet()) {
+			String value = e.getValue() == null ? "" : e.getValue().trim();
+			if (value.isEmpty())
+				continue;
+			if (e.getKey() == null || !e.getKey().matches("[a-zA-Z]{1,32}"))
+				throw new IllegalArgumentException("Detalle inválido: " + e.getKey());
+			if (value.length() > MAX_DETAIL)
+				throw new IllegalArgumentException("Detalle demasiado largo: " + e.getKey());
+			result.put(e.getKey(), value);
+		}
+		if (result.size() > MAX_DETAILS)
+			throw new IllegalArgumentException("Demasiados detalles de disciplina");
+		return Collections.unmodifiableMap(result);
+	}
+
+	public static final int MAX_DETAILS = 12, MAX_DETAIL = 120;
 
 	static String required(String value, String field) {
 		if (value == null || value.trim().isEmpty())
@@ -112,6 +138,10 @@ public final class TrainingProfile {
 		return historyConsent;
 	}
 
+	public Map<String, String> getDetails() {
+		return details;
+	}
+
 	public TrainingProfile withResources(Set<Resource> value) {
 		return toBuilder().resources(value).build();
 	}
@@ -120,7 +150,7 @@ public final class TrainingProfile {
 		return new Builder().sportId(sportId).goal(goal).environment(environment).focus(focus).category(category)
 			.resources(resources).daysPerWeek(daysPerWeek).durationMinutes(durationMinutes).level(level)
 			.experience(experience).space(space).preferences(preferences).limitations(limitations)
-			.historyConsent(historyConsent);
+			.historyConsent(historyConsent).details(details);
 	}
 
 	@Override
@@ -134,13 +164,14 @@ public final class TrainingProfile {
 			historyConsent == p.historyConsent && sportId.equals(p.sportId) && goal == p.goal &&
 			environment == p.environment && focus == p.focus && category == p.category &&
 			resources.equals(p.resources) && level.equals(p.level) && experience.equals(p.experience) &&
-			space.equals(p.space) && preferences.equals(p.preferences) && limitations.equals(p.limitations);
+			space.equals(p.space) && preferences.equals(p.preferences) && limitations.equals(p.limitations) &&
+			details.equals(p.details);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(sportId, goal, environment, focus, category, resources, daysPerWeek, durationMinutes, level,
-			experience, space, preferences, limitations, historyConsent);
+			experience, space, preferences, limitations, historyConsent, details);
 	}
 
 	public static final class Builder {
@@ -151,6 +182,7 @@ public final class TrainingProfile {
 		private Focus focus = Focus.SPECIFIC;
 		private Category category = Category.NO_EQUIPMENT;
 		private Set<Resource> resources = EnumSet.noneOf(Resource.class);
+		private Map<String, String> details = Collections.emptyMap();
 		private int daysPerWeek = 3, durationMinutes = 30;
 		private boolean historyConsent;
 
@@ -222,6 +254,11 @@ public final class TrainingProfile {
 
 		public Builder historyConsent(boolean value) {
 			historyConsent = value;
+			return this;
+		}
+
+		public Builder details(Map<String, String> value) {
+			details = new TreeMap<>(Objects.requireNonNull(value, "details"));
 			return this;
 		}
 

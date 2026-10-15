@@ -45,6 +45,60 @@
 			"complementaryCoverage": "EXAMPLE_UNREVIEWED"
 		},
 		{
+			"id": "functional",
+			"name": "Entrenamiento funcional / CrossFit",
+			"specificCoverage": "EXAMPLE_UNREVIEWED",
+			"complementaryCoverage": "PENDING_VALIDATION"
+		},
+		{
+			"id": "yoga",
+			"name": "Yoga",
+			"specificCoverage": "EXAMPLE_UNREVIEWED",
+			"complementaryCoverage": "PENDING_VALIDATION"
+		},
+		{
+			"id": "pilates",
+			"name": "Pilates",
+			"specificCoverage": "EXAMPLE_UNREVIEWED",
+			"complementaryCoverage": "PENDING_VALIDATION"
+		},
+		{
+			"id": "hiking",
+			"name": "Senderismo y trail",
+			"specificCoverage": "EXAMPLE_UNREVIEWED",
+			"complementaryCoverage": "EXAMPLE_UNREVIEWED"
+		},
+		{
+			"id": "climbing",
+			"name": "Escalada",
+			"specificCoverage": "EXAMPLE_UNREVIEWED",
+			"complementaryCoverage": "EXAMPLE_UNREVIEWED"
+		},
+		{
+			"id": "combat",
+			"name": "Boxeo y artes marciales",
+			"specificCoverage": "EXAMPLE_UNREVIEWED",
+			"complementaryCoverage": "EXAMPLE_UNREVIEWED"
+		},
+		{
+			"id": "padel",
+			"name": "Pádel",
+			"specificCoverage": "PENDING_VALIDATION",
+			"complementaryCoverage": "EXAMPLE_UNREVIEWED"
+		},
+		{
+			"id": "tennis",
+			"name": "Tenis",
+			"specificCoverage": "PENDING_VALIDATION",
+			"complementaryCoverage": "EXAMPLE_UNREVIEWED"
+		},
+		{
+			"id": "volleyball",
+			"name": "Voleibol",
+			"specificCoverage": "PENDING_VALIDATION",
+			"complementaryCoverage": "EXAMPLE_UNREVIEWED"
+		},
+		{
 			"id": "other",
 			"name": "Otra disciplina",
 			"specificCoverage": "PENDING_VALIDATION",
@@ -68,7 +122,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -144,7 +199,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -167,7 +223,10 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional",
+				"yoga",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -192,7 +251,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -242,7 +302,8 @@
 				"DUMBBELLS"
 			],
 			"sportIds": [
-				"strength"
+				"strength",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -291,7 +352,8 @@
 				"BARBELL"
 			],
 			"sportIds": [
-				"strength"
+				"strength",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -444,7 +506,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -537,7 +600,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -564,7 +633,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -587,7 +662,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -613,7 +689,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -639,7 +716,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -719,7 +797,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -770,7 +849,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -877,7 +957,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -1143,7 +1224,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -1359,7 +1441,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -1412,7 +1495,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -1741,7 +1825,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -1767,7 +1852,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -1849,7 +1935,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -1876,7 +1963,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2036,7 +2124,9 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2061,7 +2151,9 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2085,7 +2177,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2110,7 +2203,9 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2136,7 +2231,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2345,7 +2441,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2371,7 +2468,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2396,7 +2494,9 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional",
+				"combat"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2421,7 +2521,9 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional",
+				"combat"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2448,7 +2550,9 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"yoga",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2474,7 +2578,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2527,7 +2632,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2553,7 +2659,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2580,7 +2687,9 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"yoga",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2607,7 +2716,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2632,7 +2742,9 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"yoga",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2658,7 +2770,10 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"yoga",
+				"pilates",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2682,7 +2797,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2707,7 +2823,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2777,7 +2894,8 @@
 			],
 			"requiredResources": [],
 			"sportIds": [
-				"running"
+				"running",
+				"hiking"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2875,7 +2993,9 @@
 			"sportIds": [
 				"strength",
 				"calisthenics",
-				"running"
+				"running",
+				"functional",
+				"combat"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2904,7 +3024,9 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2933,7 +3055,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2960,7 +3083,8 @@
 				"strength",
 				"calisthenics",
 				"running",
-				"cycling"
+				"cycling",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -2988,7 +3112,9 @@
 				"strength",
 				"calisthenics",
 				"swimming",
-				"cycling"
+				"cycling",
+				"yoga",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -3016,7 +3142,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -3043,7 +3170,8 @@
 			"sportIds": [
 				"strength",
 				"calisthenics",
-				"running"
+				"running",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -3072,7 +3200,8 @@
 				"strength",
 				"calisthenics",
 				"running",
-				"cycling"
+				"cycling",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -3100,7 +3229,8 @@
 				"strength",
 				"calisthenics",
 				"running",
-				"cycling"
+				"cycling",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -3128,7 +3258,8 @@
 				"strength",
 				"calisthenics",
 				"running",
-				"cycling"
+				"cycling",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -3155,7 +3286,9 @@
 			"sportIds": [
 				"strength",
 				"calisthenics",
-				"swimming"
+				"swimming",
+				"yoga",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -3183,7 +3316,8 @@
 			"sportIds": [
 				"strength",
 				"calisthenics",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -3210,7 +3344,8 @@
 				"strength",
 				"calisthenics",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -3240,7 +3375,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -3270,7 +3411,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -3300,7 +3447,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -3330,7 +3483,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -3360,7 +3519,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -3388,7 +3553,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -3415,7 +3586,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -3443,7 +3620,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -3473,7 +3656,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -3503,7 +3692,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -4162,7 +4357,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"hiking"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -4187,7 +4383,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"hiking"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -4212,7 +4409,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -4237,7 +4435,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -4262,7 +4461,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -4312,7 +4512,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -4488,7 +4689,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -4513,7 +4715,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -4588,7 +4791,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -4613,7 +4817,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -4822,7 +5027,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -4954,7 +5160,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5034,7 +5241,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5060,7 +5268,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5087,7 +5296,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5114,7 +5324,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5193,7 +5404,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5327,7 +5539,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5381,7 +5594,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5435,7 +5649,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5489,7 +5704,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5666,7 +5882,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5716,7 +5933,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5741,7 +5959,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5767,7 +5986,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5792,7 +6012,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5817,7 +6038,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5841,7 +6063,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -5994,7 +6217,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6019,7 +6243,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6043,7 +6268,9 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6067,7 +6294,9 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6091,7 +6320,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6118,7 +6348,9 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6144,7 +6376,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6169,7 +6402,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6194,7 +6428,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"combat"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6219,7 +6454,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6244,7 +6480,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6269,7 +6506,9 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"yoga",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6295,7 +6534,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6321,7 +6561,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6347,7 +6588,9 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6399,7 +6642,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6425,7 +6669,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6451,7 +6696,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6502,7 +6748,8 @@
 			],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6528,7 +6775,9 @@
 			"sportIds": [
 				"strength",
 				"calisthenics",
-				"running"
+				"running",
+				"functional",
+				"combat"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6579,7 +6828,8 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"combat"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6604,7 +6854,9 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional",
+				"combat"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6629,7 +6881,9 @@
 			"requiredResources": [],
 			"sportIds": [
 				"strength",
-				"calisthenics"
+				"calisthenics",
+				"functional",
+				"combat"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6651,7 +6905,8 @@
 			],
 			"requiredResources": [],
 			"sportIds": [
-				"running"
+				"running",
+				"hiking"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6819,7 +7074,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6846,7 +7102,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6872,7 +7129,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6899,7 +7157,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6926,7 +7185,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6953,7 +7213,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -6980,7 +7241,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -7006,7 +7268,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -7032,7 +7295,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -7058,7 +7322,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -7084,7 +7349,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -7110,7 +7376,9 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga",
+				"climbing"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -7137,7 +7405,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -7165,7 +7434,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -7192,7 +7462,9 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -7219,7 +7491,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -7246,7 +7519,9 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga",
+				"pilates"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -7273,7 +7548,8 @@
 				"calisthenics",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"yoga"
 			],
 			"coverage": "SPECIFIC",
 			"reviewed": false,
@@ -7300,7 +7576,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -7327,7 +7609,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -7354,7 +7642,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -7381,7 +7675,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -7409,7 +7709,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -7437,7 +7743,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -7465,7 +7777,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,
@@ -7493,7 +7811,13 @@
 				"other",
 				"running",
 				"cycling",
-				"swimming"
+				"swimming",
+				"hiking",
+				"climbing",
+				"combat",
+				"padel",
+				"tennis",
+				"volleyball"
 			],
 			"coverage": "COMPLEMENTARY",
 			"reviewed": false,

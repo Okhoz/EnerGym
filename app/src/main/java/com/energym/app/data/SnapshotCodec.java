@@ -96,13 +96,17 @@ public final class SnapshotCodec {
 	}
 
 	private static JSONObject profile(TrainingProfile p) throws JSONException {
-		return new JSONObject().put("sportId", p.getSportId()).put("goal", p.getGoal().name())
+		JSONObject o = new JSONObject().put("sportId", p.getSportId()).put("goal", p.getGoal().name())
 			.put("environment", p.getEnvironment().name()).put("focus", p.getFocus().name())
 			.put("category", p.getCategory().name()).put("resources", array(p.getResources()))
 			.put("daysPerWeek", p.getDaysPerWeek()).put("durationMinutes", p.getDurationMinutes())
 			.put("level", p.getLevel()).put("experience", p.getExperience()).put("space", p.getSpace())
 			.put("preferences", p.getPreferences()).put("limitations", p.getLimitations())
 			.put("historyConsent", p.isHistoryConsent());
+		// Solo con datos: los snapshots anteriores conservan exactamente su forma y su identidad.
+		if (!p.getDetails().isEmpty())
+			o.put("details", new JSONObject(p.getDetails()));
+		return o;
 	}
 
 	private static TrainingProfile profile(JSONObject o) throws JSONException {
@@ -112,7 +116,20 @@ public final class SnapshotCodec {
 			.resources(enums(o.getJSONArray("resources"), Resource.class)).daysPerWeek(o.getInt("daysPerWeek"))
 			.durationMinutes(o.getInt("durationMinutes")).level(o.getString("level"))
 			.experience(o.getString("experience")).space(o.getString("space")).preferences(o.getString("preferences"))
-			.limitations(o.getString("limitations")).historyConsent(o.getBoolean("historyConsent")).build();
+			.limitations(o.getString("limitations")).historyConsent(o.getBoolean("historyConsent"))
+			.details(details(o.optJSONObject("details"))).build();
+	}
+
+	private static Map<String, String> details(JSONObject o) throws JSONException {
+		Map<String, String> result = new LinkedHashMap<>();
+		if (o == null)
+			return result;
+		Iterator<String> keys = o.keys();
+		while (keys.hasNext()) {
+			String key = keys.next();
+			result.put(key, o.getString(key));
+		}
+		return result;
 	}
 
 	private static JSONObject routine(Routine r) throws JSONException {
