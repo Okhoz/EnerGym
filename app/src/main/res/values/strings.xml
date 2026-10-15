@@ -33,5 +33,7 @@
 	<string name="account_sign_out">Salir de la cuenta / demo</string>
 	<string name="account_separation">Cada cuenta conserva su propio perfil, rutinas y sesiones. La demo no se copia automáticamente a Google. Cerrar sesión oculta los datos locales de esa cuenta.</string>
 	<string name="account_local_data">Borrar elimina el perfil, las rutinas, las sesiones, la conversación y las propuestas locales de la cuenta o demo actual, y cierra su sesión. No borra otras cuentas ni datos de Firebase. Si vuelves a conectar Google, se restaurarán los datos ya confirmados en Firebase; los pendientes solo locales se perderán.</string>
+	<string name="chat_hint">Escribe un mensaje…</string>
+	<string name="chat_send">Enviar mensaje</string>
 </resources>
 

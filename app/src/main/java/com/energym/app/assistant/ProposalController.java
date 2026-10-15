@@ -88,7 +88,7 @@ public final class ProposalController {
 			}
 			if (messages.isEmpty())
 				add("assistant",
-					"Soy tu asistente guiado local gratuito, por reglas. Cuéntame tus días, tiempo, lugar, material y objetivo. Puedes revisar cada propuesta antes de guardarla.");
+					"¡Hola! Soy tu asistente de EnerGym. Cuéntame tu objetivo, cuántos días y minutos tienes, dónde entrenas y qué material usas, y te preparo una rutina. También puedo explicarte cualquier ejercicio.");
 		}
 		changed.run();
 	}

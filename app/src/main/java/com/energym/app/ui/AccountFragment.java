@@ -37,8 +37,7 @@ public final class AccountFragment extends ScreenFragment {
 		action(backup, "Reintentar sincronización", user != null && !signing, state.sync::requestSync);
 		card("Separación de cuentas",
 			getString(R.string.account_separation));
-		card("Historial y personalización",
-			"Enviar local usa reglas en este dispositivo. Enviar externo envía tu mensaje y el perfil de la conversación al servidor y su proveedor de IA, solo cuando lo pulsas. Los mensajes anteriores se envían únicamente con tu consentimiento en Tu perfil. Ese permiso es independiente del respaldo Firebase.");
+		assistantServer();
 		LinearLayout local = card("Datos de este dispositivo",
 			getString(R.string.account_local_data));
 		action(local, "Borrar datos locales", app.owner() != null && !signing, () -> {
@@ -50,6 +49,34 @@ public final class AccountFragment extends ScreenFragment {
 			dialog.setArguments(args);
 			dialog.show(getParentFragmentManager(), "delete-local-confirmation");
 		});
+	}
+
+	/**
+	 * Ajustes del asistente fuera del chat: servidor de IA emparejado o guiado local gratuito por reglas.
+	 */
+	private void assistantServer() {
+		com.energym.app.assistant.ProposalController c = state.assistant;
+		if (c == null || app.owner() == null)
+			return;
+		LinearLayout server = card("Asistente con IA", c.connected() ?
+			"Conectado a tu servidor. Los mensajes del chat se envían a la IA junto con el perfil de la conversación; los anteriores, solo con tu permiso en Tu perfil." :
+			"Sin servidor, el chat usa el guiado local gratuito por reglas, sin enviar datos. Empareja tu servidor para que responda la IA.");
+		if (c.connected()) {
+			action(server, "Desconectar y revocar", !c.busy, c::disconnect);
+			return;
+		}
+		action(server, c.showConnection ? "Ocultar conexión" : "Conectar servidor de IA", c::toggleConnection);
+		if (!c.showConnection)
+			return;
+		textField(server, "assistant_endpoint", "URL del servidor (HTTPS)", c.endpoint, false, false, c::endpointInput);
+		textField(server, "assistant_pairing", "Código privado de emparejamiento", c.pairingCode, false, false,
+			c::pairingInput);
+		android.widget.EditText pairing = server.findViewWithTag("assistant_pairing");
+		pairing.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+		pairing.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(128)});
+		action(server, "Conectar", !c.busy, () -> c.connect(c.endpoint, c.pairingCode));
+		if (!c.status.isEmpty())
+			text(server, c.status, R.style.EnerGym_Body, 12);
 	}
 
 	/**

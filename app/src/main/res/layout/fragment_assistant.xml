@@ -1,552 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Chat: mensajes desplazables y compositor fijo abajo. El compositor queda fuera de @id/rows para que
+     el render de datos no reconstruya el campo y conserve foco y teclado. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:fillViewport="true"
-	android:saveEnabled="false"
-	android:background="@android:color/transparent"
-	android:clipToPadding="false"
+	android:orientation="vertical"
 	tools:context=".MainActivity">
 
-	<LinearLayout
-		android:id="@+id/screen_body"
+	<ScrollView
+		android:id="@+id/chat_scroll"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="vertical"
-		android:paddingHorizontal="@dimen/screen_gutter"
-		android:paddingTop="@dimen/section_gap"
-		android:paddingBottom="@dimen/content_bottom">
-
-		<TextView
-			android:id="@+id/eyebrow"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			style="@style/EnerGym.Eyebrow"
-			tools:text="APRENDE Y AJUSTA" />
-
-		<TextView
-			android:id="@+id/screen_title"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="@dimen/space_inline"
-			style="@style/EnerGym.ScreenTitle"
-			tools:text="Asistente" />
-
-		<TextView
-			android:id="@+id/screen_subtitle"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="@dimen/space_inline"
-			android:layout_marginBottom="@dimen/section_gap"
-			style="@style/EnerGym.Body"
-			tools:text="Guiado local · gratuito&#xA;Conversación por reglas para preparar rutinas y explicar tu ejercicio." />
+		android:layout_height="0dp"
+		android:layout_weight="1"
+		android:fillViewport="true"
+		android:saveEnabled="false"
+		android:clipToPadding="false">
 
 		<LinearLayout
-			android:id="@+id/rows"
+			android:id="@+id/screen_body"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:orientation="vertical">
+			android:orientation="vertical"
+			android:paddingHorizontal="@dimen/screen_gutter"
+			android:paddingTop="@dimen/space_inline"
+			android:paddingBottom="@dimen/space_inline">
 
-			<LinearLayout
+			<!-- La cabecera compartida existe para ScreenFragment pero el chat no la muestra. -->
+			<TextView
+				android:id="@+id/eyebrow"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:orientation="vertical"
-				android:visibility="gone"
-				tools:visibility="visible"
-				android:importantForAccessibility="noHideDescendants">
-				<!-- Solo editor: GONE en ejecución; ScreenFragment.render elimina estas filas. -->
-				<com.google.android.material.card.MaterialCardView
-					android:layout_width="match_parent"
+				android:visibility="gone" />
+
+			<TextView
+				android:id="@+id/screen_title"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:visibility="gone" />
+
+			<TextView
+				android:id="@+id/screen_subtitle"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:visibility="gone" />
+
+			<LinearLayout
+				android:id="@+id/rows"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical">
+
+				<!-- Solo editor: ScreenFragment.render elimina estas filas. -->
+				<TextView
+					style="@style/EnerGym.ChatAssistant"
+					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="@dimen/section_gap"
-					style="@style/EnerGym.GlassCard">
+					android:visibility="gone"
+					tools:visibility="visible"
+					tools:text="¡Hola! Cuéntame tu objetivo, días y material." />
 
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="@dimen/card_padding"
-						android:background="@drawable/glass_panel">
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							style="@style/EnerGym.CardTitle"
-							tools:text="Tu mensaje" />
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="@dimen/space_inline"
-							style="@style/EnerGym.Body"
-							tools:text="Ejemplo: tres días en casa, sin material, 30 min. Después indica el objetivo y tu nivel." />
-
-						<LinearLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:orientation="vertical"
-							android:layout_marginTop="@dimen/space_inline">
-
-							<LinearLayout
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:orientation="vertical"
-								android:layout_marginBottom="@dimen/field_gap">
-
-								<TextView
-									style="@style/EnerGym.FieldCaption"
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									android:layout_marginBottom="@dimen/label_gap"
-									tools:text="Mensaje" />
-
-								<com.google.android.material.textfield.TextInputLayout
-									style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									app:hintEnabled="false"
-									app:boxBackgroundColor="@color/glass_field"
-									app:boxStrokeColor="@color/field_outline"
-									app:boxStrokeWidth="1dp"
-									app:boxStrokeWidthFocused="2dp"
-									app:boxCornerRadiusTopStart="12dp"
-									app:boxCornerRadiusTopEnd="12dp"
-									app:boxCornerRadiusBottomStart="12dp"
-									app:boxCornerRadiusBottomEnd="12dp">
-
-									<com.google.android.material.textfield.TextInputEditText
-										android:layout_width="match_parent"
-										android:layout_height="wrap_content"
-										android:minHeight="60dp"
-										android:paddingHorizontal="16dp"
-										android:paddingVertical="16dp"
-										android:inputType="textCapSentences"
-										android:textColor="@color/white"
-										android:textSize="16sp"
-										android:saveEnabled="false"
-										tools:text="Ejemplo de diseño: preparar una rutina" />
-								</com.google.android.material.textfield.TextInputLayout>
-							</LinearLayout>
-
-							<com.energym.app.ui.effects.GlassButton
-								style="@style/EnerGym.Button"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:minHeight="@dimen/primary_touch_target"
-								android:layout_marginTop="@dimen/action_gap"
-								android:layout_marginBottom="0dp"
-								android:textSize="16sp"
-								tools:text="Enviar local" />
-						</LinearLayout>
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-
-				<com.google.android.material.card.MaterialCardView
-					android:layout_width="match_parent"
+				<TextView
+					style="@style/EnerGym.ChatUser"
+					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="@dimen/section_gap"
-					style="@style/EnerGym.GlassCard">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="@dimen/card_padding"
-						android:background="@drawable/glass_panel">
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							style="@style/EnerGym.CardTitle"
-							tools:text="Asistente guiado" />
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="@dimen/space_inline"
-							style="@style/EnerGym.Body"
-							tools:text="Ejemplo de diseño · la conversación se carga al abrir la app." />
-
-						<LinearLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:orientation="vertical"
-							android:layout_marginTop="@dimen/space_inline" />
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-
-				<com.google.android.material.card.MaterialCardView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="@dimen/section_gap"
-					style="@style/EnerGym.GlassCard">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="@dimen/card_padding"
-						android:background="@drawable/glass_panel">
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							style="@style/EnerGym.CardTitle"
-							tools:text="Vista previa · sin guardar" />
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="@dimen/space_inline"
-							style="@style/EnerGym.Body"
-							tools:text="Ejemplo de propuesta · perfil provisional y tiempo estimado" />
-
-						<LinearLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:orientation="vertical"
-							android:layout_marginTop="@dimen/space_inline" />
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-
-				<com.google.android.material.card.MaterialCardView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="@dimen/section_gap"
-					style="@style/EnerGym.GlassCard">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="@dimen/card_padding"
-						android:background="@drawable/glass_panel">
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							style="@style/EnerGym.CardTitle"
-							tools:text="Ejercicio de ejemplo" />
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="@dimen/space_inline"
-							style="@style/EnerGym.Body"
-							tools:text="Prescripción orientativa y justificación." />
-
-						<LinearLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:orientation="vertical"
-							android:layout_marginTop="@dimen/space_inline">
-
-							<com.energym.app.ui.effects.GlassButton
-								style="@style/EnerGym.Button"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:minHeight="@dimen/primary_touch_target"
-								android:layout_marginTop="@dimen/action_gap"
-								android:layout_marginBottom="0dp"
-								android:textSize="16sp"
-								tools:text="Consultar técnica" />
-						</LinearLayout>
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-
-				<com.google.android.material.card.MaterialCardView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="@dimen/section_gap"
-					style="@style/EnerGym.GlassCard">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="@dimen/card_padding"
-						android:background="@drawable/glass_panel">
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							style="@style/EnerGym.CardTitle"
-							tools:text="Revisa y decide" />
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="@dimen/space_inline"
-							style="@style/EnerGym.Body"
-							tools:text="Aceptar guarda el perfil mostrado y una nueva versión de rutina. Rechazar conserva los datos actuales y las sesiones anteriores." />
-
-						<LinearLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:orientation="vertical"
-							android:layout_marginTop="@dimen/space_inline">
-
-							<com.energym.app.ui.effects.GlassButton
-								style="@style/EnerGym.Button"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:minHeight="@dimen/primary_touch_target"
-								android:layout_marginTop="@dimen/action_gap"
-								android:layout_marginBottom="0dp"
-								android:textSize="16sp"
-								tools:text="Guardar perfil y aceptar" />
-
-							<com.energym.app.ui.effects.GlassButton
-								style="@style/EnerGym.Button"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:minHeight="@dimen/primary_touch_target"
-								android:layout_marginTop="@dimen/action_gap"
-								android:layout_marginBottom="0dp"
-								android:textSize="16sp"
-								tools:text="Rechazar propuesta" />
-
-							<com.energym.app.ui.effects.GlassButton
-								style="@style/EnerGym.Button"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:minHeight="@dimen/primary_touch_target"
-								android:layout_marginTop="@dimen/action_gap"
-								android:layout_marginBottom="0dp"
-								android:textSize="16sp"
-								tools:text="Reducir 5 minutos" />
-
-							<com.energym.app.ui.effects.GlassButton
-								style="@style/EnerGym.Button"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:minHeight="@dimen/primary_touch_target"
-								android:layout_marginTop="@dimen/action_gap"
-								android:layout_marginBottom="0dp"
-								android:textSize="16sp"
-								tools:text="Sustituir primer ejercicio" />
-						</LinearLayout>
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-
-				<com.google.android.material.card.MaterialCardView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="@dimen/section_gap"
-					style="@style/EnerGym.GlassCard">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="@dimen/card_padding"
-						android:background="@drawable/glass_panel">
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							style="@style/EnerGym.CardTitle"
-							tools:text="Conversación local" />
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="@dimen/space_inline"
-							style="@style/EnerGym.Body"
-							tools:text="Mensajes conservados en este dispositivo. El servidor recibe como máximo 12 mensajes solo con el permiso de tu perfil; las sesiones históricas no se envían." />
-
-						<LinearLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:orientation="vertical"
-							android:layout_marginTop="@dimen/space_inline">
-
-							<com.energym.app.ui.effects.GlassButton
-								style="@style/EnerGym.Button"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:minHeight="@dimen/primary_touch_target"
-								android:layout_marginTop="@dimen/action_gap"
-								android:layout_marginBottom="0dp"
-								android:textSize="16sp"
-								tools:text="Ver conversación" />
-						</LinearLayout>
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-
-				<com.google.android.material.card.MaterialCardView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="@dimen/section_gap"
-					style="@style/EnerGym.GlassCard">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="@dimen/card_padding"
-						android:background="@drawable/glass_panel">
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							style="@style/EnerGym.CardTitle"
-							tools:text="Servidor opcional de IA" />
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="@dimen/space_inline"
-							style="@style/EnerGym.Body"
-							tools:text="Desactivado por defecto. El modo guiado local funciona sin esta conexión." />
-
-						<LinearLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:orientation="vertical"
-							android:layout_marginTop="@dimen/space_inline">
-
-							<com.energym.app.ui.effects.GlassButton
-								style="@style/EnerGym.Button"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:minHeight="@dimen/primary_touch_target"
-								android:layout_marginTop="@dimen/action_gap"
-								android:layout_marginBottom="0dp"
-								android:textSize="16sp"
-								tools:text="Ocultar conexión" />
-
-							<LinearLayout
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:orientation="vertical"
-								android:layout_marginBottom="@dimen/field_gap">
-
-								<TextView
-									style="@style/EnerGym.FieldCaption"
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									android:layout_marginBottom="@dimen/label_gap"
-									tools:text="URL del servidor (HTTPS)" />
-
-								<com.google.android.material.textfield.TextInputLayout
-									style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									app:hintEnabled="false"
-									app:boxBackgroundColor="@color/glass_field"
-									app:boxStrokeColor="@color/field_outline"
-									app:boxStrokeWidth="1dp"
-									app:boxStrokeWidthFocused="2dp"
-									app:boxCornerRadiusTopStart="12dp"
-									app:boxCornerRadiusTopEnd="12dp"
-									app:boxCornerRadiusBottomStart="12dp"
-									app:boxCornerRadiusBottomEnd="12dp">
-
-									<com.google.android.material.textfield.TextInputEditText
-										android:layout_width="match_parent"
-										android:layout_height="wrap_content"
-										android:minHeight="60dp"
-										android:paddingHorizontal="16dp"
-										android:paddingVertical="16dp"
-										android:inputType="textCapSentences"
-										android:textColor="@color/white"
-										android:textSize="16sp"
-										android:saveEnabled="false"
-										tools:text="Introduce la URL de tu servidor" />
-								</com.google.android.material.textfield.TextInputLayout>
-							</LinearLayout>
-
-							<LinearLayout
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:orientation="vertical"
-								android:layout_marginBottom="@dimen/field_gap">
-
-								<TextView
-									style="@style/EnerGym.FieldCaption"
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									android:layout_marginBottom="@dimen/label_gap"
-									tools:text="Código privado de emparejamiento" />
-
-								<com.google.android.material.textfield.TextInputLayout
-									style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									app:hintEnabled="false"
-									app:boxBackgroundColor="@color/glass_field"
-									app:boxStrokeColor="@color/field_outline"
-									app:boxStrokeWidth="1dp"
-									app:boxStrokeWidthFocused="2dp"
-									app:boxCornerRadiusTopStart="12dp"
-									app:boxCornerRadiusTopEnd="12dp"
-									app:boxCornerRadiusBottomStart="12dp"
-									app:boxCornerRadiusBottomEnd="12dp">
-
-									<com.google.android.material.textfield.TextInputEditText
-										android:layout_width="match_parent"
-										android:layout_height="wrap_content"
-										android:minHeight="60dp"
-										android:paddingHorizontal="16dp"
-										android:paddingVertical="16dp"
-										android:inputType="textCapSentences"
-										android:textColor="@color/white"
-										android:textSize="16sp"
-										android:saveEnabled="false"
-										tools:text="Introduce tu código privado" />
-								</com.google.android.material.textfield.TextInputLayout>
-							</LinearLayout>
-
-							<com.energym.app.ui.effects.GlassButton
-								style="@style/EnerGym.Button"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:minHeight="@dimen/primary_touch_target"
-								android:layout_marginTop="@dimen/action_gap"
-								android:layout_marginBottom="0dp"
-								android:textSize="16sp"
-								tools:text="Conectar servidor" />
-						</LinearLayout>
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-
-				<com.google.android.material.card.MaterialCardView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="@dimen/section_gap"
-					style="@style/EnerGym.GlassCard">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="@dimen/card_padding"
-						android:background="@drawable/glass_panel">
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							style="@style/EnerGym.CardTitle"
-							tools:text="Qué compartirás" />
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="@dimen/space_inline"
-							style="@style/EnerGym.Body"
-							tools:text="Al pulsar Enviar al servidor se envían tu mensaje, el perfil actual y el ID de ejercicio. Los mensajes anteriores se adjuntan solo con el consentimiento opcional del perfil." />
-
-						<LinearLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:orientation="vertical"
-							android:layout_marginTop="@dimen/space_inline" />
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
+					android:layout_gravity="end"
+					android:visibility="gone"
+					tools:visibility="visible"
+					tools:text="Tres días en casa, 30 minutos" />
 			</LinearLayout>
 		</LinearLayout>
+	</ScrollView>
+
+	<View
+		android:layout_width="match_parent"
+		android:layout_height="1dp"
+		android:background="@color/glass_highlight" />
+
+	<LinearLayout
+		android:id="@+id/chat_composer"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center_vertical"
+		android:orientation="horizontal"
+		android:paddingHorizontal="12dp"
+		android:paddingVertical="10dp">
+
+		<com.google.android.material.textfield.TextInputLayout
+			style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			app:hintEnabled="false"
+			app:boxBackgroundColor="@color/glass_field"
+			app:boxStrokeColor="@color/field_outline"
+			app:boxStrokeWidth="1dp"
+			app:boxStrokeWidthFocused="2dp"
+			app:boxCornerRadiusTopStart="24dp"
+			app:boxCornerRadiusTopEnd="24dp"
+			app:boxCornerRadiusBottomStart="24dp"
+			app:boxCornerRadiusBottomEnd="24dp">
+
+			<com.google.android.material.textfield.TextInputEditText
+				android:id="@+id/chat_input"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:minHeight="48dp"
+				android:maxLines="5"
+				android:paddingHorizontal="18dp"
+				android:paddingVertical="12dp"
+				android:hint="@string/chat_hint"
+				android:textColorHint="@color/text_secondary"
+				android:inputType="textCapSentences|textMultiLine"
+				android:maxLength="2000"
+				android:textColor="@color/white"
+				android:textSize="16sp"
+				android:saveEnabled="false" />
+		</com.google.android.material.textfield.TextInputLayout>
+
+		<com.google.android.material.button.MaterialButton
+			android:id="@+id/chat_send"
+			style="@style/EnerGym.IconButton"
+			android:layout_width="52dp"
+			android:layout_height="52dp"
+			android:layout_marginStart="10dp"
+			android:minWidth="48dp"
+			android:minHeight="48dp"
+			android:contentDescription="@string/chat_send"
+			app:backgroundTint="@color/gold"
+			app:icon="@drawable/ic_send"
+			app:iconTint="@color/surface" />
 	</LinearLayout>
-</ScrollView>
+</LinearLayout>
