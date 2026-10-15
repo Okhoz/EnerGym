@@ -25,7 +25,7 @@ public final class ResourceRepository {
 	}
 
 	/**
-	 * Solo una coincidencia exacta habilita la vista previa; las variantes siguen sin recurso.
+	 * Solo una fila del manifiesto habilita la vista 3D del ejercicio; no se deduce por nombre ni variante.
 	 */
 	public ResourceManifest forExercise(String id) {
 		return byExercise.get(id);
@@ -47,7 +47,7 @@ public final class ResourceRepository {
 			while ((count = input.read(chunk)) != -1) {
 				if (Thread.currentThread().isInterrupted())
 					throw new InterruptedIOException("Carga cancelada");
-				if (out.size() + count > 8 * 1024 * 1024)
+				if (out.size() + count > 16 * 1024 * 1024)
 					throw new IOException("Recurso demasiado grande");
 				out.write(chunk, 0, count);
 			}

@@ -73,6 +73,7 @@ public final class AppController {
 
 	private ExerciseRoute explanationRoute, visualizationRoute;
 	private java.util.function.Predicate<Exercise> visualizationPolicy = e -> false;
+	private java.util.function.Function<Exercise, String> visualizationExplanation = e -> null;
 	private List<Exercise> animations = Collections.emptyList();
 	private long navigationRevision;
 
@@ -85,6 +86,17 @@ public final class AppController {
 		visualizationRoute = route;
 		visualizationPolicy = policy;
 		animations = available;
+	}
+
+	public void visualizationExplanations(java.util.function.Function<Exercise, String> explanation) {
+		visualizationExplanation = explanation == null ? e -> null : explanation;
+	}
+
+	/**
+	 * Indica si la vista 3D es una captura CC0 o una animación esquemática; null si no hay vista disponible.
+	 */
+	public String visualizationExplanation() {
+		return visualizationAvailable() ? visualizationExplanation.apply(exercise) : null;
 	}
 
 	public List<Exercise> availableAnimations() {

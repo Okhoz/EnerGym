@@ -142,6 +142,7 @@ public final class AppState extends AndroidViewModel {
 		visualization.bind(viewerLaunch);
 		app.visualizations((exercise, profile) -> visualization.open(exercise), resourcePolicy::available,
 			resourcePolicy.available());
+		app.visualizationExplanations(resourcePolicy::explanation);
 		assistant.openCommands(app::navigationRevision, command -> {
 			if (!visualization.assistant(command.snapshot, assistant.exercise, command.conversationId,
 				command.requestId, command.originRevision)) {

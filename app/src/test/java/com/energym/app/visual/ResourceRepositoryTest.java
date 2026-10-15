@@ -1,92 +1,123 @@
 package com.energym.app.visual;
 
 import java.io.*;
+import java.nio.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
-import java.nio.*;
-import java.security.*;
 
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 /**
- * Alterar hash, lectura completa o correspondencia exacta deja de aceptar el recurso.
+ * Alterar manifiesto, hash, lectura completa o asignación de clips deja de aceptar el recurso.
  */
 public class ResourceRepositoryTest {
+	private static final Path GLB = Paths.get("src/main/assets", ResourceManifest.MODEL_PATH);
+
 	@Test
-	public void derivativeKeepsExactOriginalBinaryChunk() throws Exception {
-		byte[] bytes = Files.readAllBytes(Paths.get("src/main/assets/visual/push_up_native.glb"));
-		int jsonSize = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt(12);
-		byte[] binary = Arrays.copyOfRange(bytes, 20 + jsonSize, bytes.length);
-		StringBuilder hash = new StringBuilder();
-		for (byte b : MessageDigest.getInstance("SHA-256").digest(binary))
-			hash.append(String.format("%02x", b & 255));
-		assertEquals("338f0a42938e2ee2de53d777bbc87c32f18101aeab82d813903c40437d39e97f", hash.toString());
-		assertEquals("67bfd1bf9c9c679dfd81f34202c661f954ce0ec4b15baac56a5781a372d11326", ResourceManifest.pushUp().sourceSha256);
+	public void everyCatalogExerciseHasExactlyOneVisualization() throws Exception {
+		Map<?, ?> catalog = (Map<?, ?>) MiniJson.parse(
+			new String(Files.readAllBytes(Paths.get("src/main/assets/catalog.json")), StandardCharsets.UTF_8));
+		List<String> ids = new ArrayList<>();
+		for (Object e : (List<?>) catalog.get("exercises"))
+			ids.add((String) ((Map<?, ?>) e).get("id"));
+		assertEquals(287, ids.size());
+		ResourceRepository repo = PackagedManifest.repository();
+		assertEquals(ids.size(), repo.all().size());
+		for (String id : ids)
+			assertNotNull(id, repo.forExercise(id));
+		assertNull(repo.forExercise("unknown-exercise"));
 	}
 
 	@Test
-	public void exactExerciseOnlyAndActualPackagedBytes() throws Exception {
-		ResourceRepository repo = new ResourceRepository(Collections.singletonList(ResourceManifest.pushUp()), path -> Files.newInputStream(Paths.get("src/main/assets", path)));
-		assertNull(repo.forExercise("knee-pushup"));
-		assertNull(repo.forExercise("bodyweight-squat"));
-		assertEquals(5957652, repo.loadVerified(repo.forExercise("standard-pushup")).length);
-	}
-
-	@Test
-	public void everyVerifiedResourcePassesIntegrityWithPackagedBytes() throws Exception {
-		List<ResourceManifest> verified = ResourceManifest.verified();
-		ResourceRepository repo = new ResourceRepository(verified, path -> Files.newInputStream(Paths.get("src/main/assets", path)));
-		Set<String> paths = new HashSet<>();
-		for (ResourceManifest r : verified) {
-			assertTrue(paths.add(r.assetPath));
-			assertSame(r, repo.forExercise(r.exerciseId));
+	public void manifestClipsExistInTheSingleModelWithTheirDurations() throws Exception {
+		byte[] bytes = Files.readAllBytes(GLB);
+		assertEquals(ResourceManifest.MODEL_SHA256, ResourceManifest.sha256(bytes));
+		Map<?, ?> doc = glbJson(bytes);
+		List<?> accessors = (List<?>) doc.get("accessors");
+		Map<String, Float> durations = new HashMap<>();
+		for (Object a : (List<?>) doc.get("animations")) {
+			Map<?, ?> anim = (Map<?, ?>) a;
+			float max = 0;
+			for (Object s : (List<?>) anim.get("samplers")) {
+				Map<?, ?> input = (Map<?, ?>) accessors.get(((Number) ((Map<?, ?>) s).get("input")).intValue());
+				max = Math.max(max, ((Number) ((List<?>) input.get("max")).get(0)).floatValue());
+			}
+			assertNull("Clip duplicado", durations.put((String) anim.get("name"), max));
+		}
+		Set<String> used = new HashSet<>();
+		for (ResourceManifest r : PackagedManifest.all()) {
+			assertEquals(ResourceManifest.MODEL_PATH, r.assetPath);
+			assertEquals(ResourceManifest.MODEL_SHA256, r.sha256);
+			assertTrue(r.exerciseId + " " + r.clipName, durations.containsKey(r.clipName));
+			assertEquals(r.exerciseId, durations.get(r.clipName), r.duration, .001f);
+			assertEquals(r.duration, r.markers.get("final"), 0f);
+			assertTrue(r.markers.get("middle") >= 0 && r.markers.get("middle") <= r.duration);
 			assertFalse(r.professionallyReviewed);
 			assertEquals("CC0-1.0", r.license);
-			assertEquals(Collections.singleton("Human.rig"), r.clipNames);
-			assertEquals(r.duration, r.markers.get("final"), 0f);
-			assertEquals(r.duration / 2, r.markers.get("middle"), .000001f);
-			assertTrue(repo.loadVerified(r).length > 5_000_000);
+			used.add(r.clipName);
 		}
-		assertEquals(Arrays.asList("standard-pushup", "jumping-jacks", "running-easy", "brisk-walk"), new ArrayList<>(ids(repo.all())));
-		assertNull(repo.forExercise("knee-pushup"));
-		assertNull(repo.forExercise("burpee"));
+		// Ningún clip queda empaquetado sin un ejercicio que lo muestre.
+		assertEquals(durations.keySet(), used);
 	}
 
 	@Test
-	public void packagedManifestAndCatalogDeclareEachVerifiedResource() throws Exception {
-		String manifest = new String(Files.readAllBytes(Paths.get("src/main/assets/visual/manifest.json")), "UTF-8");
-		String catalog = new String(Files.readAllBytes(Paths.get("src/main/assets/catalog.json")), "UTF-8");
-		assertEquals(ResourceManifest.verified().size(), manifest.split("\"exerciseId\"", -1).length - 1);
-		for (ResourceManifest r : ResourceManifest.verified()) {
-			assertTrue(r.exerciseId, manifest.contains("\"exerciseId\": \"" + r.exerciseId + "\""));
-			assertTrue(r.exerciseId, manifest.contains("\"sha256\": \"" + r.sha256 + "\""));
-			assertTrue(r.exerciseId, manifest.contains("\"sourceSha256\": \"" + r.sourceSha256 + "\""));
-			assertTrue(r.exerciseId, manifest.contains("\"sourceUrl\": \"" + r.sourceUrl + "\""));
-			assertTrue(r.exerciseId, catalog.contains("\"id\": \"" + r.exerciseId + "\""));
-			// La adaptación solo reescribe JSON: el BIN empaquetado es el de la exportación original.
-			byte[] bytes = Files.readAllBytes(Paths.get("src/main/assets", r.assetPath));
-			int jsonSize = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt(12);
-			StringBuilder hash = new StringBuilder();
-			for (byte b : MessageDigest.getInstance("SHA-256").digest(Arrays.copyOfRange(bytes, 20 + jsonSize, bytes.length)))
-				hash.append(String.format("%02x", b & 255));
-			assertTrue(r.exerciseId, manifest.contains("\"binaryChunkSha256\": \"" + hash + "\""));
+	public void capturesAndSchematicAnimationsAreLabelledApart() {
+		ResourceManifest pushUp = PackagedManifest.pushUp();
+		assertEquals(ResourceManifest.Kind.CC0_CAPTURE, pushUp.kind);
+		assertEquals("EXACT", pushUp.match);
+		assertEquals("Captura de movimiento CC0", pushUp.label());
+		ResourceManifest tempo = PackagedManifest.forExercise("tempo-run");
+		assertEquals(ResourceManifest.Kind.CC0_CAPTURE, tempo.kind);
+		assertEquals("Captura CC0 de un gesto similar", tempo.label());
+		ResourceManifest squat = PackagedManifest.forExercise("barbell-back-squat");
+		assertEquals(ResourceManifest.Kind.SCHEMATIC, squat.kind);
+		assertEquals("Animación esquemática", squat.label());
+		assertTrue(squat.explanation().contains("esquemática"));
+		int captures = 0;
+		for (ResourceManifest r : PackagedManifest.all()) {
+			if (r.kind == ResourceManifest.Kind.CC0_CAPTURE) {
+				captures++;
+				assertTrue(r.clipName, r.clipName.startsWith("cc0/"));
+			} else
+				assertTrue(r.clipName, r.clipName.startsWith("esq/"));
+		}
+		assertEquals(14, captures);
+	}
+
+	@Test
+	public void editedManifestIsRejected() {
+		byte[] bytes = PackagedManifest.bytes();
+		String text = new String(bytes, StandardCharsets.UTF_8).replace("\"esq/squat\"", "\"cc0/jog\"");
+		try {
+			ResourceManifest.parse(text.getBytes(StandardCharsets.UTF_8));
+			fail("Un manifiesto editado no debe aceptarse");
+		} catch (IllegalArgumentException expected) {
+			assertTrue(expected.getMessage().contains("verificada"));
 		}
 	}
 
-	private static Set<String> ids(Collection<ResourceManifest> resources) {
-		Set<String> ids = new LinkedHashSet<>();
-		for (ResourceManifest r : resources)
-			ids.add(r.exerciseId);
-		return ids;
+	@Test
+	public void singleModelKeepsTheApkBudget() throws Exception {
+		assertTrue(Files.size(GLB) < 12L * 1024 * 1024);
+		for (String legacy : Arrays.asList("push_up_native.glb", "jumping_jacks_native.glb", "jog_native.glb",
+			"walk_native.glb"))
+			assertFalse(legacy, Files.exists(Paths.get("src/main/assets/visual", legacy)));
+	}
+
+	@Test
+	public void actualPackagedBytesPassIntegrity() throws Exception {
+		ResourceRepository repo = PackagedManifest.repository();
+		assertEquals(Files.size(GLB), repo.loadVerified(repo.forExercise("standard-pushup")).length);
 	}
 
 	@Test
 	public void corruptFileFailsBeforeNativeParsing() throws Exception {
-		byte[] bytes = Files.readAllBytes(Paths.get("src/main/assets/visual/push_up_native.glb"));
+		byte[] bytes = Files.readAllBytes(GLB);
 		bytes[100] ^= 1;
-		ResourceRepository repo = new ResourceRepository(Collections.singletonList(ResourceManifest.pushUp()), path -> new ByteArrayInputStream(bytes));
+		ResourceRepository repo = new ResourceRepository(PackagedManifest.all(), path -> new ByteArrayInputStream(bytes));
 		try {
 			repo.loadVerified(repo.forExercise("standard-pushup"));
 			fail("Debe activar fallback");
@@ -97,12 +128,12 @@ public class ResourceRepositoryTest {
 
 	@Test
 	public void shortReadsAndClosedStreamAreSupported() throws Exception {
-		byte[] bytes = Files.readAllBytes(Paths.get("src/main/assets/visual/push_up_native.glb"));
+		byte[] bytes = Files.readAllBytes(GLB);
 		final boolean[] closed = {false};
-		ResourceRepository repo = new ResourceRepository(Collections.singletonList(ResourceManifest.pushUp()), path -> new ByteArrayInputStream(bytes) {
+		ResourceRepository repo = new ResourceRepository(PackagedManifest.all(), path -> new ByteArrayInputStream(bytes) {
 			@Override
 			public synchronized int read(byte[] b, int offset, int length) {
-				return super.read(b, offset, Math.min(13, length));
+				return super.read(b, offset, Math.min(4093, length));
 			}
 
 			@Override
@@ -110,8 +141,14 @@ public class ResourceRepositoryTest {
 				closed[0] = true;
 			}
 		});
-		assertEquals(bytes.length, repo.loadVerified(repo.forExercise("standard-pushup")).length);
+		assertEquals(bytes.length, repo.loadVerified(repo.forExercise("burpee")).length);
 		assertTrue(closed[0]);
 	}
-}
 
+	private static Map<?, ?> glbJson(byte[] bytes) {
+		ByteBuffer header = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
+		assertEquals(0x46546c67, header.getInt(0));
+		int jsonSize = header.getInt(12);
+		return (Map<?, ?>) MiniJson.parse(new String(bytes, 20, jsonSize, StandardCharsets.UTF_8));
+	}
+}

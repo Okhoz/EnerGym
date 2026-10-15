@@ -10,17 +10,24 @@ import java.util.*;
  */
 public final class ExerciseResourcePolicy {
 	private final CatalogRepository catalog;
-	private final Set<String> resourceIds = new HashSet<>();
+	private final Map<String, ResourceManifest> resources = new HashMap<>();
 
 	public ExerciseResourcePolicy(CatalogRepository catalog, Collection<ResourceManifest> resources) {
 		this.catalog = Objects.requireNonNull(catalog);
 		for (ResourceManifest resource : resources)
-			resourceIds.add(resource.exerciseId);
+			this.resources.put(resource.exerciseId, resource);
 	}
 
 	public boolean available(Exercise snapshot) {
-		return snapshot != null && resourceIds.contains(snapshot.getId()) &&
+		return snapshot != null && resources.containsKey(snapshot.getId()) &&
 			same(snapshot, catalog.findExercise(snapshot.getId()));
+	}
+
+	/**
+	 * Explicación del tipo de vista 3D (captura CC0 o esquemática) para la pantalla del ejercicio.
+	 */
+	public String explanation(Exercise snapshot) {
+		return available(snapshot) ? resources.get(snapshot.getId()).explanation() : null;
 	}
 
 	public List<Exercise> available() {

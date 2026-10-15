@@ -1,209 +1,2636 @@
 {
-	"version": 1,
-	"resources": [
-		{
-			"exerciseId": "standard-pushup",
-			"assetPath": "visual/push_up_native.glb",
-			"sha256": "80338cac3e52dd9b7d7676c83fda2c00158a5254ac91e930710c1497b67bfe3f",
-			"sourceSha256": "67bfd1bf9c9c679dfd81f34202c661f954ce0ec4b15baac56a5781a372d11326",
-			"adaptation": "Removed orphan Human weights animation: zero mesh morph targets. Mesh, rig and BIN unchanged.",
-			"binaryChunkSha256": "338f0a42938e2ee2de53d777bbc87c32f18101aeab82d813903c40437d39e97f",
-			"sourceUrl": "https://assiamahs.github.io/opengym3d/assets/push_up.glb",
-			"sourceRevision": "ea3a60130fdcfb3c4771e44d09f84ebab4ee9bae",
-			"sourceRevisionNote": "Revision of inspected pipeline/spec; mutable export is identified by SHA-256, deployment revision unproven.",
-			"license": "CC0-1.0",
-			"licenseFiles": [
-				"visual/licenses/Mesh2Motion-CC0.md",
-				"visual/licenses/CC0-1.0.txt"
-			],
-			"creators": "OpenGym3D · Mesh2Motion · MakeHuman/MPFB core assets",
-			"reviewStatus": "TECHNICAL_PREVIEW_PROFESSIONAL_REVIEW_PENDING",
-			"professionallyReviewed": false,
-			"technicalEvidence": "Original rejected by Filament cgltf: orphan Human weights clip output18, input2, zero morph targets. Minimal CC0 derivative retains Human.rig with byte-identical BIN. Native runtime acceptance recorded separately in docs/resources.md.",
-			"capabilities": [
-				"play",
-				"pause",
-				"speed",
-				"view",
-				"marker",
-				"rotate",
-				"zoom"
-			],
-			"views": [
-				"front",
-				"side",
-				"rear",
-				"reset"
-			],
-			"regions": [],
-			"clipNames": [
-				"Human.rig"
-			],
-			"durationSeconds": 1.533333,
-			"markers": {
-				"initial": 0,
-				"middle": 0.7666665,
-				"final": 1.533333
+	"version": 2,
+	"model": {
+		"assetPath": "visual/energym_motions.glb",
+		"sha256": "46fc49771546ae4519d17c35e0d37d72c39779e1d4ca9d87629b3597dec3dee9",
+		"bytes": 8655180,
+		"license": "CC0-1.0",
+		"licenseFiles": [
+			"visual/licenses/Mesh2Motion-CC0.md",
+			"visual/licenses/CC0-1.0.txt"
+		],
+		"creators": "OpenGym3D · Mesh2Motion · MakeHuman/MPFB core assets · EnerGym (clips esquemáticos)",
+		"sources": [
+			{
+				"file": "push_up_native.glb",
+				"sha256": "80338cac3e52dd9b7d7676c83fda2c00158a5254ac91e930710c1497b67bfe3f"
 			},
-			"markerMeaning": "Timeline samples of the inspected clips, not professionally approved movement phases; initial and final belong to a near-closed loop.",
-			"speeds": [
-				0.25,
-				0.5,
-				1.0
-			]
+			{
+				"file": "jumping_jacks_native.glb",
+				"sha256": "dd6f6e860be59702714edefed5dac8265d391c4d4a2244ac7fea18b52ef2abfa"
+			},
+			{
+				"file": "jog_native.glb",
+				"sha256": "ad9cb7c7b9828e1f65d00a6d02b3afddf0a0fe52070eca5e335300c1231d5a2c"
+			},
+			{
+				"file": "walk_native.glb",
+				"sha256": "fb71090b36eb0f03a17b451618e6a28a0bb83e043baf7c1f348acf3b890c92f5"
+			},
+			{
+				"file": "human-base-animations.glb",
+				"sha256": "406eb0a8dc4ab366e623b79b6e3005a4951392e1bda78ae39c1099d31147733c"
+			}
+		],
+		"reviewStatus": "TECHNICAL_PREVIEW_PROFESSIONAL_REVIEW_PENDING",
+		"professionallyReviewed": false,
+		"kinds": {
+			"CC0_CAPTURE": "Captura de movimiento CC0 (Mesh2Motion, vía OpenGym3D o retarget propio).",
+			"SCHEMATIC": "Animación esquemática generada por patrón de movimiento con props simplificados."
+		},
+		"captureClips": {
+			"cc0/push_up": "Flexión (Mesh2Motion «Pushup»)",
+			"cc0/jumping_jacks": "Saltos de tijera (Mesh2Motion «Jumping Jacks»)",
+			"cc0/jog": "Trote en el sitio (Mesh2Motion «Jog»)",
+			"cc0/walk": "Marcha en el sitio (Mesh2Motion «Walk»)",
+			"cc0/sprint": "Sprint en el sitio (Mesh2Motion «Sprint»)",
+			"cc0/swim": "Crol (Mesh2Motion «Swim_Fwd»)",
+			"cc0/boxing": "Jab y cruzado (Mesh2Motion «Punch_Jab», «Punch_Cross»)"
+		}
+	},
+	"exercises": [
+		{
+			"exerciseId": "bodyweight-squat",
+			"clip": "esq/squat",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.889
 		},
 		{
-			"exerciseId": "jumping-jacks",
-			"assetPath": "visual/jumping_jacks_native.glb",
-			"sha256": "dd6f6e860be59702714edefed5dac8265d391c4d4a2244ac7fea18b52ef2abfa",
-			"sourceSha256": "94aa534eded3272a61f775d3a7067a9093df97c99f5505d64e39251c46697a0e",
-			"adaptation": "Removed orphan Human weights animation: zero mesh morph targets. Mesh, rig and BIN unchanged.",
-			"binaryChunkSha256": "b8c2aee85ea30f7510998da1b6d3fd0fb5828a636fc9b68902d705e1e276ae3f",
-			"sourceUrl": "https://assiamahs.github.io/opengym3d/assets/jumping_jack.glb",
-			"sourceRevision": "ea3a60130fdcfb3c4771e44d09f84ebab4ee9bae",
-			"sourceRevisionNote": "GitHub Pages deployment of ea3a601 (render & deploy run 35005945810, 2026-09-15) was the live export on 2026-10-15; the spec exercises/jumping_jack.json maps to cc0/mesh2motion/human-addon-animations.glb#Jumping Jacks. Bytes identified by SHA-256.",
-			"license": "CC0-1.0",
-			"licenseFiles": [
-				"visual/licenses/Mesh2Motion-CC0.md",
-				"visual/licenses/CC0-1.0.txt"
-			],
-			"creators": "OpenGym3D · Mesh2Motion · MakeHuman/MPFB core assets",
-			"reviewStatus": "TECHNICAL_PREVIEW_PROFESSIONAL_REVIEW_PENDING",
-			"professionallyReviewed": false,
-			"technicalEvidence": "Mesh2Motion clip «Jumping Jacks» retargeted by OpenGym3D onto the MakeHuman rig. Same orphan Human weights clip as push_up.glb (zero morph targets) removed by tools/normalize_opengym3d.py; BIN chunk byte-identical. Filament runtime acceptance pending device check, see docs/resources.md.",
-			"capabilities": [
-				"play",
-				"pause",
-				"speed",
-				"view",
-				"marker",
-				"rotate",
-				"zoom"
-			],
-			"views": [
-				"front",
-				"side",
-				"rear",
-				"reset"
-			],
-			"regions": [],
-			"clipNames": [
-				"Human.rig"
-			],
-			"durationSeconds": 1.266667,
-			"markers": {
-				"initial": 0,
-				"middle": 0.6333335,
-				"final": 1.266667
-			},
-			"markerMeaning": "Timeline samples of the inspected clips, not professionally approved movement phases; initial and final belong to a near-closed loop.",
-			"speeds": [
-				0.25,
-				0.5,
-				1.0
-			]
+			"exerciseId": "bodyweight-lunge",
+			"clip": "esq/lunge-static",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.883
+		},
+		{
+			"exerciseId": "knee-pushup",
+			"clip": "esq/pushup-knee",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.709
+		},
+		{
+			"exerciseId": "glute-bridge",
+			"clip": "esq/bridge",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.3,
+			"viewRadius": 0.756
+		},
+		{
+			"exerciseId": "forearm-plank",
+			"clip": "esq/plank-forearm",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 0.0,
+			"viewRadius": 0.916
+		},
+		{
+			"exerciseId": "standing-mobility",
+			"clip": "esq/shoulder-mobility",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.2,
+			"viewRadius": 1.056
+		},
+		{
+			"exerciseId": "dumbbell-squat",
+			"clip": "esq/squat-dumbbells",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.889
+		},
+		{
+			"exerciseId": "dumbbell-row",
+			"clip": "esq/row-dumbbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.696
+		},
+		{
+			"exerciseId": "dumbbell-floor-press",
+			"clip": "esq/floor-press-dumbbells",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.753
+		},
+		{
+			"exerciseId": "barbell-deadlift",
+			"clip": "esq/deadlift",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "dumbbell-bench-press",
+			"clip": "esq/bench-press-dumbbells",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.693
+		},
+		{
+			"exerciseId": "chair-squat",
+			"clip": "esq/squat-chair",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.889
+		},
+		{
+			"exerciseId": "wall-sit",
+			"clip": "esq/wall-sit",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 0.0,
+			"viewRadius": 0.682
+		},
+		{
+			"exerciseId": "supported-calf-raise",
+			"clip": "esq/calf-raise-support",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.0,
+			"viewRadius": 0.938
+		},
+		{
+			"exerciseId": "band-row",
+			"clip": "esq/row-seated",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.588
+		},
+		{
+			"exerciseId": "mat-mobility",
+			"clip": "esq/cat-cow",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.701
 		},
 		{
 			"exerciseId": "running-easy",
-			"assetPath": "visual/jog_native.glb",
-			"sha256": "ad9cb7c7b9828e1f65d00a6d02b3afddf0a0fe52070eca5e335300c1231d5a2c",
-			"sourceSha256": "3e20fe0299cd78c9534f4c1320a4e2e4f31f8b4ae51598a69065f93a43a0c020",
-			"adaptation": "Removed orphan Human weights animation: zero mesh morph targets. Mesh, rig and BIN unchanged.",
-			"binaryChunkSha256": "05ec689556476c4419480c1688fd43456057457f1463303172866d2995fa246b",
-			"sourceUrl": "https://assiamahs.github.io/opengym3d/assets/jog.glb",
-			"sourceRevision": "ea3a60130fdcfb3c4771e44d09f84ebab4ee9bae",
-			"sourceRevisionNote": "GitHub Pages deployment of ea3a601 (render & deploy run 35005945810, 2026-09-15) was the live export on 2026-10-15; the spec exercises/jog.json maps to cc0/mesh2motion/human-base-animations.glb#Jog. Bytes identified by SHA-256.",
-			"license": "CC0-1.0",
-			"licenseFiles": [
-				"visual/licenses/Mesh2Motion-CC0.md",
-				"visual/licenses/CC0-1.0.txt"
-			],
-			"creators": "OpenGym3D · Mesh2Motion · MakeHuman/MPFB core assets",
-			"reviewStatus": "TECHNICAL_PREVIEW_PROFESSIONAL_REVIEW_PENDING",
-			"professionallyReviewed": false,
-			"technicalEvidence": "Mesh2Motion clip «Jog» (jog in place) retargeted by OpenGym3D; shows stride and arm swing, not outdoor travel or pace. Same orphan Human weights clip as push_up.glb (zero morph targets) removed by tools/normalize_opengym3d.py; BIN chunk byte-identical. Filament runtime acceptance pending device check, see docs/resources.md.",
-			"capabilities": [
-				"play",
-				"pause",
-				"speed",
-				"view",
-				"marker",
-				"rotate",
-				"zoom"
-			],
-			"views": [
-				"front",
-				"side",
-				"rear",
-				"reset"
-			],
-			"regions": [],
-			"clipNames": [
-				"Human.rig"
-			],
+			"clip": "cc0/jog",
+			"kind": "CC0_CAPTURE",
+			"match": "EXACT",
 			"durationSeconds": 1.2,
-			"markers": {
-				"initial": 0,
-				"middle": 0.6,
-				"final": 1.2
-			},
-			"markerMeaning": "Timeline samples of the inspected clips, not professionally approved movement phases; initial and final belong to a near-closed loop.",
-			"speeds": [
-				0.25,
-				0.5,
-				1.0
-			]
+			"middle": 0.6,
+			"viewRadius": 0.0
+		},
+		{
+			"exerciseId": "cycling-easy",
+			"clip": "esq/bike",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.795
+		},
+		{
+			"exerciseId": "swimming-easy",
+			"clip": "cc0/swim",
+			"kind": "CC0_CAPTURE",
+			"match": "EXACT",
+			"durationSeconds": 1.666667,
+			"middle": 0.833333,
+			"viewRadius": 1.066
+		},
+		{
+			"exerciseId": "sport-complementary-squat",
+			"clip": "esq/squat",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.889
+		},
+		{
+			"exerciseId": "sport-complementary-mobility",
+			"clip": "esq/dynamic-warmup",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 0.8,
+			"viewRadius": 1.048
+		},
+		{
+			"exerciseId": "standard-pushup",
+			"clip": "cc0/push_up",
+			"kind": "CC0_CAPTURE",
+			"match": "EXACT",
+			"durationSeconds": 1.533333,
+			"middle": 0.766667,
+			"viewRadius": 0.0
+		},
+		{
+			"exerciseId": "barbell-back-squat",
+			"clip": "esq/squat-back",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.889
+		},
+		{
+			"exerciseId": "barbell-front-squat",
+			"clip": "esq/squat-front",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.889
+		},
+		{
+			"exerciseId": "barbell-bench-press",
+			"clip": "esq/bench-press",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.693
+		},
+		{
+			"exerciseId": "barbell-incline-press",
+			"clip": "esq/bench-press-incline",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.866
+		},
+		{
+			"exerciseId": "barbell-overhead-press",
+			"clip": "esq/press-barbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 1.057
+		},
+		{
+			"exerciseId": "barbell-row",
+			"clip": "esq/row-barbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.696
+		},
+		{
+			"exerciseId": "barbell-romanian-deadlift",
+			"clip": "esq/rdl",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "barbell-hip-thrust",
+			"clip": "esq/hip-thrust",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.3,
+			"viewRadius": 0.751
+		},
+		{
+			"exerciseId": "barbell-curl",
+			"clip": "esq/curl-barbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "barbell-close-grip-press",
+			"clip": "esq/bench-press-close",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.698
+		},
+		{
+			"exerciseId": "dumbbell-goblet-squat",
+			"clip": "esq/squat-goblet",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.889
+		},
+		{
+			"exerciseId": "dumbbell-shoulder-press",
+			"clip": "esq/press-dumbbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 1.057
+		},
+		{
+			"exerciseId": "dumbbell-arnold-press",
+			"clip": "esq/press-arnold",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.5,
+			"viewRadius": 1.056
+		},
+		{
+			"exerciseId": "dumbbell-lateral-raise",
+			"clip": "esq/lateral-raise",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "dumbbell-reverse-fly",
+			"clip": "esq/reverse-fly",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.847
+		},
+		{
+			"exerciseId": "dumbbell-biceps-curl",
+			"clip": "esq/curl-dumbbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "dumbbell-hammer-curl",
+			"clip": "esq/curl-hammer",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "dumbbell-overhead-triceps",
+			"clip": "esq/triceps-overhead",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 1.057
+		},
+		{
+			"exerciseId": "dumbbell-triceps-kickback",
+			"clip": "esq/triceps-kickback",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.683
+		},
+		{
+			"exerciseId": "dumbbell-romanian-deadlift",
+			"clip": "esq/rdl-dumbbells",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "dumbbell-walking-lunge",
+			"clip": "esq/lunge-walking-dumbbells",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "dumbbell-bulgarian-split-squat",
+			"clip": "esq/lunge-bulgarian",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.856
+		},
+		{
+			"exerciseId": "dumbbell-step-up",
+			"clip": "esq/step-up-dumbbells",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 1.11
+		},
+		{
+			"exerciseId": "dumbbell-incline-press",
+			"clip": "esq/bench-press-incline-dumbbells",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.868
+		},
+		{
+			"exerciseId": "dumbbell-fly",
+			"clip": "esq/fly",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.834
+		},
+		{
+			"exerciseId": "dumbbell-one-arm-row",
+			"clip": "esq/row-one-arm",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.6
+		},
+		{
+			"exerciseId": "dumbbell-pullover",
+			"clip": "esq/pullover",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.828
+		},
+		{
+			"exerciseId": "dumbbell-shrug",
+			"clip": "esq/shrug",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.0,
+			"middle": 1.0,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "dumbbell-thruster",
+			"clip": "esq/thruster",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.6,
+			"viewRadius": 1.055
+		},
+		{
+			"exerciseId": "dumbbell-calf-raise",
+			"clip": "esq/calf-raise-dumbbells",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.0,
+			"viewRadius": 0.938
+		},
+		{
+			"exerciseId": "lat-pulldown",
+			"clip": "esq/pulldown",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.876
+		},
+		{
+			"exerciseId": "seated-cable-row",
+			"clip": "esq/row-seated",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.588
+		},
+		{
+			"exerciseId": "leg-press",
+			"clip": "esq/leg-press",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.713
+		},
+		{
+			"exerciseId": "leg-extension",
+			"clip": "esq/leg-extension",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.697
+		},
+		{
+			"exerciseId": "leg-curl",
+			"clip": "esq/leg-curl-lying",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.909
+		},
+		{
+			"exerciseId": "machine-chest-press",
+			"clip": "esq/chest-press-machine",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.718
+		},
+		{
+			"exerciseId": "pec-deck",
+			"clip": "esq/pec-deck",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.835
+		},
+		{
+			"exerciseId": "cable-triceps-pushdown",
+			"clip": "esq/triceps-pushdown",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.888
+		},
+		{
+			"exerciseId": "cable-biceps-curl",
+			"clip": "esq/curl-cable",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "cable-face-pull",
+			"clip": "esq/face-pull",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.93
+		},
+		{
+			"exerciseId": "cable-woodchop",
+			"clip": "esq/woodchop",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.1,
+			"viewRadius": 1.005
+		},
+		{
+			"exerciseId": "machine-hip-abduction",
+			"clip": "esq/hip-abduction",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.726
+		},
+		{
+			"exerciseId": "machine-calf-raise",
+			"clip": "esq/calf-raise-barbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.0,
+			"viewRadius": 0.938
+		},
+		{
+			"exerciseId": "assisted-pull-up",
+			"clip": "esq/pull-up-assisted",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.983
+		},
+		{
+			"exerciseId": "rowing-machine",
+			"clip": "esq/rowing",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 0.8,
+			"viewRadius": 0.787
+		},
+		{
+			"exerciseId": "stationary-bike",
+			"clip": "esq/bike",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.795
+		},
+		{
+			"exerciseId": "elliptical",
+			"clip": "esq/elliptical",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.869
+		},
+		{
+			"exerciseId": "band-pull-apart",
+			"clip": "esq/pull-apart",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "band-face-pull",
+			"clip": "esq/face-pull",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.93
+		},
+		{
+			"exerciseId": "band-biceps-curl",
+			"clip": "esq/curl-band",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "band-triceps-extension",
+			"clip": "esq/triceps-overhead-cable",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 1.057
+		},
+		{
+			"exerciseId": "band-lateral-raise",
+			"clip": "esq/lateral-raise-band",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "band-lateral-walk",
+			"clip": "esq/lateral-walk",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.821
+		},
+		{
+			"exerciseId": "band-chest-press",
+			"clip": "esq/chest-press-band",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.892
+		},
+		{
+			"exerciseId": "pull-up",
+			"clip": "esq/pull-up",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 1.159
+		},
+		{
+			"exerciseId": "chin-up",
+			"clip": "esq/chin-up",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 1.156
+		},
+		{
+			"exerciseId": "parallel-bar-dips",
+			"clip": "esq/dips",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.793
+		},
+		{
+			"exerciseId": "inverted-row",
+			"clip": "esq/row-inverted",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.889
+		},
+		{
+			"exerciseId": "pike-pushup",
+			"clip": "esq/pike-pushup",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.694
+		},
+		{
+			"exerciseId": "diamond-pushup",
+			"clip": "esq/pushup-diamond",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.904
+		},
+		{
+			"exerciseId": "wall-pushup",
+			"clip": "esq/pushup-wall",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.856
+		},
+		{
+			"exerciseId": "bench-dips",
+			"clip": "esq/dips-bench",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.687
+		},
+		{
+			"exerciseId": "chair-step-up",
+			"clip": "esq/step-up",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 1.11
+		},
+		{
+			"exerciseId": "reverse-lunge",
+			"clip": "esq/lunge-reverse",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "split-squat",
+			"clip": "esq/lunge-static",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.883
+		},
+		{
+			"exerciseId": "side-lunge",
+			"clip": "esq/side-lunge",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 0.9,
+			"viewRadius": 0.873
+		},
+		{
+			"exerciseId": "single-leg-glute-bridge",
+			"clip": "esq/bridge-single",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.3,
+			"viewRadius": 0.756
+		},
+		{
+			"exerciseId": "jump-squat",
+			"clip": "esq/squat-jump",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.3,
+			"middle": 0.7,
+			"viewRadius": 1.17
+		},
+		{
+			"exerciseId": "mountain-climbers",
+			"clip": "esq/mountain-climbers",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 0.9,
+			"middle": 0.45,
+			"viewRadius": 0.887
+		},
+		{
+			"exerciseId": "burpee",
+			"clip": "esq/burpee",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.3,
+			"viewRadius": 1.285
+		},
+		{
+			"exerciseId": "superman",
+			"clip": "esq/superman",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 1.069
+		},
+		{
+			"exerciseId": "crunch",
+			"clip": "esq/crunch",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.763
+		},
+		{
+			"exerciseId": "bicycle-crunch",
+			"clip": "esq/bicycle-crunch",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.6,
+			"middle": 0.8,
+			"viewRadius": 0.88
+		},
+		{
+			"exerciseId": "lying-leg-raise",
+			"clip": "esq/leg-raise",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.895
+		},
+		{
+			"exerciseId": "dead-bug",
+			"clip": "esq/dead-bug",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 0.9,
+			"viewRadius": 1.045
+		},
+		{
+			"exerciseId": "bird-dog",
+			"clip": "esq/bird-dog",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 0.9,
+			"viewRadius": 1.066
+		},
+		{
+			"exerciseId": "glute-kickback",
+			"clip": "esq/glute-kickback",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.1,
+			"viewRadius": 0.897
+		},
+		{
+			"exerciseId": "side-plank",
+			"clip": "esq/side-plank",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 0.0,
+			"viewRadius": 0.897
+		},
+		{
+			"exerciseId": "hollow-hold",
+			"clip": "esq/hollow-hold",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 0.0,
+			"viewRadius": 0.954
+		},
+		{
+			"exerciseId": "dead-hang",
+			"clip": "esq/dead-hang",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 0.0,
+			"viewRadius": 1.052
+		},
+		{
+			"exerciseId": "glute-bridge-hold",
+			"clip": "esq/bridge-hold",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 0.0,
+			"viewRadius": 0.747
+		},
+		{
+			"exerciseId": "running-intervals",
+			"clip": "cc0/jog",
+			"kind": "CC0_CAPTURE",
+			"match": "SIMILAR",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.0
+		},
+		{
+			"exerciseId": "tempo-run",
+			"clip": "cc0/jog",
+			"kind": "CC0_CAPTURE",
+			"match": "SIMILAR",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.0
 		},
 		{
 			"exerciseId": "brisk-walk",
-			"assetPath": "visual/walk_native.glb",
-			"sha256": "fb71090b36eb0f03a17b451618e6a28a0bb83e043baf7c1f348acf3b890c92f5",
-			"sourceSha256": "789867cd7f3ab8362f29632d1b424eb0f31193fca3a05318ac830a03b2115eb1",
-			"adaptation": "Removed orphan Human weights animation: zero mesh morph targets. Mesh, rig and BIN unchanged.",
-			"binaryChunkSha256": "55decda8a7701e5edb2798ed3a7d1e207220a0d168afc1a3d5cd07116cc34a77",
-			"sourceUrl": "https://assiamahs.github.io/opengym3d/assets/walk.glb",
-			"sourceRevision": "ea3a60130fdcfb3c4771e44d09f84ebab4ee9bae",
-			"sourceRevisionNote": "GitHub Pages deployment of ea3a601 (render & deploy run 35005945810, 2026-09-15) was the live export on 2026-10-15; the spec exercises/walk.json maps to cc0/mesh2motion/human-base-animations.glb#Walk. Bytes identified by SHA-256.",
-			"license": "CC0-1.0",
-			"licenseFiles": [
-				"visual/licenses/Mesh2Motion-CC0.md",
-				"visual/licenses/CC0-1.0.txt"
-			],
-			"creators": "OpenGym3D · Mesh2Motion · MakeHuman/MPFB core assets",
-			"reviewStatus": "TECHNICAL_PREVIEW_PROFESSIONAL_REVIEW_PENDING",
-			"professionallyReviewed": false,
-			"technicalEvidence": "Mesh2Motion clip «Walk» (walk in place) retargeted by OpenGym3D; shows step and arm swing, not brisk-walk speed. Same orphan Human weights clip as push_up.glb (zero morph targets) removed by tools/normalize_opengym3d.py; BIN chunk byte-identical. Filament runtime acceptance pending device check, see docs/resources.md.",
-			"capabilities": [
-				"play",
-				"pause",
-				"speed",
-				"view",
-				"marker",
-				"rotate",
-				"zoom"
-			],
-			"views": [
-				"front",
-				"side",
-				"rear",
-				"reset"
-			],
-			"regions": [],
-			"clipNames": [
-				"Human.rig"
-			],
+			"clip": "cc0/walk",
+			"kind": "CC0_CAPTURE",
+			"match": "EXACT",
 			"durationSeconds": 1.7,
-			"markers": {
-				"initial": 0,
-				"middle": 0.85,
-				"final": 1.7
-			},
-			"markerMeaning": "Timeline samples of the inspected clips, not professionally approved movement phases; initial and final belong to a near-closed loop.",
-			"speeds": [
-				0.25,
-				0.5,
-				1.0
-			]
+			"middle": 0.85,
+			"viewRadius": 0.0
+		},
+		{
+			"exerciseId": "cycling-intervals",
+			"clip": "esq/bike",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.795
+		},
+		{
+			"exerciseId": "swimming-intervals",
+			"clip": "cc0/swim",
+			"kind": "CC0_CAPTURE",
+			"match": "EXACT",
+			"durationSeconds": 1.666667,
+			"middle": 0.833333,
+			"viewRadius": 1.066
+		},
+		{
+			"exerciseId": "swimming-kick-drill",
+			"clip": "esq/swim-kick",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 0.7,
+			"middle": 0.35,
+			"viewRadius": 1.065
+		},
+		{
+			"exerciseId": "jumping-jacks",
+			"clip": "cc0/jumping_jacks",
+			"kind": "CC0_CAPTURE",
+			"match": "EXACT",
+			"durationSeconds": 1.266667,
+			"middle": 0.633333,
+			"viewRadius": 0.0
+		},
+		{
+			"exerciseId": "cat-cow",
+			"clip": "esq/cat-cow",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.701
+		},
+		{
+			"exerciseId": "hip-flexor-stretch",
+			"clip": "esq/hip-flexor-stretch",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.746
+		},
+		{
+			"exerciseId": "hamstring-stretch",
+			"clip": "esq/hamstring-stretch",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.879
+		},
+		{
+			"exerciseId": "thoracic-open-book",
+			"clip": "esq/open-book",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.855
+		},
+		{
+			"exerciseId": "worlds-greatest-stretch",
+			"clip": "esq/worlds-greatest",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 1.5,
+			"viewRadius": 0.919
+		},
+		{
+			"exerciseId": "ankle-wall-mobility",
+			"clip": "esq/ankle-wall",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.758
+		},
+		{
+			"exerciseId": "calf-wall-stretch",
+			"clip": "esq/calf-wall-stretch",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.831
+		},
+		{
+			"exerciseId": "hip-90-90",
+			"clip": "esq/hip-90-90",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.8,
+			"middle": 1.2,
+			"viewRadius": 0.817
+		},
+		{
+			"exerciseId": "pigeon-stretch",
+			"clip": "esq/pigeon",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.875
+		},
+		{
+			"exerciseId": "childs-pose",
+			"clip": "esq/childs-pose",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 0.0,
+			"viewRadius": 0.646
+		},
+		{
+			"exerciseId": "band-shoulder-dislocate",
+			"clip": "esq/shoulder-dislocate",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 1.029
+		},
+		{
+			"exerciseId": "neck-mobility",
+			"clip": "esq/neck-mobility",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 6.0,
+			"middle": 1.5,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "prep-lateral-lunge",
+			"clip": "esq/side-lunge",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 0.9,
+			"viewRadius": 0.873
+		},
+		{
+			"exerciseId": "prep-single-leg-rdl",
+			"clip": "esq/single-leg-rdl",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.902
+		},
+		{
+			"exerciseId": "prep-skater-jump",
+			"clip": "esq/skater-jumps",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.4,
+			"middle": 0.7,
+			"viewRadius": 0.87
+		},
+		{
+			"exerciseId": "prep-jump-squat",
+			"clip": "esq/squat-jump",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.3,
+			"middle": 0.7,
+			"viewRadius": 1.17
+		},
+		{
+			"exerciseId": "prep-single-leg-calf-raise",
+			"clip": "esq/calf-raise-single",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.0,
+			"viewRadius": 0.938
+		},
+		{
+			"exerciseId": "prep-side-plank",
+			"clip": "esq/side-plank",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 0.0,
+			"viewRadius": 0.897
+		},
+		{
+			"exerciseId": "prep-dead-bug",
+			"clip": "esq/dead-bug",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 0.9,
+			"viewRadius": 1.045
+		},
+		{
+			"exerciseId": "prep-hip-flexor-stretch",
+			"clip": "esq/hip-flexor-stretch",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.746
+		},
+		{
+			"exerciseId": "prep-ankle-mobility",
+			"clip": "esq/ankle-mobility",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.758
+		},
+		{
+			"exerciseId": "prep-dynamic-warmup",
+			"clip": "esq/dynamic-warmup",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 0.8,
+			"viewRadius": 1.048
+		},
+		{
+			"exerciseId": "smith-squat",
+			"clip": "esq/squat-smith",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.889
+		},
+		{
+			"exerciseId": "smith-bench-press",
+			"clip": "esq/bench-press",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.693
+		},
+		{
+			"exerciseId": "hack-squat",
+			"clip": "esq/squat-hack",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.889
+		},
+		{
+			"exerciseId": "seated-leg-curl",
+			"clip": "esq/leg-curl-seated",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.697
+		},
+		{
+			"exerciseId": "machine-hip-adduction",
+			"clip": "esq/hip-adduction",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.726
+		},
+		{
+			"exerciseId": "machine-hip-thrust",
+			"clip": "esq/hip-thrust-machine",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.3,
+			"viewRadius": 0.751
+		},
+		{
+			"exerciseId": "machine-glute-kickback",
+			"clip": "esq/kickback-machine",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.1,
+			"viewRadius": 0.846
+		},
+		{
+			"exerciseId": "seated-calf-raise",
+			"clip": "esq/calf-raise-seated",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.0,
+			"viewRadius": 0.695
+		},
+		{
+			"exerciseId": "machine-shoulder-press",
+			"clip": "esq/press-machine",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.877
+		},
+		{
+			"exerciseId": "machine-lateral-raise",
+			"clip": "esq/lateral-raise-machine",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.718
+		},
+		{
+			"exerciseId": "reverse-pec-deck",
+			"clip": "esq/reverse-fly-seated",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.869
+		},
+		{
+			"exerciseId": "machine-row",
+			"clip": "esq/row-machine",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.712
+		},
+		{
+			"exerciseId": "cable-crossover",
+			"clip": "esq/crossover",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.875
+		},
+		{
+			"exerciseId": "cable-low-fly",
+			"clip": "esq/low-fly",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.892
+		},
+		{
+			"exerciseId": "cable-lateral-raise",
+			"clip": "esq/lateral-raise-cable",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "cable-overhead-triceps",
+			"clip": "esq/triceps-overhead-cable",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 1.057
+		},
+		{
+			"exerciseId": "cable-crunch",
+			"clip": "esq/crunch-cable",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.733
+		},
+		{
+			"exerciseId": "cable-pull-through",
+			"clip": "esq/pull-through",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "cable-glute-kickback",
+			"clip": "esq/kickback-cable",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.1,
+			"viewRadius": 0.874
+		},
+		{
+			"exerciseId": "straight-arm-pulldown",
+			"clip": "esq/pulldown-straight-arm",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.817
+		},
+		{
+			"exerciseId": "close-grip-pulldown",
+			"clip": "esq/pulldown-close",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.88
+		},
+		{
+			"exerciseId": "machine-preacher-curl",
+			"clip": "esq/curl-preacher",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.704
+		},
+		{
+			"exerciseId": "machine-dip",
+			"clip": "esq/dips-machine",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.718
+		},
+		{
+			"exerciseId": "back-extension",
+			"clip": "esq/back-extension",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.924
+		},
+		{
+			"exerciseId": "machine-ab-crunch",
+			"clip": "esq/crunch-machine",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.718
+		},
+		{
+			"exerciseId": "treadmill-incline-walk",
+			"clip": "cc0/walk",
+			"kind": "CC0_CAPTURE",
+			"match": "SIMILAR",
+			"durationSeconds": 1.7,
+			"middle": 0.85,
+			"viewRadius": 0.0
+		},
+		{
+			"exerciseId": "stair-climber",
+			"clip": "esq/stair-climber",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.6,
+			"middle": 0.8,
+			"viewRadius": 0.891
+		},
+		{
+			"exerciseId": "air-bike",
+			"clip": "esq/air-bike",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.795
+		},
+		{
+			"exerciseId": "ski-erg",
+			"clip": "esq/ski-erg",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.6,
+			"middle": 0.6,
+			"viewRadius": 1.046
+		},
+		{
+			"exerciseId": "barbell-sumo-deadlift",
+			"clip": "esq/sumo-deadlift",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "barbell-good-morning",
+			"clip": "esq/good-morning",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "barbell-lunge",
+			"clip": "esq/lunge-static-back",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.883
+		},
+		{
+			"exerciseId": "pendlay-row",
+			"clip": "esq/row-pendlay",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.583
+		},
+		{
+			"exerciseId": "t-bar-row",
+			"clip": "esq/row-t-bar",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.696
+		},
+		{
+			"exerciseId": "barbell-upright-row",
+			"clip": "esq/upright-row-barbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "barbell-skull-crusher",
+			"clip": "esq/skull-crusher",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.768
+		},
+		{
+			"exerciseId": "barbell-shrug",
+			"clip": "esq/shrug-barbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.0,
+			"middle": 1.0,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "barbell-floor-press",
+			"clip": "esq/floor-press",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.753
+		},
+		{
+			"exerciseId": "barbell-push-press",
+			"clip": "esq/push-press",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 0.9,
+			"viewRadius": 1.057
+		},
+		{
+			"exerciseId": "power-clean",
+			"clip": "esq/power-clean",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 0.9,
+			"viewRadius": 0.91
+		},
+		{
+			"exerciseId": "landmine-press",
+			"clip": "esq/press-landmine",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.891
+		},
+		{
+			"exerciseId": "barbell-calf-raise",
+			"clip": "esq/calf-raise-barbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.0,
+			"viewRadius": 0.938
+		},
+		{
+			"exerciseId": "barbell-reverse-curl",
+			"clip": "esq/curl-reverse",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "barbell-wrist-curl",
+			"clip": "esq/curl-wrist",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.8,
+			"middle": 0.9,
+			"viewRadius": 0.652
+		},
+		{
+			"exerciseId": "dumbbell-deadlift",
+			"clip": "esq/deadlift-dumbbells",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "dumbbell-sumo-squat",
+			"clip": "esq/squat-sumo-goblet",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.889
+		},
+		{
+			"exerciseId": "dumbbell-static-lunge",
+			"clip": "esq/lunge-static-dumbbells",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.883
+		},
+		{
+			"exerciseId": "dumbbell-lateral-lunge",
+			"clip": "esq/side-lunge-goblet",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 0.9,
+			"viewRadius": 0.873
+		},
+		{
+			"exerciseId": "dumbbell-single-leg-rdl",
+			"clip": "esq/single-leg-rdl-dumbbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.902
+		},
+		{
+			"exerciseId": "dumbbell-hip-thrust",
+			"clip": "esq/hip-thrust-dumbbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.3,
+			"viewRadius": 0.751
+		},
+		{
+			"exerciseId": "dumbbell-chest-supported-row",
+			"clip": "esq/row-chest-supported",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.695
+		},
+		{
+			"exerciseId": "renegade-row",
+			"clip": "esq/row-renegade",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 0.9,
+			"viewRadius": 0.882
+		},
+		{
+			"exerciseId": "dumbbell-upright-row",
+			"clip": "esq/upright-row",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "dumbbell-front-raise",
+			"clip": "esq/front-raise",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "dumbbell-concentration-curl",
+			"clip": "esq/curl-concentration",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.636
+		},
+		{
+			"exerciseId": "dumbbell-incline-curl",
+			"clip": "esq/curl-incline",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.763
+		},
+		{
+			"exerciseId": "dumbbell-zottman-curl",
+			"clip": "esq/curl-zottman",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.0,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "dumbbell-skull-crusher",
+			"clip": "esq/skull-crusher-dumbbells",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.767
+		},
+		{
+			"exerciseId": "dumbbell-close-grip-press",
+			"clip": "esq/bench-press-close-dumbbells",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.696
+		},
+		{
+			"exerciseId": "dumbbell-snatch",
+			"clip": "esq/snatch",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.1,
+			"viewRadius": 1.058
+		},
+		{
+			"exerciseId": "dumbbell-clean-press",
+			"clip": "esq/clean-press",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 1.5,
+			"viewRadius": 1.056
+		},
+		{
+			"exerciseId": "farmers-walk",
+			"clip": "esq/farmers-walk",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.895
+		},
+		{
+			"exerciseId": "suitcase-carry",
+			"clip": "esq/suitcase-carry",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.895
+		},
+		{
+			"exerciseId": "dumbbell-side-bend",
+			"clip": "esq/side-bend",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.947
+		},
+		{
+			"exerciseId": "dumbbell-russian-twist",
+			"clip": "esq/russian-twist-dumbbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.6,
+			"middle": 0.8,
+			"viewRadius": 0.579
+		},
+		{
+			"exerciseId": "dumbbell-swing",
+			"clip": "esq/swing",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.5,
+			"middle": 0.7,
+			"viewRadius": 0.9
+		},
+		{
+			"exerciseId": "dumbbell-woodchop",
+			"clip": "esq/woodchop-dumbbell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.1,
+			"viewRadius": 1.005
+		},
+		{
+			"exerciseId": "band-squat",
+			"clip": "esq/squat-band",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.889
+		},
+		{
+			"exerciseId": "band-deadlift",
+			"clip": "esq/deadlift-band",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "band-good-morning",
+			"clip": "esq/good-morning-band",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "band-glute-bridge",
+			"clip": "esq/bridge",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.3,
+			"viewRadius": 0.756
+		},
+		{
+			"exerciseId": "band-kickback",
+			"clip": "esq/glute-kickback",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.1,
+			"viewRadius": 0.897
+		},
+		{
+			"exerciseId": "band-lat-pulldown",
+			"clip": "esq/pulldown-band",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 1.056
+		},
+		{
+			"exerciseId": "band-overhead-press",
+			"clip": "esq/press-band",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 1.057
+		},
+		{
+			"exerciseId": "band-pallof-press",
+			"clip": "esq/pallof-press",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.862
+		},
+		{
+			"exerciseId": "band-hamstring-curl",
+			"clip": "esq/leg-curl-band",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.909
+		},
+		{
+			"exerciseId": "band-clamshell",
+			"clip": "esq/clamshell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.1,
+			"viewRadius": 0.931
+		},
+		{
+			"exerciseId": "bodyweight-sumo-squat",
+			"clip": "esq/squat-sumo",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.889
+		},
+		{
+			"exerciseId": "pulse-squat",
+			"clip": "esq/squat-pulse",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 1.0,
+			"viewRadius": 0.889
+		},
+		{
+			"exerciseId": "cossack-squat",
+			"clip": "esq/cossack",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 0.9,
+			"viewRadius": 0.873
+		},
+		{
+			"exerciseId": "pistol-squat-assisted",
+			"clip": "esq/pistol-assisted",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 1.045
+		},
+		{
+			"exerciseId": "curtsy-lunge",
+			"clip": "esq/curtsy-lunge",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "single-leg-calf-raise",
+			"clip": "esq/calf-raise-single",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.0,
+			"viewRadius": 0.938
+		},
+		{
+			"exerciseId": "glute-bridge-march",
+			"clip": "esq/bridge-march",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 1.4,
+			"viewRadius": 0.787
+		},
+		{
+			"exerciseId": "frog-pump",
+			"clip": "esq/frog-pump",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.3,
+			"viewRadius": 0.706
+		},
+		{
+			"exerciseId": "donkey-kick",
+			"clip": "esq/donkey-kick",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.1,
+			"viewRadius": 0.782
+		},
+		{
+			"exerciseId": "fire-hydrant",
+			"clip": "esq/fire-hydrant",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.1,
+			"viewRadius": 0.699
+		},
+		{
+			"exerciseId": "clamshell",
+			"clip": "esq/clamshell",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.1,
+			"viewRadius": 0.931
+		},
+		{
+			"exerciseId": "jump-lunge",
+			"clip": "esq/lunge-jump",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.0,
+			"middle": 1.0,
+			"viewRadius": 1.004
+		},
+		{
+			"exerciseId": "tuck-jump",
+			"clip": "esq/tuck-jump",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.8,
+			"middle": 0.9,
+			"viewRadius": 1.112
+		},
+		{
+			"exerciseId": "box-jump-low",
+			"clip": "esq/box-jump",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.2,
+			"viewRadius": 1.29
+		},
+		{
+			"exerciseId": "wide-pushup",
+			"clip": "esq/pushup-wide",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.904
+		},
+		{
+			"exerciseId": "decline-pushup",
+			"clip": "esq/pushup-decline",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.89
+		},
+		{
+			"exerciseId": "incline-pushup",
+			"clip": "esq/pushup-incline",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 0.903
+		},
+		{
+			"exerciseId": "archer-pushup",
+			"clip": "esq/pushup-archer",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 1.0,
+			"viewRadius": 0.902
+		},
+		{
+			"exerciseId": "hindu-pushup",
+			"clip": "esq/pushup-hindu",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 1.8,
+			"viewRadius": 0.909
+		},
+		{
+			"exerciseId": "negative-pull-up",
+			"clip": "esq/pull-up-negative",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 1.3,
+			"viewRadius": 1.159
+		},
+		{
+			"exerciseId": "scapular-pull-up",
+			"clip": "esq/pull-up-scapular",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.2,
+			"middle": 1.1,
+			"viewRadius": 1.067
+		},
+		{
+			"exerciseId": "hanging-knee-raise",
+			"clip": "esq/hanging-knee-raise",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 1.053
+		},
+		{
+			"exerciseId": "hanging-leg-raise",
+			"clip": "esq/hanging-leg-raise",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.8,
+			"middle": 1.4,
+			"viewRadius": 1.055
+		},
+		{
+			"exerciseId": "muscle-up",
+			"clip": "esq/muscle-up",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.2,
+			"viewRadius": 1.498
+		},
+		{
+			"exerciseId": "wall-handstand-hold",
+			"clip": "esq/wall-handstand",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 0.0,
+			"viewRadius": 1.053
+		},
+		{
+			"exerciseId": "l-sit",
+			"clip": "esq/l-sit",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 0.0,
+			"viewRadius": 0.598
+		},
+		{
+			"exerciseId": "reverse-plank",
+			"clip": "esq/reverse-plank",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 0.0,
+			"viewRadius": 0.85
+		},
+		{
+			"exerciseId": "plank-shoulder-taps",
+			"clip": "esq/plank-shoulder-taps",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.8,
+			"middle": 0.6,
+			"viewRadius": 0.882
+		},
+		{
+			"exerciseId": "plank-jacks",
+			"clip": "esq/plank-jacks",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.882
+		},
+		{
+			"exerciseId": "bear-crawl",
+			"clip": "esq/bear-crawl",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.697
+		},
+		{
+			"exerciseId": "inchworm",
+			"clip": "esq/inchworm",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.4,
+			"middle": 2.2,
+			"viewRadius": 0.906
+		},
+		{
+			"exerciseId": "flutter-kicks",
+			"clip": "esq/flutter-kicks",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.0,
+			"middle": 0.5,
+			"viewRadius": 0.875
+		},
+		{
+			"exerciseId": "scissor-kicks",
+			"clip": "esq/scissor-kicks",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.0,
+			"middle": 0.5,
+			"viewRadius": 0.852
+		},
+		{
+			"exerciseId": "v-up",
+			"clip": "esq/v-up",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 1.3,
+			"viewRadius": 1.062
+		},
+		{
+			"exerciseId": "russian-twist",
+			"clip": "esq/russian-twist",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.6,
+			"middle": 0.8,
+			"viewRadius": 0.579
+		},
+		{
+			"exerciseId": "heel-touches",
+			"clip": "esq/heel-touches",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.4,
+			"middle": 0.7,
+			"viewRadius": 0.721
+		},
+		{
+			"exerciseId": "reverse-crunch",
+			"clip": "esq/reverse-crunch",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.7
+		},
+		{
+			"exerciseId": "toe-touch-crunch",
+			"clip": "esq/toe-touch-crunch",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.0,
+			"middle": 1.0,
+			"viewRadius": 0.61
+		},
+		{
+			"exerciseId": "side-plank-dips",
+			"clip": "esq/side-plank-dips",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.91
+		},
+		{
+			"exerciseId": "stir-the-pot",
+			"clip": "esq/stir-the-pot",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 1.0,
+			"viewRadius": 0.934
+		},
+		{
+			"exerciseId": "high-knees",
+			"clip": "esq/high-knees",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 0.9,
+			"middle": 0.225,
+			"viewRadius": 0.899
+		},
+		{
+			"exerciseId": "butt-kicks",
+			"clip": "esq/butt-kicks",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 0.9,
+			"middle": 0.225,
+			"viewRadius": 0.904
+		},
+		{
+			"exerciseId": "shadow-boxing",
+			"clip": "cc0/boxing",
+			"kind": "CC0_CAPTURE",
+			"match": "EXACT",
+			"durationSeconds": 2.366667,
+			"middle": 1.183333,
+			"viewRadius": 0.841
+		},
+		{
+			"exerciseId": "squat-thrust",
+			"clip": "esq/squat-thrust",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.9,
+			"middle": 0.9,
+			"viewRadius": 0.997
+		},
+		{
+			"exerciseId": "skater-jumps",
+			"clip": "esq/skater-jumps",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.4,
+			"middle": 0.7,
+			"viewRadius": 0.87
+		},
+		{
+			"exerciseId": "stair-run",
+			"clip": "esq/stair-run",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.4,
+			"middle": 0.35,
+			"viewRadius": 0.899
+		},
+		{
+			"exerciseId": "fartlek-run",
+			"clip": "cc0/jog",
+			"kind": "CC0_CAPTURE",
+			"match": "SIMILAR",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.0
+		},
+		{
+			"exerciseId": "long-run",
+			"clip": "cc0/jog",
+			"kind": "CC0_CAPTURE",
+			"match": "SIMILAR",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.0
+		},
+		{
+			"exerciseId": "hill-sprints",
+			"clip": "cc0/sprint",
+			"kind": "CC0_CAPTURE",
+			"match": "SIMILAR",
+			"durationSeconds": 0.833333,
+			"middle": 0.416667,
+			"viewRadius": 0.793
+		},
+		{
+			"exerciseId": "cycling-hills",
+			"clip": "esq/bike",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.795
+		},
+		{
+			"exerciseId": "swimming-backstroke",
+			"clip": "esq/backstroke",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 1.066
+		},
+		{
+			"exerciseId": "aqua-jogging",
+			"clip": "esq/aqua-jogging",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.4,
+			"middle": 0.35,
+			"viewRadius": 0.899
+		},
+		{
+			"exerciseId": "wall-angels",
+			"clip": "esq/wall-angels",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.2,
+			"middle": 1.6,
+			"viewRadius": 1.044
+		},
+		{
+			"exerciseId": "doorway-chest-stretch",
+			"clip": "esq/doorway-stretch",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.932
+		},
+		{
+			"exerciseId": "quad-stretch",
+			"clip": "esq/quad-stretch",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "figure-four-stretch",
+			"clip": "esq/figure-four",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.696
+		},
+		{
+			"exerciseId": "cobra-stretch",
+			"clip": "esq/cobra",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 1.8,
+			"viewRadius": 0.995
+		},
+		{
+			"exerciseId": "downward-dog",
+			"clip": "esq/downward-dog",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.632
+		},
+		{
+			"exerciseId": "thread-the-needle",
+			"clip": "esq/thread-the-needle",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.8,
+			"middle": 1.2,
+			"viewRadius": 0.857
+		},
+		{
+			"exerciseId": "hip-circles",
+			"clip": "esq/hip-circles",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 1.5,
+			"viewRadius": 0.896
+		},
+		{
+			"exerciseId": "arm-circles",
+			"clip": "esq/arm-circles",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.8,
+			"middle": 0.9,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "leg-swings",
+			"clip": "esq/leg-swings",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.4,
+			"middle": 0.7,
+			"viewRadius": 0.91
+		},
+		{
+			"exerciseId": "shoulder-rolls",
+			"clip": "esq/shoulder-rolls",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.4,
+			"middle": 1.2,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "wrist-mobility",
+			"clip": "esq/wrist-mobility",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 1.2,
+			"middle": 0.6,
+			"viewRadius": 0.898
+		},
+		{
+			"exerciseId": "frog-stretch",
+			"clip": "esq/frog-stretch",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.796
+		},
+		{
+			"exerciseId": "couch-stretch",
+			"clip": "esq/couch-stretch",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.746
+		},
+		{
+			"exerciseId": "seated-forward-fold",
+			"clip": "esq/seated-forward-fold",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.628
+		},
+		{
+			"exerciseId": "butterfly-stretch",
+			"clip": "esq/butterfly",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.596
+		},
+		{
+			"exerciseId": "supine-spinal-twist",
+			"clip": "esq/supine-twist",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 2.0,
+			"viewRadius": 0.956
+		},
+		{
+			"exerciseId": "scorpion-stretch",
+			"clip": "esq/scorpion",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 1.8,
+			"viewRadius": 0.907
+		},
+		{
+			"exerciseId": "prep-lateral-shuffle",
+			"clip": "esq/lateral-shuffle",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 0.8,
+			"middle": 0.4,
+			"viewRadius": 0.826
+		},
+		{
+			"exerciseId": "prep-short-sprints",
+			"clip": "cc0/sprint",
+			"kind": "CC0_CAPTURE",
+			"match": "EXACT",
+			"durationSeconds": 0.833333,
+			"middle": 0.416667,
+			"viewRadius": 0.793
+		},
+		{
+			"exerciseId": "prep-pogo-jumps",
+			"clip": "esq/pogo-jumps",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 0.6,
+			"middle": 0.3,
+			"viewRadius": 0.974
+		},
+		{
+			"exerciseId": "prep-deceleration",
+			"clip": "esq/deceleration",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 2.6,
+			"middle": 0.8,
+			"viewRadius": 0.918
+		},
+		{
+			"exerciseId": "prep-copenhagen-plank",
+			"clip": "esq/copenhagen-plank",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.0,
+			"middle": 0.0,
+			"viewRadius": 0.88
+		},
+		{
+			"exerciseId": "prep-nordic-assisted",
+			"clip": "esq/nordic",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 2.0,
+			"viewRadius": 0.868
+		},
+		{
+			"exerciseId": "prep-hip-airplane",
+			"clip": "esq/hip-airplane",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 4.0,
+			"middle": 1.0,
+			"viewRadius": 0.899
+		},
+		{
+			"exerciseId": "prep-bird-dog",
+			"clip": "esq/bird-dog",
+			"kind": "SCHEMATIC",
+			"match": "PATTERN",
+			"durationSeconds": 3.6,
+			"middle": 0.9,
+			"viewRadius": 1.066
 		}
 	]
 }

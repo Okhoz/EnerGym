@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 public class ViewerControllerTest {
 	@Test
 	public void controlsRequireReadyAndCorrectExercise() {
-		ViewerController controller = new ViewerController(ResourceManifest.pushUp(), state -> {
+		ViewerController controller = new ViewerController(PackagedManifest.pushUp(), state -> {
 		});
 		assertFalse(controller.command(new ViewerCommand("standard-pushup", ViewerCommand.Action.PAUSE, "", 0, 0)));
 		controller.ready();
@@ -23,7 +23,7 @@ public class ViewerControllerTest {
 
 	@Test
 	public void finalMarkerStaysAtFinalWithoutWrappingToZero() {
-		ViewerController controller = new ViewerController(ResourceManifest.pushUp(), state -> {
+		ViewerController controller = new ViewerController(PackagedManifest.pushUp(), state -> {
 		});
 		controller.ready();
 		controller.command(new ViewerCommand("standard-pushup", ViewerCommand.Action.MARKER, "final", 0, 0));
@@ -34,7 +34,7 @@ public class ViewerControllerTest {
 
 	@Test
 	public void backgroundAndRestorationPreservePoseAndControls() {
-		ViewerController controller = new ViewerController(ResourceManifest.pushUp(), state -> {
+		ViewerController controller = new ViewerController(PackagedManifest.pushUp(), state -> {
 		});
 		controller.ready();
 		controller.active(true);
@@ -43,7 +43,7 @@ public class ViewerControllerTest {
 		controller.advance(9);
 		assertEquals(.4f, controller.state().playhead, .00001f);
 		controller.command(new ViewerCommand("standard-pushup", ViewerCommand.Action.SPEED, "", .25f, 0));
-		ViewerController restored = new ViewerController(ResourceManifest.pushUp(), state -> {
+		ViewerController restored = new ViewerController(PackagedManifest.pushUp(), state -> {
 		});
 		restored.restore(controller.state());
 		restored.ready();

@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
  * Eliminar la correlación o las listas permitidas debe romper estas pruebas.
  */
 public class ViewerCommandValidatorTest {
-	private final ResourceManifest resource = ResourceManifest.pushUp();
+	private final ResourceManifest resource = PackagedManifest.pushUp();
 	private final ViewerCommandValidator validator = new ViewerCommandValidator();
 
 	@Test
@@ -34,6 +34,6 @@ public class ViewerCommandValidatorTest {
 	public void technicalPreviewDoesNotUnlockVerifiedDemonstration() {
 		assertFalse(resource.professionallyReviewed);
 		assertFalse(resource.capabilities.contains("verified-demonstration"));
-		assertEquals(java.util.Collections.singleton("Human.rig"), resource.clipNames);
+		assertEquals(java.util.Collections.singleton("cc0/push_up"), resource.clipNames);
 	}
 }

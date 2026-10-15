@@ -27,8 +27,8 @@ public final class ExerciseFragment extends ScreenFragment {
 		LinearLayout help =
 			card("¿Dudas?", "Pregunta al asistente por este ejercicio.");
 		action(help, "Explicación guiada", app::requestExplanation);
-		LinearLayout movement = card("Vista 3D", app.visualizationAvailable() ?
-			"Animación de referencia sin revisión profesional." :
+		String explanation = app.visualizationExplanation();
+		LinearLayout movement = card("Vista 3D", explanation != null ? explanation :
 			"Este ejercicio aún no tiene animación; sigue la técnica escrita.");
 		action(movement, "Vista previa 3D", app.visualizationAvailable(), app::requestVisualization);
 	}

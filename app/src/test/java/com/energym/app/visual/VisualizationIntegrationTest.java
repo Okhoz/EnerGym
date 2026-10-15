@@ -23,7 +23,7 @@ public final class VisualizationIntegrationTest {
 		CatalogRepository catalog = new CatalogRepository(2, Collections.singletonList(
 			new Sport("strength", "Fuerza", Sport.CoverageStatus.EXAMPLE_UNREVIEWED,
 				Sport.CoverageStatus.EXAMPLE_UNREVIEWED)), Collections.singletonList(e));
-		return new ExerciseResourcePolicy(catalog, Collections.singletonList(ResourceManifest.pushUp()));
+		return new ExerciseResourcePolicy(catalog, Collections.singletonList(PackagedManifest.pushUp()));
 	}
 
 	@Test

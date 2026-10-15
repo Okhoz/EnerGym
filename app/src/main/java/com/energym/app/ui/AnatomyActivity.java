@@ -133,6 +133,7 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 					if (!current(token))
 						return;
 					manifest = resource;
+					((TextView) findViewById(R.id.viewer_credits)).setText(credits(resource));
 					controller = new ViewerController(manifest, this);
 					controller.restore(restored);
 					try {
@@ -178,6 +179,15 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 				});
 			}
 		});
+	}
+
+	private static String credits(ResourceManifest resource) {
+		if (resource.kind == ResourceManifest.Kind.SCHEMATIC)
+			return "Animación esquemática generada por EnerGym a partir del patrón de movimiento\n" +
+				"Modelo MakeHuman/MPFB vía OpenGym3D · CC0 1.0 · Filament Apache 2.0\n" +
+				"Archivo local, sin cuenta ni descargas durante el uso";
+		return "Recurso: OpenGym3D · Mesh2Motion · MakeHuman/MPFB\nArte y movimiento CC0 1.0 · Filament Apache 2.0\n" +
+			"Archivo local, sin cuenta ni descargas durante el uso";
 	}
 
 	private boolean current(long token) {
@@ -285,7 +295,8 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 		loading.setVisibility(state.ready ? android.view.View.GONE : android.view.View.VISIBLE);
 		((TextView) findViewById(R.id.viewer_play)).setText(state.playing ? "Pausar" : "Reproducir");
 		if (state.ready)
-			status.setText("Sin conexión · " + (state.playing ? "Reproduciendo" : "En pausa") + " · " +
+			status.setText("Sin conexión · " + (manifest == null ? "" : manifest.label() + " · ") +
+				(state.playing ? "Reproduciendo" : "En pausa") + " · " +
 				String.format(java.util.Locale.forLanguageTag("es"), "%.2f×", state.speed));
 		findViewById(R.id.viewer_speed_quarter).setSelected(state.speed == .25f);
 		findViewById(R.id.viewer_speed_half).setSelected(state.speed == .5f);

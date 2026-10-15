@@ -1,15 +1,24 @@
 # Referencia animada local
 
-Esta versión incorpora cuatro vistas previas técnicas, todas exportaciones CC0 de OpenGym3D con la misma malla MakeHuman y movimiento Mesh2Motion:
+Los 287 ejercicios del catálogo tienen vista 3D. Todo vive en un único archivo, `app/src/main/assets/visual/energym_motions.glb` (8,7 MB; ~3,5 MB comprimido en el APK), con una malla MakeHuman/MPFB CC0 y 257 clips. Antes había cuatro GLB de ~5,95 MB que repetían la malla (~11 MB comprimidos).
 
-| Ejercicio del catálogo | Recurso empaquetado | Exportación OpenGym3D | Clip Mesh2Motion de origen | `Human.rig` |
-| --- | --- | --- | --- | --- |
-| `standard-pushup` «Flexión estándar» | `push_up_native.glb` | `push_up.glb` | `human-addon-animations.glb#Pushup` | 1,533333 s |
-| `jumping-jacks` «Saltos de tijera» | `jumping_jacks_native.glb` | `jumping_jack.glb` | `human-addon-animations.glb#Jumping Jacks` | 1,266667 s |
-| `running-easy` «Carrera continua de ejemplo» | `jog_native.glb` | `jog.glb` | `human-base-animations.glb#Jog` | 1,2 s |
-| `brisk-walk` «Caminata rápida» | `walk_native.glb` | `walk.glb` | `human-base-animations.glb#Walk` | 1,7 s |
+Hay dos tipos de clip, y la interfaz siempre dice cuál se está viendo («Captura de movimiento CC0», «Captura CC0 de un gesto similar» o «Animación esquemática»):
 
-Ninguna corresponde a variantes (`knee-pushup`, `burpee`, etc.) ni se anuncia como demostración profesional verificada. `running-easy` y `brisk-walk` se ilustran con trote y marcha en el sitio: muestran zancada y braceo, no desplazamiento, ritmo ni velocidad. Cada recurso tiene un cuerpo único animado; no posee capas de músculos separadas, regiones seleccionables ni mediciones de articulaciones. Los colores de vértices no indican activación muscular.
+| Tipo | Ejercicios | Origen |
+| --- | --- | --- |
+| Captura CC0 exacta | `standard-pushup`, `jumping-jacks`, `running-easy`, `brisk-walk`, `prep-short-sprints`, `swimming-easy`, `swimming-intervals`, `shadow-boxing` | Clips Mesh2Motion CC0: los cuatro de OpenGym3D (copiados tal cual) y «Sprint», «Swim_Fwd», «Punch_Jab»+«Punch_Cross» retargeteados |
+| Captura CC0 de gesto similar | `running-intervals`, `tempo-run`, `fartlek-run`, `long-run` (trote), `treadmill-incline-walk` (marcha), `hill-sprints` (sprint) | Mismos clips; ilustran el gesto en el sitio, no el ritmo ni la pendiente |
+| Animación esquemática | Los 273 restantes (250 clips distintos) | Generada por EnerGym por patrón de movimiento |
+
+Las animaciones esquemáticas parten de poses clave escritas por patrón (sentadilla, bisagra, zancada, empuje, tracción, curl, extensión, elevación, plancha, core, cardio, saltos y estiramientos), con parámetros por ejercicio: apertura, profundidad, inclinación del tronco, agarre (prono/supino/neutro) y carga. Un solucionador resuelve la cinemática directa e inversa (pies o manos plantados), apoya en el suelo el punto más bajo de la malla e interpola con suavizado. Se añaden props simplificados (barra, mancuernas, apoyo o banco, barra fija); las máquinas y las poleas se representan solo con el asiento o sin aparato. Son orientativas: no son capturas ni demostraciones validadas, y no se ha revisado su técnica de forma profesional.
+
+## Generación
+
+1. Descargar las exportaciones OpenGym3D (`push_up.glb`, `jumping_jack.glb`, `jog.glb`, `walk.glb`) y normalizarlas con `python -I tools/normalize_opengym3d.py exportaciones entradas` (verifica origen y resultado; ver abajo).
+2. Añadir a `entradas` `human-base-animations.glb` de Mesh2Motion (revisión `653a9698f5f315523072f1c3ff3496100401317b`, SHA-256 `406eb0a8dc4ab366e623b79b6e3005a4951392e1bda78ae39c1099d31147733c`).
+3. `python -I tools/build_exercise_motions.py entradas` escribe el GLB y `manifest.json` y actualiza en `ResourceManifest` las huellas `MANIFEST_SHA256` y `MODEL_SHA256`. Sin dependencias externas; tarda menos de un minuto.
+
+`tools/exercise_motion_catalog.py` asigna cada ejercicio a su clip. Los clips CC0 de OpenGym3D se copian sin cambios. Los esquemáticos y los retargeteados se muestrean a 15 o 30 fps y se guardan con rotaciones en SHORT normalizado; los canales constantes usan dos claves, porque Filament ignora los muestreadores de una sola clave. Cada clip coloca `CamTarget` en el centro de su movimiento, y el manifiesto guarda un radio de encuadre (`viewRadius`) para que la cámara se aleje en ejercicios amplios, como las dominadas.
 
 ## Procedencia exacta: flexión estándar
 
@@ -40,19 +49,19 @@ Descargadas e inspeccionadas el 15-10-2026 desde `https://assiamahs.github.io/op
 - Licencia: `ASSET_LIBRARY.json` en ea3a601 marca `motion/cc0/jumping-jacks`, `motion/cc0/jog` y `motion/cc0/walk` como CC0-1.0 con `commercial_use: true`; la declaración `motions/cc0/mesh2motion/LICENSE-CC0.md` de esa revisión es byte a byte la ya incluida en el APK. Malla y rig: MakeHuman/MPFB core assets CC0, igual que la flexión (mismos 166 nodos, malla `Mesh`, material `Body`, skin única).
 - No se usan las entradas Mixamo (`motion/mixamo/*`) ni CMU (`motion/cmu/*`, «app-only», no revendibles) del catálogo OpenGym3D.
 - Las tres exportaciones tienen el mismo defecto que `push_up.glb` (pista `Human` de pesos sin morph targets) y reciben la misma adaptación mínima con `tools/normalize_opengym3d.py`, que también reproduce byte a byte `push_up_native.glb`.
-- Tamaño: cada GLB añade ~5,95 MB sin comprimir y ~2,77 MB comprimido en el APK (la malla se repite en cada archivo). Las cuatro vistas previas ocupan ~11 MB comprimidos.
+- Tamaño histórico: cada GLB añadía ~5,95 MB sin comprimir y ~2,77 MB comprimido (la malla se repetía). Ahora son entradas del generador y no se empaquetan.
 
 ## Arquitectura y controles
 
-`ResourceRepository` conserva correspondencias exactas y verifica tamaño acotado, SHA-256 y cabecera antes de entrar en JNI. `PackagedResources` lee el manifiesto local y coteja identidad y capacidades de cada fila con la lista cerrada `ResourceManifest.verified()`; filas extra, ausentes, duplicadas o alteradas invalidan el manifiesto completo. No descarga recursos durante el uso.
+`ResourceRepository` conserva correspondencias exactas por ejercicio y, antes de entrar en JNI, verifica el tamaño acotado (16 MB), el SHA-256 y la cabecera. `PackagedResources` lee el manifiesto local (versión 2) con un lector JSON propio y solo lo acepta si su SHA-256 coincide con `ResourceManifest.MANIFEST_SHA256` y el modelo con `MODEL_SHA256`: esa huella es la lista cerrada, así que cualquier fila editada, añadida o quitada invalida el manifiesto completo. `NativeAnimationRenderer` busca por nombre el clip del ejercicio, comprueba su duración y aplica solo ese clip. No descarga recursos durante el uso.
 
 `ViewerController` y `ViewerCommandValidator` son código Java testeable en JVM: correlación de ejercicio, vistas, velocidades y marcadores permitidos, tiempo de reproducción, zoom acotado y restauración saneada. `AnatomyActivity` es la vista XML y adaptador de ciclo de vida. Vive en el proceso privado `:viewer`, con `exported=false`. `NativeAnimationRenderer` posee superficie y todos los objetos Filament en el hilo principal; la lectura usa un trabajador I/O cancelable. Los resultados tardíos se descartan al cerrar. Pausar elimina callbacks; liberar cancela carga, separa superficie y destruye explícitamente motor, materiales, modelo y demás objetos.
 
 El driver Vulkan del emulador retiene ~4,6 MB por creación/render de nuevos swapchains incluso con escena vacía sin Activity ni modelo. No es posible recuperar esa memoria con GC ni liberando los objetos documentados. Tras el cierre final, el visor recupera únicamente su proceso privado; nunca mata el proceso principal. El contador de Activities evita interrumpir otra instancia viva y `isChangingConfigurations()` evita matar el proceso durante recreación. No hay caché de Activity, superficie, modelo ni motor inmortal. La UI conserva pausa, cámara y velocidad por Bundle al recrear; la integración dispone de un broadcast del paquete no exportado `AnatomyActivity.ACTION_CLOSE` para invalidar contexto y terminar la vista.
 
-Controles admitidos: reproducir/pausar, 0,25× / 0,5× / 1×, órbita y zoom por botones o gestos, frente/lateral/restablecer. La cámara usa el nodo `CamTarget` existente en cada GLB para encuadrar el cuerpo; el tamaño se deriva del límite del recurso. Los marcadores inicial/medio/final son muestras de la línea temporal real; no son fases técnicas aprobadas. El final se mantiene sin aplicar módulo a cero. El clip forma un bucle casi cerrado, por lo que inicial y final se parecen.
+Controles admitidos: reproducir/pausar, 0,25× / 0,5× / 1×, órbita y zoom por botones o gestos, frente/lateral/restablecer. La cámara sigue el nodo `CamTarget`, que cada clip anima al centro de su movimiento; la distancia es el mayor valor entre el límite del recurso y `viewRadius`. Los marcadores inicial/medio/final son muestras de la línea temporal real; no son fases técnicas aprobadas. El final se mantiene sin aplicar módulo a cero. El clip forma un bucle casi cerrado, por lo que inicial y final se parecen.
 
-Ausencia o corrupción del recurso, ejercicio desconocido, variante sin mapeo, clips inesperados o fallo del renderizador muestran un estado de indisponibilidad con referencia escrita cuando existe. No se habilitan controles ficticios ni comandos de texto ejecutable.
+Ausencia o corrupción del recurso, ejercicio desconocido, clip ausente o con otra duración o fallo del renderizador muestran un estado de indisponibilidad con referencia escrita cuando existe. No se habilitan controles ficticios ni comandos de texto ejecutable.
 
 ## Dependencias y validación
 
@@ -63,3 +72,5 @@ Recursos adicionales (15-10-2026): `ResourceRepositoryTest` verifica, para los c
 Pruebas JVM de identidad, comandos, hash corrupto, lectura corta, cierre del stream, marcadores, restauración y BIN intacto: 10 casos; fallo inicial de 7 de los 9 casos originales registrado con implementación vacía, luego verdes. La prueba final usa UIAutomation/accesibilidad y capturas reales del proceso remoto, exige malla y cambios de pose, gira/amplía mediante botones, comprueba pausa sobre píxeles, reproduce y verifica cierre/reclamación del proceso. También comprueba rotación y Home conservando pausa, y siete aperturas con memoria principal estable. Resultados y capturas en `.superpowers/sdd/energym/task-7-core-report.md` del workspace.
 
 Integración terminada: rutas desde el ejercicio y asistente, disponibilidad exacta por ejercicio, correlación de cuenta/contexto y catálogo/backend v2. AppState y MainActivity coordinan ActivityResult, leases e IPC privado con órdenes validadas; el cierre de contexto revoca la apertura y cierra el visor separado. Las pruebas de integración de Task7 cubren estas rutas y la invalidación por cuenta/contexto. Pendiente de validación: dispositivo físico arm64, RenderEffect en dispositivo físico compatible y revisión profesional de la técnica. La vista previa nunca desbloquea la demostración verificada.
+
+Validación del 15-10-2026 (GLB único): `ResourceRepositoryTest` comprueba que los 287 ejercicios del catálogo tienen exactamente una fila, que cada clip existe en el GLB con la duración del manifiesto, que no hay clips sin uso, el etiquetado captura/esquemática, el rechazo de un manifiesto editado y el presupuesto de tamaño. En el emulador Medium Phone API 37 (Vulkan) se abrieron desde la biblioteca sentadilla trasera, flexión estándar (captura), curl con mancuernas, dominadas, peso muerto rumano, plancha sobre antebrazos, press militar, press de banca, cuestas cortas (sprint retargeteado), nado continuo (crol retargeteado), postura de la paloma, bicicleta estática y burpee: todos cargaron, se movieron y mostraron su etiqueta. Además se revisaron offline fotogramas de los 257 clips. `AnatomyActivityTest` está actualizada para recorrer capturas y clips esquemáticos de varios grupos.

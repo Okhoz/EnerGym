@@ -59,7 +59,9 @@ public final class TrainingFragment extends ScreenFragment {
 		action(profile, app.profile == null ? "Configurar mi perfil" : "Editar perfil",
 			() -> app.navigate(Screen.PROFILE));
 		// 3. Explorar: biblioteca con buscador y animaciones 3D.
-		LinearLayout library = card("Biblioteca", app.catalog.getExercises().size() + " ejercicios con su técnica.");
+		int total = app.catalog.getExercises().size(), animated = app.availableAnimations().size();
+		LinearLayout library = card("Biblioteca", total + " ejercicios con su técnica" +
+			(animated == 0 ? "." : animated == total ? " y vista 3D." : "; " + animated + " con vista 3D."));
 		LinearLayout results = new LinearLayout(requireContext());
 		results.setOrientation(LinearLayout.VERTICAL);
 		textField(library, "exercise_search", "Buscar ejercicio", query, false, false, q -> {
@@ -68,7 +70,8 @@ public final class TrainingFragment extends ScreenFragment {
 		});
 		add(library, results, 0);
 		search(results, query);
-		if (!app.availableAnimations().isEmpty()) {
+		// Con la biblioteca casi completa en 3D, la lista dejaría de ser un atajo útil.
+		if (animated > 0 && animated <= 12) {
 			LinearLayout movement = card("Con vista 3D", "");
 			for (com.energym.app.domain.Exercise exercise : app.availableAnimations())
 				action(movement, exercise.getName(), () -> app.openExercise(exercise));

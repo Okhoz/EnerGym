@@ -81,8 +81,10 @@ public class AnatomyActivityTest {
 	}
 
 	@Test
-	public void additionalCc0ResourcesLoadInFilamentAndMove() throws Exception {
-		for (String id : new String[]{"jumping-jacks", "running-easy", "brisk-walk"}) {
+	public void capturesAndSchematicClipsFromSeveralGroupsLoadInFilamentAndMove() throws Exception {
+		// Capturas CC0 (incluidas las retargeteadas) y clips esquemáticos de pierna, espalda, pecho, core y movilidad.
+		for (String id : new String[]{"jumping-jacks", "running-easy", "brisk-walk", "hill-sprints", "swimming-easy",
+			"barbell-back-squat", "pull-up", "barbell-bench-press", "forearm-plank", "pigeon-stretch"}) {
 			launch(id);
 			awaitReady();
 			click("viewer_initial");
@@ -252,13 +254,13 @@ public class AnatomyActivityTest {
 	}
 
 	@Test
-	public void unsupportedVariantsRemainWrittenAndUnscopedChildRejected() throws Exception {
+	public void variantsHaveTheirOwnLabelledViewAndUnscopedChildRejected() throws Exception {
 
 		parent.onActivity(a -> {
 			Exercise knee = a.state().app.catalog.findExercise("knee-pushup");
 			a.state().app.openExercise(knee);
-			assertFalse(a.state().app.visualizationAvailable());
-			assertTrue(MainFlowTest.textContaining(a.getWindow().getDecorView(), "aún no tiene animación"));
+			assertTrue(a.state().app.visualizationAvailable());
+			assertTrue(MainFlowTest.textContaining(a.getWindow().getDecorView(), "Animación esquemática"));
 		});
 
 		context.startActivity(
@@ -268,7 +270,8 @@ public class AnatomyActivityTest {
 		awaitGone();
 
 		ResourceRepository repo = PackagedResources.load(context);
-		assertNull(repo.forExercise("knee-pushup"));
+		assertEquals(ResourceManifest.Kind.SCHEMATIC, repo.forExercise("knee-pushup").kind);
+		assertEquals(ResourceManifest.Kind.CC0_CAPTURE, repo.forExercise("standard-pushup").kind);
 		assertFalse(repo.forExercise("standard-pushup").professionallyReviewed);
 
 	}

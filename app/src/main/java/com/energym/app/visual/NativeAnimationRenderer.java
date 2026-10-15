@@ -46,8 +46,8 @@ public final class NativeAnimationRenderer implements UiHelper.RendererCallback,
 	private SwapChain swapChain;
 	private FilamentAsset asset;
 	private Animator animator;
-	private int[] clipIndices;
-	private float[] clipDurations;
+	private int clipIndex = -1, camTarget;
+	private float clipDuration;
 	private boolean active, closed, loaded;
 	private long previousFrameNanos, loadStartedNanos;
 	private final ForegroundLoadClock loadClock = new ForegroundLoadClock();
@@ -113,38 +113,40 @@ public final class NativeAnimationRenderer implements UiHelper.RendererCallback,
 		if (!resources.asyncBeginLoad(asset))
 			throw new IllegalStateException("No se pudo cargar el recurso nativo");
 		animator = asset.getInstance().getAnimator();
-		if (animator.getAnimationCount() != manifest.clipNames.size())
-			throw new IllegalArgumentException("Clips no coinciden con el manifiesto");
-		clipIndices = new int[manifest.clipNames.size()];
-		clipDurations = new float[clipIndices.length];
-		Set<String> found = new LinkedHashSet<>();
-		StringBuilder evidence = new StringBuilder();
+		// El GLB único contiene un clip por movimiento: solo se aplica el del ejercicio, con su duración exacta.
+		clipIndex = -1;
 		for (int i = 0; i < animator.getAnimationCount(); i++) {
-			String name = animator.getAnimationName(i);
-			float duration = animator.getAnimationDuration(i);
-			if (!manifest.clipNames.contains(name) || !found.add(name) || !Float.isFinite(duration) ||
-				Math.abs(duration - manifest.duration) > .0001f)
-				throw new IllegalArgumentException("Animación local distinta de la inspeccionada");
-			clipIndices[i] = i;
-			clipDurations[i] = duration;
-			evidence.append(name).append(" ").append(duration).append(" s; ");
+			if (!manifest.clipName.equals(animator.getAnimationName(i)))
+				continue;
+			if (clipIndex >= 0)
+				throw new IllegalArgumentException("Clip duplicado en el recurso local");
+			clipIndex = i;
 		}
-		clipEvidence = evidence.toString();
+		if (clipIndex < 0)
+			throw new IllegalArgumentException("Clip no encontrado en el recurso local");
+		clipDuration = animator.getAnimationDuration(clipIndex);
+		if (!Float.isFinite(clipDuration) || Math.abs(clipDuration - manifest.duration) > .001f)
+			throw new IllegalArgumentException("Animación local distinta de la inspeccionada");
+		clipEvidence = manifest.clipName + " " + clipDuration + " s; " + manifest.kind;
 		Box box = asset.getBoundingBox();
 		float[] c = box.getCenter(), h = box.getHalfExtent();
 		for (int i = 0; i < 3; i++)
 			center[i] = c[i];
-		baseDistance = Math.max(.2, 3.0 * Math.max(h[0], Math.max(h[1], h[2])));
-		// El límite de reposo no sigue la pose animada; cada GLB incorpora CamTarget para centrar el cuerpo.
-		int target = asset.getFirstEntityByName("CamTarget");
-		if (target != 0) {
-			TransformManager transforms = engine.getTransformManager();
-			float[] matrix = transforms.getWorldTransform(transforms.getInstance(target), new float[16]);
-			center[0] = matrix[12];
-			center[1] = matrix[13];
-			center[2] = matrix[14];
-		}
+		baseDistance = Math.max(.2, 3.0 * Math.max(manifest.viewRadius, Math.max(h[0], Math.max(h[1], h[2]))));
+		// El límite de reposo no sigue la pose animada; cada clip coloca CamTarget en el centro de su movimiento.
+		camTarget = asset.getFirstEntityByName("CamTarget");
+		updateCenter();
 		asset.releaseSourceData();
+	}
+
+	private void updateCenter() {
+		if (camTarget == 0)
+			return;
+		TransformManager transforms = engine.getTransformManager();
+		float[] matrix = transforms.getWorldTransform(transforms.getInstance(camTarget), new float[16]);
+		center[0] = matrix[12];
+		center[1] = matrix[13];
+		center[2] = matrix[14];
 	}
 
 	public void resume() {
@@ -208,10 +210,9 @@ public final class NativeAnimationRenderer implements UiHelper.RendererCallback,
 			previousFrameNanos = nanos;
 			ViewerState state = controller.state();
 			if (loaded) {
-				// Solo el clip real del esqueleto: la adaptación retira pesos huérfanos sin mallas destino.
-				for (int i = 0; i < clipIndices.length; i++)
-					animator.applyAnimation(clipIndices[i], Math.min(state.playhead, clipDurations[i]));
+				animator.applyAnimation(clipIndex, Math.min(state.playhead, clipDuration));
 				animator.updateBoneMatrices();
+				updateCenter();
 			}
 			double yaw = Math.toRadians(state.yaw), pitch = Math.toRadians(state.pitch), distance =
 				baseDistance * state.zoom;
