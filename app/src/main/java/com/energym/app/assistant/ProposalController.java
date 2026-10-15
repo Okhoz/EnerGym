@@ -111,12 +111,20 @@ public final class ProposalController {
 	private void setPreview(Routine value, TrainingProfile expected) {
 		preview = value;
 		previewBase = expected;
+		swapped.clear();
 	}
 
 	private void clearPreview() {
 		preview = null;
 		previewBase = null;
+		swapped.clear();
 	}
+
+	/**
+	 * Ejercicios que ya se han mostrado en cada posición de la propuesta: pulsar «cambiar» varias veces recorre
+	 * alternativas distintas en vez de alternar entre dos.
+	 */
+	private final Map<Integer, Set<String>> swapped = new HashMap<>();
 
 	public boolean connected() {
 		return client.connected();
@@ -686,14 +694,35 @@ public final class ProposalController {
 	}
 
 	public void substituteFirst() {
-		if (preview == null || preview.isEmpty()) {
+		substitute(0);
+	}
+
+	/**
+	 * Cambia el ejercicio de esa posición por una alternativa compatible libre; el aviso queda junto al chat.
+	 */
+	public void substitute(int index) {
+		if (preview == null || preview.isEmpty() || index < 0 || index >= preview.getItems().size()) {
 			add("assistant", "Primero prepara una propuesta para sustituir un ejercicio.");
 			persist();
 			changed.run();
 			return;
 		}
-		RoutineItem first = preview.getItems().get(0);
-		Set<String> used = new HashSet<>();
+		RoutineItem first = preview.getItems().get(index);
+		Set<String> seen = swapped.computeIfAbsent(index, k -> new HashSet<>());
+		seen.add(first.getExercise().getId());
+		if (!replace(index, first, seen)) {
+			// Ya se mostraron todas: se vuelve a empezar la ronda sin repetir el actual.
+			seen.clear();
+			seen.add(first.getExercise().getId());
+			if (!replace(index, first, seen)) {
+				status = "No hay otra alternativa compatible para " + first.getExercise().getName() + " con tu perfil.";
+				changed.run();
+			}
+		}
+	}
+
+	private boolean replace(int index, RoutineItem first, Set<String> seen) {
+		Set<String> used = new HashSet<>(seen);
 		for (RoutineItem i : preview.getItems())
 			used.add(i.getExercise().getId());
 		for (Exercise e : new CompatibilityEngine().alternatives(first.getExercise(), preview.getProfile(), catalog))
@@ -709,19 +738,17 @@ public final class ProposalController {
 					continue;
 				}
 				List<RoutineItem> items = new ArrayList<>(preview.getItems());
-				items.set(0, new RoutineItem(e, prescription, first.getEstimatedMinutes(),
-					"Sustitución compatible del primer ejercicio; pendiente de aceptación."));
+				items.set(index, new RoutineItem(e, prescription, first.getEstimatedMinutes(),
+					"Sustitución compatible; pendiente de aceptación."));
 				preview = new Routine(UUID.randomUUID().toString(), 0, preview.getTitle(), preview.getProfile(), items,
 					preview.getExplanation(), preview.getMetadata());
-				add("assistant",
-					"He sustituido " + first.getExercise().getName() + " por " + e.getName() + " en la vista previa.");
+				swapped.get(index).add(e.getId());
+				status = "🔄 Cambiado " + first.getExercise().getName() + " por " + e.getName() + ".";
 				persist();
 				changed.run();
-				return;
+				return true;
 			}
-		add("assistant", "No hay una alternativa compatible libre para el primer ejercicio de esta propuesta.");
-		persist();
-		changed.run();
+		return false;
 	}
 
 	public void reduceTime() {

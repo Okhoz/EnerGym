@@ -97,6 +97,32 @@ public class ProposalControllerTest {
 	}
 
 	@Test
+	public void swapButtonCyclesAlternativesForAnyExerciseAndSaysWhatChanged() {
+		catalog = Arrays.asList(exercise("one", "One"), exercise("two", "Two"), exercise("three", "Three"),
+			exercise("four", "Four"));
+		profile[0] = new TrainingProfile.Builder().build();
+		ProposalController c = controller();
+		Map<String, String> values = new LinkedHashMap<>();
+		values.put("sets", "2");
+		values.put("repetitions", "8");
+		values.put("loadKg", "0");
+		values.put("restSeconds", "60");
+		c.preview = new Routine("p", 0, "Dos", profile[0], Arrays.asList(new RoutineItem(catalog.get(0), values, 5, "a"),
+			new RoutineItem(catalog.get(1), values, 5, "b")), "x", new RoutineMetadata(RoutineMetadata.Origin.AI, true));
+		int messages = c.messages.size();
+		c.substitute(1);
+		assertEquals("Cambia el segundo, no el primero", "one", c.preview.getItems().get(0).getExercise().getId());
+		String first = c.preview.getItems().get(1).getExercise().getId();
+		assertTrue(first, first.equals("three") || first.equals("four"));
+		assertTrue(c.status, c.status.startsWith("🔄 Cambiado"));
+		assertEquals("El aviso no se esconde encima de la tarjeta", messages, c.messages.size());
+		c.substitute(1);
+		String second = c.preview.getItems().get(1).getExercise().getId();
+		assertNotEquals("Cada toque muestra otra alternativa", first, second);
+		assertNotEquals("one", second);
+	}
+
+	@Test
 	public void routineSubstitutionRetainsOriginAndDisabledProgression() {
 		catalog = Arrays.asList(exercise("one", "One"), exercise("two", "Two"));
 		profile[0] = new TrainingProfile.Builder().build();
