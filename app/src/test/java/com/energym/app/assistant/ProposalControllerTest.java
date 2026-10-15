@@ -123,6 +123,37 @@ public class ProposalControllerTest {
 	}
 
 	@Test
+	public void minusFiveMinutesTrimsTheSameRoutineInsteadOfReplacingIt() {
+		catalog = Arrays.asList(exercise("one", "One"), exercise("two", "Two"), exercise("three", "Three"));
+		profile[0] = new TrainingProfile.Builder().build();
+		ProposalController c = controller();
+		Map<String, String> values = new LinkedHashMap<>();
+		values.put("sets", "3");
+		values.put("repetitions", "10");
+		values.put("loadKg", "0");
+		values.put("restSeconds", "60");
+		c.preview = new Routine("p", 0, "Tres", profile[0], Arrays.asList(new RoutineItem(catalog.get(0), values, 6, "a"),
+			new RoutineItem(catalog.get(1), values, 6, "b"), new RoutineItem(catalog.get(2), values, 6, "c")), "x",
+			new RoutineMetadata(RoutineMetadata.Origin.AI, true));
+		int messages = c.messages.size();
+		c.reduceTime();
+		Routine trimmed = c.preview;
+		assertTrue(trimmed.getEstimatedMinutes() + " min", trimmed.getEstimatedMinutes() <= 13);
+		assertEquals("Mismos ejercicios, solo menos series", Arrays.asList("one", "two", "three"),
+			Arrays.asList(trimmed.getItems().get(0).getExercise().getId(), trimmed.getItems().get(1).getExercise().getId(),
+				trimmed.getItems().get(2).getExercise().getId()));
+		assertEquals(RoutineMetadata.Origin.AI, trimmed.getMetadata().getOrigin());
+		assertTrue(c.status, c.status.startsWith("⏱️ Rutina recortada de 18 a"));
+		assertEquals("No genera otra rutina por el chat", messages, c.messages.size());
+		for (RoutineItem item : trimmed.getItems())
+			ChatProtocol.validatePrescription(item.getExercise(), item.getPrescription(), item.getEstimatedMinutes());
+		for (int i = 0; i < 10; i++)
+			c.reduceTime();
+		assertFalse("Siempre queda al menos un ejercicio", c.preview.getItems().isEmpty());
+		assertTrue(c.status, c.status.contains("mínimo"));
+	}
+
+	@Test
 	public void routineSubstitutionRetainsOriginAndDisabledProgression() {
 		catalog = Arrays.asList(exercise("one", "One"), exercise("two", "Two"));
 		profile[0] = new TrainingProfile.Builder().build();

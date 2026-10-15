@@ -751,9 +751,98 @@ public final class ProposalController {
 		return false;
 	}
 
+	/**
+	 * Recorta unos 5 minutos de la propuesta actual sin cambiarla por otra: quita series al ejercicio con más
+	 * series, acorta los bloques de tiempo y, si no basta, quita el último ejercicio.
+	 */
 	public void reduceTime() {
-		if (preview != null)
-			sendLocal("Ajusta la rutina a " + Math.max(5, preview.getProfile().getDurationMinutes() - 5) + " min");
+		if (preview == null || preview.isEmpty())
+			return;
+		int before = preview.getEstimatedMinutes();
+		int target = Math.max(5, before - 5);
+		List<RoutineItem> items = new ArrayList<>(preview.getItems());
+		List<String> changes = new ArrayList<>();
+		while (total(items) > target) {
+			if (!shorten(items, total(items) - target, changes)) {
+				if (items.size() <= 1)
+					break;
+				changes.add("sin " + items.remove(items.size() - 1).getExercise().getName());
+			}
+		}
+		int after = total(items);
+		if (after >= before) {
+			status = "⏱️ La rutina ya está en su mínimo (" + before + " min).";
+			changed.run();
+			return;
+		}
+		preview = new Routine(UUID.randomUUID().toString(), 0, preview.getTitle(), preview.getProfile(), items,
+			preview.getExplanation(), preview.getMetadata());
+		status = "⏱️ Rutina recortada de " + before + " a " + after + " min: " + String.join(", ", changes) + ".";
+		persist();
+		changed.run();
+	}
+
+	private static int total(List<RoutineItem> items) {
+		int t = 0;
+		for (RoutineItem i : items)
+			t += i.getEstimatedMinutes();
+		return t;
+	}
+
+	/**
+	 * Un paso de recorte: una serie menos al ejercicio con más series (mínimo 1) o menos minutos en un bloque de
+	 * tiempo (mínimo 5). Devuelve false si ya no se puede acortar nada sin quitar ejercicios.
+	 */
+	private static boolean shorten(List<RoutineItem> items, int excess, List<String> changes) {
+		int best = -1, most = 1;
+		for (int i = 0; i < items.size(); i++) {
+			Map<String, String> p = items.get(i).getPrescription();
+			int sets = p.containsKey("sets") ? (int) Double.parseDouble(p.get("sets").replace(',', '.')) : 0;
+			if (sets > most) {
+				most = sets;
+				best = i;
+			}
+		}
+		if (best >= 0) {
+			RoutineItem item = items.get(best);
+			Map<String, String> p = new LinkedHashMap<>(item.getPrescription());
+			p.put("sets", Integer.toString(most - 1));
+			int minutes = Math.max(1, (int) Math.ceil(item.getEstimatedMinutes() * (most - 1) / (double) most));
+			if (fits(item, p, minutes)) {
+				items.set(best, new RoutineItem(item.getExercise(), p, minutes, item.getJustification()));
+				changes.add("1 serie menos de " + item.getExercise().getName());
+				return true;
+			}
+		}
+		for (int i = 0; i < items.size(); i++) {
+			RoutineItem item = items.get(i);
+			String key = item.getPrescription().containsKey("timeMinutes") ? "timeMinutes" :
+				item.getPrescription().containsKey("durationMinutes") ? "durationMinutes" : null;
+			if (key == null)
+				continue;
+			int current = (int) Double.parseDouble(item.getPrescription().get(key).replace(',', '.'));
+			int cut = Math.min(excess, current - 5);
+			if (cut <= 0)
+				continue;
+			Map<String, String> p = new LinkedHashMap<>(item.getPrescription());
+			p.put(key, Integer.toString(current - cut));
+			int minutes = item.getEstimatedMinutes() - cut;
+			if (fits(item, p, minutes)) {
+				items.set(i, new RoutineItem(item.getExercise(), p, minutes, item.getJustification()));
+				changes.add(cut + " min menos de " + item.getExercise().getName());
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean fits(RoutineItem item, Map<String, String> prescription, int minutes) {
+		try {
+			ChatProtocol.validatePrescription(item.getExercise(), prescription, minutes);
+			return true;
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
 	}
 
 	/**
