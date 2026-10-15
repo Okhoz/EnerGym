@@ -237,10 +237,9 @@ public final class TrainingFragment extends ScreenFragment {
 		});
 		toggle.setTag("training_more_options");
 		if (!state.training.optionsExpanded) return;
-		LinearLayout options = card("Perfil y propuesta local", "Genera una propuesta por reglas locales, sin IA, o ajusta tu perfil.");
+		// El perfil se edita desde el menú ☰ de arriba a la derecha.
+		LinearLayout options = card("Propuesta local", "Genera una propuesta por reglas locales, sin IA.");
 		action(options, "Crear propuesta", !app.loading && !app.profileSaving() && !app.routines.busy, app::createRoutine);
-		action(options, app.profile == null ? "Configurar mi perfil" : "Editar perfil", true,
-			() -> app.navigate(app.owner() == null ? Screen.ACCOUNT : Screen.PROFILE));
 	}
 
 	private void library() {

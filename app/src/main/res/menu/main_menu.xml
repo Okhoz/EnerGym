@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Menú de la esquina superior derecha: todo lo que no es una pestaña de la barra inferior. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item
+		android:id="@+id/menu_profile"
+		android:title="@string/menu_profile" />
+	<item
+		android:id="@+id/menu_body"
+		android:title="@string/menu_body" />
+	<item
+		android:id="@+id/menu_account"
+		android:title="@string/menu_account" />
+</menu>

@@ -82,10 +82,7 @@ public final class MainActivity extends AppCompatActivity {
 		});
 		state = new ViewModelProvider(this).get(AppState.class);
 		state.bindViewer(viewerLaunch);
-		findViewById(R.id.account).setOnClickListener(v -> {
-			if (state.app != null)
-				state.app.navigate(AppController.Screen.ACCOUNT);
-		});
+		findViewById(R.id.account).setOnClickListener(this::openMenu);
 		findViewById(R.id.back).setOnClickListener(v -> {
 			if (state.app != null)
 				state.app.back();
@@ -169,6 +166,34 @@ public final class MainActivity extends AppCompatActivity {
 		} finally {
 			rendering = false;
 		}
+	}
+
+	/**
+	 * Menú hamburguesa de la esquina superior derecha: perfil, datos físicos y cuenta (con el entrenador IA).
+	 * Sin cuenta, perfil y datos físicos llevan primero a Cuenta para entrar.
+	 */
+	private void openMenu(View anchor) {
+		if (state.app == null)
+			return;
+		androidx.appcompat.widget.PopupMenu menu = new androidx.appcompat.widget.PopupMenu(
+			new android.view.ContextThemeWrapper(this, R.style.EnerGym_PopupMenu), anchor, android.view.Gravity.END);
+		menu.inflate(R.menu.main_menu);
+		menu.setOnMenuItemClickListener(item -> {
+			AppController app = state.app;
+			int id = item.getItemId();
+			if (id != R.id.menu_account && app.owner() == null)
+				app.navigate(AppController.Screen.ACCOUNT);
+			else if (id == R.id.menu_profile)
+				app.navigate(AppController.Screen.PROFILE);
+			else if (id == R.id.menu_body) {
+				if (state.nutrition != null)
+					state.nutrition.fillBody();
+				app.navigate(AppController.Screen.BODY);
+			} else
+				app.navigate(AppController.Screen.ACCOUNT);
+			return true;
+		});
+		menu.show();
 	}
 
 	private Fragment fragment(AppController.Screen screen) {

@@ -63,9 +63,9 @@
 			android:paddingHorizontal="12dp"
 			android:paddingVertical="12dp"
 			android:textSize="14sp"
-			android:contentDescription="@string/account"
-			android:tooltipText="@string/account"
-			app:icon="@drawable/ic_account"
+			android:contentDescription="@string/menu"
+			android:tooltipText="@string/menu"
+			app:icon="@drawable/ic_menu"
 			app:iconSize="24dp"
 			app:iconPadding="0dp"
 			app:iconGravity="textStart" />
