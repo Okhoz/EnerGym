@@ -8,6 +8,7 @@ load_file() {
 		ENERGYM_TLS_PASSWORD) file=${ENERGYM_TLS_PASSWORD_FILE-}; direct=${ENERGYM_TLS_PASSWORD-} ;;
 		ENERGYM_PROXY_TOKEN) file=${ENERGYM_PROXY_TOKEN_FILE-}; direct=${ENERGYM_PROXY_TOKEN-} ;;
 		GEMINI_API_KEY) file=${GEMINI_API_KEY_FILE-}; direct=${GEMINI_API_KEY-} ;;
+		GROQ_API_KEY) file=${GROQ_API_KEY_FILE-}; direct=${GROQ_API_KEY-} ;;
 		ENERGYM_PAIRING_CODE) file=${ENERGYM_PAIRING_CODE_FILE-}; direct=${ENERGYM_PAIRING_CODE-} ;;
 		*) fail ;;
 	esac
@@ -20,7 +21,7 @@ load_file() {
 	# export recibe una sola asignación: el contenido del archivo nunca se interpreta.
 	export "$name=$value"
 }
-for secret in ENERGYM_TLS_PASSWORD ENERGYM_PROXY_TOKEN GEMINI_API_KEY ENERGYM_PAIRING_CODE; do
+for secret in ENERGYM_TLS_PASSWORD ENERGYM_PROXY_TOKEN GEMINI_API_KEY GROQ_API_KEY ENERGYM_PAIRING_CODE; do
 	load_file "$secret"
 done
 if [ "${ENERGYM_DEV_MODE:-true}" != 'true' ]; then

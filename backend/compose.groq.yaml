@@ -1,0 +1,14 @@
+# Superposición opcional: activa Groq Free (openai/gpt-oss-120b) en el backend de cualquiera de los Compose.
+# Uso: docker compose -f compose.preview.yaml -f compose.groq.yaml up -d
+# La clave se monta como secreto de archivo (nunca variable, build arg ni imagen). Sin tarjeta ni Upgrade en Groq.
+services:
+  backend:
+    environment:
+      ENERGYM_AI_PROVIDER: groq
+      GROQ_ENABLED: "true"
+      GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-120b}
+      GROQ_API_KEY_FILE: /run/secrets/groq_api_key
+    secrets: [groq_api_key]
+secrets:
+  groq_api_key:
+    file: ${ENERGYM_GROQ_KEY_FILE:?Archivo privado con la clave Groq fuera del repositorio obligatorio}
