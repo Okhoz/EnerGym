@@ -106,4 +106,14 @@ public final class ExerciseSearchTest {
 		assertEquals(3, search.find("", ExerciseSearch.Filters.all()).size());
 		assertTrue(search.find("sentadilla convencional", new ExerciseSearch.Filters("", Environment.HOME, "", null)).isEmpty());
 	}
+
+	@Test public void typosSynonymsAndMuscleGroupsFindExercisesAfterDirectMatches() {
+		assertEquals("Errata", "push-up", find("flexon estandar", ExerciseSearch.Filters.all()).get(0).getId());
+		assertEquals("Sinónimo de material", Collections.singletonList("band-press"),
+			ids(find("press con goma", ExerciseSearch.Filters.all())));
+		assertTrue("Por grupo muscular", ids(find("hombro", ExerciseSearch.Filters.all())).contains("band-mobility"));
+		List<String> direct = ids(find("press", ExerciseSearch.Filters.all()));
+		assertEquals("Las coincidencias directas van primero", Arrays.asList("band-press", "bench-press"),
+			direct.subList(0, 2));
+	}
 }

@@ -1,5 +1,7 @@
 package com.energym.app.nutrition;
 
+import com.energym.app.domain.TextMatch;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
@@ -67,26 +69,38 @@ public final class CommonFoods {
 	 * Alimentos cuyo nombre o sinónimos contienen todas las palabras escritas (sin tildes ni mayúsculas; admite
 	 * plurales). Primero los que empiezan por la búsqueda o la tienen como sinónimo exacto. Menos de 2 letras no busca.
 	 */
+	/**
+	 * Alimentos que encajan con lo escrito, de más a menos relevante: empieza por lo escrito, todas las palabras en
+	 * el nombre, en sus alias, por sinónimo («papa» → patata) y, al final, con una errata («maccarones»).
+	 */
 	public static List<Food> search(String query, int limit) {
 		String q = normalize(query);
 		if (q.length() < 2)
 			return Collections.emptyList();
-		String[] terms = q.split(" ");
-		List<Food> first = new ArrayList<>(), rest = new ArrayList<>();
+		List<String> terms = TextMatch.terms(q);
+		if (terms.isEmpty())
+			return Collections.emptyList();
+		List<Food> found = new ArrayList<>();
+		Map<Food, Integer> rank = new HashMap<>();
 		for (Food f : all) {
-			boolean every = true;
-			for (String t : terms)
-				if (!f.searchable.contains(" " + stem(t))) {
-					every = false;
-					break;
-				}
-			if (!every)
-				continue;
 			String name = normalize(f.name);
-			(name.startsWith(q) || name.startsWith(stem(q)) || f.searchable.contains(" " + q + " ") ? first : rest).add(f);
+			int score;
+			if (name.startsWith(q) || name.startsWith(stem(q)))
+				score = 0;
+			else {
+				int inName = TextMatch.matchAll(terms, name);
+				int inAll = TextMatch.matchAll(terms, f.searchable.trim());
+				score = inName <= TextMatch.PREFIX ? 1 : inAll <= TextMatch.PREFIX ? 2 :
+					inAll == TextMatch.SYNONYM ? 3 : inAll == TextMatch.TYPO ? 4 : -1;
+			}
+			if (score >= 0) {
+				found.add(f);
+				rank.put(f, score);
+			}
 		}
-		first.addAll(rest);
-		return first.size() > limit ? first.subList(0, limit) : first;
+		// A igual relevancia, los nombres más cortos (más genéricos) primero: «Arroz blanco» antes que «Arroz con…».
+		found.sort(Comparator.<Food>comparingInt(rank::get).thenComparingInt(f -> f.name.length()));
+		return found.size() > limit ? found.subList(0, limit) : found;
 	}
 
 	/** «macarrones» → «macarron», «fresas» → «fresa»: así el plural encuentra el singular y al revés. */

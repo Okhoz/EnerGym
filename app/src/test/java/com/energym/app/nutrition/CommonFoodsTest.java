@@ -44,4 +44,13 @@ public class CommonFoodsTest {
 			assertTrue(f.name, f.portion > 0);
 		}
 	}
+
+	@Test
+	public void typosAndRegionalNamesStillFindTheFood() {
+		assertTrue("Errata", CommonFoods.search("macarones", 5).stream().anyMatch(f -> f.name.startsWith("Macarrones")));
+		assertTrue("Errata", CommonFoods.search("plantano", 5).stream().anyMatch(f -> f.name.startsWith("Plátano")));
+		assertTrue("Papa = patata", CommonFoods.search("papa", 8).stream().anyMatch(f -> f.name.startsWith("Patata")));
+		assertTrue("Jugo = zumo", CommonFoods.search("jugo", 8).stream().anyMatch(f -> f.name.startsWith("Zumo")));
+		assertEquals("Lo exacto primero", "Plátano", CommonFoods.search("platano", 5).get(0).name);
+	}
 }

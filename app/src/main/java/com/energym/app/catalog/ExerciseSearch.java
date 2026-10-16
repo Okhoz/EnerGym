@@ -1,6 +1,7 @@
 package com.energym.app.catalog;
 
 import com.energym.app.domain.Exercise;
+import com.energym.app.domain.TextMatch;
 import com.energym.app.domain.TrainingProfile.*;
 
 import java.text.Normalizer;
@@ -73,25 +74,40 @@ public final class ExerciseSearch {
 				e.getRequiredResources().contains(Resource.valueOf(f.material))));
 	}
 
+	/**
+	 * Relevancia (menor es mejor): primero coincidencias directas en el nombre, luego en alias, material, grupo
+	 * muscular y técnica; después sinónimos y erratas. -1 si no coincide.
+	 */
 	private int score(Exercise e, String query, List<String> terms) {
 		if (query.isEmpty())
 			return 0;
 		String name = normalize(e.getName());
 		if (name.equals(query))
 			return 0;
-		if (name.startsWith(query) && all(terms, name))
-			return 1;
-		if (all(terms, name))
-			return 2;
+		int inName = TextMatch.matchAll(terms, name, 3);
+		if (inName <= TextMatch.PREFIX)
+			return name.startsWith(query) ? 1 : 2;
 		String identifiers = name + " " + normalize(e.getId()) + " " + aliases(e.getId());
-		if (all(terms, identifiers))
+		if (TextMatch.matchAll(terms, identifiers, 3) <= TextMatch.PREFIX)
 			return 3;
 		StringBuilder metadata = new StringBuilder(identifiers);
 		for (Resource resource : e.getRequiredResources())
 			metadata.append(' ').append(materialWords(resource));
-		if (all(terms, metadata.toString()))
+		// El grupo muscular también se busca: «pecho», «gluteos», «espalda»…
+		for (com.energym.app.domain.RoutineRequest.Area area : com.energym.app.domain.RoutineRequest.areas(e))
+			metadata.append(' ').append(normalize(area.label));
+		int inMetadata = TextMatch.matchAll(terms, metadata.toString(), 3);
+		if (inMetadata <= TextMatch.PREFIX)
 			return 4;
-		return all(terms, metadata + " " + normalize(e.getDescription())) ? 5 : -1;
+		int inDescription = TextMatch.matchAll(terms, metadata + " " + normalize(e.getDescription()), 3);
+		if (inDescription <= TextMatch.PREFIX)
+			return 5;
+		// Sinónimos y erratas («biseps», «sentadila»), siempre detrás de las coincidencias directas.
+		if (inName != TextMatch.NONE)
+			return 4 + inName;
+		if (inMetadata != TextMatch.NONE)
+			return 8 + inMetadata;
+		return inDescription == TextMatch.SYNONYM ? 12 : -1;
 	}
 
 	/** Nombres habituales de los básicos: apuntan al mismo ID y respetan todos los filtros. */
@@ -114,20 +130,6 @@ public final class ExerciseSearch {
 			case "parallel-bar-dips": return "fondos paralelas dips";
 			default: return "";
 		}
-	}
-	private boolean all(List<String> terms, String text) {
-		List<String> words = Arrays.asList(text.split(" "));
-		for (String term : terms) {
-			boolean found = false;
-			for (String word : words)
-				if (word.equals(term) || (term.length() >= 3 && word.startsWith(term))) {
-					found = true;
-					break;
-				}
-			if (!found)
-				return false;
-		}
-		return true;
 	}
 
 	private String materialWords(Resource resource) {

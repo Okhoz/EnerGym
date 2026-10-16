@@ -241,7 +241,32 @@ public final class FoodFragment extends ScreenFragment {
 		results.removeAllViews();
 		List<CommonFoods.Food> found = CommonFoods.search(commonQuery, 8);
 		String q = commonQuery.trim();
-		if (found.isEmpty() && q.length() >= 2)
+		// Primero lo que ya anotaste alguna vez (con tu cantidad habitual): suele ser lo que buscas.
+		List<String> terms = com.energym.app.domain.TextMatch.terms(q);
+		int mine = 0;
+		if (!terms.isEmpty())
+			for (FoodEntry e : n.recentFoods(Integer.MAX_VALUE)) {
+				if (mine == 3 || com.energym.app.domain.TextMatch.matchAll(terms,
+					com.energym.app.domain.TextMatch.normalize(e.name)) == com.energym.app.domain.TextMatch.NONE)
+					continue;
+				if (mine++ == 0)
+					text(results, "Tus alimentos:", R.style.EnerGym_FieldCaption, 12);
+				android.view.View row = getLayoutInflater().inflate(R.layout.row_food, results, false);
+				((TextView) row.findViewById(R.id.food_name)).setText(e.name);
+				((TextView) row.findViewById(R.id.food_detail)).setText(NutritionController.format(e.amount) + " " +
+					e.unit.symbol + " · " + NutritionController.format(e.kcal100) + " kcal/100 " + e.unit.symbol);
+				((TextView) row.findViewById(R.id.food_kcal)).setText("+");
+				row.setContentDescription("Añadir de nuevo " + e.name);
+				row.setOnClickListener(v -> {
+					commonQuery = "";
+					n.startFrom(e);
+					app.changed();
+				});
+				results.addView(row);
+			}
+		if (mine > 0 && !found.isEmpty())
+			text(results, "Alimentos habituales:", R.style.EnerGym_FieldCaption, 12);
+		if (found.isEmpty() && mine == 0 && q.length() >= 2)
 			text(results, "No está en la lista de habituales.", R.style.EnerGym_FieldCaption, 4);
 		for (CommonFoods.Food f : found) {
 			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, results, false);
