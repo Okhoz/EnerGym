@@ -60,6 +60,20 @@ public final class Reminders {
 			.apply();
 	}
 
+	/** Marca o desmarca el día (aaaa-mm-dd) en que ya se cumplió algo («waterDoneDay», «trainedDay»). */
+	static void markDay(Context c, String key, java.time.LocalDate day, boolean done) {
+		SharedPreferences p = prefs(c);
+		String value = day.toString();
+		if (done && !value.equals(p.getString(key, "")))
+			p.edit().putString(key, value).apply();
+		else if (!done && value.equals(p.getString(key, "")))
+			p.edit().remove(key).apply();
+	}
+
+	static boolean dayMarked(Context c, String key, java.time.LocalDate day) {
+		return day.toString().equals(prefs(c).getString(key, ""));
+	}
+
 	/** Sin permiso (Android 13+) o con las notificaciones de la app apagadas, los avisos no se verían. */
 	public static boolean canNotify(Context c) {
 		if (Build.VERSION.SDK_INT >= 33 &&

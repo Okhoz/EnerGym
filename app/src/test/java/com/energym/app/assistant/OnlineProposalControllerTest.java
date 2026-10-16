@@ -16,6 +16,59 @@ public final class OnlineProposalControllerTest {
 		assertFalse(controller.busy);
 	}
 
+	@Test public void unavailableOnDeviceAiAnswersWithTheLocalGuideInsteadOfDroppingTheMessage() {
+		AutomaticClient client = new AutomaticClient(false) {
+			public boolean onDevice() {
+				return true;
+			}
+
+			public String unavailableCode() {
+				return "MODEL_UNAVAILABLE";
+			}
+		};
+		ProposalController controller = new ProposalController(new ProposalControllerTest.Store(),
+			new ProposalControllerTest.Memory(), client, Collections.singletonList(new com.energym.app.domain.Exercise(
+				"squat", "Sentadilla sin accesorios", com.energym.app.domain.MetricType.STRENGTH,
+				EnumSet.of(com.energym.app.domain.TrainingProfile.Goal.STRENGTH),
+				EnumSet.of(com.energym.app.domain.TrainingProfile.Environment.HOME), Collections.emptySet(),
+				Collections.singleton("strength"), com.energym.app.domain.Exercise.Coverage.SPECIFIC, false,
+				"Baja la cadera con la espalda neutra.", Collections.emptyList())), () -> null, () -> {}, routine -> {});
+		controller.activate("uid-A");
+		int before = controller.messages.size();
+		controller.send("¿cómo hago bien una sentadilla?");
+		assertNull("Nada se envía al modelo no disponible", client.callback);
+		assertTrue("Se guarda la pregunta y la respuesta local", controller.messages.size() >= before + 2);
+		assertEquals("assistant", controller.messages.get(controller.messages.size() - 1).role);
+		assertFalse(controller.busy);
+		assertTrue("Explica la técnica del ejercicio nombrado", controller.messages.get(controller.messages.size() - 1)
+			.text.contains("Técnica de"));
+	}
+
+	@Test public void ambiguousExerciseNameListsTheVariantsAndAFullNameExplainsIt() {
+		AutomaticClient client = new AutomaticClient(false) {
+			public boolean onDevice() {
+				return true;
+			}
+		};
+		ProposalController controller = new ProposalController(new ProposalControllerTest.Store(),
+			new ProposalControllerTest.Memory(), client, Arrays.asList(plank("plank", "Plancha sobre antebrazos"),
+			plank("side-plank", "Plancha lateral")), () -> null, () -> {}, routine -> {});
+		controller.activate("uid-A");
+		controller.send("¿cómo hago la plancha?");
+		String reply = controller.messages.get(controller.messages.size() - 1).text;
+		assertTrue(reply.contains("2 variantes") && reply.contains("Plancha lateral") && reply.contains("Plancha sobre antebrazos"));
+		controller.send("¿y la plancha lateral?");
+		assertTrue(controller.messages.get(controller.messages.size() - 1).text.startsWith("Técnica de Plancha lateral"));
+	}
+
+	private static com.energym.app.domain.Exercise plank(String id, String name) {
+		return new com.energym.app.domain.Exercise(id, name, com.energym.app.domain.MetricType.ISOMETRIC,
+			EnumSet.of(com.energym.app.domain.TrainingProfile.Goal.STRENGTH),
+			EnumSet.of(com.energym.app.domain.TrainingProfile.Environment.HOME), Collections.emptySet(),
+			Collections.singleton("strength"), com.energym.app.domain.Exercise.Coverage.SPECIFIC, false,
+			"Cuerpo en línea recta.", Collections.emptyList());
+	}
+
 	@Test public void activatingTheAccountEnablesOnlineWithoutPairing() {
 		OnlineChatClient.TokenSource tokens = new OnlineChatClient.TokenSource() {
 			public String currentUid() {
@@ -114,7 +167,7 @@ public final class OnlineProposalControllerTest {
 		return controller;
 	}
 
-	private static final class AutomaticClient implements ChatClient {
+	private static class AutomaticClient implements ChatClient {
 		final boolean configured;
 		Callback callback;
 		AutomaticClient(boolean configured) {

@@ -57,7 +57,8 @@ public final class AssistantFragment extends ScreenFragment {
 		String text = input.getText().toString();
 		if (text.trim().isEmpty())
 			return;
-		boolean unavailable = c.automaticConnection() && !c.localGuidance() && !c.remoteActive();
+		// Sin IA online el mensaje se queda escrito; la IA del móvil no disponible responde con el guiado local.
+		boolean unavailable = c.automaticConnection() && !c.localGuidance() && !c.remoteActive() && !c.onDevice();
 		if (!unavailable)
 			input.setText("");
 		c.send(text);

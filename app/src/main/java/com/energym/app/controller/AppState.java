@@ -239,6 +239,17 @@ public final class AppState extends AndroidViewModel {
 			manualExerciseBrowser.resetFor(app.owner(), app.manual.draftRevision());
 			if (reminders != null && app.profile != null)
 				reminders.syncDays(app.profile.getDaysPerWeek());
+			if (reminders != null && water != null && nutrition != null && app.owner() != null) {
+				java.time.LocalDate today = java.time.LocalDate.now();
+				boolean trained = false;
+				for (com.energym.app.domain.Session s : app.history)
+					if (s.getStatus() == com.energym.app.domain.Session.Status.FINISHED && java.time.Instant
+						.ofEpochMilli(s.getCompletedAt()).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+						.equals(today))
+						trained = true;
+				reminders.today(today, water.ml(today),
+					com.energym.app.nutrition.WaterLog.goal(nutrition.effectiveBody()), trained);
+			}
 		}
 		if (visualization != null && app != null)
 			visualization.context(app.owner(), app.navigationRevision(), app.screen, app.exercise);

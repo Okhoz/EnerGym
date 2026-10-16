@@ -19,6 +19,8 @@ public final class SessionFragment extends ScreenFragment {
 	private final Handler ticker = new Handler(Looper.getMainLooper());
 	private TextView restLabel;
 	private final Runnable tick = this::tick;
+	/** Ejercicio y registros mostrados en el último pintado: detectan el avance tras guardar. */
+	private int shownExercise = -1, shownResults = -1;
 
 	public SessionFragment() {
 		super(R.layout.fragment_session);
@@ -52,6 +54,17 @@ public final class SessionFragment extends ScreenFragment {
 		section("Ejercicio actual", 8);
 		choice(rows, "selectedExercise", "Ejercicio de la sesión", ids, names, Integer.toString(app.sessions.selected),
 			value -> app.sessions.select(Integer.parseInt(value)));
+		int saved = app.sessions.session.getResults().size();
+		if (shownResults >= 0 && saved > shownResults)
+			android.widget.Toast.makeText(requireContext(), "Ejercicio guardado", android.widget.Toast.LENGTH_SHORT).show();
+		// Al cambiar de ejercicio (a mano o tras guardar) se vuelve arriba para verlo desde el principio.
+		if (shownExercise >= 0 && shownExercise != app.sessions.selected && getView() instanceof android.widget.ScrollView)
+			getView().post(() -> {
+				if (getView() != null)
+					((android.widget.ScrollView) getView()).smoothScrollTo(0, 0);
+			});
+		shownExercise = app.sessions.selected;
+		shownResults = saved;
 		RoutineItem item = app.sessions.item();
 		Exercise e = item.getExercise();
 		LinearLayout context = card(e.getName(),

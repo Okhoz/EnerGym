@@ -308,6 +308,32 @@ public class TrainingControllerTest {
 	}
 
 	@Test
+	public void savingAnExerciseMovesToTheNextOneStillWithoutValues() {
+		Routine first = routine();
+		Exercise other =
+			new Exercise("lunge", "Zancada", MetricType.STRENGTH, EnumSet.of(TrainingProfile.Goal.STRENGTH),
+				EnumSet.of(TrainingProfile.Environment.HOME), Collections.emptySet(), Collections.singleton("strength"),
+				Exercise.Coverage.SPECIFIC, false, "Técnica", Collections.emptyList());
+		Routine r = new Routine(first.getProposalId(), 1, first.getTitle(), first.getProfile(),
+			Arrays.asList(first.getItems().get(0),
+				new RoutineItem(other, first.getItems().get(0).getPrescription(), 5, "Mismo objetivo")),
+			first.getExplanation());
+		Store s = new Store();
+		SessionController c = new SessionController(s, () -> {
+		}, e -> {
+		}, () -> {
+		});
+		c.start(r);
+		s.saving.success(7L);
+		c.record();
+		s.saving.success(7L);
+		assertEquals("Tras guardar pasa al siguiente ejercicio pendiente", 1, c.selected);
+		c.record();
+		s.saving.success(7L);
+		assertEquals("Con todo registrado se queda en el actual", 1, c.selected);
+	}
+
+	@Test
 	public void sameDraftReopenPreservesSelectedExerciseAndItsText() {
 		Routine first = routine();
 		Exercise other =

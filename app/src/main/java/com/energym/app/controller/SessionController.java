@@ -98,6 +98,9 @@ public final class SessionController {
 				}
 				session = current.session;
 				id = current.id;
+				// Al retomar otro borrador se abre el primer ejercicio aún sin registrar.
+				if (previous == null)
+					selected = firstPending();
 				changed.run();
 			}
 
@@ -169,8 +172,29 @@ public final class SessionController {
 		}
 		Session next = session.withResult(item().getExercise().getId(),
 			validator.normalized(item().getExercise().getMetricType(), inputs()));
-		save(next, () -> {
-		});
+		save(next, this::advance);
+	}
+
+	/** Primer ejercicio sin valores guardados; el primero si ya están todos. */
+	private int firstPending() {
+		List<RoutineItem> items = session.getRoutine().getItems();
+		for (int i = 0; i < items.size(); i++)
+			if (!session.getResults().containsKey(items.get(i).getExercise().getId()))
+				return i;
+		return 0;
+	}
+
+	/** Tras guardar, pasa al siguiente ejercicio aún sin registrar (si queda alguno) para no tener que buscarlo. */
+	private void advance() {
+		List<RoutineItem> items = session.getRoutine().getItems();
+		for (int step = 1; step < items.size(); step++) {
+			int index = (selected + step) % items.size();
+			if (!session.getResults().containsKey(items.get(index).getExercise().getId())) {
+				selected = index;
+				changed.run();
+				return;
+			}
+		}
 	}
 
 	private void save(Session next, Runnable after) {

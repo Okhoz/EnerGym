@@ -978,9 +978,23 @@ public final class AppController {
 	public static String metrics(MetricType type, Map<String, String> values) {
 		List<String> lines = new ArrayList<>();
 		for (MetricValidator.Field field : new MetricValidator().fields(type))
-			if (values.containsKey(field.key))
-				lines.add(field.label + ": " + values.get(field.key).replace('.', ','));
+			if (values.containsKey(field.key)) {
+				String value = values.get(field.key);
+				// «Carga: 0» se lee como un error: sin carga externa es peso corporal.
+				if ("loadKg".equals(field.key) && isZero(value))
+					lines.add("Carga: peso corporal");
+				else
+					lines.add(field.label + ": " + value.replace('.', ','));
+			}
 		return String.join("\n", lines);
+	}
+
+	private static boolean isZero(String value) {
+		try {
+			return Double.parseDouble(value.replace(',', '.')) == 0;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 
 	/**

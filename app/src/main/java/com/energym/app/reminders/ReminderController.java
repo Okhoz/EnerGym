@@ -51,6 +51,15 @@ public final class ReminderController {
 		Reminders.schedule(context);
 	}
 
+	/**
+	 * Lo ya hecho hoy calla sus avisos hasta mañana: el de agua al cumplir el objetivo y el de entreno al
+	 * finalizar una sesión.
+	 */
+	public void today(java.time.LocalDate day, int waterMl, int waterGoal, boolean trained) {
+		Reminders.markDay(context, "waterDoneDay", day, waterGoal > 0 && waterMl >= waterGoal);
+		Reminders.markDay(context, "trainedDay", day, trained);
+	}
+
 	private void update(ReminderPlan next) {
 		plan = next;
 		Reminders.save(context, plan);

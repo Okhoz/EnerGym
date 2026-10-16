@@ -17,9 +17,13 @@ public final class ReminderReceiver extends BroadcastReceiver {
 		String action = intent.getAction();
 		ReminderPlan plan = Reminders.load(context);
 		long late = System.currentTimeMillis() - intent.getLongExtra(Reminders.EXTRA_AT, System.currentTimeMillis());
-		if (Reminders.ACTION_TRAINING.equals(action) && plan.training && late < LATE_TRAINING_MS)
+		java.time.LocalDate today = java.time.LocalDate.now();
+		// Ya entrenado o con el agua del día cumplida, no se insiste.
+		if (Reminders.ACTION_TRAINING.equals(action) && plan.training && late < LATE_TRAINING_MS &&
+			!Reminders.dayMarked(context, "trainedDay", today))
 			Reminders.showTraining(context);
-		else if (Reminders.ACTION_WATER.equals(action) && plan.water && late < LATE_WATER_MS)
+		else if (Reminders.ACTION_WATER.equals(action) && plan.water && late < LATE_WATER_MS &&
+			!Reminders.dayMarked(context, "waterDoneDay", today))
 			Reminders.showWater(context, java.time.LocalTime.now().getHour());
 		Reminders.schedule(context);
 	}

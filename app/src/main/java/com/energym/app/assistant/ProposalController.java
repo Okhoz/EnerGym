@@ -351,7 +351,8 @@ public final class ProposalController {
 		String text = normalize(raw);
 		add("user", raw.trim());
 		boolean planning = planningTurn(text);
-		status = client.onDevice() && !localGuidance ? connectionNotice() :
+		// Con la IA del móvil la cabecera ya explica el modo: no se repite el aviso bajo cada respuesta.
+		status = client.onDevice() ? "" :
 			automaticConnection() ? "Guiado local seleccionado · respuestas por reglas, sin IA." :
 			"Guiado local · sin IA. Conecta tu servidor en Cuenta para conversar con la IA.";
 		if (exercise != null && !planning && !greeting(text)) {
@@ -390,8 +391,12 @@ public final class ProposalController {
 				response = "Para ganar constancia, prueba una meta pequeña que puedas repetir y reserva un momento concreto. Si un día no sale, retoma en la siguiente ocasión sin intentar compensarlo todo. ¿Qué suele dificultarte empezar?";
 			else if (text.contains("cans") || text.contains("descans"))
 				response = "El descanso también forma parte del entrenamiento. Ajusta la sesión a cómo te encuentres y evita forzar si estás muy cansado. Si hay dolor o malestar persistente, consulta a un profesional sanitario.";
+			else if (techniqueReply(raw) != null)
+				response = techniqueReply(raw);
 			else
-				response = "Puedo orientarte con la técnica del catálogo y preparar una rutina si me la pides. En este modo local uso respuestas guiadas; para conversar con IA, elige el modo online cuando esté disponible.";
+				response = "Puedo explicarte la técnica de un ejercicio (por ejemplo «¿cómo hago una sentadilla?»), " +
+					"darte ideas de constancia y descanso o preparar una rutina si me la pides." +
+					(client.onDevice() ? "" : " En este modo local uso respuestas guiadas; para conversar con IA, elige el modo online cuando esté disponible.");
 			add("assistant", response);
 			persist();
 			changed.run();
@@ -664,10 +669,47 @@ public final class ProposalController {
 		changed.run();
 	}
 
+	/**
+	 * Respuesta de técnica cuando el mensaje nombra un ejercicio del catálogo: el nombre completo lo identifica;
+	 * con solo la palabra base («plancha») y varias variantes, se enumeran para que la persona elija.
+	 */
+	private String techniqueReply(String raw) {
+		String text = " " + com.energym.app.catalog.ExerciseSearch.normalize(raw) + " ";
+		Exercise named = null;
+		for (Exercise e : catalog) {
+			String name = com.energym.app.catalog.ExerciseSearch.normalize(e.getName());
+			if (!name.isEmpty() && text.contains(" " + name + " ") &&
+				(named == null || name.length() > named.getName().length()))
+				named = e;
+		}
+		if (named != null)
+			return explanation(named);
+		List<Exercise> family = new ArrayList<>();
+		for (Exercise e : catalog) {
+			String first = com.energym.app.catalog.ExerciseSearch.normalize(e.getName()).split(" ")[0];
+			if (first.length() >= 5 && (text.contains(" " + first + " ") || text.contains(" " + first + "s ")))
+				family.add(e);
+		}
+		if (family.isEmpty())
+			return null;
+		if (family.size() == 1)
+			return explanation(family.get(0));
+		family.sort(Comparator.<Exercise>comparingInt(e -> e.getRequiredResources().size())
+			.thenComparing(Exercise::getName));
+		List<String> names = new ArrayList<>();
+		for (Exercise e : family.subList(0, Math.min(8, family.size())))
+			names.add(e.getName());
+		String base = family.get(0).getName().split(" ")[0];
+		return "Hay " + family.size() + " variantes de " + base.toLowerCase(Locale.ROOT) + " en el catálogo: " +
+			String.join(", ", names) + (family.size() > names.size() ? " y más" : "") +
+			". ¿Cuál te interesa? Escribe su nombre, por ejemplo «¿cómo hago " +
+			Collections.min(names, Comparator.comparingInt(String::length)).toLowerCase(Locale.ROOT) + "?»";
+	}
+
 	private String explanation(Exercise e) {
 		return "Técnica de " + e.getName() + "\n" + e.getDescription() + "\nMaterial de esta versión: " +
 			(e.getRequiredResources().isEmpty() ? "ninguno" : AppController.labels(e.getRequiredResources())) +
-			". Practica con control; detente si aparece dolor. Es una explicación guiada por reglas del snapshot seleccionado.";
+			". Practica con control; detente si aparece dolor. Explicación orientativa del catálogo, sin revisión profesional.";
 	}
 
 	public void reject() {
@@ -873,6 +915,12 @@ public final class ProposalController {
 	 */
 	public void send(String text) {
 		if (automaticConnection() && !localGuidance) {
+			// La IA del móvil aún no responde (sin soporte o descargando): el aviso promete el guiado local,
+			// que tampoco sale del móvil, así que se contesta con él en vez de dejar el mensaje sin enviar.
+			if (!remoteActive() && onDevice()) {
+				sendLocal(text);
+				return;
+			}
 			if (!remoteActive()) {
 				status = connectionNotice();
 				changed.run();
