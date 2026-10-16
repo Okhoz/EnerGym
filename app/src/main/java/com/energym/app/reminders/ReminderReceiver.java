@@ -15,6 +15,10 @@ public final class ReminderReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		String action = intent.getAction();
+		if (RestTimer.ACTION_DONE.equals(action)) {
+			RestTimer.finished(context);
+			return;
+		}
 		ReminderPlan plan = Reminders.load(context);
 		long late = System.currentTimeMillis() - intent.getLongExtra(Reminders.EXTRA_AT, System.currentTimeMillis());
 		java.time.LocalDate today = java.time.LocalDate.now();

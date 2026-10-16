@@ -31,6 +31,18 @@ public final class SessionFragment extends ScreenFragment {
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+		com.energym.app.reminders.RestTimer.inFront(true);
+	}
+
+	@Override
+	public void onPause() {
+		com.energym.app.reminders.RestTimer.inFront(false);
+		super.onPause();
+	}
+
+	@Override
 	public void onDestroyView() {
 		ticker.removeCallbacks(tick);
 		restLabel = null;
@@ -447,7 +459,16 @@ public final class SessionFragment extends ScreenFragment {
 	private void startRest(RoutineItem item) {
 		double seconds = number(item.getPrescription().getOrDefault("restSeconds", "60"), 60);
 		if (seconds > 0)
-			restEndsAt = SystemClock.elapsedRealtime() + (long) (seconds * 1000);
+			restEndsAt(SystemClock.elapsedRealtime() + (long) (seconds * 1000), item.getExercise().getName());
+	}
+
+	/** Cambia el descanso en pantalla y su aviso fuera de la app (0 = parado). */
+	private void restEndsAt(long at, String exercise) {
+		restEndsAt = at;
+		if (at == 0)
+			com.energym.app.reminders.RestTimer.cancel(requireContext());
+		else
+			com.energym.app.reminders.RestTimer.start(requireContext(), at, exercise);
 	}
 
 	private List<Session> finishedWith(String exerciseId) {
@@ -538,11 +559,12 @@ public final class SessionFragment extends ScreenFragment {
 		LinearLayout presets = columns(card, 8);
 		for (int seconds : new int[]{60, 90, 120})
 			compact(presets, seconds / 60 + ":" + (seconds % 60 == 0 ? "00" : "30"), true, () -> {
-				restEndsAt = SystemClock.elapsedRealtime() + seconds * 1000L;
+				restEndsAt(SystemClock.elapsedRealtime() + seconds * 1000L,
+					app.sessions.item() == null ? "" : app.sessions.item().getExercise().getName());
 				tick();
 			});
 		compact(presets, "✕", true, () -> {
-			restEndsAt = 0;
+			restEndsAt(0, "");
 			tick();
 		}).setContentDescription("Parar el descanso");
 		tick();

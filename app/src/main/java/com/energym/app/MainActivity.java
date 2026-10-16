@@ -152,7 +152,9 @@ public final class MainActivity extends AppCompatActivity {
 			String open = pendingOpen;
 			pendingOpen = null;
 			// navigate() vuelve a pintar a través del observador.
-			state.app.navigate("NUTRITION".equals(open) ? AppController.Screen.NUTRITION : AppController.Screen.TRAINING);
+			state.app.navigate("NUTRITION".equals(open) ? AppController.Screen.NUTRITION :
+				"SESSION".equals(open) && state.app.sessions.session != null ? AppController.Screen.SESSION :
+					AppController.Screen.TRAINING);
 			return;
 		}
 		queuePendingAvatar();
