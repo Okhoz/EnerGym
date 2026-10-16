@@ -175,6 +175,24 @@ public final class SessionController {
 		save(next, this::advance);
 	}
 
+	/**
+	 * Entreno libre: pasa la sesión abierta a una versión nueva de su rutina (con un ejercicio más), conservando lo
+	 * apuntado y el inicio, y abre el ejercicio añadido. {@code replaced} recibe el borrador anterior para archivarlo.
+	 */
+	public void migrate(Routine routine, Consumer<Session> replaced) {
+		if (busy || session == null || session.getStatus() != Session.Status.DRAFT || routine == null ||
+			routine.getVersionId() <= 0)
+			return;
+		Session old = session;
+		Session next = new Session(UUID.randomUUID().toString(), routine, old.getResults(), old.getStartedAt(), 0,
+			Session.Status.DRAFT);
+		save(next, () -> {
+			selected = routine.getItems().size() - 1;
+			changed.run();
+			replaced.accept(old);
+		});
+	}
+
 	/** Series ya apuntadas del ejercicio actual (vacío si no es de fuerza o aún no hay). */
 	public List<SetLog.Entry> sets() {
 		RoutineItem item = item();

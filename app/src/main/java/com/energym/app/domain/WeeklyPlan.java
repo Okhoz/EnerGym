@@ -117,6 +117,10 @@ public final class WeeklyPlan {
 		return null;
 	}
 
+	public static boolean samePlan(Routine a, Routine b) {
+		return !planOf(a).isEmpty() && planOf(a).equals(planOf(b));
+	}
+
 	private static String planOf(Routine r) {
 		Matcher m = PLAN.matcher(r.getExplanation() == null ? "" : r.getExplanation());
 		return m.find() ? m.group(1) : "";

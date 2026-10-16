@@ -76,6 +76,12 @@ public final class SessionFragment extends ScreenFragment {
 			tracker(item, e);
 		else
 			form(item, e);
+		if (FreeWorkout.is(app.sessions.session.getRoutine())) {
+			com.google.android.material.button.MaterialButton more = action(rows, "+ Añadir ejercicio",
+				!app.sessions.busy && !app.trainingMutation,
+				() -> ExercisePicker.show(requireContext(), "Añadir ejercicio", app.freeCandidates(), app::addFreeExercise));
+			more.setTag("session_add_exercise");
+		}
 		rest();
 		if (app.sessions.selected + 1 < ids.size())
 			action(rows, "Siguiente ejercicio", !app.sessions.busy,

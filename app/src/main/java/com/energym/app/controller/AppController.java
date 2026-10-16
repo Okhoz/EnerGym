@@ -155,6 +155,7 @@ public final class AppController {
 		sessions = new SessionController(store, this::changed, this::error, () -> {
 			notice = "Sesión finalizada y guardada localmente.";
 			selectNextPlanDay();
+			retireFreeRoutine();
 			reload();
 			navigate(Screen.HISTORY);
 		});
@@ -261,7 +262,7 @@ public final class AppController {
 					}
 				// Sin elección explícita se sigue el orden restaurado; una elección humana ausente permanece pendiente.
 				if (selectedRoutineId == null && !versions.isEmpty()) {
-					selected = versions.get(0);
+					selected = defaultRoutine();
 				}
 				routines.accepted = selected;
 				lastLoadedRoutine = selected;
@@ -310,6 +311,114 @@ public final class AppController {
 		routines.create();
 		if (routines.preview != null)
 			navigate(Screen.ROUTINE);
+	}
+
+	/** Ejercicios que se pueden añadir al entreno libre de hoy. */
+	public List<Exercise> freeCandidates() {
+		if (profile == null)
+			return Collections.emptyList();
+		Routine current = sessions.session != null && FreeWorkout.is(sessions.session.getRoutine()) ?
+			sessions.session.getRoutine() : null;
+		return FreeWorkout.candidates(profile, catalog.getExercises(), current);
+	}
+
+	/**
+	 * Entreno libre (como apuntar en FitNotes sin rutina): empieza con un ejercicio o, si ya hay uno libre abierto,
+	 * le añade este. Cada cambio guarda una versión nueva y la sesión pasa a ella sin perder lo apuntado.
+	 */
+	public void addFreeExercise(Exercise exercise) {
+		if (trainingMutation || loading || !initialDataReady || sessions.busy || exercise == null) return;
+		if (owner == null) {
+			navigate(Screen.ACCOUNT);
+			return;
+		}
+		if (profile == null) {
+			error("Guarda tu perfil (lugar y material) antes de entrenar.");
+			return;
+		}
+		Session open = sessions.session != null && sessions.session.getStatus() == Session.Status.DRAFT ?
+			sessions.session : null;
+		if (open != null && !FreeWorkout.is(open.getRoutine())) {
+			error("Ya tienes un entreno de rutina abierto. Termínalo o descártalo antes de empezar uno libre.");
+			return;
+		}
+		String today = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("d/M"));
+		Routine next = FreeWorkout.with(profile, open == null ? null : open.getRoutine(), exercise, today);
+		trainingMutation = true;
+		long token = generation;
+		changed();
+		store.acceptManual(next, new AppStore.Callback<Routine>() {
+			public void success(Routine saved) {
+				if (token != generation) return;
+				trainingMutation = false;
+				if (open == null) {
+					sessions.start(saved);
+					navigate(Screen.SESSION);
+					return;
+				}
+				String oldRoutine = open.getRoutine().getProposalId();
+				sessions.migrate(saved, old -> {
+					// El borrador y la versión anteriores se archivan: la sesión nueva ya lleva todo lo apuntado.
+					store.archiveTraining(false, old.getSyncId(), ignore());
+					store.archiveTraining(true, oldRoutine, ignore());
+				});
+				navigate(Screen.SESSION);
+			}
+
+			public void failure(Exception e) {
+				if (token != generation) return;
+				trainingMutation = false;
+				error(e.getMessage());
+			}
+		});
+	}
+
+	/** Al terminar un entreno libre su rutina del día se retira de la lista; la sesión guarda su copia. */
+	private void retireFreeRoutine() {
+		if (sessions.session != null && FreeWorkout.is(sessions.session.getRoutine()))
+			store.archiveTraining(true, sessions.session.getRoutine().getProposalId(), ignore());
+	}
+
+	/** Archivado en segundo plano: al acabar refresca listas; un fallo no interrumpe el entreno. */
+	private AppStore.Callback<Void> ignore() {
+		long token = generation;
+		return new AppStore.Callback<Void>() {
+			public void success(Void ignored) {
+				if (token == generation)
+					reload();
+			}
+
+			public void failure(Exception e) {
+			}
+		};
+	}
+
+	/**
+	 * Rutina de hoy sin elección explícita: en un plan semanal, el día que sigue al último entreno terminado; si el
+	 * plan aún no se ha empezado, su día 1; si no hay plan, la más reciente.
+	 */
+	private Routine defaultRoutine() {
+		Session last = null;
+		for (Session s : history)
+			if (s.getStatus() == Session.Status.FINISHED && (last == null || s.getCompletedAt() > last.getCompletedAt()))
+				last = s;
+		Routine next = last == null ? null : WeeklyPlan.next(last.getRoutine(), versions);
+		if (next != null)
+			return next;
+		Routine newest = versions.get(0);
+		for (Routine r : versions)
+			if (!FreeWorkout.is(r)) {
+				newest = r;
+				break;
+			}
+		int[] day = WeeklyPlan.dayOf(newest);
+		if (day != null && day[0] != 1)
+			for (Routine r : versions) {
+				int[] other = WeeklyPlan.dayOf(r);
+				if (other != null && other[0] == 1 && other[1] == day[1] && WeeklyPlan.samePlan(r, newest))
+					return r;
+			}
+		return newest;
 	}
 
 	/** Plan semanal: al terminar un día queda seleccionado el siguiente, como en una rutina de FitNotes. */

@@ -125,6 +125,8 @@ public final class TrainingFragment extends ScreenFragment {
 
 	private void routines(boolean hasNextStep) {
 		List<Routine> routines = new ArrayList<>(app.versions);
+		// El entreno libre no es una rutina guardada: se ve en «Ahora» mientras está abierto.
+		routines.removeIf(com.energym.app.domain.FreeWorkout::is);
 		// Los días de un plan semanal van juntos y en orden (Día 1, Día 2…), como las rutinas de FitNotes.
 		routines.sort(Comparator.comparingInt((Routine r) -> com.energym.app.domain.WeeklyPlan.dayOf(r) == null ? 1 : 0)
 			.thenComparingInt(r -> com.energym.app.domain.WeeklyPlan.dayOf(r) == null ? 0 :
@@ -149,8 +151,14 @@ public final class TrainingFragment extends ScreenFragment {
 
 	/** Crear siempre a la vista: con el entrenador, a mano o una automática al momento. */
 	private void createSection(boolean hasNextStep) {
-		section("Crear una rutina", 32);
 		boolean ready = app.owner() != null && !app.loading;
+		section("Sin rutina", 32);
+		LinearLayout free = card("🏋️ Entreno libre", "Como en un cuaderno: eliges los ejercicios sobre la marcha y apuntas " +
+			"cada serie. Solo ves los compatibles con tu lugar y material.");
+		MaterialButton freeStart = action(free, "Empezar entreno libre", ready && !app.trainingMutation && app.profile != null,
+			() -> ExercisePicker.show(requireContext(), "Primer ejercicio", app.freeCandidates(), app::addFreeExercise));
+		freeStart.setTag("training_free");
+		section("Crear una rutina", 32);
 		LinearLayout create = card("¿Cómo la quieres crear?", "");
 		MaterialButton ai = action(create, "✦ Pedírsela al entrenador", ready && !state.assistant.busy, () -> {
 			if (state.assistant.busy)
