@@ -474,6 +474,13 @@ public final class MainActivity extends AppCompatActivity {
 		super.onTrimMemory(level);
 	}
 
+	/** Cada vez que se abre la app, los anillos de progreso se rellenan de nuevo hasta su valor. */
+	@Override
+	protected void onStart() {
+		super.onStart();
+		com.energym.app.ui.charts.RingView.replayOnNextShow();
+	}
+
 	@Override
 	protected void onDestroy() {
 		if (menuSheet != null && menuSheet.isShowing()) menuSheet.dismiss();

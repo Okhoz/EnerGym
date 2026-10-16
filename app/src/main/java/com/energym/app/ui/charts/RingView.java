@@ -16,6 +16,16 @@ public final class RingView extends View {
 	private double current, target;
 	private String center = "", unit = "", title = "";
 	private int color;
+	/** Fracción del arco y de la cifra ya dibujada (0–1): la animación de «recarga» al abrir la app. */
+	private float fill = 1;
+	private android.animation.ValueAnimator filling;
+	/** Anillos que ya se han rellenado desde que se abrió la app: al volver a pintar no se repite. */
+	private static final java.util.Set<String> PLAYED = new java.util.HashSet<>();
+
+	/** Al abrir (o volver a) la app, los anillos vuelven a rellenarse una vez. */
+	public static void replayOnNextShow() {
+		PLAYED.clear();
+	}
 
 	public RingView(Context context) {
 		this(context, null);
@@ -49,8 +59,37 @@ public final class RingView extends View {
 		build(strokeDp);
 		setContentDescription(title + ": " + Math.round(current) + " de " + Math.round(target) + " " + unit +
 			(target > 0 && current > target ? ", por encima del objetivo" : ""));
+		// Se rellena desde cero hasta su valor, proporcional a lo conseguido, la primera vez tras abrir la app.
+		if (target > 0 && PLAYED.add(title) &&
+			com.energym.app.ui.effects.MotionPreferences.enabled(getContext()))
+			animateFill();
 		invalidate();
 		return this;
+	}
+
+	private void animateFill() {
+		if (filling != null)
+			filling.cancel();
+		fill = 0;
+		filling = android.animation.ValueAnimator.ofFloat(0, 1);
+		filling.setDuration(1100);
+		filling.setStartDelay(120);
+		filling.setInterpolator(new android.view.animation.DecelerateInterpolator(1.8f));
+		filling.addUpdateListener(a -> {
+			fill = (float) a.getAnimatedValue();
+			invalidate();
+		});
+		filling.start();
+	}
+
+	@Override
+	protected void onDetachedFromWindow() {
+		if (filling != null) {
+			filling.cancel();
+			filling = null;
+			fill = 1;
+		}
+		super.onDetachedFromWindow();
 	}
 
 	public int gold() {
@@ -82,13 +121,13 @@ public final class RingView extends View {
 		float size = Math.min(getWidth(), getHeight() - palette.dp(26)) - stroke;
 		float cx = getWidth() / 2f, cy = stroke / 2 + size / 2;
 		bounds.set(cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2);
-		canvas.drawArc(bounds, 0, 360, false, track);
+		canvas.drawArc(bounds, -90, 360 * fill, false, track);
 		double ratio = target <= 0 ? 0 : current / target;
-		arc.setColor(ratio > 1.05 ? palette.over : color);
+		arc.setColor(ratio > 1.05 && fill >= 1 ? palette.over : color);
 		if (ratio > 0)
-			canvas.drawArc(bounds, -90, (float) (Math.min(1, ratio) * 360), false, arc);
+			canvas.drawArc(bounds, -90, (float) (Math.min(1, ratio) * 360 * fill), false, arc);
 		float valueY = cy - (value.descent() + value.ascent()) / 2 - palette.dp(6);
-		canvas.drawText(center, cx, valueY, value);
+		canvas.drawText(fill >= 1 ? center : Long.toString(Math.round(current * fill)), cx, valueY, value);
 		canvas.drawText(target > 0 ? "de " + Math.round(target) + " " + unit : unit, cx,
 			valueY + palette.dp(16), label);
 		canvas.drawText(title, cx, getHeight() - palette.dp(6), caption);
