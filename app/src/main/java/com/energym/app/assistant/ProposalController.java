@@ -110,7 +110,7 @@ public final class ProposalController {
 	 * Vincula cada propuesta al perfil vigente en su creación; resembrar el diálogo nunca cambia este CAS.
 	 */
 	private void setPreview(Routine value, TrainingProfile expected) {
-		preview = value;
+		preview = value == null ? null : carryOver.apply(value);
 		previewBase = expected;
 		previewAnchor = messages.size();
 		swapped.clear();
@@ -129,6 +129,13 @@ public final class ProposalController {
 	 */
 	public void trainingContext(Supplier<String> summary) {
 		training = summary == null ? () -> "" : summary;
+	}
+
+	private java.util.function.UnaryOperator<Routine> carryOver = r -> r;
+
+	/** Ajusta una propuesta nueva a lo último que la persona registró (sin reiniciar cargas ya conseguidas). */
+	public void carryOver(java.util.function.UnaryOperator<Routine> adjust) {
+		carryOver = adjust == null ? r -> r : adjust;
 	}
 
 	private void clearPreview() {

@@ -81,6 +81,24 @@ public final class RoutineRepository {
 	}
 
 	/**
+	 * Progresión automática: guarda la nueva versión y archiva la anterior en una transacción. Las sesiones ya
+	 * registradas conservan su copia de la versión con la que se hicieron.
+	 */
+	public Routine replaceWithProgression(String originalId, Routine replacement) {
+		return database.transaction(() -> {
+			if (originalId.equals(replacement.getProposalId()) || bySyncId(originalId) == null)
+				throw new IllegalArgumentException("La rutina ya no está disponible");
+			if (new TrainingArchiveRepository(database).contains(SyncRecord.Kind.ROUTINE, originalId))
+				throw new IllegalArgumentException("La rutina ya subió de nivel en otro dispositivo");
+			boolean manual = replacement.getMetadata() != null &&
+				replacement.getMetadata().getOrigin() == RoutineMetadata.Origin.MANUAL;
+			long id = manual ? saveManual(replacement) : saveAccepted(replacement);
+			new TrainingArchiveRepository(database).archive(SyncRecord.Kind.ROUTINE, originalId);
+			return load(id);
+		});
+	}
+
+	/**
 	 * Compara recursos/consentimiento dentro de SQLite; ningún fallo deja el perfil parcialmente guardado.
 	 */
 	public Routine acceptProposal(Routine routine, TrainingProfile expected) {

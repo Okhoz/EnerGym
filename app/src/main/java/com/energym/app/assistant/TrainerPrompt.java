@@ -58,16 +58,17 @@ public final class TrainerPrompt {
 				.append("Elige de 3 a 5 ejercicios solo de la lista, en buen orden (movilidad o calentamiento primero ")
 				.append("si los hay). La rutina va SOLO en \"rutina\": nunca copies la rutina, IDs ni JSON dentro de ")
 				.append("\"texto\". En \"texto\" (2 o 3 párrafos cortos) explica el enfoque y da consejos de técnica, pero no escribas ")
-				.append("series, repeticiones ni segundos: la app los calcula y los muestra. Empieza conservador, con un esfuerzo de 6 o 7 sobre 10, para que la app pueda ")
-				.append("subir series, repeticiones, carga o tiempo en cada sesión (sobrecarga progresiva). ")
+				.append("series, repeticiones ni segundos: la app los calcula y los muestra. Empieza conservador, con un esfuerzo de 6 o 7 sobre 10. ")
+				.append("Para la sobrecarga progresiva, conserva los ejercicios que ya hizo si encajan: la app parte de su ")
+				.append("última carga y sube sola la rutina tras cada sesión (repeticiones, luego carga). ")
 				.append("Ten en cuenta el nivel, la experiencia, las limitaciones y los datos de su disciplina.\n");
 		p.append("\nPERFIL DEL CLIENTE\n").append(profile(r.profileData)).append('\n');
 		if (!r.training.isEmpty())
 			p.append("\nSU ENTRENAMIENTO (datos reales de la app)\n").append(cut(r.training, 1400)).append('\n')
 				.append("Úsalo para responder sobre su progreso, comentar sus últimas sesiones y ajustar lo que ")
 				.append("propongas (no repitas lo que ya le cuesta, sube poco a poco lo que domina; relaciona su dieta con su objetivo). Si hay una ")
-				.append("progresión lista o un entreno a medias, díselo: puede usar los botones del chat para ")
-				.append("aplicarla, continuar o empezar el entreno.\n");
+				.append("subida de nivel automática reciente, felicítale y explica qué subió y por qué; si hay un entreno a ")
+				.append("medias, díselo: puede usar los botones del chat para continuar o empezar el entreno.\n");
 		if (r.profile == null) {
 			List<String> missing = missing(r.profileData);
 			p.append("Perfil incompleto (falta: ").append(String.join(", ", missing)).append("). Responde a su ")

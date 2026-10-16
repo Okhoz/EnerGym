@@ -205,6 +205,8 @@ public final class AppController {
 		progression = null;
 		progressionBase = null;
 		progressionHistory = null;
+		lastProgression = Collections.emptyList();
+		autoProgressing = false;
 		profileDraft.clear();
 		backStack.clear();
 		profileDirty = false;
@@ -262,6 +264,7 @@ public final class AppController {
 				routines.accepted = selected;
 				lastLoadedRoutine = selected;
 				changed();
+				autoProgress();
 			}
 
 			public void failure(Exception e) {
@@ -455,11 +458,121 @@ public final class AppController {
 					.append(" ejercicios anotados)\n");
 				break;
 			}
+		if (!lastProgression.isEmpty())
+			s.append("Última subida de nivel automática: ").append(String.join("; ", lastProgression)).append('\n');
 		ProgressionEngine.Plan plan = progression();
 		if (plan != null)
 			s.append("Progresión lista para aplicar: ").append(String.join("; ", plan.changes)).append('\n');
 		String text = s.toString().trim();
 		return text.equals("Sesiones terminadas: 0") ? "" : text.length() > 1400 ? text.substring(0, 1399) + "…" : text;
+	}
+
+	/**
+	 * Continuidad de la sobrecarga: una rutina nueva no reinicia lo conseguido. Los ejercicios con carga parten
+	 * del último peso que se completó, y los isométricos de los segundos ya aguantados (si caben en su tiempo).
+	 */
+	public Routine continueFrom(Routine proposal) {
+		if (proposal == null || proposal.isEmpty() || history.isEmpty())
+			return proposal;
+		List<RoutineItem> items = new ArrayList<>();
+		boolean changed = false;
+		for (RoutineItem item : proposal.getItems()) {
+			Map<String, String> last = lastResult(item.getExercise().getId());
+			Map<String, String> p = new LinkedHashMap<>(item.getPrescription());
+			String note = "";
+			MetricType type = item.getExercise().getMetricType();
+			if (last != null && type == MetricType.STRENGTH && !item.getExercise().getRequiredResources().isEmpty()) {
+				double load = number(last.get("loadKg"));
+				if (load > 0 && number(p.get("loadKg")) != load) {
+					p.put("loadKg", ProgressionEngine.fmt(load));
+					note = "Parte de tu última carga: " + ProgressionEngine.fmt(load).replace('.', ',') + " kg.";
+				}
+			} else if (last != null && type == MetricType.ISOMETRIC) {
+				double held = number(last.get("durationSeconds"));
+				if (held > number(p.get("durationSeconds")) && held <= 90) {
+					p.put("durationSeconds", ProgressionEngine.fmt(held));
+					note = "Parte de los " + ProgressionEngine.fmt(held) + " s que ya aguantas.";
+				}
+			}
+			if (!note.isEmpty()) {
+				try {
+					com.energym.app.assistant.ChatProtocol.validatePrescription(item.getExercise(), p,
+						item.getEstimatedMinutes());
+				} catch (IllegalArgumentException invalid) {
+					note = "";
+				}
+			}
+			if (note.isEmpty())
+				items.add(item);
+			else {
+				changed = true;
+				items.add(new RoutineItem(item.getExercise(), p, item.getEstimatedMinutes(),
+					(item.getJustification() + " " + note).trim()));
+			}
+		}
+		if (!changed)
+			return proposal;
+		Routine adjusted = new Routine(proposal.getProposalId(), proposal.getVersionId(), proposal.getTitle(),
+			proposal.getProfile(), items, proposal.getExplanation(), proposal.getMetadata());
+		return adjusted.isValidFor(proposal.getProfile()) ? adjusted : proposal;
+	}
+
+	private Map<String, String> lastResult(String exerciseId) {
+		Session best = null;
+		for (Session s : history)
+			if (s.getStatus() == Session.Status.FINISHED && s.getResults().containsKey(exerciseId) &&
+				(best == null || s.getCompletedAt() > best.getCompletedAt()))
+				best = s;
+		return best == null ? null : best.getResults().get(exerciseId);
+	}
+
+	private static double number(String value) {
+		try {
+			return value == null ? 0 : Double.parseDouble(value.trim().replace(',', '.'));
+		} catch (NumberFormatException e) {
+			return 0;
+		}
+	}
+
+	private boolean autoProgressing;
+	/** Cambios de la última subida de nivel automática, para avisar y para el entrenador IA. */
+	public List<String> lastProgression = Collections.emptyList();
+
+	/**
+	 * Sobrecarga progresiva automática: al terminar una sesión, la rutina activa sube de nivel sola si lo
+	 * registrado lo justifica. La versión anterior se archiva; las sesiones hechas conservan su copia. Si el perfil
+	 * cambió desde entonces, queda el botón «Subir de nivel» para revisarla a mano.
+	 */
+	private void autoProgress() {
+		Routine base = routines.accepted;
+		if (autoProgressing || owner == null || !initialDataReady || routines.busy || base == null)
+			return;
+		ProgressionEngine.Plan plan = progression();
+		if (plan == null)
+			return;
+		boolean manualOrigin = base.getMetadata() != null &&
+			base.getMetadata().getOrigin() == RoutineMetadata.Origin.MANUAL;
+		if (!manualOrigin && (profile == null || !plan.routine.isValidFor(profile)))
+			return;
+		autoProgressing = true;
+		long token = generation;
+		store.progress(base.getProposalId(), plan.routine, new AppStore.Callback<Routine>() {
+			public void success(Routine saved) {
+				if (token != generation)
+					return;
+				autoProgressing = false;
+				lastProgression = plan.changes;
+				notice = "📈 Tu rutina ha subido de nivel:\n• " + String.join("\n• ", plan.changes);
+				routineAccepted(saved);
+			}
+
+			public void failure(Exception e) {
+				if (token != generation)
+					return;
+				autoProgressing = false;
+				changed();
+			}
+		});
 	}
 
 	/**

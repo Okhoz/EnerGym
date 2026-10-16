@@ -137,6 +137,7 @@ public final class AppState extends AndroidViewModel {
 			catalog.getExercises(), catalog.getVersion(), () -> app.profile, this::changed, r -> {
 			app.routineAccepted(r);
 		});
+		assistant.carryOver(app::continueFrom);
 		assistant.trainingContext(() -> {
 			String training = app.trainingSummary(), food = nutrition.summary();
 			return training.isEmpty() ? food : food.isEmpty() ? training : food + "\n" + training;

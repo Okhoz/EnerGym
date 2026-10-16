@@ -59,6 +59,25 @@ public final class TrainingEditingRepositoryTest {
 		assertEquals(1, routines.versions().size());
 	}
 
+	@Test public void automaticProgressionReplacesTheRoutineOnceAndKeepsTheSessionSnapshot() {
+		Routine original = routine("Fuerza");
+		long sessionId = sessions.saveDraft(new Session(original));
+		String previous = SnapshotCodec.encodeRoutine(original);
+		Routine next = new Routine(UUID.randomUUID().toString(), 0, "Fuerza · nivel 2", original.getProfile(),
+			original.getItems(), "Progresión", original.getMetadata());
+		Routine saved = routines.replaceWithProgression(original.getProposalId(), next);
+		assertEquals(1, routines.versions().size());
+		assertEquals("Fuerza · nivel 2", routines.versions().get(0).getTitle());
+		assertEquals(saved.getProposalId(), next.getProposalId());
+		assertEquals(previous, SnapshotCodec.encodeRoutine(sessions.load(sessionId).getRoutine()));
+		// Un segundo intento (otro dispositivo o doble aviso) no crea otra versión.
+		Routine again = new Routine(UUID.randomUUID().toString(), 0, "Fuerza · nivel 2", original.getProfile(),
+			original.getItems(), "Progresión", original.getMetadata());
+		assertThrows(IllegalArgumentException.class,
+			() -> routines.replaceWithProgression(original.getProposalId(), again));
+		assertEquals(1, routines.versions().size());
+	}
+
 	@Test public void archiveSurvivesSnapshotRestoreAndCannotResurrectWithOldRoutineOrDraft() {
 		Routine original = routine("Original");
 		Session draft = new Session(original);

@@ -62,6 +62,11 @@ public interface AppStore {
 		callback.failure(new UnsupportedOperationException("Este almacén no admite editar rutinas"));
 	}
 
+	/** Sustituye una rutina por su siguiente nivel de progresión, archivando la anterior. */
+	default void progress(String originalId, Routine value, Callback<Routine> callback) {
+		callback.failure(new UnsupportedOperationException("Este almacén no admite progresión automática"));
+	}
+
 	/** Lápida sincronizable, sin destruir los snapshots históricos. */
 	default void archiveTraining(boolean routine, String syncId, Callback<Void> callback) {
 		callback.failure(new UnsupportedOperationException("Este almacén no admite eliminar entrenamientos"));

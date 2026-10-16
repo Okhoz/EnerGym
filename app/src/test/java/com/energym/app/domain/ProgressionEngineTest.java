@@ -52,12 +52,38 @@ public class ProgressionEngineTest {
 		assertTrue(plan.routine.getTitle().endsWith("nivel 2"));
 		Routine top = routine(p, new RoutineItem(squat, map("sets", "3", "repetitions", "8", "loadKg", "60", "restSeconds", "120"),
 			10, "Base"));
-		Map<String, String> next = new ProgressionEngine().next(top, Collections.singletonList(
-			done(top, "squat", map("sets", "3", "repetitions", "8", "loadKg", "60")))).routine.getItems().get(0).getPrescription();
+		// Intermedio: una sola sesión en el techo consolida; la carga sube tras dos seguidas con esfuerzo asumible.
+		assertNull(new ProgressionEngine().next(top, Collections.singletonList(
+			done(top, "squat", map("sets", "3", "repetitions", "8", "loadKg", "60")))));
+		List<Session> twice = Arrays.asList(daysAgo(top, "squat", map("sets", "3", "repetitions", "8", "loadKg", "60",
+			"effort", "7"), 3), done(top, "squat", map("sets", "3", "repetitions", "8", "loadKg", "60", "effort", "6")));
+		ProgressionEngine.Plan loaded = new ProgressionEngine().next(top, twice);
+		Map<String, String> next = loaded.routine.getItems().get(0).getPrescription();
 		assertEquals("62.5", next.get("loadKg"));
 		assertEquals("5", next.get("repetitions"));
-		assertTrue(new ProgressionEngine().next(top, Collections.singletonList(
-			done(top, "squat", map("sets", "3", "repetitions", "8", "loadKg", "60")))).changes.get(0).contains("kg 60 → 62,5"));
+		assertTrue(loaded.changes.get(0).contains("kg 60 → 62,5"));
+		assertTrue("Explica el motivo", loaded.changes.get(0).contains("dos sesiones seguidas"));
+	}
+
+	@Test
+	public void effortEightAddsRepsButNeverLoad() {
+		TrainingProfile p = profile(TrainingProfile.Goal.STRENGTH, 30);
+		Routine top = routine(p, new RoutineItem(squat,
+			map("sets", "3", "repetitions", "8", "loadKg", "60", "restSeconds", "120"), 10, "Base"));
+		assertNull(new ProgressionEngine().next(top, Arrays.asList(
+			daysAgo(top, "squat", map("sets", "3", "repetitions", "8", "loadKg", "60", "effort", "7"), 3),
+			done(top, "squat", map("sets", "3", "repetitions", "8", "loadKg", "60", "effort", "8")))));
+		Routine low = routine(p, new RoutineItem(squat,
+			map("sets", "3", "repetitions", "6", "loadKg", "60", "restSeconds", "120"), 10, "Base"));
+		assertEquals("7", new ProgressionEngine().next(low, Collections.singletonList(
+			done(low, "squat", map("sets", "3", "repetitions", "6", "loadKg", "60", "effort", "8"))))
+			.routine.getItems().get(0).getPrescription().get("repetitions"));
+	}
+
+	private static Session daysAgo(Routine r, String id, Map<String, String> result, int days) {
+		long at = System.currentTimeMillis() - days * 86400000L;
+		return new Session(UUID.randomUUID().toString(), r, Collections.singletonMap(id, result), at - 3600000, at,
+			Session.Status.FINISHED);
 	}
 
 	@Test
@@ -67,9 +93,14 @@ public class ProgressionEngineTest {
 			10, "Base"));
 		assertNull(new ProgressionEngine().next(r, Collections.singletonList(
 			done(r, "squat", map("sets", "3", "repetitions", "8", "loadKg", "60", "effort", "9.5")))));
-		Map<String, String> deload = new ProgressionEngine().next(r, Collections.singletonList(
-			done(r, "squat", map("sets", "2", "repetitions", "5", "loadKg", "60")))).routine.getItems().get(0).getPrescription();
-		assertEquals("55", deload.get("loadKg"));
+		// Un mal día se repite; dos seguidos por debajo de lo previsto bajan un 10 %.
+		assertNull(new ProgressionEngine().next(r, Collections.singletonList(
+			done(r, "squat", map("sets", "2", "repetitions", "5", "loadKg", "60")))));
+		ProgressionEngine.Plan deloaded = new ProgressionEngine().next(r, Arrays.asList(
+			daysAgo(r, "squat", map("sets", "3", "repetitions", "5", "loadKg", "60"), 4),
+			done(r, "squat", map("sets", "2", "repetitions", "5", "loadKg", "60"))));
+		assertEquals("55", deloaded.routine.getItems().get(0).getPrescription().get("loadKg"));
+		assertTrue(deloaded.changes.get(0).contains("descarga"));
 		assertNull(new ProgressionEngine().next(r, Collections.emptyList()));
 	}
 

@@ -62,6 +62,10 @@ public final class AndroidAppStore implements AppStore {
 		sync.withDatabase(db -> new RoutineRepository(db).replaceManual(originalId, r), callback(c, true));
 	}
 
+	public void progress(String originalId, Routine r, Callback<Routine> c) {
+		sync.withDatabase(db -> new RoutineRepository(db).replaceWithProgression(originalId, r), callback(c, true));
+	}
+
 	public void archiveTraining(boolean routine, String syncId, Callback<Void> c) {
 		sync.withDatabase(db -> {
 			new TrainingArchiveRepository(db).archive(routine ? SyncRecord.Kind.ROUTINE : SyncRecord.Kind.SESSION, syncId);

@@ -30,7 +30,7 @@ public final class TrainingFragment extends ScreenFragment {
 
 	@Override
 	protected void content() {
-		heading("", "Entreno", "");
+		heading("", "Entreno", "Tus rutinas suben de nivel solas cuando completas las sesiones.");
 		restoreSelection();
 		// La referencia anterior se captura antes de retirar las filas y después se libera.
 		browser = null;
@@ -47,11 +47,14 @@ public final class TrainingFragment extends ScreenFragment {
 	}
 
 	private void sections() {
-		LinearLayout tabs = columns(rows, 0);
+		// Control segmentado: un solo contenedor redondeado y la opción elegida en dorado.
+		LinearLayout tabs = columns(rows, 4);
+		tabs.setPadding(dp(4), dp(4), dp(4), dp(4));
+		tabs.setBackground(rounded(R.color.surface_card, 24, 0, 0));
 		tab(tabs, "Mis rutinas", "mine", TrainingViewState.Pane.MINE);
 		tab(tabs, "Con IA", "ai", TrainingViewState.Pane.AI);
 		tab(tabs, "Ejercicios", "exercises", TrainingViewState.Pane.EXERCISES);
-		((LinearLayout.LayoutParams) tabs.getLayoutParams()).bottomMargin = dp(16);
+		((LinearLayout.LayoutParams) tabs.getLayoutParams()).bottomMargin = dp(28);
 	}
 
 	private void tab(LinearLayout tabs, String label, String key, TrainingViewState.Pane pane) {
@@ -61,19 +64,19 @@ public final class TrainingFragment extends ScreenFragment {
 		button.setText(label);
 		button.setTag("training_tab_" + key);
 		button.setTextSize(14);
+		button.setAllCaps(false);
 		button.setMinWidth(0);
-		button.setMinHeight(dp(48));
-		button.setMaxLines(2);
-		button.setPadding(dp(6), dp(4), dp(6), dp(4));
+		button.setMinHeight(dp(44));
+		button.setMaxLines(1);
+		button.setPadding(dp(4), 0, dp(4), 0);
 		button.setInsetTop(0);
 		button.setInsetBottom(0);
-		button.setCornerRadius(dp(16));
+		button.setCornerRadius(dp(20));
 		button.setCheckable(true);
 		button.setChecked(selected);
-		button.setBackgroundTintList(ColorStateList.valueOf(color(selected ? R.color.surface_selected : R.color.surface)));
-		button.setStrokeColor(ColorStateList.valueOf(color(selected ? R.color.gold : R.color.divider)));
-		button.setStrokeWidth(dp(1));
-		button.setTextColor(color(selected ? R.color.gold : R.color.text_secondary));
+		button.setBackgroundTintList(ColorStateList.valueOf(color(selected ? R.color.gold : android.R.color.transparent)));
+		button.setStrokeWidth(0);
+		button.setTextColor(color(selected ? R.color.surface : R.color.text_secondary));
 		button.setOnClickListener(view -> {
 			if (browser != null) browser.capture();
 			state.training.select(pane);
@@ -85,9 +88,27 @@ public final class TrainingFragment extends ScreenFragment {
 					((android.widget.ScrollView) getView()).smoothScrollTo(0, 0);
 			});
 		});
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(56), 1);
-		if (tabs.getChildCount() > 0) params.setMarginStart(dp(6));
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(44), 1);
+		if (tabs.getChildCount() > 0) params.setMarginStart(dp(4));
 		tabs.addView(button, params);
+	}
+
+	/** Rótulo de sección discreto, con aire por encima para separar bloques. */
+	private void section(String label, int topDp) {
+		android.widget.TextView view = text(rows, label.toUpperCase(new Locale("es", "ES")), R.style.EnerGym_FieldCaption, topDp);
+		view.setLetterSpacing(0.08f);
+		view.setTextColor(color(R.color.text_tertiary));
+		((LinearLayout.LayoutParams) view.getLayoutParams()).bottomMargin = dp(12);
+		androidx.core.view.ViewCompat.setAccessibilityHeading(view, true);
+	}
+
+	private android.graphics.drawable.GradientDrawable rounded(int fill, int radiusDp, int stroke, int strokeDp) {
+		android.graphics.drawable.GradientDrawable d = new android.graphics.drawable.GradientDrawable();
+		d.setColor(color(fill));
+		d.setCornerRadius(dp(radiusDp));
+		if (strokeDp > 0)
+			d.setStroke(dp(strokeDp), color(stroke));
+		return d;
 	}
 
 	/** Continuar tiene prioridad; cada propuesta sigue siendo revisable antes de aceptarse. */
@@ -103,8 +124,12 @@ public final class TrainingFragment extends ScreenFragment {
 		Session draft = active != null ? active : pending.isEmpty() ? null : pending.get(0);
 		if (draft != null) {
 			featuredDraftId = draft.getSyncId();
-			LinearLayout resume = card("Continúa tu entreno", draft.getRoutine().getTitle() + "\n" +
-				draft.getResults().size() + " de " + draft.getRoutine().getItems().size() + " ejercicios registrados");
+			section("En curso", 0);
+			int saved = draft.getResults().size(), total = draft.getRoutine().getItems().size();
+			LinearLayout resume = card("Continúa tu entreno", draft.getRoutine().getTitle());
+			add(resume, new com.energym.app.ui.charts.ProgressBarView(requireContext()), 4)
+				.set(total == 0 ? 0 : saved / (double) total, saved + " de " + total + " ejercicios registrados");
+			text(resume, saved + " de " + total + " ejercicios registrados", R.style.EnerGym_FieldCaption, 8);
 			primary(action(resume, active != null ? "Volver a mi sesión" : "Continuar borrador", !app.sessions.busy,
 				() -> {
 					if (active != null) app.navigate(Screen.SESSION);
@@ -116,12 +141,14 @@ public final class TrainingFragment extends ScreenFragment {
 		}
 		if (app.routines.preview != null) {
 			Routine preview = app.routines.preview;
+			section("Pendiente", 0);
 			LinearLayout proposal = card("Propuesta pendiente", preview.getTitle() + "\n" + summary(preview));
 			primary(action(proposal, "Revisar propuesta", !app.routines.busy, () -> app.navigate(Screen.ROUTINE)));
 			return true;
 		}
 		ProgressionEngine.Plan progression = app.progression();
 		if (progression != null) {
+			section("Siguiente nivel", 0);
 			LinearLayout next = card("Tu próxima progresión", "Hay ajustes de sobrecarga progresiva para tu rutina seleccionada.");
 			primary(action(next, "Revisar progresión", !app.routines.busy, app::reviewProgression));
 			action(next, "Repetir rutina actual", !app.sessions.busy, app::startSession);
@@ -129,7 +156,9 @@ public final class TrainingFragment extends ScreenFragment {
 		}
 		if (app.routines.accepted == null) return false;
 		Routine selected = app.routines.accepted;
-		LinearLayout ready = card("Tu rutina seleccionada", selected.getTitle() + "\n" + summary(selected));
+		section("Hoy", 0);
+		LinearLayout ready = card(selected.getTitle(), summary(selected) + (selected.isProgressionEnabled() ?
+			"\n📈 Progresión automática activada" : ""));
 		primary(action(ready, "Empezar sesión", !app.sessions.busy, app::startSession));
 		action(ready, "Ver ejercicios", !app.routines.busy, app::viewSelectedRoutine);
 		return true;
@@ -141,10 +170,29 @@ public final class TrainingFragment extends ScreenFragment {
 			boolean generated = routine.getMetadata() != null && routine.getMetadata().getOrigin() == RoutineMetadata.Origin.AI;
 			if (generated == ai) routines.add(routine);
 		}
-		LinearLayout list = card(ai ? "Rutinas con IA" : "Tus rutinas", routines.isEmpty() ?
-			(ai ? "Habla con tu entrenador para preparar un plan." : "Elige ejercicios y ajusta tus series, repeticiones y cargas.") :
-			"Selecciona la rutina que quieras entrenar.");
-		MaterialButton create = action(list, ai ? "Crear rutina con IA" : "Crear rutina manual",
+		if (!app.lastProgression.isEmpty()) {
+			section("Última subida de nivel", hasNextStep ? 32 : 0);
+			card("📈 Tu rutina ha mejorado", "• " + String.join("\n• ", app.lastProgression));
+			hasNextStep = true;
+		}
+		section(ai ? "Rutinas con IA" : "Tus rutinas", hasNextStep ? 32 : 0);
+		if (routines.isEmpty()) {
+			LinearLayout empty = card(ai ? "✦ Aún no tienes rutinas con IA" : "Aún no tienes rutinas propias",
+				ai ? "Habla con tu entrenador para preparar un plan a tu medida." :
+					"Elige ejercicios y ajusta tus series, repeticiones y cargas.");
+			MaterialButton create = createButton(empty, ai);
+			if (!hasNextStep) primary(create);
+			return;
+		}
+		for (Routine routine : routines)
+			routineRow(routine);
+		MaterialButton create = createButton(rows, ai);
+		((LinearLayout.LayoutParams) create.getLayoutParams()).topMargin = dp(4);
+		if (!hasNextStep) primary(create);
+	}
+
+	private MaterialButton createButton(LinearLayout target, boolean ai) {
+		return action(target, ai ? "Crear rutina con IA" : "Crear rutina manual",
 			app.owner() != null && !app.loading && !app.manual.busy && (!ai || !state.assistant.busy), () -> {
 				if (ai) {
 					if (state.assistant.busy)
@@ -154,25 +202,63 @@ public final class TrainingFragment extends ScreenFragment {
 					app.navigate(Screen.ASSISTANT);
 				} else app.createManualRoutine();
 			});
-		if (!hasNextStep) primary(create);
-		for (Routine routine : routines) {
-			boolean selected = app.routines.accepted != null &&
-				app.routines.accepted.getProposalId().equals(routine.getProposalId());
-			LinearLayout row = columns(list, 12);
-			MaterialButton choose = compact(row, routine.getTitle() + (selected ? " · seleccionada" : ""),
-				!app.routines.busy && !app.trainingMutation, () -> app.selectRoutine(routine.getProposalId()));
-			choose.setMaxLines(3);
-			MaterialButton options = compact(row, "⋮", !app.trainingMutation && !app.manual.busy,
-				() -> routineOptions(routine));
-			options.setContentDescription("Opciones de la rutina " + routine.getTitle());
-			options.setTag("routine_options_" + routine.getProposalId());
-			LinearLayout.LayoutParams size = (LinearLayout.LayoutParams) options.getLayoutParams();
-			size.width = dp(56);
-			size.weight = 0;
-			choose.setTextColor(color(selected ? R.color.gold : R.color.white));
-			text(list, origin(routine) + " · " + summary(routine) + "\nProgresión " +
-				(routine.isProgressionEnabled() ? "activada" : "desactivada"), R.style.EnerGym_FieldCaption, 4);
-		}
+	}
+
+	/** Fila de rutina: título, datos clave y menú; la elegida lleva borde dorado. */
+	private void routineRow(Routine routine) {
+		boolean selected = app.routines.accepted != null &&
+			app.routines.accepted.getProposalId().equals(routine.getProposalId());
+		boolean enabled = !app.routines.busy && !app.trainingMutation;
+		LinearLayout row = new LinearLayout(requireContext());
+		row.setOrientation(LinearLayout.HORIZONTAL);
+		row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+		row.setPadding(dp(20), dp(18), dp(8), dp(18));
+		row.setBackground(rounded(selected ? R.color.surface_selected : R.color.surface_card, 22,
+			R.color.gold, selected ? 1 : 0));
+		row.setMinimumHeight(dp(72));
+		row.setClickable(enabled);
+		row.setFocusable(true);
+		row.setTag("routine_row_" + routine.getProposalId());
+		row.setContentDescription(routine.getTitle() + ". " + summary(routine) + (selected ? ". Seleccionada" : ". Toca para seleccionarla"));
+		row.setOnClickListener(v -> app.selectRoutine(routine.getProposalId()));
+		android.util.TypedValue ripple = new android.util.TypedValue();
+		requireContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, ripple, true);
+		row.setForeground(ContextCompat.getDrawable(requireContext(), ripple.resourceId));
+
+		LinearLayout texts = new LinearLayout(requireContext());
+		texts.setOrientation(LinearLayout.VERTICAL);
+		android.widget.TextView title = new android.widget.TextView(requireContext());
+		title.setTextAppearance(R.style.EnerGym_CardTitle);
+		title.setText(routine.getTitle());
+		title.setTextColor(color(selected ? R.color.gold : R.color.white));
+		title.setMaxLines(2);
+		title.setEllipsize(android.text.TextUtils.TruncateAt.END);
+		texts.addView(title);
+		android.widget.TextView meta = new android.widget.TextView(requireContext());
+		meta.setTextAppearance(R.style.EnerGym_FieldCaption);
+		meta.setText(summary(routine) + " · " + origin(routine) + (routine.isProgressionEnabled() ? " · 📈" : "") +
+			(selected ? "\n✓ Seleccionada" : ""));
+		LinearLayout.LayoutParams metaParams = new LinearLayout.LayoutParams(
+			LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		metaParams.topMargin = dp(6);
+		texts.addView(meta, metaParams);
+		row.addView(texts, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+
+		MaterialButton options = new MaterialButton(requireContext(), null,
+			com.google.android.material.R.attr.materialIconButtonStyle);
+		options.setText("⋮");
+		options.setTextSize(20);
+		options.setTextColor(color(R.color.text_secondary));
+		options.setEnabled(!app.trainingMutation && !app.manual.busy);
+		options.setContentDescription("Opciones de la rutina " + routine.getTitle());
+		options.setTag("routine_options_" + routine.getProposalId());
+		options.setOnClickListener(v -> routineOptions(routine));
+		row.addView(options, new LinearLayout.LayoutParams(dp(48), dp(48)));
+
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+			LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.bottomMargin = dp(12);
+		rows.addView(row, params);
 	}
 
 	private void routineOptions(Routine routine) {
@@ -236,6 +322,9 @@ public final class TrainingFragment extends ScreenFragment {
 			render();
 		});
 		toggle.setTag("training_more_options");
+		toggle.setBackgroundTintList(ColorStateList.valueOf(color(android.R.color.transparent)));
+		toggle.setTextColor(color(R.color.text_secondary));
+		((LinearLayout.LayoutParams) toggle.getLayoutParams()).topMargin = dp(24);
 		if (!state.training.optionsExpanded) return;
 		// El perfil se edita desde el menú ☰ de arriba a la derecha.
 		LinearLayout options = card("Propuesta local", "Genera una propuesta por reglas locales, sin IA.");
