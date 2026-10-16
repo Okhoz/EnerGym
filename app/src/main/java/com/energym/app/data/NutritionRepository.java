@@ -95,7 +95,7 @@ public final class NutritionRepository {
 			return new JSONObject().put("sex", b.sex.name()).put("age", b.age).put("heightCm", b.heightCm)
 				.put("weightKg", b.weightKg).put("activity", b.activity.name()).put("goal", b.goal.name())
 				.put("allergies", b.allergies).put("diet", b.diet.name()).put("cooking", b.cooking.name())
-				.put("mealsPerDay", b.mealsPerDay).put("dislikes", b.dislikes).toString();
+				.put("mealsPerDay", b.mealsPerDay).put("dislikes", b.dislikes).put("budget", b.budget).toString();
 		} catch (JSONException e) {
 			throw new IllegalArgumentException("Perfil físico inválido", e);
 		}
@@ -118,7 +118,7 @@ public final class NutritionRepository {
 				BodyProfile.Goal.valueOf(o.getString("goal")), o.getString("allergies"),
 				enumOr(BodyProfile.Diet.class, o.optString("diet"), BodyProfile.Diet.OMNIVORE),
 				enumOr(BodyProfile.Cooking.class, o.optString("cooking"), BodyProfile.Cooking.NORMAL),
-				o.optInt("mealsPerDay", 4), o.optString("dislikes", ""));
+				o.optInt("mealsPerDay", 4), o.optString("dislikes", ""), o.optDouble("budget", 0));
 		} catch (JSONException e) {
 			throw new IllegalArgumentException("Perfil físico inválido", e);
 		}

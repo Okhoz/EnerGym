@@ -77,6 +77,9 @@ public final class BodyFragment extends ScreenFragment {
 		}
 		choice(diet, "cooking", "Tiempo para cocinar", cooking, cookingLabels, d.getOrDefault("cooking", "NORMAL"),
 			"", v -> d.put("cooking", v));
+		textField(diet, "budget", "Presupuesto diario para comida en € (opcional)", d.getOrDefault("budget", ""), true,
+			false, "La IA elegirá los alimentos con mejor relación calidad-precio para no pasarte. Vacío = sin límite.",
+			v -> d.put("budget", v));
 		textField(diet, "dislikes", "Alimentos que no tomas (opcional)", d.getOrDefault("dislikes", ""), false, false,
 			"Por gusto o costumbre; las alergias van en su propio campo.", v -> d.put("dislikes", v));
 		LinearLayout goals = card("¿Qué quieres conseguir?", "Elige el ajuste de calorías. Se confirma al guardar tus datos.");

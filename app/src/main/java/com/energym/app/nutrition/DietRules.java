@@ -105,6 +105,12 @@ public final class DietRules {
 			p.append("ALERGIAS (prohibido usarlos ni sus derivados): ").append(body.allergies).append(".\n");
 		if (!body.dislikes.isEmpty())
 			p.append("No incluyas: ").append(body.dislikes).append(".\n");
+		if (body.budget > 0)
+			p.append("PRESUPUESTO: ").append(NutritionController.format(body.budget))
+				.append(" € al día en total (precios de supermercado en España). Elige los alimentos con mejor relación ")
+				.append("nutrientes/precio: legumbres, huevos, arroz, pasta, avena, patata, pollo, atún en lata, ")
+				.append("congelados, fruta y verdura de temporada, marca blanca. Indica el coste estimado de cada comida ")
+				.append("en \"coste\" (euros) y que la suma no pase del presupuesto. En \"consejo\" da un truco para ahorrar.\n");
 		if (!avoidDishes.isEmpty())
 			p.append("Platos distintos a: ").append(String.join("; ", avoidDishes)).append(".\n");
 		p.append("Haz exactamente ").append(slots.size()).append(" comidas, en este orden: ")
@@ -116,7 +122,8 @@ public final class DietRules {
 		p.append("Responde SOLO con JSON, sin texto alrededor:\n")
 			.append("{\"consejo\":\"un consejo breve para su objetivo\",\"comidas\":[{\"nombre\":\"Desayuno\",")
 			.append("\"plato\":\"nombre del plato\",\"ingredientes\":\"cantidades en gramos, separadas por comas\",")
-			.append("\"kcal\":500,\"proteinas\":30,\"hidratos\":60,\"grasas\":15}]}\n");
+			.append("\"kcal\":500,\"proteinas\":30,\"hidratos\":60,\"grasas\":15")
+			.append(body.budget > 0 ? ",\"coste\":1.5" : "").append("}]}\n");
 		return p.toString();
 	}
 
@@ -137,6 +144,26 @@ public final class DietRules {
 		VG = BodyProfile.Diet.VEGAN, P = BodyProfile.Diet.PESCATARIAN, M = BodyProfile.Diet.MEDITERRANEAN;
 
 	private static final Map<String, List<Dish>> DISHES = new LinkedHashMap<>();
+	/** Coste aproximado en euros por cada 500 kcal del plato (supermercado en España). */
+	private static final Map<String, Double> COST = new HashMap<>();
+
+	static {
+		String[] names = {"Avena con yogur, plátano y nueces", "Tostadas integrales con huevo revuelto y tomate",
+			"Porridge de avena con bebida de soja y frutos rojos", "Tostadas con aguacate y tofu revuelto",
+			"Tortitas de arroz con requesón y fresas", "Yogur natural con fruta", "Fruta con un puñado de almendras",
+			"Hummus con palitos de zanahoria", "Pollo a la plancha con arroz integral y verduras",
+			"Lentejas estofadas con verduras", "Salmón al horno con patata y brócoli", "Pasta integral con atún y tomate",
+			"Garbanzos salteados con espinacas y quinoa", "Tofu salteado con arroz y verduras",
+			"Bocadillo integral de pavo y tomate", "Yogur griego con avena y miel",
+			"Batido de bebida de soja, plátano y cacao", "Tostada con crema de cacahuete y plátano",
+			"Tortilla francesa con ensalada y pan", "Merluza a la plancha con verduras asadas",
+			"Pavo a la plancha con puré de calabaza", "Crema de verduras y tofu a la plancha",
+			"Ensalada de quinoa, garbanzos y aguacate", "Kéfir natural", "Un puñado de nueces"};
+		double[] euros = {1.2, 1.0, 1.1, 2.0, 1.8, 1.0, 1.3, 1.2, 2.2, 0.8, 4.0, 1.4, 1.6, 1.8, 1.5, 1.3, 1.0, 0.9,
+			1.0, 3.0, 2.2, 1.5, 2.2, 1.2, 1.5};
+		for (int i = 0; i < names.length; i++)
+			COST.put(names[i], euros[i]);
+	}
 
 	static {
 		DISHES.put("Desayuno", Arrays.asList(
@@ -191,12 +218,20 @@ public final class DietRules {
 					t.carbs * share, t.fat * share));
 				continue;
 			}
+			if (body.budget > 0) {
+				// Con presupuesto se eligen los platos más baratos (la mitad más económica de los compatibles).
+				options.sort(Comparator.comparingDouble(d -> COST.getOrDefault(d.name, 2.0)));
+				options = new ArrayList<>(options.subList(0, Math.max(1, (options.size() + 1) / 2)));
+			}
 			Dish d = options.get(Math.floorMod(variant + slot.length(), options.size()));
-			meals.add(new DietPlan.Meal(slot, d.name, d.ingredients, t.kcal * share, t.protein * share,
-				t.carbs * share, t.fat * share));
+			double kcal = t.kcal * share;
+			meals.add(new DietPlan.Meal(slot, d.name, d.ingredients, kcal, t.protein * share, t.carbs * share,
+				t.fat * share, COST.getOrDefault(d.name, 2.0) * kcal / 500));
 		}
-		return new DietPlan(meals, "Menú base preparado en el móvil con tus datos. Ajusta las raciones a tu hambre " +
-			"y reparte la proteína a lo largo del día.", "Plan base del móvil", now);
+		return new DietPlan(meals, body.budget > 0 ? "Menú económico: compra legumbres secas, huevos, arroz, avena y " +
+			"fruta de temporada; los congelados y la marca blanca abaratan sin perder nutrientes." :
+			"Menú base preparado en el móvil con tus datos. Ajusta las raciones a tu hambre y reparte la proteína a lo " +
+				"largo del día.", "Plan base del móvil", now);
 	}
 
 	private static boolean allowed(Dish d, List<String> banned) {

@@ -64,6 +64,8 @@ public final class BodyProfile {
 	public final Cooking cooking;
 	public final int mealsPerDay;
 	public final String dislikes;
+	/** Euros al día para la comida; 0 si no hay límite. */
+	public final double budget;
 
 	public BodyProfile(Sex sex, int age, double heightCm, double weightKg, Activity activity, Goal goal,
 		String allergies) {
@@ -72,6 +74,14 @@ public final class BodyProfile {
 
 	public BodyProfile(Sex sex, int age, double heightCm, double weightKg, Activity activity, Goal goal,
 		String allergies, Diet diet, Cooking cooking, int mealsPerDay, String dislikes) {
+		this(sex, age, heightCm, weightKg, activity, goal, allergies, diet, cooking, mealsPerDay, dislikes, 0);
+	}
+
+	public BodyProfile(Sex sex, int age, double heightCm, double weightKg, Activity activity, Goal goal,
+		String allergies, Diet diet, Cooking cooking, int mealsPerDay, String dislikes, double budget) {
+		if (!(budget >= 0 && budget <= 200))
+			throw new IllegalArgumentException("Presupuesto entre 0 y 200 € al día.");
+		this.budget = budget;
 		this.diet = diet == null ? Diet.OMNIVORE : diet;
 		this.cooking = cooking == null ? Cooking.NORMAL : cooking;
 		if (mealsPerDay < 2 || mealsPerDay > 6)
@@ -98,7 +108,7 @@ public final class BodyProfile {
 	}
 
 	public BodyProfile withWeight(double kg) {
-		return new BodyProfile(sex, age, heightCm, kg, activity, goal, allergies, diet, cooking, mealsPerDay, dislikes);
+		return new BodyProfile(sex, age, heightCm, kg, activity, goal, allergies, diet, cooking, mealsPerDay, dislikes, budget);
 	}
 
 	/**

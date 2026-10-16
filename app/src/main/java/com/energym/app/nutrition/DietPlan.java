@@ -12,8 +12,16 @@ public final class DietPlan {
 	public static final class Meal {
 		public final String name, dish, ingredients;
 		public final double kcal, protein, carbs, fat;
+		/** Coste estimado en euros; negativo si no se conoce. */
+		public final double cost;
 
 		public Meal(String name, String dish, String ingredients, double kcal, double protein, double carbs, double fat) {
+			this(name, dish, ingredients, kcal, protein, carbs, fat, -1);
+		}
+
+		public Meal(String name, String dish, String ingredients, double kcal, double protein, double carbs, double fat,
+			double cost) {
+			this.cost = cost;
 			this.name = name;
 			this.dish = dish;
 			this.ingredients = ingredients;
@@ -66,6 +74,17 @@ public final class DietPlan {
 		return t;
 	}
 
+	/** Coste estimado del día en euros; negativo si alguna comida no lo indica. */
+	public double cost() {
+		double total = 0;
+		for (Meal m : meals) {
+			if (m.cost < 0)
+				return -1;
+			total += m.cost;
+		}
+		return total;
+	}
+
 	public String encode() {
 		List<Object> list = new ArrayList<>();
 		for (Meal m : meals) {
@@ -77,6 +96,8 @@ public final class DietPlan {
 			o.put("proteinas", Math.round(m.protein));
 			o.put("hidratos", Math.round(m.carbs));
 			o.put("grasas", Math.round(m.fat));
+			if (m.cost >= 0)
+				o.put("coste", Math.round(m.cost * 100) / 100.0);
 			list.add(o);
 		}
 		Map<String, Object> root = new LinkedHashMap<>();
@@ -106,7 +127,8 @@ public final class DietPlan {
 			double fromMacros = protein * 4 + carbs * 4 + fat * 9;
 			if (fromMacros >= 50 && Math.abs(fromMacros - kcal) > kcal * 0.1)
 				kcal = fromMacros;
-			meals.add(new Meal(name, dish, ingredients, kcal, protein, carbs, fat));
+			double cost = o.containsKey("coste") ? number(o.get("coste")) : -1;
+			meals.add(new Meal(name, dish, ingredients, kcal, protein, carbs, fat, cost > 60 ? -1 : cost));
 			if (meals.size() == 6)
 				break;
 		}
@@ -148,7 +170,7 @@ public final class DietPlan {
 		List<Meal> scaled = new ArrayList<>();
 		for (Meal m : meals)
 			scaled.add(new Meal(m.name, m.dish, m.ingredients + note, m.kcal * factor, m.protein * factor,
-				m.carbs * factor, m.fat * factor));
+				m.carbs * factor, m.fat * factor, m.cost < 0 ? -1 : m.cost * factor));
 		return new DietPlan(scaled, advice, source, createdAt);
 	}
 

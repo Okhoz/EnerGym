@@ -285,6 +285,7 @@ public final class NutritionController {
 		bodyDraft.put("cooking", b == null ? BodyProfile.Cooking.NORMAL.name() : b.cooking.name());
 		bodyDraft.put("mealsPerDay", Integer.toString(b == null ? 4 : b.mealsPerDay));
 		bodyDraft.put("dislikes", b == null ? "" : b.dislikes);
+		bodyDraft.put("budget", b == null || b.budget == 0 ? "" : format(b.budget));
 	}
 
 	/**
@@ -349,7 +350,8 @@ public final class NutritionController {
 			BodyProfile.Goal.valueOf(bodyDraft.get("goal")), bodyDraft.get("allergies"),
 			BodyProfile.Diet.valueOf(bodyDraft.getOrDefault("diet", "OMNIVORE")),
 			BodyProfile.Cooking.valueOf(bodyDraft.getOrDefault("cooking", "NORMAL")),
-			Integer.parseInt(bodyDraft.getOrDefault("mealsPerDay", "4")), bodyDraft.getOrDefault("dislikes", ""));
+			Integer.parseInt(bodyDraft.getOrDefault("mealsPerDay", "4")), bodyDraft.getOrDefault("dislikes", ""),
+			bodyDraft.getOrDefault("budget", "").trim().isEmpty() ? 0 : number(bodyDraft.get("budget")));
 	}
 
 	/** Elegir una opción modifica sólo el borrador; Guardar es la única confirmación durable. */

@@ -61,6 +61,26 @@ public final class FoodEditingTest {
 		assertEquals(NutritionController.format(known.kcal100), c.foodDraft.get("kcal100"));
 	}
 
+	@Test public void plusSavesTheFoodAndLeavesTheFormReadyForAnotherInTheSameMeal() {
+		Store store = new Store();
+		NutritionController c = controller(store);
+		c.startManual(FoodEntry.Meal.DINNER);
+		for (String[] food : new String[][]{{"Pollo", "150", "165"}, {"Arroz", "80", "360"}}) {
+			c.foodDraft.put("name", food[0]);
+			c.foodDraft.put("amount", food[1]);
+			c.foodDraft.put("kcal100", food[2]);
+			c.foodDraft.put("protein100", "10");
+			c.foodDraft.put("carbs100", "10");
+			c.foodDraft.put("fat100", "1");
+			c.addFood(() -> c.startManual(FoodEntry.Meal.DINNER));
+			assertEquals("DINNER", c.foodDraft.get("meal"));
+			assertTrue("El formulario queda vacío para el siguiente", c.foodDraft.getOrDefault("name", "").isEmpty());
+		}
+		assertEquals(2, c.entriesOn(DAY).size());
+		for (FoodEntry e : c.entriesOn(DAY))
+			assertEquals(FoodEntry.Meal.DINNER, e.meal);
+	}
+
 	@Test public void cancelOrSwitchingAccountCannotOverwriteThePreviousFood() {
 		Store store = new Store();
 		FoodEntry original = entry("one", 150);

@@ -35,6 +35,8 @@ public final class FoodFragment extends ScreenFragment {
 		FoodProduct p = n.product;
 		if (!n.editingFood() && p == null && d.getOrDefault("barcode", "").isEmpty() && d.getOrDefault("name", "").isEmpty())
 			recents(n);
+		if (!n.editingFood())
+			alreadyInMeal(n, d);
 		FoodEntry.Unit unit = FoodEntry.Unit.valueOf(d.getOrDefault("unit", "G"));
 		if (p != null)
 			card(p.displayName(), (p.quantity.isEmpty() ? "" : "Envase: " + p.quantity + "\n") + "Código " + p.barcode +
@@ -97,6 +99,44 @@ public final class FoodFragment extends ScreenFragment {
 		field(values, d, "carbs100", "Hidratos de carbono (g)" + base, refresh);
 		field(values, d, "fat100", "Grasas (g)" + base, refresh);
 		refresh.run();
+		if (!n.editingFood()) {
+			LinearLayout more = new LinearLayout(requireContext());
+			more.setOrientation(LinearLayout.HORIZONTAL);
+			more.setGravity(android.view.Gravity.CENTER_VERTICAL | android.view.Gravity.END);
+			TextView hint = new TextView(requireContext());
+			hint.setTextAppearance(R.style.EnerGym_FieldCaption);
+			hint.setText("Guardar y añadir otro");
+			hint.setGravity(android.view.Gravity.END);
+			more.addView(hint, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+			com.google.android.material.button.MaterialButton plus = new com.google.android.material.button.MaterialButton(
+				requireContext(), null, com.google.android.material.R.attr.materialIconButtonFilledStyle);
+			plus.setText("+");
+			plus.setTextSize(26);
+			plus.setPadding(0, 0, 0, 0);
+			plus.setInsetTop(0);
+			plus.setInsetBottom(0);
+			plus.setCornerRadius(dp(28));
+			plus.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+				androidx.core.content.ContextCompat.getColor(requireContext(), R.color.gold)));
+			plus.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.surface));
+			plus.setEnabled(!n.busy);
+			plus.setTag("food_add_another");
+			plus.setContentDescription("Guardar este alimento y añadir otro a la misma comida");
+			plus.setOnClickListener(v -> {
+				FoodEntry.Meal meal = FoodEntry.Meal.valueOf(d.getOrDefault("meal", "OTHER"));
+				n.addFood(() -> {
+					n.startManual(meal);
+					app.changed();
+					if (getView() instanceof android.widget.ScrollView)
+						getView().post(() -> ((android.widget.ScrollView) getView()).smoothScrollTo(0, 0));
+				});
+			});
+			LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(dp(56), dp(56));
+			size.setMarginStart(dp(12));
+			more.addView(plus, size);
+			values.addView(more, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT) {{ topMargin = dp(16); }});
+		}
 		primary(action(rows, n.editingFood() ? "Guardar cambios" : "Añadir al diario", !n.busy,
 			() -> n.addFood(() -> app.navigate(Screen.NUTRITION))));
 		action(rows, "Cancelar", !n.busy, () -> {
@@ -138,6 +178,29 @@ public final class FoodFragment extends ScreenFragment {
 			button.setText("↺ Usar «" + known.name + "» (" + NutritionController.format(known.kcal100) + " kcal/100 " +
 				known.unit.symbol + ")");
 	}
+
+	/** Alimentos ya anotados en esta comida del día: se ve lo que se lleva y se añaden más con «+». */
+	private void alreadyInMeal(NutritionController n, Map<String, String> d) {
+		FoodEntry.Meal meal = FoodEntry.Meal.valueOf(d.getOrDefault("meal", "OTHER"));
+		List<FoodEntry> added = new ArrayList<>();
+		for (FoodEntry e : n.entriesOn(n.selected))
+			if (e.meal == meal)
+				added.add(e);
+		if (added.isEmpty())
+			return;
+		double kcal = 0;
+		StringBuilder list = new StringBuilder();
+		for (FoodEntry e : added) {
+			kcal += e.kcal();
+			list.append(list.length() == 0 ? "" : "\n").append("✓ ").append(e.name).append(" · ")
+				.append(NutritionController.format(e.amount)).append(" ").append(e.unit.symbol).append(" · ")
+				.append(Math.round(e.kcal())).append(" kcal");
+		}
+		LinearLayout card = card("Ya en " + MEALS_LABEL[meal.ordinal()] + " · " + Math.round(kcal) + " kcal", list.toString());
+		card.setTag("food_meal_so_far");
+	}
+
+	private static final String[] MEALS_LABEL = {"desayuno", "comida", "merienda", "cena", "otros"};
 
 	private void field(LinearLayout target, Map<String, String> d, String key, String label, Runnable refresh) {
 		textField(target, key, label, d.getOrDefault(key, ""), true, false, v -> {

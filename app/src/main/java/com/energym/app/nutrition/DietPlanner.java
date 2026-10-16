@@ -21,6 +21,8 @@ public final class DietPlanner {
 
 	public DietPlan plan;
 	public boolean busy;
+	/** El menú se muestra plegado; se despliega al pedirlo o al crear uno nuevo. */
+	public boolean expanded;
 	public String status = "";
 	private final OnDeviceModel model;
 	private final Store store;
@@ -104,16 +106,23 @@ public final class DietPlanner {
 			note = "La IA propuso un alimento que evitas; te dejo un menú base seguro.";
 		} else if (ai != null && (ai = ai.scaledTo(targets.kcal)) == null)
 			note = "El menú de la IA no cuadraba con tus calorías; te dejo un menú base con tus datos.";
-		else if (ai == null && output != null)
+		else if (ai != null && body.budget > 0 && ai.cost() > body.budget * 1.25) {
+			ai = null;
+			note = "El menú de la IA superaba tu presupuesto; te dejo un menú económico con tus datos.";
+		} else if (ai == null && output != null)
 			note = "La IA no devolvió un menú válido; te dejo un menú base con tus datos.";
 		else if (ai == null)
 			note = "La IA del móvil aún no está lista; te dejo un menú base con tus datos.";
 		DietPlan result = ai != null ? ai : DietRules.local(body, targets, variant, now);
+		if (note.isEmpty() && body.budget > 0 && result.cost() > body.budget * 1.05)
+			note = "Con " + NutritionController.format(body.budget) + " € no llega para todo: este es el menú más " +
+				"económico que cuadra con tus calorías.";
 		String message = note;
 		delivery.execute(() -> {
 			if (token != generation)
 				return;
 			busy = false;
+			expanded = true;
 			plan = result;
 			status = message;
 			store.save(owner, result.encode());

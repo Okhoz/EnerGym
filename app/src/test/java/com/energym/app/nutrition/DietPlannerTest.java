@@ -134,6 +134,42 @@ public class DietPlannerTest {
 		assertEquals(FoodEntry.Meal.DINNER, plan.meals.get(1).diaryMeal());
 	}
 
+	private static BodyProfile budget(double euros) {
+		return new BodyProfile(BodyProfile.Sex.MALE, 30, 178, 78, BodyProfile.Activity.MODERATE,
+			BodyProfile.Goal.MAINTAIN, "", BodyProfile.Diet.OMNIVORE, BodyProfile.Cooking.QUICK, 4, "", euros);
+	}
+
+	@Test
+	public void aBudgetPicksTheCheapestDishesAndAsksTheAiForCosts() {
+		DietPlan free = DietRules.local(budget(0), budget(0).targets(), 0, 1);
+		DietPlan cheap = DietRules.local(budget(6), budget(6).targets(), 0, 1);
+		assertTrue("Con presupuesto el menú base cuesta menos", cheap.cost() < free.cost() || cheap.cost() <= 6);
+		for (DietPlan.Meal m : cheap.meals)
+			assertNotEquals("Salmón al horno con patata y brócoli", m.dish);
+		String prompt = DietRules.prompt(budget(6), budget(6).targets(), "", Collections.emptyList());
+		assertTrue(prompt.contains("PRESUPUESTO: 6 €"));
+		assertTrue(prompt.contains("\"coste\""));
+		assertFalse(DietRules.prompt(budget(0), budget(0).targets(), "", Collections.emptyList()).contains("PRESUPUESTO"));
+	}
+
+	@Test
+	public void anAiMenuFarOverBudgetIsReplacedByTheCheapMenu() {
+		BodyProfile b = budget(5);
+		Model model = new Model();
+		model.output = "{\"comidas\":[" +
+			"{\"nombre\":\"Desayuno\",\"plato\":\"Salmón ahumado\",\"kcal\":640,\"proteinas\":25,\"hidratos\":90,\"grasas\":20,\"coste\":6}," +
+			"{\"nombre\":\"Comida\",\"plato\":\"Solomillo\",\"kcal\":900,\"proteinas\":50,\"hidratos\":110,\"grasas\":28,\"coste\":9}," +
+			"{\"nombre\":\"Cena\",\"plato\":\"Gambas\",\"kcal\":700,\"proteinas\":35,\"hidratos\":50,\"grasas\":38,\"coste\":7}]}";
+		DietPlanner planner = new DietPlanner(model, new Memory(), Runnable::run, () -> { }, () -> "");
+		planner.activate("owner");
+		planner.create(b);
+		assertEquals("Plan base del móvil", planner.plan.source);
+		assertTrue(planner.status.contains("presupuesto"));
+		assertTrue(planner.plan.cost() > 0);
+		DietPlan round = DietPlan.decode(planner.plan.encode());
+		assertEquals(planner.plan.cost(), round.cost(), 0.05);
+	}
+
 	private static List<String> names(DietPlan plan) {
 		List<String> names = new ArrayList<>();
 		for (DietPlan.Meal m : plan.meals)

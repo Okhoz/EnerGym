@@ -113,6 +113,10 @@ public final class NutritionFragment extends ScreenFragment {
 			"dietista o médico.", R.style.EnerGym_FieldCaption, 4);
 	}
 
+	private static String euros(double value) {
+		return String.format(SPANISH, "%.2f €", value);
+	}
+
 	/** Dieta personalizada con la IA del móvil, a partir de los datos físicos y preferencias guardados. */
 	private void diet(NutritionController n, BodyProfile.Targets targets) {
 		com.energym.app.nutrition.DietPlanner planner = state.diet;
@@ -123,8 +127,11 @@ public final class NutritionFragment extends ScreenFragment {
 		LinearLayout card = card("✦ Tu dieta con IA", planner.busy ? "Preparando tu menú en el móvil…" :
 			plan == null ? "Un menú de un día con tus " + Math.round(targets.kcal) + " kcal, " +
 				current.mealsPerDay + " comidas y tu alimentación " + current.diet.label.toLowerCase(SPANISH) +
+				(current.budget > 0 ? ", con un presupuesto de " + euros(current.budget) + " al día" : "") +
 				". Se tienen en cuenta tus alergias y lo que no tomas." :
-				plan.source + " · " + Math.round(plan.totals()[0]) + " de " + Math.round(targets.kcal) + " kcal");
+				plan.source + " · " + Math.round(plan.totals()[0]) + " de " + Math.round(targets.kcal) + " kcal" +
+					(plan.cost() >= 0 ? " · ≈ " + euros(plan.cost()) + (current.budget > 0 ? " de " + euros(current.budget) : "") +
+						" al día" : ""));
 		card.setTag("nutrition_diet");
 		if (planner.busy)
 			return;
@@ -132,12 +139,23 @@ public final class NutritionFragment extends ScreenFragment {
 			primary(action(card, "Crear mi dieta con IA", !n.busy, () -> planner.create(current)));
 			return;
 		}
+		// Desplegable: plegado solo ocupa el resumen y el botón para ver el menú.
+		MaterialButton toggle = action(card, planner.expanded ? "Ocultar menú ▴" : "Ver menú de " + plan.meals.size() +
+			" comidas ▾", true, () -> {
+			planner.expanded = !planner.expanded;
+			render();
+		});
+		toggle.setTag("diet_toggle");
+		toggle.setContentDescription(toggle.getText() + (planner.expanded ? ", desplegado" : ", plegado"));
+		if (!planner.expanded)
+			return;
 		if (!planner.status.isEmpty())
-			text(card, planner.status, R.style.EnerGym_FieldCaption, 4);
+			text(card, planner.status, R.style.EnerGym_FieldCaption, 12);
 		for (int i = 0; i < plan.meals.size(); i++) {
 			com.energym.app.nutrition.DietPlan.Meal meal = plan.meals.get(i);
 			TextView title = text(card, meal.icon() + "  " + meal.name + " · " +
-				Math.round(meal.kcal) + " kcal", R.style.EnerGym_CardTitle, i == 0 ? 16 : 24);
+				Math.round(meal.kcal) + " kcal" + (meal.cost >= 0 ? " · ≈ " + euros(meal.cost) : ""),
+				R.style.EnerGym_CardTitle, i == 0 ? 16 : 24);
 			title.setTextSize(17);
 			text(card, meal.dish, R.style.EnerGym_Body, 4);
 			if (!meal.ingredients.isEmpty())
