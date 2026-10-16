@@ -62,6 +62,7 @@ public final class NutritionFragment extends ScreenFragment {
 		if (targets != null)
 			section("Hoy", 32);
 		remaining(n, day, totals, targets);
+		water(n, day);
 		section("Tus comidas", 32);
 
 		// Diario por comidas, como en un registro de calorías: cada comida con su total y su botón de añadir.
@@ -192,6 +193,28 @@ public final class NutritionFragment extends ScreenFragment {
 			!n.busy, () -> planner.create(current)).setTag("diet_again");
 		text(card, "Menú orientativo; no sustituye a un dietista. Cambia tus preferencias en Datos físicos.",
 			R.style.EnerGym_FieldCaption, 8);
+	}
+
+	/** Agua del día: vasos de 250 ml frente a un objetivo según el peso. */
+	private void water(NutritionController n, LocalDate day) {
+		com.energym.app.nutrition.WaterLog w = state.water;
+		if (w == null)
+			return;
+		int ml = w.ml(day), goal = com.energym.app.nutrition.WaterLog.goal(n.effectiveBody());
+		int glasses = ml / com.energym.app.nutrition.WaterLog.GLASS, target = goal / com.energym.app.nutrition.WaterLog.GLASS;
+		LinearLayout card = card("Agua", com.energym.app.nutrition.WaterLog.liters(ml) + " de " +
+			com.energym.app.nutrition.WaterLog.liters(goal) + (ml >= goal ? " · ¡Objetivo cumplido! 🎉" : ""));
+		card.setTag("nutrition_water");
+		text(card, "💧 " + glasses + " de " + target + (target == 1 ? " vaso" : " vasos"), R.style.EnerGym_CardTitle, 4);
+		add(card, new com.energym.app.ui.charts.ProgressBarView(requireContext()), 12)
+			.set(goal == 0 ? 0 : Math.min(1, ml / (double) goal), "Agua: " + ml + " de " + goal + " ml");
+		LinearLayout buttons = columns(card, 16);
+		MaterialButton less = compact(buttons, "− Vaso", ml > 0, () -> w.add(day, -com.energym.app.nutrition.WaterLog.GLASS));
+		less.setContentDescription("Quitar un vaso de agua");
+		MaterialButton more = compact(buttons, "+ Vaso de 250 ml", true, () -> w.add(day, com.energym.app.nutrition.WaterLog.GLASS));
+		more.setContentDescription("Añadir un vaso de agua de 250 mililitros");
+		((LinearLayout.LayoutParams) more.getLayoutParams()).weight = 2;
+		primary(more);
 	}
 
 	/** Objetivo confirmado y visible; el formulario mantiene su propio borrador hasta pulsar Guardar. */

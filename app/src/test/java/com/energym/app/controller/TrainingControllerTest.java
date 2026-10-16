@@ -332,5 +332,18 @@ public class TrainingControllerTest {
 		assertEquals("9", c.inputs().get("repetitions"));
 		assertEquals(0, store.saves);
 	}
-}
 
+	@Test
+	public void unsavedExerciseStartsFromThePlannedValues() {
+		Routine r = routine();
+		Session cached = new Session(r);
+		SessionController c = new SessionController(new PersistedStore(cached), () -> {
+		}, e -> {
+		}, () -> {
+		});
+		c.resume(cached);
+		Map<String, String> planned = r.getItems().get(0).getPrescription();
+		assertEquals(planned.get("sets"), c.inputs().get("sets"));
+		assertEquals(planned.get("repetitions"), c.inputs().get("repetitions"));
+	}
+}

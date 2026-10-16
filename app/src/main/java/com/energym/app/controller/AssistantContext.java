@@ -20,6 +20,11 @@ public final class AssistantContext {
 
 	public static String build(AppController app, NutritionController nutrition, GoalsController goals,
 		DietPlanner diet, LocalDate today) {
+		return build(app, nutrition, goals, diet, today, null);
+	}
+
+	public static String build(AppController app, NutritionController nutrition, GoalsController goals,
+		DietPlanner diet, LocalDate today, WaterLog water) {
 		if (app == null || app.owner() == null)
 			return "";
 		List<String> parts = new ArrayList<>();
@@ -27,7 +32,9 @@ public final class AssistantContext {
 		ProgressStats stats = new ProgressStats(app.history, ZoneId.systemDefault(), today);
 		add(parts, "PROGRESO", progress(stats), 450);
 		add(parts, "OBJETIVOS", goals(goals, stats, nutrition), 350);
-		add(parts, "CUERPO Y NUTRICIÓN", body(nutrition, today), 700);
+		String drink = water == null || nutrition == null ? "" : "\nAgua hoy: " + WaterLog.liters(water.ml(today)) +
+			" de " + WaterLog.liters(WaterLog.goal(nutrition.effectiveBody())) + ".";
+		add(parts, "CUERPO Y NUTRICIÓN", body(nutrition, today) + drink, 760);
 		add(parts, "SU DIETA CON IA", diet(diet), 350);
 		String text = String.join("\n", parts);
 		return text.length() > MAX ? text.substring(0, MAX - 1) + "…" : text;

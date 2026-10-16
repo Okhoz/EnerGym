@@ -58,6 +58,7 @@ public final class AppState extends AndroidViewModel {
 	public com.energym.app.nutrition.NutritionController nutrition;
 	public com.energym.app.progress.GoalsController goals;
 	public com.energym.app.nutrition.DietPlanner diet;
+	public com.energym.app.nutrition.WaterLog water;
 	private com.energym.app.nutrition.SyncedNutritionStore nutritionStore;
 	// Consultas a Open Food Facts: independientes del chat y de SQLite.
 	private final ExecutorService lookupWorker = Executors.newSingleThreadExecutor();
@@ -131,6 +132,16 @@ public final class AppState extends AndroidViewModel {
 		ChainedModel onDevice = new ChainedModel(new GeminiNanoModel(chatWorker), new GemmaModel(context, chatWorker));
 		OnDeviceChatClient trainer = new OnDeviceChatClient(onDevice, catalog.getExercises(), catalog.getVersion(),
 			chatWorker, main);
+		android.content.SharedPreferences glasses = context.getSharedPreferences("water_log", android.content.Context.MODE_PRIVATE);
+		water = new com.energym.app.nutrition.WaterLog(new com.energym.app.nutrition.WaterLog.Store() {
+			public int load(String key) {
+				return glasses.getInt(key, 0);
+			}
+
+			public void save(String key, int ml) {
+				glasses.edit().putInt(key, ml).apply();
+			}
+		}, this::changed);
 		// Dietas con la misma IA del móvil; el último menú de cada cuenta se guarda solo en este teléfono.
 		android.content.SharedPreferences diets = context.getSharedPreferences("diet_plans", android.content.Context.MODE_PRIVATE);
 		diet = new com.energym.app.nutrition.DietPlanner(onDevice, new com.energym.app.nutrition.DietPlanner.Store() {
@@ -153,7 +164,7 @@ public final class AppState extends AndroidViewModel {
 		});
 		assistant.carryOver(app::continueFrom);
 		// El entrenador ve todo lo que la persona ha hecho en la app (solo en el móvil, nunca en la red).
-		assistant.trainingContext(() -> AssistantContext.build(app, nutrition, goals, diet, java.time.LocalDate.now()));
+		assistant.trainingContext(() -> AssistantContext.build(app, nutrition, goals, diet, java.time.LocalDate.now(), water));
 		ExerciseResourcePolicy resourcePolicy;
 		try {
 			resourcePolicy = new ExerciseResourcePolicy(catalog, PackagedResources.load(context).all());
@@ -189,6 +200,7 @@ public final class AppState extends AndroidViewModel {
 			nutrition.activate(app.owner());
 			goals.activate(app.owner());
 			diet.activate(app.owner());
+			water.activate(app.owner());
 			changed();
 		});
 		accounts = new AccountController(gateway, sync, main, (status, value, error) -> {

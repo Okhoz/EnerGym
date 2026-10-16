@@ -58,9 +58,15 @@ public final class SessionFragment extends ScreenFragment {
 			"Propuesta orientativa:\n" + AppController.prescription(e.getMetricType(), item.getPrescription()) +
 				"\n\n" + (app.sessions.session.getResults().containsKey(e.getId()) ?
 				"Valores guardados. Puedes actualizarlos antes de finalizar." : "Todavía sin valores guardados."));
+		Session last = lastTime(e.getId());
+		if (last != null)
+			text(context, "🕑 La última vez (" + java.time.Instant.ofEpochMilli(last.getCompletedAt())
+				.atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+				.format(java.time.format.DateTimeFormatter.ofPattern("d/M")) + "): " +
+				AppController.metrics(e.getMetricType(), last.getResults().get(e.getId())), R.style.EnerGym_Body, 12);
 		action(context, "Ver técnica: " + e.getName(), () -> app.openExercise(e));
-		LinearLayout fields = card("Valores realizados", AppController.label(e.getMetricType().name()) +
-			" · carga 0 = peso corporal");
+		LinearLayout fields = card("Valores realizados", "Rellenado con lo previsto: cambia solo lo que hiciste distinto." +
+			" Carga 0 = peso corporal.");
 		Map<String, String> inputs = app.sessions.inputs();
 		for (MetricValidator.Field f : new MetricValidator().fields(e.getMetricType()))
 			if (f.choices.isEmpty())
@@ -90,6 +96,16 @@ public final class SessionFragment extends ScreenFragment {
 					if (scope == app.accountRevision()) app.deleteSession(current);
 				}).show();
 		});
+	}
+
+	/** Sesión terminada más reciente en la que se registró este ejercicio (en cualquier rutina). */
+	private Session lastTime(String exerciseId) {
+		Session best = null;
+		for (Session s : app.history)
+			if (s.getStatus() == Session.Status.FINISHED && s.getResults().containsKey(exerciseId) &&
+				(best == null || s.getCompletedAt() > best.getCompletedAt()))
+				best = s;
+		return best;
 	}
 
 	/** Temporizador de descanso entre series: cuenta atrás visible y vibración al terminar. */

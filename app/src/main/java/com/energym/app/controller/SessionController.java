@@ -135,11 +135,15 @@ public final class SessionController {
 	private Map<String, String> editable() {
 		String key = item().getExercise().getId();
 		return edits.computeIfAbsent(key, k -> {
-			Map<String, String> values =
-				new LinkedHashMap<>(session.getResults().getOrDefault(k, Collections.emptyMap()));
-			for (MetricValidator.Field field : validator.fields(item().getExercise().getMetricType()))
+			Map<String, String> saved = session.getResults().get(k);
+			Map<String, String> values = new LinkedHashMap<>(saved == null ? Collections.emptyMap() : saved);
+			for (MetricValidator.Field field : validator.fields(item().getExercise().getMetricType())) {
+				// Sin valores guardados, se parte de lo previsto: solo hay que cambiar lo que fue distinto.
+				if (saved == null && item().getPrescription().containsKey(field.key))
+					values.putIfAbsent(field.key, item().getPrescription().get(field.key));
 				if (!field.choices.isEmpty())
 					values.putIfAbsent(field.key, field.choices.get(0));
+			}
 			return values;
 		});
 	}
