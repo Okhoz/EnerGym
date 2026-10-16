@@ -27,6 +27,10 @@ public final class SessionFragment extends ScreenFragment {
 	private int trackTab, selectedSet = -1;
 	/** Unidad de peso elegida en Cuenta: se muestra y escribe en ella, se guarda siempre en kg. */
 	private boolean lb;
+	/** «Más opciones» del registro desplegado. */
+	private boolean moreOptions;
+	/** Lista de ejercicios del día desplegada. */
+	private boolean showList;
 
 	public SessionFragment() {
 		super(R.layout.fragment_session);
@@ -69,13 +73,10 @@ public final class SessionFragment extends ScreenFragment {
 			String group = Supersets.label(links, i);
 			ids.add(Integer.toString(i++));
 			// ✓ marca lo ya apuntado para ver de un vistazo qué falta; A1/A2 las superseries.
-			names.add((app.sessions.session.getResults().containsKey(item.getExercise().getId()) ? "✓ " : "") +
-				(group.isEmpty() ? "" : group + " · ") + item.getExercise().getName());
+			names.add((group.isEmpty() ? "" : group + " · ") + item.getExercise().getName());
 		}
-		section("Ejercicio " + (app.sessions.selected + 1) + " de " + ids.size(), 8);
-		choice(rows, "selectedExercise", "Cambiar de ejercicio", ids, names, Integer.toString(app.sessions.selected),
-			value -> app.sessions.select(Integer.parseInt(value)));
 		int saved = app.sessions.session.getResults().size();
+		exercises(names, links, saved);
 		if (shownResults >= 0 && saved > shownResults &&
 			app.sessions.item().getExercise().getMetricType() != MetricType.STRENGTH)
 			android.widget.Toast.makeText(requireContext(), "Ejercicio guardado", android.widget.Toast.LENGTH_SHORT).show();
@@ -99,7 +100,8 @@ public final class SessionFragment extends ScreenFragment {
 				() -> ExercisePicker.show(requireContext(), "Añadir ejercicio", app.freeCandidates(), app::addFreeExercise));
 			more.setTag("session_add_exercise");
 		}
-		rest();
+		if (e.getMetricType() != MetricType.STRENGTH)
+			rest();
 		if (app.sessions.selected + 1 < ids.size())
 			action(rows, "Siguiente ejercicio", !app.sessions.busy,
 				() -> app.sessions.select(app.sessions.selected + 1));
@@ -123,6 +125,55 @@ public final class SessionFragment extends ScreenFragment {
 					if (scope == app.accountRevision()) app.deleteSession(current);
 				}).show();
 		});
+	}
+
+	/**
+	 * Navegación entre ejercicios: ‹ › para el anterior y el siguiente y la lista del día (lo hecho en cada uno) al
+	 * desplegarla.
+	 */
+	private void exercises(List<String> names, Set<Integer> links, int saved) {
+		int at = app.sessions.selected, count = names.size();
+		section("Ejercicio " + (at + 1) + " de " + count + " · " + saved + " apuntados", 8);
+		LinearLayout nav = columns(rows, 0);
+		compact(nav, "‹", at > 0 && !app.sessions.busy, () -> app.sessions.select(at - 1))
+			.setContentDescription("Ejercicio anterior");
+		compact(nav, showList ? "Ocultar lista" : "☰ Todos", true, () -> {
+			showList = !showList;
+			render();
+		}).setTag("session_list_toggle");
+		compact(nav, "›", at + 1 < count && !app.sessions.busy, () -> app.sessions.select(at + 1))
+			.setContentDescription("Ejercicio siguiente");
+		if (!showList)
+			return;
+		LinearLayout list = card("Ejercicios de hoy", "Toca uno para ir a él.");
+		List<RoutineItem> items = app.sessions.session.getRoutine().getItems();
+		for (int i = 0; i < items.size(); i++) {
+			Exercise x = items.get(i).getExercise();
+			Map<String, String> values = app.sessions.session.getResults().get(x.getId());
+			List<SetLog.Entry> done = x.getMetricType() == MetricType.STRENGTH ? SetLog.of(values) :
+				Collections.emptyList();
+			String detail = values == null ? "Pendiente · " + planned(items.get(i)) :
+				x.getMetricType() != MetricType.STRENGTH || done.isEmpty() ? "✓ Apuntado" :
+					done.size() + " de " + items.get(i).getPrescription().getOrDefault("sets", "?") + " series · " +
+						compactSets(done);
+			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, list, false);
+			((TextView) row.findViewById(R.id.food_name)).setText((i + 1) + ".  " + names.get(i));
+			((TextView) row.findViewById(R.id.food_detail)).setText(detail);
+			((TextView) row.findViewById(R.id.food_kcal)).setText(i == at ? "▶" : values != null ? "✓" : "");
+			if (i == at)
+				row.setBackground(rounded(R.color.surface_selected, 12, R.color.gold, 1));
+			int index = i;
+			row.setTag("session_exercise_" + i);
+			row.setContentDescription(names.get(i) + ". " + detail + (i == at ? ". Actual" : ". Toca para ir"));
+			row.setOnClickListener(v -> {
+				showList = false;
+				if (index == app.sessions.selected)
+					render();
+				else
+					app.sessions.select(index);
+			});
+			list.addView(row);
+		}
 	}
 
 	/** Formulario de siempre para lo que no se mide en series de peso × repeticiones (cardio, movilidad…). */
@@ -175,10 +226,12 @@ public final class SessionFragment extends ScreenFragment {
 			});
 		if (trackTab == 1) {
 			history(e);
+			rest();
 			return;
 		}
 		if (trackTab == 2) {
 			graph(e);
+			rest();
 			return;
 		}
 		List<SetLog.Entry> sets = app.sessions.sets();
@@ -191,9 +244,6 @@ public final class SessionFragment extends ScreenFragment {
 			(before.isEmpty() ? "" : "\n🕑 La última vez (" + day(last) + "): " + compactSets(before)) +
 			(last == null || last.getResults().get(e.getId()).getOrDefault(SetLog.NOTE, "").isEmpty() ? "" :
 				"\n📝 " + last.getResults().get(e.getId()).get(SetLog.NOTE)));
-		com.google.android.material.button.MaterialButton technique =
-			action(log, "Ver técnica", true, () -> app.openExercise(e));
-		technique.setContentDescription("Ver técnica: " + e.getName());
 		stepper(log, "Peso (" + Plates.unit(lb) + ")", "track_kg", kgInput, lb ? 5 : 2.5, true, v -> {
 			kgInput = v;
 			app.sessions.input("trackKg", v);
@@ -203,29 +253,11 @@ public final class SessionFragment extends ScreenFragment {
 			repsInput = v;
 			app.sessions.input("trackReps", v);
 		});
-		List<String> kinds = new ArrayList<>(), kindNames = new ArrayList<>();
-		for (SetLog.Kind k : SetLog.Kind.values()) {
-			kinds.add(Character.toString(k.code));
-			kindNames.add(k == SetLog.Kind.NORMAL ? "Normal" : k.label);
-		}
-		// Separa los selectores de los botones − / + de repeticiones.
-		add(log, new android.view.View(requireContext()), 12);
-		choice(log, "track_kind", "Tipo de serie", kinds, kindNames, kindInput, v -> {
-			kindInput = v;
-			app.sessions.input("trackKind", v);
-		});
-		List<String> rpeNames = new ArrayList<>();
-		for (String r : RPE)
-			rpeNames.add(r.isEmpty() ? "Sin indicar" : "RPE " + r.replace('.', ',') + (r.equals("10") ? " (al límite)" :
-				r.equals("8") ? " (quedaban 2)" : r.equals("9") ? " (quedaba 1)" : ""));
-		choice(log, "track_rpe", "Esfuerzo (RPE, opcional)", RPE, rpeNames, rpeInput, v -> {
-			rpeInput = v;
-			app.sessions.input("trackRpe", v);
-		});
-		if (sets.isEmpty())
+		// Solo la primera vez con este ejercicio: luego la ayuda sobra.
+		if (sets.isEmpty() && before.isEmpty())
 			text(log, "Ajusta con − y + (o escribe el número) y pulsa «Guardar serie» al acabar cada serie. " +
 				"Peso 0 = peso corporal. Tu objetivo sube solo cuando lo cumples.", R.style.EnerGym_FieldCaption, 12);
-		LinearLayout buttons = columns(log, 12);
+		LinearLayout buttons = columns(log, 16);
 		com.google.android.material.button.MaterialButton save =
 			compact(buttons, editing ? "Actualizar" : "Guardar serie", !app.sessions.busy, () -> {
 				double typedKg = number(kgInput, -1);
@@ -235,18 +267,8 @@ public final class SessionFragment extends ScreenFragment {
 				double rpe = number(rpeInput, 0);
 				if (editing)
 					app.sessions.updateSet(selectedSet, kg, reps, kind, rpe);
-				else {
-					// En superserie o circuito se pasa al siguiente sin descanso; se descansa al cerrar la vuelta.
-					int from = app.sessions.selected;
-					Set<Integer> group = links();
-					app.sessions.addSet(kg, reps, kind, rpe, () -> {
-						int to = Supersets.after(group, from);
-						if (to != from && app.sessions.selected == from)
-							app.sessions.select(to);
-					});
-					if (Supersets.restsAfter(group, from))
-						startRest(item);
-				}
+				else
+					saveSet(item, kg, reps, kind, rpe);
 				selectedSet = -1;
 			});
 		primary(save);
@@ -260,34 +282,32 @@ public final class SessionFragment extends ScreenFragment {
 				render();
 			}
 		});
-		double best = Math.max(previousBest(e.getId()), SetLog.best(sets));
-		// Sin carga (peso corporal) no hay discos que calcular ni 1RM en kg.
-		if (best > 0 || number(kgInput, 0) > 0)
-			action(log, "🏋️ Discos y tabla 1RM", true, () -> PlateDialog.show(requireContext(),
-				Plates.toKg(number(kgInput, 0), lb), best, lb)).setTag("track_plates");
-		int count = app.sessions.session.getRoutine().getItems().size();
-		int at = app.sessions.selected;
-		if (!editing && at + 1 < count) {
-			Set<Integer> links = links();
-			String next = app.sessions.session.getRoutine().getItems().get(at + 1).getExercise().getName();
-			action(log, links.contains(at) ? "🔗 Quitar superserie con " + next : "🔗 Hacer superserie con " + next,
-				!app.sessions.busy, () -> {
-					Set<Integer> changed = new TreeSet<>(links);
-					if (!changed.remove(at))
-						changed.add(at);
-					saveLinks(changed);
-					android.widget.Toast.makeText(requireContext(), changed.contains(at) ?
-						"Superserie: tras cada serie pasarás a " + next + " sin descanso" : "Superserie quitada",
-						android.widget.Toast.LENGTH_SHORT).show();
-					render();
-				}).setTag("track_superset");
+		// Lo más habitual, a un toque: otra serie igual que la última.
+		if (!editing && !sets.isEmpty()) {
+			SetLog.Entry previous = sets.get(sets.size() - 1);
+			action(log, "↻ Otra igual: " + weight(previous.kg).toLowerCase(Locale.ROOT) + " × " + previous.reps,
+				!app.sessions.busy, () -> saveSet(item, previous.kg, previous.reps, previous.kind, previous.rpe))
+				.setTag("track_repeat");
 		}
 		if (editing)
 			action(log, "Cancelar edición", true, () -> {
 				selectedSet = -1;
 				render();
 			});
-		note(sets.isEmpty());
+		// Tipo de serie, RPE, nota, técnica, discos y superserie: plegados para que registrar sea rápido.
+		List<String> chosen = new ArrayList<>();
+		if (!"N".equals(kindInput))
+			chosen.add(SetLog.Kind.valueOf(kindName(kindInput)).label);
+		if (!rpeInput.isEmpty())
+			chosen.add("RPE " + rpeInput.replace('.', ','));
+		action(log, (moreOptions ? "Menos opciones ▴" : "Más opciones ▾") +
+			(chosen.isEmpty() ? "" : " · " + String.join(" · ", chosen)), true, () -> {
+			moreOptions = !moreOptions;
+			render();
+		}).setTag("track_more");
+		if (moreOptions)
+			options(log, item, e, sets, editing);
+		rest();
 		if (sets.isEmpty())
 			return;
 		double record = previousBest(e.getId());
@@ -359,18 +379,72 @@ public final class SessionFragment extends ScreenFragment {
 		return SetLog.Kind.NORMAL.name();
 	}
 
-	/** Nota del ejercicio en este entreno: se guarda con la siguiente serie o con su botón si ya hay series. */
-	private void note(boolean noSets) {
-		LinearLayout box = card("📝 Nota", "Cómo te has sentido, molestias, ajustes de la máquina… La verás la próxima vez.");
-		String current = app.sessions.note();
-		textField(box, "track_note", "Nota (opcional)", current, false, false, "Ej.: asiento en el 4, me molestó el hombro",
-			"", v -> app.sessions.input(SetLog.NOTE, v));
-		if (!noSets)
-			compact(columns(box, 12), "Guardar nota", !app.sessions.busy, () -> {
-				String typed = app.sessions.inputs().getOrDefault(SetLog.NOTE, "");
-				app.sessions.saveNote(typed);
+	/** Guarda una serie nueva; en superserie o circuito pasa al siguiente sin descanso y descansa al cerrar la vuelta. */
+	private void saveSet(RoutineItem item, double kg, int reps, SetLog.Kind kind, double rpe) {
+		int from = app.sessions.selected;
+		Set<Integer> group = links();
+		app.sessions.addSet(kg, reps, kind, rpe, () -> {
+			int to = Supersets.after(group, from);
+			if (to != from && app.sessions.selected == from)
+				app.sessions.select(to);
+		});
+		if (Supersets.restsAfter(group, from))
+			startRest(item);
+	}
+
+	/** Lo que no hace falta en cada serie: tipo, RPE, nota, técnica, discos y superserie. */
+	private void options(LinearLayout log, RoutineItem item, Exercise e, List<SetLog.Entry> sets, boolean editing) {
+		List<String> kinds = new ArrayList<>(), kindNames = new ArrayList<>();
+		for (SetLog.Kind k : SetLog.Kind.values()) {
+			kinds.add(Character.toString(k.code));
+			kindNames.add(k == SetLog.Kind.NORMAL ? "Normal" : k.label);
+		}
+		add(log, new android.view.View(requireContext()), 8);
+		choice(log, "track_kind", "Tipo de serie", kinds, kindNames, kindInput, v -> {
+			kindInput = v;
+			app.sessions.input("trackKind", v);
+		});
+		List<String> rpeNames = new ArrayList<>();
+		for (String r : RPE)
+			rpeNames.add(r.isEmpty() ? "Sin indicar" : "RPE " + r.replace('.', ',') + (r.equals("10") ? " (al límite)" :
+				r.equals("8") ? " (quedaban 2)" : r.equals("9") ? " (quedaba 1)" : ""));
+		choice(log, "track_rpe", "Esfuerzo (RPE, opcional)", RPE, rpeNames, rpeInput, v -> {
+			rpeInput = v;
+			app.sessions.input("trackRpe", v);
+		});
+		textField(log, "track_note", "📝 Nota del ejercicio (opcional)", app.sessions.note(), false, false,
+			"Ej.: asiento en el 4, me molestó el hombro", "La verás la próxima vez que lo hagas.",
+			v -> app.sessions.input(SetLog.NOTE, v));
+		if (!sets.isEmpty())
+			action(log, "Guardar nota", !app.sessions.busy, () -> {
+				app.sessions.saveNote(app.sessions.inputs().getOrDefault(SetLog.NOTE, ""));
 				android.widget.Toast.makeText(requireContext(), "Nota guardada", android.widget.Toast.LENGTH_SHORT).show();
 			});
+		com.google.android.material.button.MaterialButton technique =
+			action(log, "Ver técnica", true, () -> app.openExercise(e));
+		technique.setContentDescription("Ver técnica: " + e.getName());
+		double best = Math.max(previousBest(e.getId()), SetLog.best(sets));
+		// Sin carga (peso corporal) no hay discos que calcular ni 1RM en kg.
+		if (best > 0 || number(kgInput, 0) > 0)
+			action(log, "🏋️ Discos y tabla 1RM", true, () -> PlateDialog.show(requireContext(),
+				Plates.toKg(number(kgInput, 0), lb), best, lb)).setTag("track_plates");
+		int count = app.sessions.session.getRoutine().getItems().size();
+		int at = app.sessions.selected;
+		if (!editing && at + 1 < count) {
+			Set<Integer> links = links();
+			String next = app.sessions.session.getRoutine().getItems().get(at + 1).getExercise().getName();
+			action(log, links.contains(at) ? "🔗 Quitar superserie con " + next : "🔗 Hacer superserie con " + next,
+				!app.sessions.busy, () -> {
+					Set<Integer> changed = new TreeSet<>(links);
+					if (!changed.remove(at))
+						changed.add(at);
+					saveLinks(changed);
+					android.widget.Toast.makeText(requireContext(), changed.contains(at) ?
+						"Superserie: tras cada serie pasarás a " + next + " sin descanso" : "Superserie quitada",
+						android.widget.Toast.LENGTH_SHORT).show();
+					render();
+				}).setTag("track_superset");
+		}
 	}
 
 	/** Valores de partida: la última serie de hoy, si no la última vez que lo hiciste, si no lo previsto. */
