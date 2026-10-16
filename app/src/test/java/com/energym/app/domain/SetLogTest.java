@@ -45,4 +45,27 @@ public class SetLogTest {
 		assertEquals(116.67, new SetLog.Entry(100, 5).oneRepMax(), 0.01);
 		assertEquals(116.67, SetLog.best(Arrays.asList(new SetLog.Entry(80, 5), new SetLog.Entry(100, 5))), 0.01);
 	}
+
+	@Test
+	public void kindsRpeAndNotesRoundTripAndWarmupsDoNotCount() {
+		List<SetLog.Entry> sets = Arrays.asList(new SetLog.Entry(40, 10, SetLog.Kind.WARMUP, 0),
+			new SetLog.Entry(80, 5, SetLog.Kind.NORMAL, 8), new SetLog.Entry(80, 4, SetLog.Kind.FAILURE, 10),
+			new SetLog.Entry(60, 8, SetLog.Kind.DROP, 0));
+		String encoded = SetLog.encode(sets);
+		assertEquals("40:10:W;80:5:N:8;80:4:F:10;60:8:D", encoded);
+		assertEquals(sets, SetLog.parse(encoded));
+		assertEquals("Los registros antiguos siguen igual", "60:5", SetLog.encode(Arrays.asList(new SetLog.Entry(60, 5))));
+		Map<String, String> base = new HashMap<>();
+		base.put(SetLog.NOTE, "asiento en el 4");
+		Map<String, String> summary = SetLog.summary(sets, base, "90");
+		assertEquals("El calentamiento no cuenta como serie", "3", summary.get("sets"));
+		assertEquals("9", summary.get("effort"));
+		assertEquals("asiento en el 4", summary.get(SetLog.NOTE));
+		assertEquals(93.33, SetLog.best(sets), 0.01);
+		assertEquals(0, SetLog.best(Arrays.asList(new SetLog.Entry(200, 3, SetLog.Kind.WARMUP, 0))), 0.001);
+		Map<String, String> clean = new MetricValidator().normalized(MetricType.STRENGTH, summary);
+		assertEquals(encoded, clean.get(SetLog.KEY));
+		assertEquals("asiento en el 4", clean.get(SetLog.NOTE));
+		assertTrue(new MetricValidator().validate(MetricType.STRENGTH, summary).isEmpty());
+	}
 }

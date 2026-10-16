@@ -106,6 +106,10 @@ public final class MetricValidator {
 		// Fuerza también conserva sus series una a una (estilo FitNotes) si el formato es válido.
 		if (type == MetricType.STRENGTH && SetLog.valid(values.get(SetLog.KEY)))
 			result.put(SetLog.KEY, values.get(SetLog.KEY));
+		// Nota libre del ejercicio (cualquier tipo), en una línea y como mucho 200 caracteres.
+		String note = values.getOrDefault(SetLog.NOTE, "").replaceAll("\\s+", " ").trim();
+		if (!note.isEmpty())
+			result.put(SetLog.NOTE, note.length() > 200 ? note.substring(0, 200) : note);
 		return result;
 	}
 }

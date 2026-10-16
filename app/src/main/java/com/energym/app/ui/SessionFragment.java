@@ -22,7 +22,8 @@ public final class SessionFragment extends ScreenFragment {
 	/** Ejercicio y registros mostrados en el último pintado: detectan el avance tras guardar. */
 	private int shownExercise = -1, shownResults = -1;
 	/** Registro de fuerza: ejercicio mostrado, pestaña, serie en edición y valores de − / +. */
-	private String trackKey = "", kgInput = "", repsInput = "";
+	private String trackKey = "", kgInput = "", repsInput = "", kindInput = "N", rpeInput = "";
+	private static final List<String> RPE = Arrays.asList("", "6", "7", "7.5", "8", "8.5", "9", "9.5", "10");
 	private int trackTab, selectedSet = -1;
 
 	public SessionFragment() {
@@ -146,6 +147,8 @@ public final class SessionFragment extends ScreenFragment {
 			seedInputs(item, e);
 			kgInput = typed.getOrDefault("trackKg", kgInput);
 			repsInput = typed.getOrDefault("trackReps", repsInput);
+			kindInput = typed.getOrDefault("trackKind", "N");
+			rpeInput = typed.getOrDefault("trackRpe", "");
 		}
 		segmented("track", new String[]{"Registrar", "Historial", "Gráfica"},
 			new String[]{"track_tab_log", "track_tab_history", "track_tab_graph"}, trackTab, index -> {
@@ -167,7 +170,9 @@ public final class SessionFragment extends ScreenFragment {
 			SetLog.of(last.getResults().get(e.getId()));
 		LinearLayout log = card(e.getName() + " · " + (editing ? "editando serie " + (selectedSet + 1) :
 			"serie " + (sets.size() + 1)), "🎯 Objetivo de hoy: " + planned(item) +
-			(before.isEmpty() ? "" : "\n🕑 La última vez (" + day(last) + "): " + compactSets(before)));
+			(before.isEmpty() ? "" : "\n🕑 La última vez (" + day(last) + "): " + compactSets(before)) +
+			(last == null || last.getResults().get(e.getId()).getOrDefault(SetLog.NOTE, "").isEmpty() ? "" :
+				"\n📝 " + last.getResults().get(e.getId()).get(SetLog.NOTE)));
 		com.google.android.material.button.MaterialButton technique =
 			action(log, "Ver técnica", true, () -> app.openExercise(e));
 		technique.setContentDescription("Ver técnica: " + e.getName());
@@ -179,6 +184,23 @@ public final class SessionFragment extends ScreenFragment {
 			repsInput = v;
 			app.sessions.input("trackReps", v);
 		});
+		List<String> kinds = new ArrayList<>(), kindNames = new ArrayList<>();
+		for (SetLog.Kind k : SetLog.Kind.values()) {
+			kinds.add(Character.toString(k.code));
+			kindNames.add(k == SetLog.Kind.NORMAL ? "Normal" : k.label);
+		}
+		choice(log, "track_kind", "Tipo de serie", kinds, kindNames, kindInput, v -> {
+			kindInput = v;
+			app.sessions.input("trackKind", v);
+		});
+		List<String> rpeNames = new ArrayList<>();
+		for (String r : RPE)
+			rpeNames.add(r.isEmpty() ? "Sin indicar" : "RPE " + r.replace('.', ',') + (r.equals("10") ? " (al límite)" :
+				r.equals("8") ? " (quedaban 2)" : r.equals("9") ? " (quedaba 1)" : ""));
+		choice(log, "track_rpe", "Esfuerzo (RPE, opcional)", RPE, rpeNames, rpeInput, v -> {
+			rpeInput = v;
+			app.sessions.input("trackRpe", v);
+		});
 		if (sets.isEmpty())
 			text(log, "Ajusta con − y + (o escribe el número) y pulsa «Guardar serie» al acabar cada serie. " +
 				"Peso 0 = peso corporal. Tu objetivo sube solo cuando lo cumples.", R.style.EnerGym_FieldCaption, 12);
@@ -187,10 +209,12 @@ public final class SessionFragment extends ScreenFragment {
 			compact(buttons, editing ? "Actualizar" : "Guardar serie", !app.sessions.busy, () -> {
 				double kg = number(kgInput, -1);
 				int reps = (int) number(repsInput, 0);
+				SetLog.Kind kind = SetLog.Kind.valueOf(kindName(kindInput));
+				double rpe = number(rpeInput, 0);
 				if (editing)
-					app.sessions.updateSet(selectedSet, kg, reps);
+					app.sessions.updateSet(selectedSet, kg, reps, kind, rpe);
 				else {
-					app.sessions.addSet(kg, reps);
+					app.sessions.addSet(kg, reps, kind, rpe);
 					startRest(item);
 				}
 				selectedSet = -1;
@@ -211,6 +235,7 @@ public final class SessionFragment extends ScreenFragment {
 				selectedSet = -1;
 				render();
 			});
+		note(sets.isEmpty());
 		if (sets.isEmpty())
 			return;
 		double record = previousBest(e.getId());
@@ -220,7 +245,7 @@ public final class SessionFragment extends ScreenFragment {
 		for (int i = 0; i < sets.size(); i++) {
 			SetLog.Entry s = sets.get(i);
 			// Récord: más 1RM estimado con carga, o más repeticiones que nunca a peso corporal.
-			boolean pr = s.kg > 0 ? s.oneRepMax() > record + 0.001 : s.reps > repsRecord;
+			boolean pr = s.counts() && (s.kg > 0 ? s.oneRepMax() > record + 0.001 : s.reps > repsRecord);
 			if (pr && s.kg > 0)
 				record = s.oneRepMax();
 			else if (pr)
@@ -228,12 +253,13 @@ public final class SessionFragment extends ScreenFragment {
 			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, list, false);
 			((TextView) row.findViewById(R.id.food_name)).setText((i + 1) + ".   " + weight(s.kg) + " × " + s.reps +
 				(s.reps == 1 ? " rep" : " reps"));
-			((TextView) row.findViewById(R.id.food_detail)).setText(pr ? "Nuevo récord personal" :
-				s.kg > 0 ? "1RM estimado " + SetLog.format(Math.round(s.oneRepMax() * 2) / 2.0) + " kg" : "");
+			((TextView) row.findViewById(R.id.food_detail)).setText(tags(s, pr ? "Nuevo récord personal" :
+				s.kg > 0 && s.counts() ? "1RM estimado " + SetLog.format(Math.round(s.oneRepMax() * 2) / 2.0) + " kg" : ""));
 			((TextView) row.findViewById(R.id.food_kcal)).setText(pr ? "🏆" : "");
 			int index = i;
 			row.setTag("track_set_" + i);
 			row.setContentDescription("Serie " + (i + 1) + ": " + weight(s.kg) + " por " + s.reps +
+				(s.kind != SetLog.Kind.NORMAL ? ", " + s.kind.label : "") + (s.rpe > 0 ? ", RPE " + SetLog.format(s.rpe) : "") +
 				(pr ? ", récord personal" : "") + ". Toca para editarla");
 			if (index == selectedSet)
 				row.setBackground(rounded(R.color.surface_selected, 12, R.color.gold, 1));
@@ -241,10 +267,45 @@ public final class SessionFragment extends ScreenFragment {
 				selectedSet = index;
 				kgInput = SetLog.format(s.kg);
 				repsInput = Integer.toString(s.reps);
+				kindInput = Character.toString(s.kind.code);
+				rpeInput = s.rpe > 0 ? SetLog.format(s.rpe) : "";
 				render();
 			});
 			list.addView(row);
 		}
+	}
+
+	/** «Calentamiento · RPE 8 · detalle»: tipo y esfuerzo de una serie delante del detalle que ya hubiera. */
+	private static String tags(SetLog.Entry s, String detail) {
+		List<String> parts = new ArrayList<>();
+		if (s.kind != SetLog.Kind.NORMAL)
+			parts.add(s.kind.label);
+		if (s.rpe > 0)
+			parts.add("RPE " + SetLog.format(s.rpe).replace('.', ','));
+		if (!detail.isEmpty())
+			parts.add(detail);
+		return String.join(" · ", parts);
+	}
+
+	private static String kindName(String code) {
+		for (SetLog.Kind k : SetLog.Kind.values())
+			if (code != null && code.length() == 1 && k.code == code.charAt(0))
+				return k.name();
+		return SetLog.Kind.NORMAL.name();
+	}
+
+	/** Nota del ejercicio en este entreno: se guarda con la siguiente serie o con su botón si ya hay series. */
+	private void note(boolean noSets) {
+		LinearLayout box = card("📝 Nota", "Cómo te has sentido, molestias, ajustes de la máquina… La verás la próxima vez.");
+		String current = app.sessions.note();
+		textField(box, "track_note", "Nota (opcional)", current, false, false, "Ej.: asiento en el 4, me molestó el hombro",
+			"", v -> app.sessions.input(SetLog.NOTE, v));
+		if (!noSets)
+			compact(columns(box, 12), "Guardar nota", !app.sessions.busy, () -> {
+				String typed = app.sessions.inputs().getOrDefault(SetLog.NOTE, "");
+				app.sessions.saveNote(typed);
+				android.widget.Toast.makeText(requireContext(), "Nota guardada", android.widget.Toast.LENGTH_SHORT).show();
+			});
 	}
 
 	/** Valores de partida: la última serie de hoy, si no la última vez que lo hiciste, si no lo previsto. */
@@ -337,9 +398,14 @@ public final class SessionFragment extends ScreenFragment {
 			StringBuilder lines = new StringBuilder();
 			for (int i = 0; i < sets.size(); i++) {
 				SetLog.Entry x = sets.get(i);
+				String extra = tags(x, "");
 				lines.append(i == 0 ? "" : "\n").append(i + 1).append(".  ").append(weight(x.kg)).append(" × ")
-					.append(x.reps).append(x.kg > 0 && Math.abs(x.oneRepMax() - best) < 0.001 ? "  🏆" : "");
+					.append(x.reps).append(extra.isEmpty() ? "" : "  (" + extra + ")")
+					.append(x.counts() && x.kg > 0 && Math.abs(x.oneRepMax() - best) < 0.001 ? "  🏆" : "");
 			}
+			String note = s.getResults().get(e.getId()).getOrDefault(SetLog.NOTE, "");
+			if (!note.isEmpty())
+				lines.append("\n📝 ").append(note);
 			card(dayLong(s), lines.length() == 0 ? "Sin series registradas" : lines.toString());
 		}
 	}

@@ -203,14 +203,58 @@ public final class SessionController {
 
 	/** Apunta una serie (peso y repeticiones) y la guarda al momento, como en FitNotes. */
 	public void addSet(double kg, int reps) {
-		changeSets(list -> list.add(new SetLog.Entry(kg, reps)), kg, reps);
+		addSet(kg, reps, SetLog.Kind.NORMAL, 0);
+	}
+
+	/** Serie con su tipo (calentamiento, drop set, al fallo) y esfuerzo percibido (RPE 1–10, 0 sin indicar). */
+	public void addSet(double kg, int reps, SetLog.Kind kind, double rpe) {
+		changeSets(list -> list.add(new SetLog.Entry(kg, reps, kind, rpe)), kg, reps);
 	}
 
 	public void updateSet(int index, double kg, int reps) {
 		changeSets(list -> {
 			if (index >= 0 && index < list.size())
-				list.set(index, new SetLog.Entry(kg, reps));
+				list.set(index, new SetLog.Entry(kg, reps, list.get(index).kind, list.get(index).rpe));
 		}, kg, reps);
+	}
+
+	public void updateSet(int index, double kg, int reps, SetLog.Kind kind, double rpe) {
+		changeSets(list -> {
+			if (index >= 0 && index < list.size())
+				list.set(index, new SetLog.Entry(kg, reps, kind, rpe));
+		}, kg, reps);
+	}
+
+	/** Nota del ejercicio actual en este entreno; se guarda al momento si ya tiene valores. */
+	public String note() {
+		RoutineItem item = item();
+		if (item == null)
+			return "";
+		Map<String, String> saved = session.getResults().get(item.getExercise().getId());
+		String typed = edits.containsKey(item.getExercise().getId()) ?
+			edits.get(item.getExercise().getId()).get(SetLog.NOTE) : null;
+		return typed != null ? typed : saved == null ? "" : saved.getOrDefault(SetLog.NOTE, "");
+	}
+
+	public void saveNote(String text) {
+		RoutineItem item = item();
+		if (busy || item == null || session.getStatus() != Session.Status.DRAFT)
+			return;
+		input(SetLog.NOTE, text == null ? "" : text);
+		String id = item.getExercise().getId();
+		Map<String, String> saved = session.getResults().get(id);
+		if (saved == null)
+			return;
+		Map<String, String> next = new LinkedHashMap<>(saved);
+		String clean = validator.normalized(item.getExercise().getMetricType(), Collections.singletonMap(SetLog.NOTE,
+			text == null ? "" : text)).get(SetLog.NOTE);
+		if (clean == null)
+			next.remove(SetLog.NOTE);
+		else
+			next.put(SetLog.NOTE, clean);
+		edits.remove(id);
+		save(session.withResult(id, next), () -> {
+		});
 	}
 
 	public void removeSet(int index) {
@@ -237,7 +281,11 @@ public final class SessionController {
 		}
 		String id = item.getExercise().getId();
 		String rest = item.getPrescription().getOrDefault("restSeconds", "60");
-		Map<String, String> values = SetLog.summary(list, session.getResults().get(id), rest);
+		Map<String, String> base = new LinkedHashMap<>(session.getResults().getOrDefault(id, Collections.emptyMap()));
+		String typedNote = edits.containsKey(id) ? edits.get(id).get(SetLog.NOTE) : null;
+		if (typedNote != null)
+			base.put(SetLog.NOTE, typedNote.replaceAll("\\s+", " ").trim());
+		Map<String, String> values = SetLog.summary(list, base, rest);
 		Session next = values == null ? session.withoutResult(id) : session.withResult(id, values);
 		// Lo editable refleja lo guardado: así «terminar» no lo ve como cambios sin guardar.
 		edits.remove(id);
