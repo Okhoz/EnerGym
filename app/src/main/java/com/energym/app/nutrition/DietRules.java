@@ -86,6 +86,12 @@ public final class DietRules {
 
 	/** Prompt breve para la IA del móvil: datos, objetivo, restricciones y formato JSON exacto. */
 	public static String prompt(BodyProfile body, BodyProfile.Targets t, String training, List<String> avoidDishes) {
+		return prompt(body, t, training, avoidDishes, body.dailyBudget());
+	}
+
+	/** {@code dailyBudget}: euros para este día (lo que queda del mes repartido entre los días que faltan). */
+	public static String prompt(BodyProfile body, BodyProfile.Targets t, String training, List<String> avoidDishes,
+		double dailyBudget) {
 		List<String> slots = slots(body.mealsPerDay);
 		StringBuilder p = new StringBuilder();
 		p.append("Eres un nutricionista deportivo. Crea el menú de UN día para tu cliente, con platos sencillos y ")
@@ -107,8 +113,8 @@ public final class DietRules {
 			p.append("No incluyas: ").append(body.dislikes).append(".\n");
 		if (body.monthlyBudget > 0)
 			p.append("PRESUPUESTO: ").append(Math.round(body.monthlyBudget)).append(" € al mes, unos ")
-				.append(String.format(java.util.Locale.ROOT, "%.2f", body.dailyBudget()))
-				.append(" € al día en total (precios de supermercado en España). Elige los alimentos con mejor relación ")
+				.append(String.format(java.util.Locale.ROOT, "%.2f", dailyBudget))
+				.append(" € para este día en total (precios de supermercado en España). Elige los alimentos con mejor relación ")
 				.append("nutrientes/precio: legumbres, huevos, arroz, pasta, avena, patata, pollo, atún en lata, ")
 				.append("congelados, fruta y verdura de temporada, marca blanca. Indica el coste estimado de cada comida ")
 				.append("en \"coste\" (euros) y que la suma no pase del presupuesto. En \"consejo\" da un truco para ahorrar.\n");

@@ -149,7 +149,7 @@ public class DietPlannerTest {
 		for (DietPlan.Meal m : cheap.meals)
 			assertNotEquals("Salmón al horno con patata y brócoli", m.dish);
 		String prompt = DietRules.prompt(budget(6), budget(6).targets(), "", Collections.emptyList());
-		assertTrue(prompt, prompt.contains("PRESUPUESTO: 182 € al mes, unos 6.00 € al día"));
+		assertTrue(prompt, prompt.contains("PRESUPUESTO: 182 € al mes, unos 6.00 € para este día"));
 		assertEquals(6, budget(6).dailyBudget(), 0.001);
 		assertTrue(prompt.contains("\"coste\""));
 		assertFalse(DietRules.prompt(budget(0), budget(0).targets(), "", Collections.emptyList()).contains("PRESUPUESTO"));
@@ -171,6 +171,67 @@ public class DietPlannerTest {
 		assertTrue(planner.plan.cost() > 0);
 		DietPlan round = DietPlan.decode(planner.plan.encode());
 		assertEquals(planner.plan.cost(), round.cost(), 0.05);
+	}
+
+	@Test
+	public void theWholeMonthIsPlannedAndUpdatesWithWhatIsLogged() {
+		java.time.LocalDate today = java.time.LocalDate.of(2026, 10, 16);
+		Map<java.time.LocalDate, Double> eaten = new HashMap<>();
+		Memory store = new Memory();
+		DietPlanner planner = new DietPlanner(null, store, Runnable::run, () -> { }, () -> "", () -> today,
+			day -> eaten.getOrDefault(day, 0.0));
+		planner.activate("owner");
+		BodyProfile b = body(BodyProfile.Diet.OMNIVORE, 4, "", "");
+		planner.sync(b);
+		assertEquals("Del 16 al 31 de octubre", 16, planner.days().size());
+		assertEquals(today, planner.selected);
+		double base = planner.plan.totals()[0];
+		assertEquals(b.targets().kcal, base, 1);
+		DietPlan tomorrowBefore = planner.days().get(today.plusDays(1));
+		// Se pasó 800 kcal los dos últimos días: hoy y mañana compensan la mitad, como mucho un 10 %.
+		eaten.put(today.minusDays(1), b.targets().kcal + 800);
+		eaten.put(today.minusDays(2), b.targets().kcal + 800);
+		planner.sync(b);
+		assertEquals(b.targets().kcal * 0.9, planner.plan.totals()[0], 1);
+		assertTrue(planner.adjustment, planner.adjustment.contains("te pasaste"));
+		assertEquals("Los días lejanos mantienen el objetivo base", b.targets().kcal,
+			planner.days().get(today.plusDays(5)).totals()[0], 1);
+		assertNotSame(tomorrowBefore, planner.days().get(today.plusDays(1)));
+		// El plan se guarda y vuelve igual al reabrir.
+		planner.activate(null);
+		planner.activate("owner");
+		assertEquals(16, planner.days().size());
+		planner.select(today.plusDays(3));
+		assertEquals(today.plusDays(3), planner.selected);
+		assertSame(planner.days().get(today.plusDays(3)), planner.plan);
+	}
+
+	@Test
+	public void theDailyBudgetIsWhatIsLeftOfTheMonth() {
+		java.time.LocalDate today = java.time.LocalDate.of(2026, 10, 16);
+		DietPlanner planner = new DietPlanner(null, new Memory(), Runnable::run, () -> { }, () -> "", () -> today,
+			day -> 0.0);
+		planner.activate("owner");
+		BodyProfile b = new BodyProfile(BodyProfile.Sex.MALE, 30, 178, 78, BodyProfile.Activity.MODERATE,
+			BodyProfile.Goal.MAINTAIN, "", BodyProfile.Diet.OMNIVORE, BodyProfile.Cooking.QUICK, 4, "", 310);
+		planner.sync(b);
+		// 15 días anteriores a la media (310/30,4 al día) y quedan 16 días para el resto.
+		double expected = (310 - 15 * b.dailyBudget()) / 16;
+		assertEquals(expected, planner.dailyBudget(b, today), 0.01);
+		assertTrue(planner.adjustment.contains("€ para este día"));
+	}
+
+	@Test
+	public void anOldSingleMenuBecomesTodayInTheMonthPlan() {
+		Memory store = new Memory();
+		BodyProfile b = body(BodyProfile.Diet.OMNIVORE, 3, "", "");
+		store.saved.put("owner", DietRules.local(b, b.targets(), 0, 1).encode());
+		java.time.LocalDate today = java.time.LocalDate.of(2026, 10, 30);
+		DietPlanner planner = new DietPlanner(null, store, Runnable::run, () -> { }, () -> "", () -> today, d -> 0.0);
+		planner.activate("owner");
+		assertNotNull(planner.plan);
+		planner.sync(b);
+		assertEquals(2, planner.days().size());
 	}
 
 	private static List<String> names(DietPlan plan) {

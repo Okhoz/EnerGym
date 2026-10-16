@@ -142,7 +142,8 @@ public final class AppState extends AndroidViewModel {
 				diets.edit().putString(owner, json).apply();
 			}
 		}, main, this::changed, () -> app.profile == null ? "" : app.profile.getDaysPerWeek() + " días por semana de " +
-			app.disciplineName() + ", sesiones de " + app.profile.getDurationMinutes() + " min");
+			app.disciplineName() + ", sesiones de " + app.profile.getDurationMinutes() + " min",
+			java.time.LocalDate::now, day -> nutrition.historyCalories(day));
 		trainer.listen(this::changed);
 		// Al abrir la app (aunque aún no haya cuenta) se comprueba el modelo y, si falta, empieza su descarga.
 		trainer.activate(null);

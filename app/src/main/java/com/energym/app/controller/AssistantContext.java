@@ -132,13 +132,14 @@ public final class AssistantContext {
 	}
 
 	static String diet(DietPlanner diet) {
-		if (diet == null || diet.plan == null)
+		DietPlan plan = diet == null ? null : diet.days().get(LocalDate.now());
+		if (plan == null)
 			return "";
-		DietPlan plan = diet.plan;
 		List<String> meals = new ArrayList<>();
 		for (DietPlan.Meal m : plan.meals)
 			meals.add(m.name + ": " + m.dish + " (" + Math.round(m.kcal) + " kcal)");
-		return plan.source + ", " + Math.round(plan.totals()[0]) + " kcal" +
+		return "Plan del mes (" + diet.days().size() + " días con menú). Hoy: " + plan.source + ", " +
+			Math.round(plan.totals()[0]) + " kcal" +
 			(plan.cost() >= 0 ? String.format(Locale.ROOT, ", ≈ %.2f €", plan.cost()) : "") + ". " + String.join("; ", meals) + ".";
 	}
 }

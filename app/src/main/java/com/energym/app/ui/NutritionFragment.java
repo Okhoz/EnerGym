@@ -122,33 +122,31 @@ public final class NutritionFragment extends ScreenFragment {
 		return String.format(SPANISH, "%.2f €", value);
 	}
 
-	/** Dieta personalizada con la IA del móvil, a partir de los datos físicos y preferencias guardados. */
+	/**
+	 * Dieta del mes con la IA del móvil: cada día tiene su menú; se elige el día con las flechas y los días que
+	 * vienen se ajustan solos con lo que se anota (comidas, peso y preferencias).
+	 */
 	private void diet(NutritionController n, BodyProfile.Targets targets) {
 		com.energym.app.nutrition.DietPlanner planner = state.diet;
 		if (planner == null || n.body == null || targets == null)
 			return;
-		com.energym.app.nutrition.DietPlan plan = planner.plan;
 		BodyProfile current = n.effectiveBody();
-		section("Dieta con IA", 32);
-		LinearLayout card = card("✦ Tu dieta con IA", planner.busy ? "Preparando tu menú en el móvil…" :
-			plan == null ? "Un menú de un día con tus " + Math.round(targets.kcal) + " kcal, " +
-				current.mealsPerDay + " comidas y tu alimentación " + current.diet.label.toLowerCase(SPANISH) +
-				(current.monthlyBudget > 0 ? ", con un presupuesto de " + Math.round(current.monthlyBudget) + " € al mes" : "") +
-				". Se tienen en cuenta tus alergias y lo que no tomas." :
-				plan.source + " · " + Math.round(plan.totals()[0]) + " de " + Math.round(targets.kcal) + " kcal" +
-					(plan.cost() >= 0 ? " · ≈ " + euros(plan.cost()) + " al día (≈ " +
-						Math.round(plan.cost() * BodyProfile.DAYS_PER_MONTH) + " €/mes" +
-						(current.monthlyBudget > 0 ? " de " + Math.round(current.monthlyBudget) + " €" : "") + ")" : ""));
+		planner.sync(current);
+		com.energym.app.nutrition.DietPlan plan = planner.plan;
+		LocalDate day = planner.selected == null ? n.today() : planner.selected;
+		java.time.YearMonth month = planner.month();
+		String monthName = month.getMonth().getDisplayName(java.time.format.TextStyle.FULL, SPANISH);
+		section("Dieta del mes", 32);
+		double cost = planner.monthCost();
+		LinearLayout card = card("✦ Tu dieta de " + monthName, planner.busy ? "Preparando el menú con la IA del móvil…" :
+			planner.days().size() + " días con menú · " + current.mealsPerDay + " comidas al día" +
+				(cost >= 0 ? " · ≈ " + Math.round(cost) + " € previstos" +
+					(current.monthlyBudget > 0 ? " de " + Math.round(current.monthlyBudget) + " €" : "") : "") +
+				"\nSe ajusta sola con lo que comes, tu peso y tus preferencias.");
 		card.setTag("nutrition_diet");
-		if (planner.busy)
+		if (planner.busy || plan == null)
 			return;
-		if (plan == null) {
-			primary(action(card, "Crear mi dieta con IA", !n.busy, () -> planner.create(current)));
-			return;
-		}
-		// Desplegable: plegado solo ocupa el resumen y el botón para ver el menú.
-		MaterialButton toggle = action(card, planner.expanded ? "Ocultar menú ▴" : "Ver menú de " + plan.meals.size() +
-			" comidas ▾", true, () -> {
+		MaterialButton toggle = action(card, planner.expanded ? "Ocultar menú ▴" : "Ver menú del día ▾", true, () -> {
 			planner.expanded = !planner.expanded;
 			render();
 		});
@@ -156,26 +154,42 @@ public final class NutritionFragment extends ScreenFragment {
 		toggle.setContentDescription(toggle.getText() + (planner.expanded ? ", desplegado" : ", plegado"));
 		if (!planner.expanded)
 			return;
+		// Día del mes: anterior / día / siguiente.
+		LinearLayout nav = columns(card, 16);
+		LocalDate first = planner.days().isEmpty() ? day : planner.days().firstKey();
+		MaterialButton back = compact(nav, "‹", day.isAfter(first), () -> planner.select(day.minusDays(1)));
+		back.setContentDescription("Día anterior");
+		back.setTextSize(22);
+		MaterialButton label = compact(nav, label(day, n.today()), !day.equals(n.today()), () -> planner.select(n.today()));
+		label.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.white));
+		((LinearLayout.LayoutParams) label.getLayoutParams()).weight = 3;
+		MaterialButton forward = compact(nav, "›", day.isBefore(month.atEndOfMonth()), () -> planner.select(day.plusDays(1)));
+		forward.setContentDescription("Día siguiente");
+		forward.setTextSize(22);
+		text(card, plan.source + " · " + Math.round(plan.totals()[0]) + " kcal" +
+			(plan.cost() >= 0 ? " · ≈ " + euros(plan.cost()) : ""), R.style.EnerGym_FieldCaption, 12);
+		if (!planner.adjustment.isEmpty())
+			text(card, "⚖ " + planner.adjustment, R.style.EnerGym_FieldCaption, 4);
 		if (!planner.status.isEmpty())
-			text(card, planner.status, R.style.EnerGym_FieldCaption, 12);
+			text(card, planner.status, R.style.EnerGym_FieldCaption, 4);
+		boolean today = day.equals(n.today());
 		for (int i = 0; i < plan.meals.size(); i++) {
 			com.energym.app.nutrition.DietPlan.Meal meal = plan.meals.get(i);
-			TextView title = text(card, meal.icon() + "  " + meal.name + " · " +
-				Math.round(meal.kcal) + " kcal" + (meal.cost >= 0 ? " · ≈ " + euros(meal.cost) : ""),
-				R.style.EnerGym_CardTitle, i == 0 ? 16 : 24);
+			TextView title = text(card, meal.icon() + "  " + meal.name + " · " + Math.round(meal.kcal) + " kcal" +
+				(meal.cost >= 0 ? " · ≈ " + euros(meal.cost) : ""), R.style.EnerGym_CardTitle, i == 0 ? 16 : 24);
 			title.setTextSize(17);
 			text(card, meal.dish, R.style.EnerGym_Body, 4);
 			if (!meal.ingredients.isEmpty())
 				text(card, meal.ingredients, R.style.EnerGym_FieldCaption, 4);
 			text(card, "P " + Math.round(meal.protein) + " g · H " + Math.round(meal.carbs) + " g · G " +
 				Math.round(meal.fat) + " g", R.style.EnerGym_FieldCaption, 4);
-			MaterialButton log = action(card, "Anotar en mi diario", !n.busy, () ->
-				n.logPlanned(meal, () -> { }));
-			log.setTag("diet_log_" + i);
+			if (today)
+				action(card, "Anotar en mi diario", !n.busy, () -> n.logPlanned(meal, () -> { })).setTag("diet_log_" + i);
 		}
 		if (!plan.advice.isEmpty())
 			text(card, "💡 " + plan.advice, R.style.EnerGym_Body, 20);
-		action(card, "🔄 Otra propuesta", !n.busy, () -> planner.create(current)).setTag("diet_again");
+		action(card, plan.source.startsWith("Creado con IA") ? "🔄 Otra propuesta con IA" : "✦ Mejorar este día con IA",
+			!n.busy, () -> planner.create(current)).setTag("diet_again");
 		text(card, "Menú orientativo; no sustituye a un dietista. Cambia tus preferencias en Datos físicos.",
 			R.style.EnerGym_FieldCaption, 8);
 	}
