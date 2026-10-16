@@ -865,6 +865,61 @@ public final class NutritionController {
 		});
 	}
 
+	/**
+	 * Recupera comidas y pesos de una copia: las comidas ya anotadas (mismo día, nombre y cantidad) no se repiten.
+	 * {@code done} recibe cuántas comidas y pesos se añadieron.
+	 */
+	public void importBackup(List<FoodEntry> foods, SortedMap<LocalDate, Double> imported,
+		java.util.function.BiConsumer<Integer, Integer> done) {
+		if (owner == null || busy)
+			return;
+		List<FoodEntry> fresh = new ArrayList<>();
+		Set<String> known = new HashSet<>();
+		for (FoodEntry e : entries)
+			known.add(e.day + "|" + e.name.toLowerCase(Locale.ROOT) + "|" + e.amount);
+		for (FoodEntry f : foods)
+			if (known.add(f.day + "|" + f.name.toLowerCase(Locale.ROOT) + "|" + f.amount))
+				fresh.add(f);
+		List<Map.Entry<LocalDate, Double>> newWeights = new ArrayList<>();
+		for (Map.Entry<LocalDate, Double> w : imported.entrySet())
+			if (!w.getValue().equals(weights.get(w.getKey())))
+				newWeights.add(w);
+		busy = true;
+		long token = generation;
+		loadRequest++;
+		changed.run();
+		addNext(fresh, 0, token, "Importado", () -> {
+			busy = true;
+			importWeights(newWeights, 0, token, () -> {
+				busy = false;
+				status = "Importado: " + fresh.size() + (fresh.size() == 1 ? " comida" : " comidas") + " y " +
+					newWeights.size() + (newWeights.size() == 1 ? " peso." : " pesos.");
+				done.accept(fresh.size(), newWeights.size());
+				changed.run();
+			});
+		});
+	}
+
+	private void importWeights(List<Map.Entry<LocalDate, Double>> list, int index, long token, Runnable done) {
+		if (index >= list.size()) {
+			done.run();
+			return;
+		}
+		Map.Entry<LocalDate, Double> w = list.get(index);
+		store.weight(owner, w.getKey(), w.getValue(), new NutritionStore.Callback<Void>() {
+			public void success(Void v) {
+				if (token != generation)
+					return;
+				weights.put(w.getKey(), w.getValue());
+				importWeights(list, index + 1, token, done);
+			}
+
+			public void failure(Exception e) {
+				fail(token, e);
+			}
+		});
+	}
+
 	public void remove(FoodEntry entry) {
 		if (owner == null || busy)
 			return;

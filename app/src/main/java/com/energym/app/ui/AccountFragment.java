@@ -25,6 +25,12 @@ public final class AccountFragment extends ScreenFragment {
 					render();
 			});
 
+	/** Copia en CSV: se elige dónde guardarla o qué archivo abrir con el selector de Android (sin permisos). */
+	private final androidx.activity.result.ActivityResultLauncher<String> exportCsv = registerForActivityResult(
+		new androidx.activity.result.contract.ActivityResultContracts.CreateDocument("text/csv"), this::writeCsv);
+	private final androidx.activity.result.ActivityResultLauncher<String[]> importCsv = registerForActivityResult(
+		new androidx.activity.result.contract.ActivityResultContracts.OpenDocument(), this::readCsv);
+
 	public AccountFragment() {
 		super(R.layout.fragment_account);
 	}
@@ -175,6 +181,77 @@ public final class AccountFragment extends ScreenFragment {
 			java.util.Arrays.asList("Kilos (kg)", "Libras (lb)"), Units.lb(requireContext()) ? "lb" : "kg",
 			"Tus registros se guardan igual; solo cambia cómo se muestran y escriben.",
 			v -> Units.setLb(requireContext(), "lb".equals(v)));
+		if (app.owner() == null)
+			return;
+		LinearLayout data = card("Tus datos en CSV", "Exporta tus entrenos serie a serie, comidas (últimas " +
+			com.energym.app.nutrition.NutritionController.HISTORY_DAYS / 7 + " semanas), peso y medidas para abrirlos en " +
+			"Excel o Google Sheets. Al importar se recuperan comidas, peso y medidas sin duplicarlas.");
+		action(data, "Exportar a CSV", true, () -> exportCsv.launch("energym-" + java.time.LocalDate.now() + ".csv"))
+			.setTag("export_csv");
+		action(data, "Importar CSV", state.nutrition != null && !state.nutrition.busy,
+			() -> importCsv.launch(new String[]{"text/csv", "text/comma-separated-values", "text/plain"}))
+			.setTag("import_csv");
+	}
+
+	private void writeCsv(android.net.Uri uri) {
+		if (uri == null || app.owner() == null)
+			return;
+		com.energym.app.nutrition.NutritionController n = state.nutrition;
+		String csv = com.energym.app.progress.CsvBackup.export(app.history, java.time.ZoneId.systemDefault(),
+			n == null ? java.util.Collections.emptyList() : n.entries,
+			n == null ? new java.util.TreeMap<>() : n.weights, state.measures.days());
+		try (java.io.OutputStream out = requireContext().getContentResolver().openOutputStream(uri, "wt")) {
+			if (out == null)
+				throw new java.io.IOException();
+			// BOM para que Excel lea bien las tildes.
+			out.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
+			out.write(csv.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+			toast("Exportado");
+		} catch (java.io.IOException | RuntimeException e) {
+			toast("No se pudo guardar el archivo");
+		}
+	}
+
+	private void readCsv(android.net.Uri uri) {
+		if (uri == null || app.owner() == null || state.nutrition == null)
+			return;
+		String text;
+		try (java.io.InputStream in = requireContext().getContentResolver().openInputStream(uri)) {
+			if (in == null)
+				throw new java.io.IOException();
+			java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
+			byte[] buffer = new byte[8192];
+			for (int r; (r = in.read(buffer)) > 0; ) {
+				bytes.write(buffer, 0, r);
+				if (bytes.size() > 10_000_000)
+					throw new java.io.IOException("Archivo demasiado grande");
+			}
+			text = bytes.toString("UTF-8").replace("\uFEFF", "");
+		} catch (java.io.IOException | RuntimeException e) {
+			toast("No se pudo leer el archivo");
+			return;
+		}
+		com.energym.app.progress.CsvBackup.Imported data = com.energym.app.progress.CsvBackup.parse(text);
+		int measures = 0;
+		for (java.util.Map.Entry<java.time.LocalDate, java.util.Map<com.energym.app.nutrition.BodyMeasures.Part, String>> m :
+			data.measures.entrySet())
+			if (!state.measures.days().containsKey(m.getKey()) && state.measures.save(m.getKey(), m.getValue()).isEmpty())
+				measures++;
+		int savedMeasures = measures;
+		int skipped = data.skipped;
+		state.nutrition.importBackup(data.foods, data.weights, (foods, weights) -> {
+			if (isAdded())
+				new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+					.setTitle("Importación terminada")
+					.setMessage(foods + " comidas, " + weights + " pesos y " + savedMeasures + " días de medidas añadidos." +
+						(skipped > 0 ? "\n" + skipped + " filas no se entendieron y se han saltado." : "") +
+						"\nLos entrenos ya están en tu cuenta, así que no se importan de nuevo.")
+					.setPositiveButton("Vale", null).show();
+		});
+	}
+
+	private void toast(String text) {
+		android.widget.Toast.makeText(requireContext(), text, android.widget.Toast.LENGTH_SHORT).show();
 	}
 
 	/** Explicación bajo un interruptor, separada del siguiente control. */
