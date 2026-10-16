@@ -22,6 +22,7 @@ public final class FormFieldGuidance {
 			case "daysPerWeek": return "Ej.: 3";
 			case "duration":
 			case "durationMinutes": return "Ej.: 45";
+			case "durationHours": return "Ej.: 1.5 (hora y media)";
 			case "estimatedMinutes": return "Ej.: 10";
 			case "level": return "Ej.: principiante";
 			case "experience": return "Ej.: 6 meses de entrenamiento de fuerza";
@@ -93,6 +94,7 @@ public final class FormFieldGuidance {
 			case "goal": return "Da prioridad al resultado que buscas con tu rutina.";
 			case "daysPerWeek": return "Indica cuántos días podrás entrenar cada semana.";
 			case "durationMinutes": return "Es el tiempo disponible para cada sesión, en minutos.";
+			case "durationHours": return "Tiempo de cada sesión en horas: 0.5 = media hora, 1.5 = hora y media.";
 			case "level": return "Describe tu nivel actual para orientar la dificultad.";
 			case "experience": return "Cuenta qué has practicado y durante cuánto tiempo.";
 			case "space": return "Describe el espacio libre en el que podrás moverte.";

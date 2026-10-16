@@ -481,19 +481,25 @@ public final class AppController {
 	public void profileInput(String key, String value) {
 		if (owner != null && !initialDataReady)
 			return;
+		if (key.equals("durationHours")) {
+			key = "durationMinutes";
+			value = minutes(value);
+		}
 		profileDraft.put(key, value);
 		profileDirty = true;
 		// La experiencia ya indica el nivel: se completa solo y la persona puede corregirlo.
-		if (key.equals("experience") && !levelFor(value).isEmpty() &&
-			!levelFor(value).equals(profileDraft.get("level"))) {
+		// Sin redibujar: la vista actualiza solo el selector de nivel para no cerrar el teclado.
+		if (key.equals("experience") && !levelFor(value).isEmpty())
 			profileDraft.put("level", levelFor(value));
-			changed();
-		}
 		// Cambiar disciplina o tipo cambia qué se pregunta: se ajusta el borrador y se redibuja el formulario.
 		if (key.equals("sportId") || key.equals("category") || key.equals("focus")) {
 			normalizeProfileDraft();
 			changed();
 		}
+	}
+
+	public String profileValue(String key) {
+		return profileDraft.getOrDefault(key, "");
 	}
 
 	private DisciplineForm disciplineForm() {
@@ -590,7 +596,7 @@ public final class AppController {
 				}
 			});
 		} catch (RuntimeException e) {
-			error("Revisa el perfil: días 1–7, tiempo 5–240 min y nivel obligatorio. " + e.getMessage());
+			error("Revisa el perfil: días 1–7, tiempo por sesión entre 0.1 y 4 horas y nivel obligatorio.");
 		}
 	}
 
@@ -662,11 +668,15 @@ public final class AppController {
 			f.add(new InputField(key, d.label, profileDraft.getOrDefault(key, ""), v, t, false, false));
 		}
 		f.add(list("daysPerWeek", "Días por semana", DAYS, DAY_LABELS));
-		f.add(list("durationMinutes", form.durationLabel, MINUTES, MINUTE_LABELS));
-		f.add(list("experience", "Experiencia previa", EXPERIENCE, EXPERIENCE));
+		// El tiempo admite cualquier valor, así que se escribe, y en horas (1,5 = hora y media).
+		f.add(new InputField("durationHours", form.durationLabel + " (horas)",
+			hours(profileDraft.getOrDefault("durationMinutes", "")), Collections.emptyList(), Collections.emptyList(),
+			false, true));
+		// Experiencia y espacio necesitan detalle propio: siguen siendo texto libre.
+		f.add(field("experience", "Experiencia previa", false, false));
 		f.add(list("level", "Nivel", LEVELS, LEVELS));
 		if (form.asksSpace)
-			f.add(list("space", "Espacio disponible", SPACES, SPACES));
+			f.add(field("space", "Espacio disponible", false, false));
 		f.add(field("preferences", "Preferencias", false, false));
 		f.add(field("limitations", "Limitaciones que quieras declarar", false, false));
 		for (TrainingProfile.Resource r : form.askedResources(category))
@@ -679,14 +689,26 @@ public final class AppController {
 		Arrays.asList("Principiante", "Intermedio", "Avanzado"));
 	private static final List<String> DAYS = Arrays.asList("1", "2", "3", "4", "5", "6", "7"),
 		DAY_LABELS = Arrays.asList("1 día", "2 días", "3 días", "4 días", "5 días", "6 días", "7 días");
-	public static final List<String> MINUTES = Collections.unmodifiableList(
-		Arrays.asList("15", "20", "30", "45", "60", "75", "90", "120", "150", "180", "240"));
-	public static final List<String> MINUTE_LABELS = Collections.unmodifiableList(Arrays.asList("15 min", "20 min",
-		"30 min", "45 min", "1 h", "1 h 15 min", "1 h 30 min", "2 h", "2 h 30 min", "3 h", "4 h"));
-	private static final List<String> EXPERIENCE = Arrays.asList("Empiezo ahora", "Menos de 1 año", "De 1 a 3 años",
-		"Más de 3 años");
-	private static final List<String> SPACES = Arrays.asList("Poco (unos 2 × 2 m)", "Medio (salón o habitación)",
-		"Amplio (garaje, jardín o parque)");
+
+	/** Minutos guardados → horas para mostrar («90» → «1,5»); vacío o texto no numérico se deja igual. */
+	public static String hours(String minutes) {
+		try {
+			double h = Integer.parseInt(minutes.trim()) / 60.0;
+			String text = Math.abs(h - Math.round(h)) < 1e-9 ? Long.toString(Math.round(h)) :
+				new java.math.BigDecimal(h).setScale(2, java.math.RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
+			return text;
+		} catch (RuntimeException e) {
+			return minutes;
+		}
+	}
+
+	/** Horas escritas («1,5», «0.75», «2») → minutos enteros; texto no válido se conserva para avisar al guardar. */
+	public static String minutes(String hours) {
+		String h = hours == null ? "" : hours.trim().replace(',', '.');
+		if (!h.matches("\\d+(?:\\.\\d+)?") && !h.matches("\\.\\d+"))
+			return h.isEmpty() ? "" : "horas no válidas";
+		return Long.toString(Math.round(Double.parseDouble(h) * 60));
+	}
 
 	/**
 	 * Lista cerrada que conserva un valor antiguo escrito a mano para no perderlo al editar el perfil.
@@ -696,22 +718,30 @@ public final class AppController {
 		String current = profileDraft.getOrDefault(key, "");
 		if (!values.contains(current)) {
 			v.add(current);
-			t.add(current.isEmpty() ? "Sin indicar" : key.equals("durationMinutes") ? current + " min" : current);
+			t.add(current.isEmpty() ? "Sin indicar" : current);
 		}
 		v.addAll(values);
 		t.addAll(labels);
 		return new InputField(key, label, current, v, t, false, false);
 	}
 
-	/** Nivel que se deduce de la experiencia elegida. */
+	private static final java.util.regex.Pattern TIME = java.util.regex.Pattern.compile(
+		"(\\d+(?:[.,]\\d+)?)\\s*(años?|anos?|meses|mes|semanas?)");
+
+	/**
+	 * Nivel que se deduce del tiempo escrito en la experiencia («8 años», «6 meses de fuerza»); vacío si no
+	 * menciona un tiempo.
+	 */
 	static String levelFor(String experience) {
-		switch (experience) {
-			case "Empiezo ahora":
-			case "Menos de 1 año": return "Principiante";
-			case "De 1 a 3 años": return "Intermedio";
-			case "Más de 3 años": return "Avanzado";
-			default: return "";
-		}
+		String text = experience == null ? "" : experience.toLowerCase(Locale.ROOT);
+		if (text.contains("nunca") || text.contains("empiezo") || text.contains("ninguna"))
+			return "Principiante";
+		java.util.regex.Matcher m = TIME.matcher(text);
+		if (!m.find())
+			return "";
+		double amount = Double.parseDouble(m.group(1).replace(',', '.'));
+		double years = m.group(2).startsWith("a") ? amount : m.group(2).startsWith("m") ? amount / 12 : amount / 52;
+		return years < 1 ? "Principiante" : years <= 3 ? "Intermedio" : "Avanzado";
 	}
 
 	private InputField options(String key, String label, List<? extends Enum<?>> values) {

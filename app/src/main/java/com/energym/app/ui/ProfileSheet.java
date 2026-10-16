@@ -138,6 +138,14 @@ public final class ProfileSheet {
 		dialog.show();
 	}
 
+	public boolean isShowing() {
+		return dialog.isShowing();
+	}
+
+	public void dismiss() {
+		dialog.dismiss();
+	}
+
 	private TextView label(String text, int sp, int color, boolean bold) {
 		TextView view = new TextView(context);
 		view.setText(text);

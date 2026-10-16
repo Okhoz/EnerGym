@@ -27,7 +27,7 @@ public final class ProfileFragment extends ScreenFragment {
 			} else if (f.key.equals("daysPerWeek"))
 				fields = card("Tu disponibilidad", "Usa una disponibilidad que puedas mantener.");
 			else if (f.key.equals("experience"))
-				fields = card("Sobre ti", "Al elegir tu experiencia se ajusta el nivel; puedes cambiarlo.");
+				fields = card("Sobre ti", "Si indicas cuánto tiempo llevas (p. ej. «2 años»), el nivel se ajusta solo; puedes cambiarlo.");
 			else if (f.key.startsWith("resource.") && !resources) {
 				fields = card("Material disponible",
 					"Marca solo el material que podrás usar en las sesiones.");
@@ -40,8 +40,25 @@ public final class ProfileFragment extends ScreenFragment {
 			else if (!f.values.isEmpty())
 				choice(fields, f.key, label, f.values, f.labels, f.value, helper, v -> app.profileInput(f.key, v));
 			else
-				textField(fields, f.key, label, f.value, f.number, f.number, helper, v -> app.profileInput(f.key, v));
+				textField(fields, f.key, label, f.value, f.number, f.number && !f.key.equals("durationHours"), helper,
+					v -> {
+						app.profileInput(f.key, v);
+						if (f.key.equals("experience"))
+							syncLevel();
+					});
 		}
 		primary(action(rows, "Guardar perfil", !app.profileSaving(), app::saveProfile));
+	}
+
+	/** Refleja en el selector el nivel deducido de la experiencia escrita. */
+	private void syncLevel() {
+		android.view.View view = getView() == null ? null : getView().findViewWithTag("level");
+		if (!(view instanceof android.widget.Spinner))
+			return;
+		android.widget.Spinner spinner = (android.widget.Spinner) view;
+		String level = app.profileValue("level");
+		for (int i = 0; i < spinner.getCount(); i++)
+			if (level.equals(spinner.getItemAtPosition(i)) && spinner.getSelectedItemPosition() != i)
+				spinner.setSelection(i);
 	}
 }

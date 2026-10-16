@@ -183,7 +183,8 @@ public final class MainActivity extends AppCompatActivity {
 	 * Sin cuenta, perfil y datos físicos llevan primero a Cuenta para entrar.
 	 */
 	private void openMenu(View anchor) {
-		if (state.app == null)
+		// Dos toques seguidos no abren un segundo panel encima del primero.
+		if (state.app == null || (menuSheet != null && menuSheet.isShowing()))
 			return;
 		String owner = state.app.owner();
 		long menuRevision = state.app.accountRevision();
@@ -232,8 +233,11 @@ public final class MainActivity extends AppCompatActivity {
 						updateAvatar();
 					});
 		}
+		menuSheet = sheet;
 		sheet.show();
 	}
+
+	private ProfileSheet menuSheet;
 
 
 	private AvatarStore avatars;
@@ -437,6 +441,8 @@ public final class MainActivity extends AppCompatActivity {
 
 	@Override
 	protected void onDestroy() {
+		if (menuSheet != null && menuSheet.isShowing()) menuSheet.dismiss();
+		menuSheet = null;
 		if (remoteAvatar != null) remoteAvatar.close();
 		if (avatarWorker != null) avatarWorker.shutdownNow();
 		if (isFinishing())
