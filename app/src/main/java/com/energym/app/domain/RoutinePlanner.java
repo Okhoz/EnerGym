@@ -92,7 +92,7 @@ public final class RoutinePlanner {
 				"Perfil." :
 			"Propuesta local por reglas según lo que has pedido. Ejemplos sin revisión profesional; adapta la intensidad a " +
 				"tu situación. No utiliza modelos de IA ni requiere conexión. La duración estimada incluye descansos y transiciones.";
-		return new Routine(UUID.randomUUID().toString(), 0, title.isEmpty() ? "Propuesta de entrenamiento" : title, profile,
+		return new Routine(UUID.randomUUID().toString(), 0, title.isEmpty() ? "Cuerpo completo" : title, profile,
 			items, explanation, new RoutineMetadata(RoutineMetadata.Origin.LOCAL_RULES, true));
 	}
 

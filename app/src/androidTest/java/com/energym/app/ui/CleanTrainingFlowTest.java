@@ -53,17 +53,12 @@ public final class CleanTrainingFlowTest {
 			pane(scenario, "training_tab_mine");
 			scenario.onActivity(activity -> {
 				View root = activity.getWindow().getDecorView();
+				// Rutinas reúne todas las formas de crear, a la vista y sin menús escondidos.
 				assertNotNull(MainFlowTest.text(root, "Crear rutina manual"));
-				assertNull(MainFlowTest.text(root, "Crear rutina con IA"));
-				assertNull(root.findViewWithTag("exercise_search"));
-				assertNull(MainFlowTest.text(root, "Crear propuesta"));
-			});
-			pane(scenario, "training_tab_ai");
-			scenario.onActivity(activity -> {
-				View root = activity.getWindow().getDecorView();
 				assertNotNull(MainFlowTest.text(root, "Crear rutina con IA"));
-				assertNull(MainFlowTest.text(root, "Crear rutina manual"));
+				assertNotNull(MainFlowTest.text(root, "⚡ Una automática ya"));
 				assertNull(root.findViewWithTag("exercise_search"));
+				assertNull("Ya no hay pestaña separada para la IA", root.findViewWithTag("training_tab_ai"));
 			});
 			pane(scenario, "training_tab_exercises");
 			scenario.onActivity(activity -> {
@@ -127,12 +122,13 @@ public final class CleanTrainingFlowTest {
 				pane(scenario, "training_tab_mine");
 				scenario.onActivity(activity -> {
 					View root = activity.getWindow().getDecorView();
-					assertEquals("El primer borrador es la acción principal", 1, count(root, "Continuar borrador"));
-					assertNotNull(MainFlowTest.text(root, "Otros borradores (1)"));
+					assertEquals("El primer entreno a medias es la acción principal", 1, count(root, "Seguir entrenando"));
+					assertNotNull(MainFlowTest.text(root, "Otros entrenos a medias (1)"));
 				});
-				MainFlowTest.click(scenario, "Otros borradores (1)");
+				MainFlowTest.click(scenario, "Otros entrenos a medias (1)");
 				scenario.onActivity(activity -> assertEquals("Cada UUID debe aparecer una vez", 2,
-					count(activity.getWindow().getDecorView(), "Continuar borrador")));
+					count(activity.getWindow().getDecorView(), "Seguir entrenando") +
+					count(activity.getWindow().getDecorView(), "Seguir este")));
 			} finally {
 				scenario.onActivity(activity -> {
 					if (activity.state().app == app[0] && Objects.equals(owner[0], app[0].owner())) {

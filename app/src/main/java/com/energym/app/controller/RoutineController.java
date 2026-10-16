@@ -37,7 +37,8 @@ public final class RoutineController {
 			error.accept("Guarda tu perfil antes de crear una propuesta.");
 			return;
 		}
-		preview = new RoutinePlanner().create(profile.get(), catalog);
+		// Cada propuesta automática varía (cuerpo completo equilibrado) en vez de repetir los primeros del catálogo.
+		preview = new RoutinePlanner().create(profile.get(), catalog, RoutineRequest.none(), System.nanoTime());
 		changed.run();
 	}
 

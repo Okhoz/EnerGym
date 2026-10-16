@@ -56,7 +56,7 @@ public final class RoutineFragment extends ScreenFragment {
 				app.back();
 			});
 		} else
-			primary(action(rows, "Empezar sesión", !app.sessions.busy, app::startSession));
+			primary(action(rows, "Empezar entreno", !app.sessions.busy, app::startSession));
 		text(rows, r.getExplanation(), R.style.EnerGym_FieldCaption, 12);
 	}
 }

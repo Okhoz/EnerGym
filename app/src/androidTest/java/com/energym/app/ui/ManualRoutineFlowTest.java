@@ -102,10 +102,9 @@ public final class ManualRoutineFlowTest {
 			scenario.onActivity(a -> {
 				original[0] = a.state().app.profile;
 				owner[0] = a.state().app.owner();
-				assertNotNull(MainFlowTest.text(a.getWindow().getDecorView(), "Con IA"));
-				assertNotNull(MainFlowTest.text(a.getWindow().getDecorView(), "Mis rutinas"));
+				assertNotNull(MainFlowTest.text(a.getWindow().getDecorView(), "Rutinas"));
 				assertNotNull(a.getWindow().getDecorView().findViewWithTag("training_tab_exercises"));
-				assertNull("La creación con IA pertenece a su propia vista",
+				assertNotNull("Crear con IA está junto a crear a mano",
 					MainFlowTest.text(a.getWindow().getDecorView(), "Crear rutina con IA"));
 			});
 			try {

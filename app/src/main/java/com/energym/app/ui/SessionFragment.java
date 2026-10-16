@@ -34,25 +34,27 @@ public final class SessionFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		heading("REGISTRA LO REAL", "Tu sesión",
-			"Anota lo que has hecho en cada ejercicio.");
+		heading("", "Tu entreno", app.sessions.session == null ? "" : app.sessions.session.getRoutine().getTitle() +
+			" · apunta lo que haces en cada ejercicio.");
 		if (app.sessions.session == null) {
-			card(app.sessions.busy ? "Abriendo borrador…" : "Sin sesión",
-				app.sessions.busy ? "Consultando sus valores guardados." : "Acepta una rutina desde Entreno.");
+			card(app.sessions.busy ? "Abriendo tu entreno…" : "No hay entreno en marcha",
+				app.sessions.busy ? "Recuperando lo que ya apuntaste." : "Ve a Entreno y pulsa «Empezar entreno».");
 			return;
 		}
 		if (app.sessions.session.getStatus() == Session.Status.FINISHED) {
-			card("Sesión finalizada", "Consulta sus valores en Progreso.");
+			card("Entreno terminado", "Lo tienes en Progreso.");
 			return;
 		}
 		List<String> ids = new ArrayList<>(), names = new ArrayList<>();
 		int i = 0;
 		for (RoutineItem item : app.sessions.session.getRoutine().getItems()) {
 			ids.add(Integer.toString(i++));
-			names.add(item.getExercise().getName());
+			// ✓ marca lo ya apuntado para ver de un vistazo qué falta.
+			names.add((app.sessions.session.getResults().containsKey(item.getExercise().getId()) ? "✓ " : "") +
+				item.getExercise().getName());
 		}
-		section("Ejercicio actual", 8);
-		choice(rows, "selectedExercise", "Ejercicio de la sesión", ids, names, Integer.toString(app.sessions.selected),
+		section("Ejercicio " + (app.sessions.selected + 1) + " de " + ids.size(), 8);
+		choice(rows, "selectedExercise", "Cambiar de ejercicio", ids, names, Integer.toString(app.sessions.selected),
 			value -> app.sessions.select(Integer.parseInt(value)));
 		int saved = app.sessions.session.getResults().size();
 		if (shownResults >= 0 && saved > shownResults)
@@ -68,9 +70,10 @@ public final class SessionFragment extends ScreenFragment {
 		RoutineItem item = app.sessions.item();
 		Exercise e = item.getExercise();
 		LinearLayout context = card(e.getName(),
-			"Propuesta orientativa:\n" + AppController.prescription(e.getMetricType(), item.getPrescription()) +
+			"Lo previsto:\n" + AppController.prescription(e.getMetricType(), item.getPrescription()) +
 				"\n\n" + (app.sessions.session.getResults().containsKey(e.getId()) ?
-				"Valores guardados. Puedes actualizarlos antes de finalizar." : "Todavía sin valores guardados."));
+				"✓ Ya apuntado. Puedes corregirlo antes de terminar." :
+				"Hazlo y apunta abajo lo que has hecho de verdad."));
 		Session last = lastTime(e.getId());
 		if (last != null)
 			text(context, "🕑 La última vez (" + java.time.Instant.ofEpochMilli(last.getCompletedAt())
@@ -78,7 +81,7 @@ public final class SessionFragment extends ScreenFragment {
 				.format(java.time.format.DateTimeFormatter.ofPattern("d/M")) + "): " +
 				AppController.metrics(e.getMetricType(), last.getResults().get(e.getId())), R.style.EnerGym_Body, 12);
 		action(context, "Ver técnica: " + e.getName(), () -> app.openExercise(e));
-		LinearLayout fields = card("Valores realizados", "Rellenado con lo previsto: cambia solo lo que hiciste distinto." +
+		LinearLayout fields = card("Lo que has hecho", "Viene relleno con lo previsto: cambia solo lo que fue distinto." +
 			" Carga 0 = peso corporal.");
 		Map<String, String> inputs = app.sessions.inputs();
 		for (MetricValidator.Field f : new MetricValidator().fields(e.getMetricType()))
@@ -93,19 +96,23 @@ public final class SessionFragment extends ScreenFragment {
 		if (app.sessions.selected + 1 < ids.size())
 			action(rows, "Siguiente ejercicio", !app.sessions.busy,
 				() -> app.sessions.select(app.sessions.selected + 1));
-		section("Cierre", 32);
-		LinearLayout finish = card("Cerrar el entrenamiento",
-			app.sessions.session.getResults().size() + " de " + ids.size() +
-				" ejercicios registrados. Guarda todos antes de finalizar.");
-		action(finish, "Finalizar sesión", !app.sessions.busy, app.sessions::finish);
-		action(finish, "Eliminar borrador", !app.sessions.busy && !app.trainingMutation, () -> {
+		section("Terminar", 32);
+		boolean done = saved >= ids.size();
+		LinearLayout finish = card(done ? "🎉 ¡Todo apuntado!" : "Terminar el entreno", done ?
+			"Termina para guardarlo en tu historial y que tu rutina pueda subir de nivel." :
+			saved + " de " + ids.size() + " ejercicios apuntados. Apunta todos para poder terminar.");
+		com.google.android.material.button.MaterialButton end =
+			action(finish, "Terminar entreno", !app.sessions.busy, app.sessions::finish);
+		if (done)
+			primary(end);
+		action(finish, "Descartar entreno", !app.sessions.busy && !app.trainingMutation, () -> {
 			Session current = app.sessions.session;
 			long scope = app.accountRevision();
 			new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-				.setTitle("¿Eliminar este borrador?")
+				.setTitle("¿Descartar este entreno?")
 				.setMessage("Se eliminarán sus registros de tu cuenta. Esta acción no se puede deshacer.")
 				.setNegativeButton("Cancelar", null)
-				.setPositiveButton("Eliminar", (dialog, button) -> {
+				.setPositiveButton("Descartar", (dialog, button) -> {
 					if (scope == app.accountRevision()) app.deleteSession(current);
 				}).show();
 		});

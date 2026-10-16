@@ -57,12 +57,11 @@ public class MainFlowTest {
 			await();
 			capture("training");
 			trainingPane(scenario, "mine");
-			click(scenario, "Más opciones");
-			click(scenario, "Crear propuesta");
+			click(scenario, "⚡ Una automática ya");
 			capture("proposal");
 			click(scenario, "Aceptar propuesta");
 			await();
-			click(scenario, "Empezar sesión");
+			click(scenario, "Empezar entreno");
 			await();
 			capture("session");
 			scenario.onActivity(a -> {
@@ -82,12 +81,11 @@ public class MainFlowTest {
 			scenario.onActivity(a -> count[0] = a.state().app.sessions.session.getRoutine().getItems().size());
 			for (int i = 0; i < count[0]; i++) {
 				fillMetrics(scenario);
+				// Guardar pasa solo al siguiente ejercicio pendiente.
 				click(scenario, "Guardar ejercicio");
 				await();
-				if (i + 1 < count[0])
-					click(scenario, "Siguiente ejercicio");
 			}
-			click(scenario, "Finalizar sesión");
+			click(scenario, "Terminar entreno");
 			await();
 			capture("history");
 			scenario.onActivity(a -> {
@@ -133,7 +131,7 @@ public class MainFlowTest {
 			capture("assistant");
 			scenario.onActivity(a -> {
 				assertNotNull(text(a.getWindow().getDecorView(), "Enviar mensaje"));
-				assertTrue(textContaining(a.getWindow().getDecorView(), "Soy tu asistente de EnerGym"));
+				assertTrue(textContaining(a.getWindow().getDecorView(), "Soy tu asistente"));
 			});
 		}
 	}
@@ -153,20 +151,20 @@ public class MainFlowTest {
 			click(scenario, "Cuenta");
 			click(scenario, "Entrar en demo local");
 			training(scenario);
-			click(scenario, "Continuar borrador");
+			click(scenario, "Seguir entrenando");
 			fillMetrics(scenario);
 			click(scenario, "Guardar ejercicio");
 			await();
 			assertSavedSquat(context, "8");
 			training(scenario);
-			click(scenario, "Volver a mi sesión");
+			click(scenario, "Seguir entrenando");
 			await();
 			assertSavedSquat(context, "8");
 			scenario.onActivity(a -> assertEquals("8",
 				((EditText) a.getWindow().getDecorView().findViewWithTag("repetitions")).getText().toString()));
 			edit(scenario, "repetitions", "9");
 			training(scenario);
-			click(scenario, "Volver a mi sesión");
+			click(scenario, "Seguir entrenando");
 			scenario.recreate();
 			await();
 			scenario.onActivity(a -> assertEquals("9",
