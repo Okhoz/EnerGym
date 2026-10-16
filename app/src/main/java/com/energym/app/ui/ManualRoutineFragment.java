@@ -55,13 +55,6 @@ public final class ManualRoutineFragment extends ScreenFragment {
 		}
 		if (entries.isEmpty()) text(chosen, "Añade tu primer ejercicio desde el catálogo.", R.style.EnerGym_Body, 8);
 		else prescription(entries.get(c.selected), c.selected, entries.size());
-		LinearLayout save = card("Guardar", "Se guardará en tu cuenta con el contexto propio de esta rutina.");
-		if (!c.error.isEmpty()) {
-			TextView error = text(save, c.error, R.style.EnerGym_Body, 8);
-			error.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
-		}
-		primary(action(save, c.busy ? "Guardando…" : c.editing() ? "Guardar cambios" : "Guardar mi rutina", !c.busy && !app.loading, c::save));
-		action(save, "Volver a entrenamientos", !c.busy, () -> app.navigate(AppController.Screen.TRAINING));
 		LinearLayout library = card("Añadir del catálogo", "Empieza por los ejercicios compatibles. Desmarca la opción para explorar todos y consultar su técnica.");
 		browser = new ExerciseBrowser(this, library, state.manualExerciseBrowser, "manual", true, new ExerciseBrowser.Results() {
 			public List<Exercise> find(String query, ExerciseSearch.Filters filters, boolean onlyCompatible) {
@@ -89,7 +82,14 @@ public final class ManualRoutineFragment extends ScreenFragment {
 					text(target, "Puedes ajustar el contexto de esta rutina o desmarcar «Sólo compatibles» para explorar todos.", R.style.EnerGym_FieldCaption, 8);
 			}
 		});
-
+		// Guardar y volver, siempre al final del formulario.
+		LinearLayout save = card("Guardar", "Se guardará en tu cuenta con el contexto propio de esta rutina.");
+		if (!c.error.isEmpty()) {
+			TextView error = text(save, c.error, R.style.EnerGym_Body, 8);
+			error.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+		}
+		primary(action(save, c.busy ? "Guardando…" : c.editing() ? "Guardar cambios" : "Guardar mi rutina", !c.busy && !app.loading, c::save));
+		action(save, "Volver a entrenamientos", !c.busy, () -> app.navigate(AppController.Screen.TRAINING));
 	}
 
 	private void contextFields() {

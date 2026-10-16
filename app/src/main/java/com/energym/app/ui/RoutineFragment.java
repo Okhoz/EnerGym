@@ -49,6 +49,7 @@ public final class RoutineFragment extends ScreenFragment {
 						.setNegativeButton("Cancelar", null).show();
 				});
 		}
+		text(rows, r.getExplanation(), R.style.EnerGym_FieldCaption, 12);
 		if (app.routines.preview != null) {
 			primary(action(rows, "Aceptar propuesta", app.routines.canAccept(), app.routines::accept));
 			action(rows, "Rechazar propuesta", !app.routines.busy, () -> {
@@ -57,7 +58,6 @@ public final class RoutineFragment extends ScreenFragment {
 			});
 		} else
 			primary(action(rows, "Empezar entreno", !app.sessions.busy, app::startSession));
-		text(rows, r.getExplanation(), R.style.EnerGym_FieldCaption, 12);
 	}
 }
 

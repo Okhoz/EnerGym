@@ -168,6 +168,9 @@ public final class SessionFragment extends ScreenFragment {
 		LinearLayout log = card(e.getName() + " · " + (editing ? "editando serie " + (selectedSet + 1) :
 			"serie " + (sets.size() + 1)), "🎯 Objetivo de hoy: " + planned(item) +
 			(before.isEmpty() ? "" : "\n🕑 La última vez (" + day(last) + "): " + compactSets(before)));
+		com.google.android.material.button.MaterialButton technique =
+			action(log, "Ver técnica", true, () -> app.openExercise(e));
+		technique.setContentDescription("Ver técnica: " + e.getName());
 		stepper(log, "Peso (kg)", "track_kg", kgInput, 2.5, true, v -> {
 			kgInput = v;
 			app.sessions.input("trackKg", v);
@@ -176,6 +179,9 @@ public final class SessionFragment extends ScreenFragment {
 			repsInput = v;
 			app.sessions.input("trackReps", v);
 		});
+		if (sets.isEmpty())
+			text(log, "Ajusta con − y + (o escribe el número) y pulsa «Guardar serie» al acabar cada serie. " +
+				"Peso 0 = peso corporal. Tu objetivo sube solo cuando lo cumples.", R.style.EnerGym_FieldCaption, 12);
 		LinearLayout buttons = columns(log, 12);
 		com.google.android.material.button.MaterialButton save =
 			compact(buttons, editing ? "Actualizar" : "Guardar serie", !app.sessions.busy, () -> {
@@ -205,12 +211,6 @@ public final class SessionFragment extends ScreenFragment {
 				selectedSet = -1;
 				render();
 			});
-		if (sets.isEmpty())
-			text(log, "Ajusta con − y + (o escribe el número) y pulsa «Guardar serie» al acabar cada serie. " +
-				"Peso 0 = peso corporal. Tu objetivo sube solo cuando lo cumples.", R.style.EnerGym_FieldCaption, 12);
-		com.google.android.material.button.MaterialButton technique =
-			action(log, "Ver técnica", true, () -> app.openExercise(e));
-		technique.setContentDescription("Ver técnica: " + e.getName());
 		if (sets.isEmpty())
 			return;
 		double record = previousBest(e.getId());
