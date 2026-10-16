@@ -62,5 +62,10 @@ public interface NutritionStore {
 		 * Entrega null si el código no existe en la base abierta.
 		 */
 		void find(String barcode, Callback<FoodProduct> callback);
+
+		/** Productos de la base abierta cuyo nombre coincide con el texto (vacío si ninguno). */
+		default void search(String query, Callback<java.util.List<FoodProduct>> callback) {
+			callback.failure(new UnsupportedOperationException("Búsqueda no disponible"));
+		}
 	}
 }

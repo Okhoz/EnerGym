@@ -251,11 +251,10 @@ public final class FoodFragment extends ScreenFragment {
 
 	private void showCommon(NutritionController n, LinearLayout results) {
 		results.removeAllViews();
-		List<CommonFoods.Food> found = CommonFoods.search(commonQuery, 6);
-		if (found.isEmpty() && commonQuery.trim().length() >= 2) {
-			text(results, "No está en la lista: escribe abajo los datos de la etiqueta.", R.style.EnerGym_FieldCaption, 4);
-			return;
-		}
+		List<CommonFoods.Food> found = CommonFoods.search(commonQuery, 8);
+		String q = commonQuery.trim();
+		if (found.isEmpty() && q.length() >= 2)
+			text(results, "No está en la lista de habituales.", R.style.EnerGym_FieldCaption, 4);
 		for (CommonFoods.Food f : found) {
 			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, results, false);
 			((TextView) row.findViewById(R.id.food_name)).setText(f.name);
@@ -270,6 +269,39 @@ public final class FoodFragment extends ScreenFragment {
 			});
 			results.addView(row);
 		}
+		online(n, results, q);
+	}
+
+	/**
+	 * Productos de marca de Open Food Facts por nombre (bajo petición: solo se envía el texto buscado). Al elegir
+	 * uno, sus valores quedan fijos como al escanear y solo se indica la cantidad.
+	 */
+	private void online(NutritionController n, LinearLayout results, String q) {
+		if (q.length() < 3)
+			return;
+		boolean mine = q.equals(n.onlineQuery);
+		if (mine && !n.onlineResults.isEmpty()) {
+			text(results, "En Open Food Facts (productos de marca):", R.style.EnerGym_FieldCaption, 12);
+			for (FoodProduct p : n.onlineResults) {
+				android.view.View row = getLayoutInflater().inflate(R.layout.row_food, results, false);
+				((TextView) row.findViewById(R.id.food_name)).setText(p.displayName());
+				((TextView) row.findViewById(R.id.food_detail)).setText((p.quantity.isEmpty() ? "" : p.quantity + " · ") +
+					NutritionController.format(p.kcal100) + " kcal/100 " + p.unit.symbol);
+				((TextView) row.findViewById(R.id.food_kcal)).setText("+");
+				row.setContentDescription("Usar " + p.displayName());
+				row.setOnClickListener(v -> {
+					commonQuery = "";
+					n.useProduct(p);
+					app.changed();
+				});
+				results.addView(row);
+			}
+			return;
+		}
+		com.google.android.material.button.MaterialButton search = action(results,
+			n.searchingOnline && mine ? "Buscando en Open Food Facts…" : "🔎 Buscar «" + q + "» en Open Food Facts",
+			!n.searchingOnline && !n.busy, () -> n.searchOnline(q));
+		search.setTag("food_search_online");
 	}
 
 	private static void suggest(NutritionController n, android.widget.Button button, String typed) {

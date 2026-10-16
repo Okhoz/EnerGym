@@ -87,13 +87,20 @@ public final class FoodProduct {
 		Object status = root.get("status");
 		if (!(status instanceof Number) || ((Number) status).intValue() != 1 || !(root.get("product") instanceof Map))
 			return null;
-		Map<String, Object> product = StrictJson.object(root.get("product"));
+		return fromProduct(barcode, StrictJson.object(root.get("product")));
+	}
+
+	/** Ficha a partir del objeto «product» de Open Food Facts (también el de cada resultado de búsqueda). */
+	static FoodProduct fromProduct(String barcode, Map<String, Object> product) {
 		String name = text(product, "product_name_es");
 		if (name.isEmpty())
 			name = text(product, "product_name");
 		if (name.isEmpty())
 			name = "Producto " + barcode;
-		String brand = text(product, "brands");
+		// La búsqueda nueva devuelve las marcas como lista; la ficha por código, como texto.
+		String brand = product.get("brands") instanceof List && !((List<?>) product.get("brands")).isEmpty() &&
+			((List<?>) product.get("brands")).get(0) instanceof String ?
+			((String) ((List<?>) product.get("brands")).get(0)).trim() : text(product, "brands");
 		if (brand.contains(","))
 			brand = brand.substring(0, brand.indexOf(',')).trim();
 		String quantity = text(product, "quantity");
@@ -114,6 +121,31 @@ public final class FoodProduct {
 		}
 		return new FoodProduct(barcode, limit(name, 120), limit(brand, 60), limit(quantity, 40), unit, kcal,
 			number(n, "proteins_100g"), number(n, "carbohydrates_100g"), number(n, "fat_100g"));
+	}
+
+	/**
+	 * Resultados de la búsqueda por texto de Open Food Facts: solo los que traen al menos las calorías, sin
+	 * repetir código y como mucho {@code limit}.
+	 */
+	public static List<FoodProduct> parseSearch(String json, int limit) {
+		Map<String, Object> root = StrictJson.object(StrictJson.parse(json));
+		List<FoodProduct> result = new ArrayList<>();
+		Set<String> codes = new HashSet<>();
+		Object list = root.get("hits") instanceof List ? root.get("hits") : root.get("products");
+		if (!(list instanceof List))
+			return result;
+		for (Object item : (List<?>) list) {
+			if (!(item instanceof Map) || result.size() >= limit)
+				continue;
+			Map<String, Object> product = StrictJson.object(item);
+			String code = text(product, "code");
+			if (!validBarcode(code) || !codes.add(code))
+				continue;
+			FoodProduct parsed = fromProduct(code, product);
+			if (!Double.isNaN(parsed.kcal100) && !parsed.name.startsWith("Producto "))
+				result.add(parsed);
+		}
+		return result;
 	}
 
 	static boolean volume(String quantity) {

@@ -658,6 +658,61 @@ public final class NutritionController {
 		return true;
 	}
 
+	/** Resultados de la última búsqueda por nombre en Open Food Facts y su texto. */
+	public List<FoodProduct> onlineResults = Collections.emptyList();
+	public String onlineQuery = "";
+	public boolean searchingOnline;
+
+	/** Busca por nombre en Open Food Facts (solo se envía el texto). */
+	public void searchOnline(String query) {
+		if (owner == null || searchingOnline || query == null || query.trim().length() < 3)
+			return;
+		searchingOnline = true;
+		onlineQuery = query.trim();
+		onlineResults = Collections.emptyList();
+		status = "Buscando «" + onlineQuery + "» en Open Food Facts…";
+		changed.run();
+		long token = generation;
+		String asked = onlineQuery;
+		lookup.search(asked, new NutritionStore.Callback<List<FoodProduct>>() {
+			public void success(List<FoodProduct> found) {
+				if (token != generation || !asked.equals(onlineQuery))
+					return;
+				searchingOnline = false;
+				onlineResults = found;
+				status = found.isEmpty() ? "Open Food Facts no tiene productos con «" + asked + "»." : "";
+				changed.run();
+			}
+
+			public void failure(Exception e) {
+				if (token != generation || !asked.equals(onlineQuery))
+					return;
+				searchingOnline = false;
+				status = "Sin conexión con Open Food Facts. Prueba con la lista de habituales o la etiqueta.";
+				changed.run();
+			}
+		});
+	}
+
+	/** Usa un producto encontrado por nombre igual que uno escaneado: sus valores fijos, solo falta la cantidad. */
+	public void useProduct(FoodProduct found) {
+		if (busy || found == null)
+			return;
+		FoodEntry.Meal meal = FoodEntry.Meal.valueOf(foodDraft.getOrDefault("meal", defaultMeal().name()));
+		startManual(meal);
+		product = found;
+		foodDraft.put("barcode", found.barcode);
+		foodDraft.put("name", found.displayName());
+		foodDraft.put("unit", found.unit.name());
+		put("kcal100", found.kcal100);
+		put("protein100", found.protein100);
+		put("carbs100", found.carbs100);
+		put("fat100", found.fat100);
+		onlineResults = Collections.emptyList();
+		status = found.complete() ? "Ficha de Open Food Facts. Indica cuánto has tomado." :
+			"Ficha incompleta: completa los valores que faltan con la etiqueta.";
+	}
+
 	private void put(String key, double value) {
 		foodDraft.put(key, Double.isNaN(value) ? "" : format(value));
 	}

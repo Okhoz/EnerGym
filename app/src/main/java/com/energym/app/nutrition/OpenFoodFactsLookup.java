@@ -55,6 +55,39 @@ public final class OpenFoodFactsLookup implements NutritionStore.Lookup {
 		});
 	}
 
+	/** Búsqueda por nombre (productos vendidos en España primero). Solo envía el texto buscado. */
+	@Override
+	public void search(String query, NutritionStore.Callback<java.util.List<FoodProduct>> callback) {
+		String q = query == null ? "" : query.trim();
+		if (q.length() < 3 || q.length() > 60) {
+			main.execute(() -> callback.success(java.util.Collections.emptyList()));
+			return;
+		}
+		worker.execute(() -> {
+			HttpURLConnection connection = null;
+			try {
+				// Servicio de búsqueda de Open Food Facts (search-a-licious): rápido y con respuestas pequeñas.
+				URL url = new URL("https://search.openfoodfacts.org/search?langs=es&page_size=20&fields=code," + FIELDS +
+					"&q=" + java.net.URLEncoder.encode(q, "UTF-8"));
+				connection = (HttpURLConnection) url.openConnection();
+				connection.setInstanceFollowRedirects(false);
+				connection.setConnectTimeout(6000);
+				connection.setReadTimeout(12000);
+				connection.setRequestProperty("User-Agent", userAgent);
+				connection.setRequestProperty("Accept", "application/json");
+				if (connection.getResponseCode() != 200)
+					throw new IOException("Respuesta " + connection.getResponseCode());
+				java.util.List<FoodProduct> found = FoodProduct.parseSearch(read(connection.getInputStream()), 10);
+				main.execute(() -> callback.success(found));
+			} catch (Exception e) {
+				main.execute(() -> callback.failure(e));
+			} finally {
+				if (connection != null)
+					connection.disconnect();
+			}
+		});
+	}
+
 	private static String read(InputStream input) throws IOException {
 		try (InputStream in = input; ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			byte[] buffer = new byte[4096];

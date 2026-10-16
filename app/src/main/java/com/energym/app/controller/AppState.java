@@ -117,6 +117,12 @@ public final class AppState extends AndroidViewModel {
 		AndroidAppStore store = new AndroidAppStore(sync);
 		app = new AppController(store, catalog);
 		nutritionStore = new com.energym.app.nutrition.SyncedNutritionStore(context, sync);
+		// Tabla de alimentos habituales incluida en la app (sin red).
+		try (java.io.InputStream foods = context.getAssets().open("foods.tsv")) {
+			com.energym.app.nutrition.CommonFoods.load(foods);
+		} catch (java.io.IOException ignored) {
+			// Sin tabla, el buscador de alimentos habituales queda vacío; escanear y la etiqueta siguen igual.
+		}
 		String version;
 		try {
 			version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
