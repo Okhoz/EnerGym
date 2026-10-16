@@ -308,6 +308,53 @@ public class TrainingControllerTest {
 	}
 
 	@Test
+	public void setsAreLoggedOneByOneEditedRemovedAndAllowFinishing() {
+		Store s = new Store();
+		List<String> errors = new ArrayList<>();
+		int[] done = {0};
+		SessionController c = new SessionController(s, () -> {
+		}, errors::add, () -> done[0]++);
+		c.start(routine());
+		s.saving.success(7L);
+		c.addSet(20, 10);
+		s.saving.success(7L);
+		c.addSet(22.5, 8);
+		s.saving.success(7L);
+		assertEquals(2, c.sets().size());
+		Map<String, String> saved = c.session.getResults().get("squat");
+		assertEquals("2", saved.get("sets"));
+		assertEquals("9", saved.get("repetitions"));
+		assertEquals("22.5", saved.get("loadKg"));
+		assertEquals("20:10;22.5:8", saved.get("setLog"));
+		assertEquals("Una serie no hace avanzar de ejercicio", 0, c.selected);
+		c.input("trackKg", "25");
+		c.updateSet(1, 25, 6);
+		s.saving.success(7L);
+		assertEquals(new SetLog.Entry(25, 6), c.sets().get(1));
+		c.addSet(-5, 3);
+		assertFalse("Peso negativo rechazado", errors.isEmpty());
+		c.finish();
+		assertEquals("Lo escrito en − / + no cuenta como cambios sin guardar", 1, s.finishes);
+	}
+
+	@Test
+	public void removingTheLastSetClearsTheExercise() {
+		Store s = new Store();
+		SessionController c = new SessionController(s, () -> {
+		}, e -> {
+		}, () -> {
+		});
+		c.start(routine());
+		s.saving.success(7L);
+		c.addSet(0, 12);
+		s.saving.success(7L);
+		c.removeSet(0);
+		s.saving.success(7L);
+		assertTrue(c.sets().isEmpty());
+		assertFalse(c.session.getResults().containsKey("squat"));
+	}
+
+	@Test
 	public void savingAnExerciseMovesToTheNextOneStillWithoutValues() {
 		Routine first = routine();
 		Exercise other =

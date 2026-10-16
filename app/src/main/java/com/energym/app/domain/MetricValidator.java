@@ -103,6 +103,9 @@ public final class MetricValidator {
 			if (!v.isEmpty())
 				result.put(f.key, v.replace(',', '.'));
 		}
+		// Fuerza también conserva sus series una a una (estilo FitNotes) si el formato es válido.
+		if (type == MetricType.STRENGTH && SetLog.valid(values.get(SetLog.KEY)))
+			result.put(SetLog.KEY, values.get(SetLog.KEY));
 		return result;
 	}
 }

@@ -175,6 +175,58 @@ public final class SessionController {
 		save(next, this::advance);
 	}
 
+	/** Series ya apuntadas del ejercicio actual (vacío si no es de fuerza o aún no hay). */
+	public List<SetLog.Entry> sets() {
+		RoutineItem item = item();
+		if (item == null || item.getExercise().getMetricType() != MetricType.STRENGTH)
+			return Collections.emptyList();
+		return SetLog.of(session.getResults().get(item.getExercise().getId()));
+	}
+
+	/** Apunta una serie (peso y repeticiones) y la guarda al momento, como en FitNotes. */
+	public void addSet(double kg, int reps) {
+		changeSets(list -> list.add(new SetLog.Entry(kg, reps)), kg, reps);
+	}
+
+	public void updateSet(int index, double kg, int reps) {
+		changeSets(list -> {
+			if (index >= 0 && index < list.size())
+				list.set(index, new SetLog.Entry(kg, reps));
+		}, kg, reps);
+	}
+
+	public void removeSet(int index) {
+		changeSets(list -> {
+			if (index >= 0 && index < list.size())
+				list.remove(index);
+		}, 0, 1);
+	}
+
+	private void changeSets(Consumer<List<SetLog.Entry>> change, double kg, int reps) {
+		RoutineItem item = item();
+		if (busy || item == null || session.getStatus() != Session.Status.DRAFT ||
+			item.getExercise().getMetricType() != MetricType.STRENGTH)
+			return;
+		if (kg < 0 || kg > 9999 || reps < 1 || reps > 999) {
+			error.accept("Revisa el peso (0 o más) y las repeticiones (1 o más).");
+			return;
+		}
+		List<SetLog.Entry> list = new ArrayList<>(sets());
+		change.accept(list);
+		if (list.size() > SetLog.MAX_SETS) {
+			error.accept("Máximo " + SetLog.MAX_SETS + " series por ejercicio.");
+			return;
+		}
+		String id = item.getExercise().getId();
+		String rest = item.getPrescription().getOrDefault("restSeconds", "60");
+		Map<String, String> values = SetLog.summary(list, session.getResults().get(id), rest);
+		Session next = values == null ? session.withoutResult(id) : session.withResult(id, values);
+		// Lo editable refleja lo guardado: así «terminar» no lo ve como cambios sin guardar.
+		edits.remove(id);
+		save(next, () -> {
+		});
+	}
+
 	/** Primer ejercicio sin valores guardados; el primero si ya están todos. */
 	private int firstPending() {
 		List<RoutineItem> items = session.getRoutine().getItems();

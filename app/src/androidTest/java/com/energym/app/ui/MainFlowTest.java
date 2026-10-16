@@ -71,19 +71,18 @@ public class MainFlowTest {
 			});
 			await();
 			capture("session-metrics");
-			edit(scenario, "sets", "2");
-			edit(scenario, "repetitions", "8");
+			edit(scenario, "track_reps", "8");
 			scenario.recreate();
 			await();
 			scenario.onActivity(a -> assertEquals("8",
-				((EditText) a.getWindow().getDecorView().findViewWithTag("repetitions")).getText().toString()));
+				((EditText) a.getWindow().getDecorView().findViewWithTag("track_reps")).getText().toString()));
 			int[] count = {0};
 			scenario.onActivity(a -> count[0] = a.state().app.sessions.session.getRoutine().getItems().size());
 			for (int i = 0; i < count[0]; i++) {
-				fillMetrics(scenario);
-				// Guardar pasa solo al siguiente ejercicio pendiente.
-				click(scenario, "Guardar ejercicio");
+				int index = i;
+				scenario.onActivity(a -> a.state().app.sessions.select(index));
 				await();
+				logCurrent(scenario);
 			}
 			click(scenario, "Terminar entreno");
 			await();
@@ -152,23 +151,21 @@ public class MainFlowTest {
 			click(scenario, "Entrar en demo local");
 			training(scenario);
 			click(scenario, "Seguir entrenando");
-			fillMetrics(scenario);
-			click(scenario, "Guardar ejercicio");
-			await();
+			logCurrent(scenario);
 			assertSavedSquat(context, "8");
 			training(scenario);
 			click(scenario, "Seguir entrenando");
 			await();
 			assertSavedSquat(context, "8");
 			scenario.onActivity(a -> assertEquals("8",
-				((EditText) a.getWindow().getDecorView().findViewWithTag("repetitions")).getText().toString()));
-			edit(scenario, "repetitions", "9");
+				((EditText) a.getWindow().getDecorView().findViewWithTag("track_reps")).getText().toString()));
+			edit(scenario, "track_reps", "9");
 			training(scenario);
 			click(scenario, "Seguir entrenando");
 			scenario.recreate();
 			await();
 			scenario.onActivity(a -> assertEquals("9",
-				((EditText) a.getWindow().getDecorView().findViewWithTag("repetitions")).getText().toString()));
+				((EditText) a.getWindow().getDecorView().findViewWithTag("track_reps")).getText().toString()));
 			assertSavedSquat(context, "8");
 		}
 	}
@@ -186,6 +183,23 @@ public class MainFlowTest {
 			R.id.navigation)).setSelectedItemId(R.id.tab_training));
 		await();
 		trainingPane(scenario, "mine");
+	}
+
+	/** Fuerza: dos series de 8 a peso corporal con el registro estilo FitNotes; el resto, su formulario. */
+	private void logCurrent(ActivityScenario<MainActivity> scenario) {
+		boolean[] tracker = {false};
+		scenario.onActivity(a -> tracker[0] = a.getWindow().getDecorView().findViewWithTag("track_kg") != null);
+		if (tracker[0]) {
+			edit(scenario, "track_kg", "0");
+			edit(scenario, "track_reps", "8");
+			click(scenario, "Guardar serie");
+			await();
+			click(scenario, "Guardar serie");
+		} else {
+			fillMetrics(scenario);
+			click(scenario, "Guardar ejercicio");
+		}
+		await();
 	}
 
 	private void fillMetrics(ActivityScenario<MainActivity> s) {

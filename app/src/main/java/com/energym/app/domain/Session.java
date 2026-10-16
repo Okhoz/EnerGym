@@ -61,6 +61,15 @@ public final class Session {
 		return new Session(syncId, routine, copy, startedAt, 0, status);
 	}
 
+	/** Quita lo apuntado de un ejercicio (p. ej. al borrar su última serie). */
+	public Session withoutResult(String exerciseId) {
+		if (status != Status.DRAFT)
+			throw new IllegalStateException("Sesión finalizada");
+		Map<String, Map<String, String>> copy = new LinkedHashMap<>(results);
+		copy.remove(exerciseId);
+		return new Session(syncId, routine, copy, startedAt, 0, status);
+	}
+
 	/**
 	 * Finalización monotónica e idempotente: no cambia el primer instante de finalización.
 	 */
