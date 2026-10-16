@@ -60,6 +60,65 @@ public abstract class ScreenFragment extends Fragment {
 			return;
 		}
 		content();
+		spaceButtons(rows);
+	}
+
+	/**
+	 * Misma separación para todos los botones de la app: 16 dp entre botones apilados y entre el texto de una
+	 * tarjeta y su primer botón, el mismo hueco entre botones en fila y, tras una tarjeta, solo el margen de la
+	 * tarjeta. Se aplica al final de cada pintado para que ninguna pantalla lo ajuste a mano.
+	 */
+	private void spaceButtons(ViewGroup group) {
+		int gap = getResources().getDimensionPixelSize(R.dimen.button_gap);
+		boolean vertical = group instanceof LinearLayout &&
+			((LinearLayout) group).getOrientation() == LinearLayout.VERTICAL;
+		// Tarjeta sin botones: su zona de acciones vacía no añade hueco abajo.
+		if (group.getId() == R.id.card_actions)
+			group.setVisibility(group.getChildCount() == 0 ? View.GONE : View.VISIBLE);
+		for (int i = 0; i < group.getChildCount(); i++) {
+			View child = group.getChildAt(i);
+			if (vertical && isButtonish(child) && child.getLayoutParams() instanceof LinearLayout.LayoutParams) {
+				LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) child.getLayoutParams();
+				View before = previousVisible(group, i);
+				boolean firstInCard = before == null && group.getId() == R.id.card_actions;
+				boolean afterCard = before != null && before.findViewById(R.id.card_actions) != null;
+				lp.topMargin = firstInCard || afterCard ? 0 : gap;
+				lp.bottomMargin = 0;
+				child.setLayoutParams(lp);
+			}
+			if (child instanceof LinearLayout && isButtonRow((LinearLayout) child)) {
+				LinearLayout row = (LinearLayout) child;
+				for (int j = 1; j < row.getChildCount(); j++) {
+					LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) row.getChildAt(j).getLayoutParams();
+					lp.setMarginStart(gap);
+					row.getChildAt(j).setLayoutParams(lp);
+				}
+				continue;
+			}
+			if (child instanceof ViewGroup)
+				spaceButtons((ViewGroup) child);
+		}
+	}
+
+	private static View previousVisible(ViewGroup group, int index) {
+		for (int i = index - 1; i >= 0; i--)
+			if (group.getChildAt(i).getVisibility() != View.GONE)
+				return group.getChildAt(i);
+		return null;
+	}
+
+	private static boolean isButtonish(View v) {
+		return v instanceof MaterialButton || (v instanceof LinearLayout && isButtonRow((LinearLayout) v));
+	}
+
+	/** Fila horizontal formada solo por botones (no los − / + con su campo, que llevan su propio diseño). */
+	private static boolean isButtonRow(LinearLayout row) {
+		if (row.getOrientation() != LinearLayout.HORIZONTAL || row.getChildCount() < 2)
+			return false;
+		for (int i = 0; i < row.getChildCount(); i++)
+			if (!(row.getChildAt(i) instanceof MaterialButton))
+				return false;
+		return true;
 	}
 
 	protected abstract void content();
