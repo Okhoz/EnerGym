@@ -188,8 +188,9 @@ public final class AssistantFragment extends ScreenFragment {
 		TextView view = new TextView(requireContext());
 		view.setTextAppearance(mine ? R.style.EnerGym_ChatUser : R.style.EnerGym_ChatAssistant);
 		view.setBackgroundResource(mine ? R.drawable.bubble_user : R.drawable.bubble_assistant);
-		int h = dp(16), v = dp(12);
+		int h = dp(18), v = dp(14);
 		view.setPadding(h, v, h, v);
+		view.setLineSpacing(dp(2), 1f);
 		view.setTextIsSelectable(true);
 		view.setText(message);
 		view.setContentDescription((mine ? "Tú: " : "Asistente: ") + message);
@@ -197,7 +198,7 @@ public final class AssistantFragment extends ScreenFragment {
 		LinearLayout.LayoutParams params =
 			new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 		params.gravity = mine ? Gravity.END : Gravity.START;
-		params.topMargin = dp(10);
+		params.topMargin = dp(16);
 		rows.addView(view, params);
 		return view;
 	}

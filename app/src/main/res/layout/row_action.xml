@@ -6,7 +6,7 @@
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
 	android:minHeight="@dimen/primary_touch_target"
-	android:layout_marginTop="@dimen/space_inline"
+	android:layout_marginTop="@dimen/button_gap"
 	android:layout_marginBottom="0dp"
 	android:textSize="15sp"
 	tools:text="Acción de ejemplo"

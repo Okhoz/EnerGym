@@ -144,10 +144,15 @@ public abstract class ScreenFragment extends Fragment {
 		MaterialButton b = (MaterialButton) getLayoutInflater().inflate(R.layout.row_action, row, false);
 		b.setText(label);
 		b.setEnabled(enabled);
-		b.setMinHeight(dp(48));
+		b.setMinHeight(dp(52));
 		b.setTextSize(14);
+		// En una fila, cada botón cabe en una línea: el texto se reduce un poco antes de partirse.
+		b.setMaxLines(1);
+		b.setPadding(dp(12), b.getPaddingTop(), dp(12), b.getPaddingBottom());
+		androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(b, 11, 14, 1,
+			android.util.TypedValue.COMPLEX_UNIT_SP);
 		b.setOnClickListener(v -> event.run());
-		return column(row, b, 12);
+		return column(row, b, 16);
 	}
 
 	/**
@@ -165,7 +170,7 @@ public abstract class ScreenFragment extends Fragment {
 		box.addView(number);
 		box.addView(label);
 		box.setContentDescription(value + " " + caption);
-		return column(row, box, 12);
+		return column(row, box, 16);
 	}
 
 	protected TextView text(LinearLayout target, String value, int style, int topDp) {
