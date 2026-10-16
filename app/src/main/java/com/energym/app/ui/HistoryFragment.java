@@ -121,9 +121,32 @@ public final class HistoryFragment extends ScreenFragment {
 			add(weight, new LineChartView(requireContext()), 8).set(kg,
 				new String[]{short_(days.get(0)), short_(days.get(days.size() - 1))}, "kg", "Evolución del peso");
 		}
+		achievements(stats, n);
 		body();
 		calendar(stats, n);
 		breakdown();
+	}
+
+	/** Logros que se ganan solos: los conseguidos y el siguiente de cada tipo con lo que falta. */
+	private void achievements(ProgressStats stats, NutritionController n) {
+		List<Achievements.Badge> badges = Achievements.of(stats.total(), stats.weekStreak(), stats.totalVolume(),
+			stats.totalMinutes(), Achievements.records(app.history), n == null ? 0 : n.loggedDays().size());
+		int earned = 0;
+		for (Achievements.Badge b : badges)
+			if (b.earned()) earned++;
+		section("Logros", 32);
+		LinearLayout card = card("🏅 " + earned + (earned == 1 ? " logro conseguido" : " logros conseguidos"),
+			"Se ganan solos al entrenar y anotar. Debajo de cada tipo, lo que te falta para el siguiente.");
+		for (Achievements.Badge b : badges) {
+			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, card, false);
+			((TextView) row.findViewById(R.id.food_name)).setText(b.icon + "  " + b.title);
+			((TextView) row.findViewById(R.id.food_detail)).setText(b.detail);
+			((TextView) row.findViewById(R.id.food_kcal)).setText(b.earned() ? "✓" :
+				Math.round(Math.min(99, b.value * 100 / b.goal)) + " %");
+			row.setAlpha(b.earned() ? 1f : 0.6f);
+			row.setContentDescription(b.title + ". " + b.detail);
+			card.addView(row);
+		}
 	}
 
 	// ---------------- Cuerpo: medidas y fotos ----------------
