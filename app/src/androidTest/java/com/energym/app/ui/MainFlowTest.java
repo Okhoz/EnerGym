@@ -245,6 +245,17 @@ public class MainFlowTest {
 		return false;
 	}
 
+	/** Abre (si está plegado) un apartado de Cuenta › Ajustes: backup, assistant, reminders, preferences, device. */
+	static void setting(ActivityScenario<MainActivity> s, String key) {
+		s.onActivity(a -> {
+			View v = a.getWindow().getDecorView().findViewWithTag("setting_" + key);
+			assertNotNull("Ajuste ausente: " + key, v);
+			if (((android.widget.TextView) v).getText().toString().endsWith("›"))
+				v.performClick();
+		});
+		await();
+	}
+
 	static void click(ActivityScenario<MainActivity> s, String label) {
 		s.onActivity(a -> {
 			// «Cuenta» está en el menú ☰ de arriba a la derecha.

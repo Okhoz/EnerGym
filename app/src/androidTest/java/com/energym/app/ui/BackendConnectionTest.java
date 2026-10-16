@@ -33,6 +33,7 @@ public class BackendConnectionTest {
 			s.onActivity(a -> ((com.google.android.material.bottomnavigation.BottomNavigationView) a.findViewById(R.id.navigation)).setSelectedItemId(R.id.tab_assistant));
 			MainFlowTest.await();
 			MainFlowTest.click(s, "Cuenta");
+			MainFlowTest.setting(s, "assistant");
 			MainFlowTest.click(s, "Conectar servidor de IA");
 			MainFlowTest.edit(s, "assistant_endpoint", url);
 			MainFlowTest.edit(s, "assistant_pairing", code);

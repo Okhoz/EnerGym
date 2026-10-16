@@ -73,6 +73,7 @@ public class GeminiLiveConnectionTest {
 				});
 				MainFlowTest.await();
 				MainFlowTest.click(scenario, "Cuenta");
+				MainFlowTest.setting(scenario, "assistant");
 				MainFlowTest.click(scenario, "Conectar servidor de IA");
 				MainFlowTest.edit(scenario, "assistant_endpoint", url);
 				MainFlowTest.edit(scenario, "assistant_pairing", code);

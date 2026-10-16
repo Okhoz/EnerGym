@@ -38,6 +38,7 @@ public class LocalDeletionFlowTest {
 					assertNotNull(a.state().assistant.preview);
 					a.state().app.navigate(AppController.Screen.ACCOUNT);
 				});
+				MainFlowTest.setting(scenario, "device");
 				MainFlowTest.click(scenario, "Borrar datos locales");
 				scenario.onActivity(a -> {
 					androidx.fragment.app.DialogFragment fragment =
@@ -48,6 +49,7 @@ public class LocalDeletionFlowTest {
 						.performClick();
 				});
 				assertNotNull(demo.loadProfile());
+				MainFlowTest.setting(scenario, "device");
 				MainFlowTest.click(scenario, "Borrar datos locales");
 				scenario.onActivity(a -> {
 					androidx.fragment.app.DialogFragment fragment =

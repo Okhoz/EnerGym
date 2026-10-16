@@ -60,7 +60,7 @@ public final class AccountFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		heading("CUENTA Y AJUSTES", "Cuenta", getString(R.string.account_intro));
+		heading("", "Cuenta", "");
 		AccountUser user = state.user;
 		LinearLayout account = card(state.accountText(), user == null ? getString(R.string.account_signed_out) : user.getEmail());
 		boolean signing = state.accountStatus == AccountController.Status.SIGNING_IN || state.deletingLocalData;
@@ -77,15 +77,23 @@ public final class AccountFragment extends ScreenFragment {
 			});
 		else if (app.owner() != null)
 			action(account, getString(R.string.account_sign_out), !signing, state.accounts::signOut);
-		LinearLayout backup =
-			card("Respaldo", state.syncText() + (state.syncError.isEmpty() ? "" : "\n" + state.syncError));
-		if (user != null)
-			action(backup, "Reintentar sincronización", !signing, state.sync::requestSync);
-		card("Separación de cuentas",
-			getString(R.string.account_separation));
-		assistantServer();
-		reminders();
-		preferences();
+		// Ajustes como lista plegable: solo uno abierto a la vez para no saturar la pantalla.
+		section("Ajustes", 32);
+		if (fold("backup", "☁️  Respaldo")) {
+			LinearLayout backup =
+				card("Respaldo", state.syncText() + (state.syncError.isEmpty() ? "" : "\n" + state.syncError));
+			if (user != null)
+				action(backup, "Reintentar sincronización", !signing, state.sync::requestSync);
+			text(backup, getString(R.string.account_separation), R.style.EnerGym_FieldCaption, 12);
+		}
+		if (app.owner() != null && state.assistant != null && fold("assistant", "✦  Entrenador con IA"))
+			assistantServer();
+		if (state.reminders != null && fold("reminders", "⏰  Recordatorios"))
+			reminders();
+		if (fold("preferences", "⚙️  Preferencias, Health Connect y CSV"))
+			preferences();
+		if (!fold("device", "🗑  Datos de este dispositivo"))
+			return;
 		LinearLayout local = card("Datos de este dispositivo",
 			getString(R.string.account_local_data));
 		action(local, "Borrar datos locales", app.owner() != null && !signing, () -> {
@@ -98,6 +106,22 @@ public final class AccountFragment extends ScreenFragment {
 			dialog.show(getParentFragmentManager(), "delete-local-confirmation");
 		});
 	}
+
+	/** Cabecera plegable de un ajuste; devuelve si está abierto. Abrir uno cierra el anterior. */
+	private boolean fold(String key, String label) {
+		boolean open = key.equals(openSetting);
+		com.google.android.material.button.MaterialButton header = action(rows, label + (open ? "   ▴" : "   ›"), true, () -> {
+			openSetting = open ? "" : key;
+			render();
+		});
+		header.setTag("setting_" + key);
+		header.setTextAlignment(android.view.View.TEXT_ALIGNMENT_VIEW_START);
+		header.setGravity(android.view.Gravity.START | android.view.Gravity.CENTER_VERTICAL);
+		return open;
+	}
+
+	/** Ajuste desplegado; sobrevive a los repintados mientras la app está abierta. */
+	private static String openSetting = "";
 
 	/**
 	 * Ajustes del asistente fuera del chat: servidor de IA emparejado o guiado local gratuito por reglas.
