@@ -208,21 +208,29 @@ public final class SessionController {
 
 	/** Serie con su tipo (calentamiento, drop set, al fallo) y esfuerzo percibido (RPE 1–10, 0 sin indicar). */
 	public void addSet(double kg, int reps, SetLog.Kind kind, double rpe) {
-		changeSets(list -> list.add(new SetLog.Entry(kg, reps, kind, rpe)), kg, reps);
+		addSet(kg, reps, kind, rpe, () -> {
+		});
+	}
+
+	/** Igual, y {@code then} se ejecuta cuando la serie ya está guardada (p. ej. pasar al siguiente de la superserie). */
+	public void addSet(double kg, int reps, SetLog.Kind kind, double rpe, Runnable then) {
+		changeSets(list -> list.add(new SetLog.Entry(kg, reps, kind, rpe)), kg, reps, then);
 	}
 
 	public void updateSet(int index, double kg, int reps) {
 		changeSets(list -> {
 			if (index >= 0 && index < list.size())
 				list.set(index, new SetLog.Entry(kg, reps, list.get(index).kind, list.get(index).rpe));
-		}, kg, reps);
+		}, kg, reps, () -> {
+		});
 	}
 
 	public void updateSet(int index, double kg, int reps, SetLog.Kind kind, double rpe) {
 		changeSets(list -> {
 			if (index >= 0 && index < list.size())
 				list.set(index, new SetLog.Entry(kg, reps, kind, rpe));
-		}, kg, reps);
+		}, kg, reps, () -> {
+		});
 	}
 
 	/** Nota del ejercicio actual en este entreno; se guarda al momento si ya tiene valores. */
@@ -261,10 +269,11 @@ public final class SessionController {
 		changeSets(list -> {
 			if (index >= 0 && index < list.size())
 				list.remove(index);
-		}, 0, 1);
+		}, 0, 1, () -> {
+		});
 	}
 
-	private void changeSets(Consumer<List<SetLog.Entry>> change, double kg, int reps) {
+	private void changeSets(Consumer<List<SetLog.Entry>> change, double kg, int reps, Runnable then) {
 		RoutineItem item = item();
 		if (busy || item == null || session.getStatus() != Session.Status.DRAFT ||
 			item.getExercise().getMetricType() != MetricType.STRENGTH)
@@ -289,8 +298,7 @@ public final class SessionController {
 		Session next = values == null ? session.withoutResult(id) : session.withResult(id, values);
 		// Lo editable refleja lo guardado: así «terminar» no lo ve como cambios sin guardar.
 		edits.remove(id);
-		save(next, () -> {
-		});
+		save(next, then);
 	}
 
 	/** Primer ejercicio sin valores guardados; el primero si ya están todos. */

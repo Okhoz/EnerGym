@@ -63,12 +63,14 @@ public final class SessionFragment extends ScreenFragment {
 			return;
 		}
 		List<String> ids = new ArrayList<>(), names = new ArrayList<>();
+		Set<Integer> links = links();
 		int i = 0;
 		for (RoutineItem item : app.sessions.session.getRoutine().getItems()) {
+			String group = Supersets.label(links, i);
 			ids.add(Integer.toString(i++));
-			// ✓ marca lo ya apuntado para ver de un vistazo qué falta.
+			// ✓ marca lo ya apuntado para ver de un vistazo qué falta; A1/A2 las superseries.
 			names.add((app.sessions.session.getResults().containsKey(item.getExercise().getId()) ? "✓ " : "") +
-				item.getExercise().getName());
+				(group.isEmpty() ? "" : group + " · ") + item.getExercise().getName());
 		}
 		section("Ejercicio " + (app.sessions.selected + 1) + " de " + ids.size(), 8);
 		choice(rows, "selectedExercise", "Cambiar de ejercicio", ids, names, Integer.toString(app.sessions.selected),
@@ -232,8 +234,16 @@ public final class SessionFragment extends ScreenFragment {
 				if (editing)
 					app.sessions.updateSet(selectedSet, kg, reps, kind, rpe);
 				else {
-					app.sessions.addSet(kg, reps, kind, rpe);
-					startRest(item);
+					// En superserie o circuito se pasa al siguiente sin descanso; se descansa al cerrar la vuelta.
+					int from = app.sessions.selected;
+					Set<Integer> group = links();
+					app.sessions.addSet(kg, reps, kind, rpe, () -> {
+						int to = Supersets.after(group, from);
+						if (to != from && app.sessions.selected == from)
+							app.sessions.select(to);
+					});
+					if (Supersets.restsAfter(group, from))
+						startRest(item);
 				}
 				selectedSet = -1;
 			});
@@ -251,6 +261,23 @@ public final class SessionFragment extends ScreenFragment {
 		double best = Math.max(previousBest(e.getId()), SetLog.best(sets));
 		action(log, "🏋️ Discos y tabla 1RM", true, () -> PlateDialog.show(requireContext(),
 			Plates.toKg(number(kgInput, 0), lb), best, lb)).setTag("track_plates");
+		int count = app.sessions.session.getRoutine().getItems().size();
+		int at = app.sessions.selected;
+		if (!editing && at + 1 < count) {
+			Set<Integer> links = links();
+			String next = app.sessions.session.getRoutine().getItems().get(at + 1).getExercise().getName();
+			action(log, links.contains(at) ? "🔗 Quitar superserie con " + next : "🔗 Hacer superserie con " + next,
+				!app.sessions.busy, () -> {
+					Set<Integer> changed = new TreeSet<>(links);
+					if (!changed.remove(at))
+						changed.add(at);
+					saveLinks(changed);
+					android.widget.Toast.makeText(requireContext(), changed.contains(at) ?
+						"Superserie: tras cada serie pasarás a " + next + " sin descanso" : "Superserie quitada",
+						android.widget.Toast.LENGTH_SHORT).show();
+					render();
+				}).setTag("track_superset");
+		}
 		if (editing)
 			action(log, "Cancelar edición", true, () -> {
 				selectedSet = -1;
@@ -294,6 +321,19 @@ public final class SessionFragment extends ScreenFragment {
 			});
 			list.addView(row);
 		}
+	}
+
+	/** Superseries de este entreno (índices enlazados con el siguiente), guardadas en este móvil. */
+	private Set<Integer> links() {
+		if (app.sessions.session == null)
+			return Collections.emptySet();
+		return Supersets.decode(requireContext().getSharedPreferences("supersets", android.content.Context.MODE_PRIVATE)
+			.getString(app.sessions.session.getSyncId(), ""), app.sessions.session.getRoutine().getItems().size());
+	}
+
+	private void saveLinks(Set<Integer> links) {
+		requireContext().getSharedPreferences("supersets", android.content.Context.MODE_PRIVATE).edit()
+			.putString(app.sessions.session.getSyncId(), Supersets.encode(links)).apply();
 	}
 
 	/** «Calentamiento · RPE 8 · detalle»: tipo y esfuerzo de una serie delante del detalle que ya hubiera. */
