@@ -56,16 +56,15 @@ public final class NutritionFragment extends ScreenFragment {
 
 		double[] totals = n.totals(day);
 		BodyProfile.Targets targets = n.targets();
-		section("Tu objetivo", 20);
-		dailyGoal(n, targets);
-		diet(n, targets);
-		if (targets != null)
-			section("Hoy", 32);
-		remaining(n, day, totals, targets);
+		// Arriba, de un vistazo: lo que te queda hoy (o configurar el objetivo si aún no hay).
+		if (targets == null)
+			dailyGoal(n, null);
+		else
+			remaining(n, day, totals, targets);
 		water(n, day);
-		section("Tus comidas", 32);
 
-		// Diario por comidas, como en un registro de calorías: cada comida con su total y su botón de añadir.
+		section("Tus comidas", 32);
+		// Solo las comidas con algo anotado; si el día está vacío, una tarjeta y copiar lo de ayer a un toque.
 		List<FoodEntry> entries = n.entriesOn(day);
 		for (FoodEntry.Meal meal : FoodEntry.Meal.values()) {
 			List<FoodEntry> items = new ArrayList<>();
@@ -75,54 +74,53 @@ public final class NutritionFragment extends ScreenFragment {
 					items.add(e);
 					mealKcal += e.kcal();
 				}
-			if (items.isEmpty() && meal == FoodEntry.Meal.OTHER)
+			if (items.isEmpty())
 				continue;
-			LinearLayout section = card(MEALS[meal.ordinal()] + (items.isEmpty() ? "" : "   " + Math.round(mealKcal) +
-				" kcal"), "");
+			LinearLayout section = card(MEALS[meal.ordinal()] + "   " + Math.round(mealKcal) + " kcal", "");
 			for (FoodEntry e : items)
 				foodRow(section, e, n);
-			if (items.isEmpty())
-				text(section, "Nada anotado todavía.", R.style.EnerGym_FieldCaption, 0);
-			List<FoodEntry> before = new ArrayList<>();
-			for (FoodEntry e : n.entriesOn(day.minusDays(1)))
-				if (e.meal == meal)
-					before.add(e);
-			// Lo de ayer a un toque (si hoy aún no has anotado esa comida) y guardar la comida para repetirla.
-			if (items.isEmpty() && !before.isEmpty())
-				action(section, "↺ Copiar de ayer (" + before.size() + (before.size() == 1 ? " alimento)" : " alimentos)"),
-					!n.busy, () -> n.logAll(before, meal, MEALS[meal.ordinal()] + " copiado de ayer", () -> {
-					})).setTag("copy_yesterday_" + meal.name());
-			if (!items.isEmpty())
-				action(section, "★ Guardar como comida", !n.busy, () -> saveMeal(items, MEALS[meal.ordinal()]))
-					.setTag("save_meal_" + meal.name());
+			action(section, "★ Guardar como comida", !n.busy, () -> saveMeal(items, MEALS[meal.ordinal()]))
+				.setTag("save_meal_" + meal.name());
+		}
+		if (entries.isEmpty()) {
+			List<FoodEntry> yesterday = n.entriesOn(day.minusDays(1));
+			LinearLayout empty = card("Nada anotado " + (day.equals(n.today()) ? "hoy" : "este día"),
+				"Pulsa «+ Añadir» o escanea un código de barras.");
+			if (!yesterday.isEmpty())
+				action(empty, "↺ Copiar lo del día anterior (" + yesterday.size() +
+					(yesterday.size() == 1 ? " alimento)" : " alimentos)"), !n.busy,
+					() -> n.logAll(yesterday, null, "Copiado del día anterior", () -> {
+					})).setTag("copy_yesterday");
 		}
 		savedMeals(n);
 		if (!n.status.isEmpty())
 			text(rows, n.status, R.style.EnerGym_FieldCaption, 0);
 
-		// La evolución (calorías por día, peso…) se ve en Progreso; aquí solo se anota.
-		action(rows, "📊 Ver tu evolución en Progreso", true, () -> app.navigate(Screen.HISTORY))
-			.setTag("nutrition_to_progress");
-		BodyProfile current = n.effectiveBody();
-		LinearLayout body = card("Peso y datos físicos", current == null ? "Sin datos físicos." :
-			"Peso actual " + NutritionController.format(current.weightKg) + " kg" + (targets == null ? "" :
-				" · mantenimiento estimado " + Math.round(current.maintenance()) + " kcal/día") +
-				(n.body.allergies.isEmpty() ? "" : "\nAlergias declaradas: " + n.body.allergies));
-		String[] typed = {""};
-		textField(body, "weight", "Peso de hoy (kg)", "", true, false, v -> typed[0] = v);
-		action(body, "Anotar peso", !n.busy, () -> n.logWeight(typed[0]));
-		action(body, n.body == null ? "Completar mis datos" : "Editar mis datos", true, () -> open(Screen.BODY));
+		// Lo que no se usa a diario, plegado: objetivo, consulta con la IA y la dieta del mes.
+		section("Más", 32);
+		MaterialButton more = action(rows, moreOpen ? "Ocultar ▴" : "Objetivo, dieta del mes e IA ▾", true, () -> {
+			moreOpen = !moreOpen;
+			render();
+		});
+		more.setTag("nutrition_more");
+		if (moreOpen) {
+			if (targets != null)
+				dailyGoal(n, targets);
+			diet(n, targets);
+			text(rows, "Datos de Open Food Facts (ODbL): revisa la etiqueta. Objetivos estimados; no sustituyen a un " +
+				"dietista o médico.", R.style.EnerGym_FieldCaption, 4);
+		}
 
-		text(rows, "Datos de Open Food Facts (ODbL): revisa la etiqueta. Objetivos estimados; no sustituyen a un " +
-			"dietista o médico.", R.style.EnerGym_FieldCaption, 4);
-		// Añadir comida, siempre al final de la pantalla (la comida se elige en el formulario según la hora).
-		MaterialButton addFood = action(rows, "+ Añadir alimento", !n.busy, () -> {
+		// Añadir, siempre al final: alimento a mano o escaneando.
+		LinearLayout add = columns(rows, 32);
+		MaterialButton addFood = compact(add, "+ Añadir", !n.busy, () -> {
 			n.startManual(n.defaultMeal());
 			app.navigate(Screen.FOOD);
 		});
 		primary(addFood);
 		addFood.setTag("nutrition_add_food");
-		action(rows, "Escanear código de barras", !n.busy, () -> {
+		addFood.setContentDescription("Añadir alimento");
+		compact(add, "Escanear", !n.busy, () -> {
 			n.startManual(n.defaultMeal());
 			scan(this);
 		}).setTag("nutrition_scan");
@@ -181,6 +179,9 @@ public final class NutritionFragment extends ScreenFragment {
 			card.addView(row);
 		}
 	}
+
+	/** Sección «Más» desplegada. */
+	private static boolean moreOpen;
 
 	private static String euros(double value) {
 		return String.format(SPANISH, "%.2f €", value);
@@ -265,18 +266,17 @@ public final class NutritionFragment extends ScreenFragment {
 			return;
 		int ml = w.ml(day), goal = com.energym.app.nutrition.WaterLog.goal(n.effectiveBody());
 		int glasses = ml / com.energym.app.nutrition.WaterLog.GLASS, target = goal / com.energym.app.nutrition.WaterLog.GLASS;
-		LinearLayout card = card("Agua", com.energym.app.nutrition.WaterLog.liters(ml) + " de " +
-			com.energym.app.nutrition.WaterLog.liters(goal) + (ml >= goal ? " · ¡Objetivo cumplido! 🎉" : ""));
+		LinearLayout card = card("💧 Agua · " + com.energym.app.nutrition.WaterLog.liters(ml) + " de " +
+			com.energym.app.nutrition.WaterLog.liters(goal), ml >= goal ? "¡Objetivo cumplido! 🎉" :
+			glasses + " de " + target + (target == 1 ? " vaso" : " vasos"));
 		card.setTag("nutrition_water");
-		text(card, "💧 " + glasses + " de " + target + (target == 1 ? " vaso" : " vasos"), R.style.EnerGym_CardTitle, 4);
 		add(card, new com.energym.app.ui.charts.ProgressBarView(requireContext()), 12)
 			.set(goal == 0 ? 0 : Math.min(1, ml / (double) goal), "Agua: " + ml + " de " + goal + " ml");
 		LinearLayout buttons = columns(card, 16);
 		MaterialButton less = compact(buttons, "− Vaso", ml > 0, () -> w.add(day, -com.energym.app.nutrition.WaterLog.GLASS));
 		less.setContentDescription("Quitar un vaso de agua");
-		MaterialButton more = compact(buttons, "+ Vaso de 250 ml", true, () -> w.add(day, com.energym.app.nutrition.WaterLog.GLASS));
+		MaterialButton more = compact(buttons, "+ Vaso", true, () -> w.add(day, com.energym.app.nutrition.WaterLog.GLASS));
 		more.setContentDescription("Añadir un vaso de agua de 250 mililitros");
-		((LinearLayout.LayoutParams) more.getLayoutParams()).weight = 2;
 		primary(more);
 	}
 
@@ -313,7 +313,7 @@ public final class NutritionFragment extends ScreenFragment {
 	 */
 	private void remaining(NutritionController n, LocalDate day, double[] totals, BodyProfile.Targets targets) {
 		if (targets == null) return;
-		LinearLayout card = card("Calorías restantes", "");
+		LinearLayout card = card("Hoy te quedan", "");
 		// Se redondea cada término antes de operar para que la cuenta visible cuadre (2451 − 195 + 0 = 2256).
 		long goal = Math.round(targets.kcal), food = Math.round(totals[0]), exercise = Math.round(exerciseKcal(n, day));
 		long left = goal - food + exercise;
