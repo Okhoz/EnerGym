@@ -533,6 +533,121 @@ public final class AppController {
 		navigate(Screen.MANUAL_ROUTINE);
 	}
 
+	/** Sugerencia del entrenador de hoy (null sin perfil o sin ejercicios compatibles) y por qué. */
+	public Routine suggestion;
+	public String suggestionReason = "";
+	private long suggestionSeed = 1;
+	private List<Session> suggestionHistory;
+	private TrainingProfile suggestionProfile;
+
+	/**
+	 * El entrenador propone una rutina para el grupo muscular que menos has trabajado en las dos últimas semanas
+	 * (o de cuerpo completo si aún no hay entrenos). Se recalcula al cambiar el historial o el perfil.
+	 */
+	public Routine suggest() {
+		if (profile == null || owner == null)
+			return null;
+		if (suggestion != null && history == suggestionHistory && profile == suggestionProfile)
+			return suggestion;
+		suggestionHistory = history;
+		suggestionProfile = profile;
+		java.time.LocalDate today = java.time.LocalDate.now();
+		List<com.energym.app.progress.MuscleBreakdown.Share> shares = com.energym.app.progress.MuscleBreakdown.of(history,
+			java.time.ZoneId.systemDefault(), today.minusDays(13), today);
+		RoutineRequest.Area[] candidates = {RoutineRequest.Area.LEGS, RoutineRequest.Area.BACK, RoutineRequest.Area.CHEST,
+			RoutineRequest.Area.SHOULDERS, RoutineRequest.Area.GLUTES, RoutineRequest.Area.CORE, RoutineRequest.Area.ARMS};
+		RoutineRequest.Area least = null;
+		double fewest = Double.MAX_VALUE;
+		int offset = (int) Math.floorMod(suggestionSeed, candidates.length);
+		// Solo zonas con suficientes ejercicios para tu lugar y material: si no, la rutina no sería de esa zona.
+		CompatibilityEngine engine = new CompatibilityEngine();
+		for (int i = 0; i < candidates.length; i++) {
+			RoutineRequest.Area a = candidates[(i + offset) % candidates.length];
+			int available = 0;
+			for (Exercise e : catalog.getExercises())
+				if (engine.isCompatible(e, profile) && RoutineRequest.areas(e).contains(a) &&
+					e.getMetricType() != MetricType.MOBILITY)
+					available++;
+			if (available < 3)
+				continue;
+			double sets = 0;
+			for (com.energym.app.progress.MuscleBreakdown.Share sh : shares)
+				if (sh.area == a)
+					sets = sh.sets;
+			if (sets < fewest) {
+				fewest = sets;
+				least = a;
+			}
+		}
+		RoutineRequest asked = shares.isEmpty() || least == null ? RoutineRequest.none() :
+			RoutineRequest.of(EnumSet.of(least), RoutineRequest.Intensity.NORMAL, 0);
+		Routine r = new RoutinePlanner().create(profile, catalog.getExercises(), asked,
+			today.toEpochDay() * 31 + suggestionSeed);
+		suggestion = r.isEmpty() ? null : r;
+		suggestionReason = shares.isEmpty() || least == null ? "Para empezar, un entreno de cuerpo completo." :
+			fewest == 0 ? "No has trabajado " + least.label + " en las últimas dos semanas." :
+				"Es lo que menos has trabajado en las últimas dos semanas (" + Math.round(fewest) +
+					(Math.round(fewest) == 1 ? " serie)." : " series).");
+		return suggestion;
+	}
+
+	/** Otra sugerencia distinta (otro grupo o ejercicios). */
+	public void nextSuggestion() {
+		suggestionSeed++;
+		suggestion = null;
+		suggestionHistory = null;
+		changed();
+	}
+
+	/** Guarda la rutina propuesta tal cual (sugerencia o propuesta de la IA) y, si se pide, empieza a entrenarla. */
+	public void acceptAndStart(Routine proposal, boolean start) {
+		if (trainingMutation || loading || !initialDataReady || proposal == null) return;
+		if (sessions.session != null && sessions.session.getStatus() == Session.Status.DRAFT && start) {
+			error("Ya tienes un entreno a medias. Termínalo o descártalo antes de empezar otro.");
+			return;
+		}
+		trainingMutation = true;
+		long token = generation;
+		changed();
+		store.accept(proposal, new AppStore.Callback<Routine>() {
+			public void success(Routine saved) {
+				if (token != generation) return;
+				trainingMutation = false;
+				if (routines.preview == proposal)
+					routines.preview = null;
+				routines.accepted = saved;
+				selectedRoutineId = saved.getProposalId();
+				suggestion = null;
+				suggestionHistory = null;
+				if (start) {
+					sessions.start(saved);
+					navigate(Screen.SESSION);
+				} else
+					navigate(Screen.TRAINING);
+				reload();
+			}
+
+			public void failure(Exception e) {
+				if (token != generation) return;
+				trainingMutation = false;
+				error(e.getMessage());
+			}
+		});
+	}
+
+	/** Abre una rutina propuesta en el editor para cambiar ejercicios, series o carga antes de guardarla. */
+	public void editProposal(Routine proposal) {
+		if (trainingMutation || loading || !initialDataReady || owner == null || proposal == null) return;
+		manual.editDraft(proposal);
+		if (!manual.error.isEmpty()) {
+			error(manual.error);
+			return;
+		}
+		if (routines.preview == proposal)
+			routines.preview = null;
+		navigate(Screen.MANUAL_ROUTINE);
+	}
+
 	/** Las rutinas de IA también se pueden ajustar a mano, guardando una nueva versión. */
 	public void editRoutine(Routine routine) {
 		if (loading || trainingMutation || !initialDataReady || owner == null) return;

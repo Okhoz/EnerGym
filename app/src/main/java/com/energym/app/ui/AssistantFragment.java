@@ -134,10 +134,6 @@ public final class AssistantFragment extends ScreenFragment {
 		if (c.exercise != null) {
 			MaterialButton chip = action(rows, "Hablando de: " + c.exercise.getName() + "  ›", true, () ->
 				app.openExercise(c.exercise));
-			chip.setMinHeight(dp(40));
-			chip.setTextSize(14);
-			((LinearLayout.LayoutParams) chip.getLayoutParams()).topMargin = dp(4);
-			((LinearLayout.LayoutParams) chip.getLayoutParams()).bottomMargin = dp(8);
 		}
 		// La tarjeta de rutina va justo tras la respuesta que la propuso; lo hablado después queda debajo.
 		int anchor = Math.min(c.previewAnchor, c.messages.size());
@@ -224,7 +220,6 @@ public final class AssistantFragment extends ScreenFragment {
 			LinearLayout line = columns(rows, 8);
 			MaterialButton open = compact(line, item.getExercise().getName(), true,
 				() -> app.openExercise(item.getExercise()));
-			open.setTextSize(14);
 			open.setContentDescription("Consultar técnica de " + item.getExercise().getName());
 			((LinearLayout.LayoutParams) open.getLayoutParams()).weight = 4;
 			MaterialButton swap = compact(line, "🔄", !c.busy, () -> c.substitute(index));

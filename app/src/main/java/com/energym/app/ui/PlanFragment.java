@@ -43,7 +43,7 @@ public final class PlanFragment extends ScreenFragment {
 			}
 		}
 		text(rows, "Total semanal: unos " + minutes + " min. Ejemplos sin revisión profesional; adapta la carga a cómo te encuentres.",
-			R.style.EnerGym_FieldCaption, 8).setPadding(dp(4), 0, dp(4), 0);
+			R.style.EnerGym_FieldCaption, 8);
 		action(rows, "🔀 Otra combinación de ejercicios", !app.trainingMutation, app::shufflePlan);
 		primary(action(rows, "Guardar plan", !app.trainingMutation, app::acceptPlan));
 		action(rows, "Cancelar", !app.trainingMutation, app::cancelPlan);

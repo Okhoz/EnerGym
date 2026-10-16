@@ -113,30 +113,15 @@ public final class FoodFragment extends ScreenFragment {
 		field(values, d, "carbs100", "Hidratos de carbono (g)" + base, refresh);
 		field(values, d, "fat100", "Grasas (g)" + base, refresh);
 		refresh.run();
+		finish(n, d);
+	}
+
+	private void finish(NutritionController n, Map<String, String> d) {
+		primary(action(rows, n.editingFood() ? "Guardar cambios" : "Añadir al diario", !n.busy,
+			() -> n.addFood(() -> app.navigate(Screen.NUTRITION))));
 		if (!n.editingFood()) {
-			LinearLayout more = new LinearLayout(requireContext());
-			more.setOrientation(LinearLayout.HORIZONTAL);
-			more.setGravity(android.view.Gravity.CENTER_VERTICAL | android.view.Gravity.END);
-			TextView hint = new TextView(requireContext());
-			hint.setTextAppearance(R.style.EnerGym_FieldCaption);
-			hint.setText("Guardar y añadir otro");
-			hint.setGravity(android.view.Gravity.END);
-			more.addView(hint, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-			com.google.android.material.button.MaterialButton plus = new com.google.android.material.button.MaterialButton(
-				requireContext(), null, com.google.android.material.R.attr.materialIconButtonFilledStyle);
-			plus.setText("+");
-			plus.setTextSize(26);
-			plus.setPadding(0, 0, 0, 0);
-			plus.setInsetTop(0);
-			plus.setInsetBottom(0);
-			plus.setCornerRadius(dp(28));
-			plus.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
-				androidx.core.content.ContextCompat.getColor(requireContext(), R.color.gold)));
-			plus.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.surface));
-			plus.setEnabled(!n.busy);
-			plus.setTag("food_add_another");
-			plus.setContentDescription("Guardar este alimento y añadir otro a la misma comida");
-			plus.setOnClickListener(v -> {
+			// Guarda este y deja el formulario listo para otro alimento de la misma comida.
+			com.google.android.material.button.MaterialButton another = action(rows, "Añadir y anotar otro", !n.busy, () -> {
 				FoodEntry.Meal meal = FoodEntry.Meal.valueOf(d.getOrDefault("meal", "OTHER"));
 				n.addFood(() -> {
 					n.startManual(meal);
@@ -145,18 +130,9 @@ public final class FoodFragment extends ScreenFragment {
 						getView().post(() -> ((android.widget.ScrollView) getView()).smoothScrollTo(0, 0));
 				});
 			});
-			LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(dp(56), dp(56));
-			size.setMarginStart(dp(12));
-			more.addView(plus, size);
-			values.addView(more, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-				LinearLayout.LayoutParams.WRAP_CONTENT) {{ topMargin = dp(16); }});
+			another.setTag("food_add_another");
+			another.setContentDescription("Guardar este alimento y añadir otro a la misma comida");
 		}
-		finish(n, d);
-	}
-
-	private void finish(NutritionController n, Map<String, String> d) {
-		primary(action(rows, n.editingFood() ? "Guardar cambios" : "Añadir al diario", !n.busy,
-			() -> n.addFood(() -> app.navigate(Screen.NUTRITION))));
 		action(rows, "Cancelar", !n.busy, () -> {
 			n.cancelFood();
 			app.navigate(Screen.NUTRITION);

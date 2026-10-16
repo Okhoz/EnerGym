@@ -81,19 +81,8 @@ public final class NutritionFragment extends ScreenFragment {
 				" kcal"), "");
 			for (FoodEntry e : items)
 				foodRow(section, e, n);
-			LinearLayout buttons = columns(section, items.isEmpty() ? 0 : 8);
-			MaterialButton addFood = compact(buttons, "+ Añadir alimento", !n.busy, () -> {
-				n.startManual(meal);
-				app.navigate(Screen.FOOD);
-			});
-			addFood.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.gold));
-			addFood.setContentDescription("Añadir alimento a " + MEALS[meal.ordinal()]);
-			((LinearLayout.LayoutParams) addFood.getLayoutParams()).weight = 1.4f;
-			MaterialButton scanFood = compact(buttons, "Escanear", !n.busy, () -> {
-				n.startManual(meal);
-				scan(this);
-			});
-			scanFood.setContentDescription("Escanear código de barras para " + MEALS[meal.ordinal()]);
+			if (items.isEmpty())
+				text(section, "Nada anotado todavía.", R.style.EnerGym_FieldCaption, 0);
 		}
 		if (!n.status.isEmpty())
 			text(rows, n.status, R.style.EnerGym_FieldCaption, 0);
@@ -113,6 +102,17 @@ public final class NutritionFragment extends ScreenFragment {
 
 		text(rows, "Datos de Open Food Facts (ODbL): revisa la etiqueta. Objetivos estimados; no sustituyen a un " +
 			"dietista o médico.", R.style.EnerGym_FieldCaption, 4);
+		// Añadir comida, siempre al final de la pantalla (la comida se elige en el formulario según la hora).
+		MaterialButton addFood = action(rows, "+ Añadir alimento", !n.busy, () -> {
+			n.startManual(n.defaultMeal());
+			app.navigate(Screen.FOOD);
+		});
+		primary(addFood);
+		addFood.setTag("nutrition_add_food");
+		action(rows, "Escanear código de barras", !n.busy, () -> {
+			n.startManual(n.defaultMeal());
+			scan(this);
+		}).setTag("nutrition_scan");
 	}
 
 	private static String euros(double value) {

@@ -82,8 +82,13 @@ public abstract class ScreenFragment extends Fragment {
 				View before = previousVisible(group, i);
 				boolean firstInCard = before == null && group.getId() == R.id.card_actions;
 				boolean afterCard = before != null && before.findViewById(R.id.card_actions) != null;
-				lp.topMargin = firstInCard || afterCard ? 0 : gap;
-				lp.bottomMargin = 0;
+				// Tras un campo de texto basta su propio margen inferior.
+				boolean afterField = before != null && before.findViewById(R.id.field_label) != null;
+				View next = nextVisible(group, i);
+				lp.topMargin = firstInCard || afterCard || afterField ? 0 : gap;
+				// Antes de una tarjeta, el mismo hueco que separa tarjetas.
+				lp.bottomMargin = next != null && next.findViewById(R.id.card_actions) != null ?
+					getResources().getDimensionPixelSize(R.dimen.section_gap) : 0;
 				child.setLayoutParams(lp);
 			}
 			if (child instanceof LinearLayout && isButtonRow((LinearLayout) child)) {
@@ -98,6 +103,13 @@ public abstract class ScreenFragment extends Fragment {
 			if (child instanceof ViewGroup)
 				spaceButtons((ViewGroup) child);
 		}
+	}
+
+	private static View nextVisible(ViewGroup group, int index) {
+		for (int i = index + 1; i < group.getChildCount(); i++)
+			if (group.getChildAt(i).getVisibility() != View.GONE)
+				return group.getChildAt(i);
+		return null;
 	}
 
 	private static View previousVisible(ViewGroup group, int index) {
@@ -203,12 +215,12 @@ public abstract class ScreenFragment extends Fragment {
 		MaterialButton b = (MaterialButton) getLayoutInflater().inflate(R.layout.row_action, row, false);
 		b.setText(label);
 		b.setEnabled(enabled);
-		b.setMinHeight(dp(52));
-		b.setTextSize(14);
+		b.setMinHeight(getResources().getDimensionPixelSize(R.dimen.primary_touch_target));
+		b.setTextSize(15);
 		// En una fila, cada botón cabe en una línea: el texto se reduce un poco antes de partirse.
 		b.setMaxLines(1);
-		b.setPadding(dp(12), b.getPaddingTop(), dp(12), b.getPaddingBottom());
-		androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(b, 11, 14, 1,
+		b.setPadding(dp(16), b.getPaddingTop(), dp(16), b.getPaddingBottom());
+		androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(b, 11, 15, 1,
 			android.util.TypedValue.COMPLEX_UNIT_SP);
 		b.setOnClickListener(v -> event.run());
 		return column(row, b, 16);

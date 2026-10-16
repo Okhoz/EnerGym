@@ -41,6 +41,7 @@ public final class TrainingFragment extends ScreenFragment {
 			return;
 		}
 		boolean hasNextStep = nextStep();
+		suggestion();
 		routines(hasNextStep);
 		otherDrafts();
 		createSection(hasNextStep);
@@ -118,9 +119,39 @@ public final class TrainingFragment extends ScreenFragment {
 		section("Hoy", 0);
 		LinearLayout ready = card("Tu entreno de hoy", selected.getTitle() + "\n" + summary(selected) +
 			(selected.isProgressionEnabled() ? "\n📈 Sube de nivel sola cuando la completas" : ""));
-		primary(action(ready, "Empezar entreno", !app.sessions.busy, app::startSession));
 		action(ready, "Ver ejercicios", !app.routines.busy, app::viewSelectedRoutine);
+		action(ready, "✏️ Editar", !app.routines.busy && !app.trainingMutation, () -> app.editRoutine(selected))
+			.setTag("training_edit_today");
+		primary(action(ready, "Empezar entreno", !app.sessions.busy, app::startSession));
 		return true;
+	}
+
+	/**
+	 * Sugerencia del entrenador: una rutina para lo que menos has trabajado. Se puede hacer tal cual, modificar
+	 * antes de guardarla o pedir otra.
+	 */
+	private void suggestion() {
+		if (app.owner() == null || app.sessions.session != null || !distinctDrafts().isEmpty())
+			return;
+		Routine s = app.suggest();
+		if (s == null)
+			return;
+		section("Sugerencia de tu entrenador", 32);
+		LinearLayout card = card("💡 " + s.getTitle(), app.suggestionReason + "\n" + summary(s));
+		card.setTag("training_suggestion");
+		for (com.energym.app.domain.RoutineItem item : s.getItems()) {
+			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, card, false);
+			((android.widget.TextView) row.findViewById(R.id.food_name)).setText(item.getExercise().getName());
+			((android.widget.TextView) row.findViewById(R.id.food_detail)).setText(PlanFragment.target(item));
+			((android.widget.TextView) row.findViewById(R.id.food_kcal)).setText("›");
+			row.setContentDescription("Ver técnica de " + item.getExercise().getName());
+			row.setOnClickListener(v -> app.openExercise(item.getExercise()));
+			card.addView(row);
+		}
+		action(card, "🔀 Otra sugerencia", !app.trainingMutation, app::nextSuggestion);
+		action(card, "✏️ Modificarla", !app.trainingMutation, () -> app.editProposal(s)).setTag("suggestion_edit");
+		primary(action(card, "Hacerla ahora", !app.trainingMutation && !app.sessions.busy,
+			() -> app.acceptAndStart(s, true)));
 	}
 
 	private void routines(boolean hasNextStep) {
@@ -144,7 +175,7 @@ public final class TrainingFragment extends ScreenFragment {
 		}
 		if (routines.size() > 1)
 			text(rows, "Toca una rutina para entrenar con ella hoy. Con ⋮ la editas o la borras.",
-				R.style.EnerGym_FieldCaption, 0).setPadding(dp(4), 0, dp(4), dp(12));
+				R.style.EnerGym_FieldCaption, 0);
 		for (Routine routine : routines)
 			routineRow(routine);
 	}
@@ -169,22 +200,22 @@ public final class TrainingFragment extends ScreenFragment {
 		});
 		ai.setTag("training_create_ai");
 		ai.setContentDescription("Crear rutina con IA");
-		text(create, "Dile qué quieres trabajar, cuánto tiempo tienes o cómo te encuentras.", R.style.EnerGym_FieldCaption, 0)
-			.setPadding(dp(4), 0, dp(4), dp(8));
+		text(create, "Dile qué quieres trabajar, cuánto tiempo tienes o cómo te encuentras.", R.style.EnerGym_FieldCaption, 6)
+			;
 		MaterialButton plan = action(create, "📅 Plan semanal", ready && !app.trainingMutation, () -> app.createPlan(""));
 		plan.setTag("training_create_plan");
 		text(create, "Una rutina por día según los días que entrenas (Empuje / Tirón / Pierna, Torso / Pierna…).",
-			R.style.EnerGym_FieldCaption, 0).setPadding(dp(4), 0, dp(4), dp(8));
+			R.style.EnerGym_FieldCaption, 6);
 		MaterialButton manual = action(create, "✍ Hacerla yo", ready && !app.manual.busy, app::createManualRoutine);
 		manual.setTag("training_create_manual");
 		manual.setContentDescription("Crear rutina manual");
-		text(create, "Eliges los ejercicios, series, repeticiones y carga.", R.style.EnerGym_FieldCaption, 0)
-			.setPadding(dp(4), 0, dp(4), dp(8));
+		text(create, "Eliges los ejercicios, series, repeticiones y carga.", R.style.EnerGym_FieldCaption, 6)
+			;
 		MaterialButton quick = action(create, "⚡ Una automática ya",
 			ready && !app.profileSaving() && !app.routines.busy, app::createRoutine);
 		quick.setTag("training_more_options");
 		text(create, "Te propongo una al momento con tu perfil, sin IA. La revisas antes de guardarla.",
-			R.style.EnerGym_FieldCaption, 0).setPadding(dp(4), 0, dp(4), 0);
+			R.style.EnerGym_FieldCaption, 6);
 		if (!hasNextStep && app.versions.isEmpty())
 			primary(ai);
 	}

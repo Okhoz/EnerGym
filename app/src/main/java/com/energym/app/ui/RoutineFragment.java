@@ -51,13 +51,23 @@ public final class RoutineFragment extends ScreenFragment {
 		}
 		text(rows, r.getExplanation(), R.style.EnerGym_FieldCaption, 12);
 		if (app.routines.preview != null) {
-			primary(action(rows, "Aceptar propuesta", app.routines.canAccept(), app.routines::accept));
+			Routine proposal = app.routines.preview;
+			// Una propuesta (de la IA o automática) se puede cambiar antes de guardarla, o hacerla ya.
+			action(rows, "✏️ Editar antes de guardar", !app.routines.busy && !app.trainingMutation,
+				() -> app.editProposal(proposal)).setTag("proposal_edit");
 			action(rows, "Rechazar propuesta", !app.routines.busy, () -> {
 				app.routines.reject();
 				app.back();
 			});
-		} else
+			action(rows, "Aceptar y empezar ya", app.routines.canAccept() && !app.trainingMutation,
+				() -> app.acceptAndStart(proposal, true)).setTag("proposal_start");
+			primary(action(rows, "Aceptar propuesta", app.routines.canAccept(), app.routines::accept));
+		} else {
+			Routine accepted = app.routines.accepted;
+			action(rows, "✏️ Editar rutina", !app.routines.busy && !app.trainingMutation,
+				() -> app.editRoutine(accepted)).setTag("routine_edit");
 			primary(action(rows, "Empezar entreno", !app.sessions.busy, app::startSession));
+		}
 	}
 }
 

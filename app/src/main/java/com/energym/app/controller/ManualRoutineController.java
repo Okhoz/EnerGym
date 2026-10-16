@@ -71,9 +71,24 @@ public final class ManualRoutineController {
 
 
 	/** Copia completa y editable de una rutina aceptada; no modifica la versión histórica. */
+	/** Marca de plan semanal de la rutina editada: un día editado sigue encadenando con los demás. */
+	private String planTag = "";
+
+	/**
+	 * Abre una rutina propuesta (por la IA o sugerida) para retocarla antes de guardarla como tuya: se guarda
+	 * como rutina nueva, sin tocar ninguna existente.
+	 */
+	public void editDraft(Routine proposal) {
+		edit(proposal);
+		editingId = null;
+	}
+
 	public void edit(Routine original) {
 		if (busy || owner == null || original == null) return;
 		clear(original.getProfile());
+		java.util.regex.Matcher tag = java.util.regex.Pattern.compile("Plan semanal \\([^)]+\\)")
+			.matcher(original.getExplanation() == null ? "" : original.getExplanation());
+		planTag = tag.find() ? tag.group() + " · " : "";
 		editingId = original.getProposalId();
 		title = original.getTitle();
 		progression = original.isProgressionEnabled();
@@ -103,6 +118,7 @@ public final class ManualRoutineController {
 		progression = true;
 		saved = null;
 		editingId = null;
+		planTag = "";
 		proposalId = UUID.randomUUID().toString();
 		base = profile == null ? new TrainingProfile.Builder().build() : profile;
 		contextFields.clear();
@@ -310,7 +326,7 @@ public final class ManualRoutineController {
 				items.add(new RoutineItem(draft.exercise, prescription, minutes, "Prescripción elegida por la persona en el editor manual."));
 			}
 			routine = new Routine(proposalId, 0, title.trim(), profile, items,
-				"Rutina manual. Revisa la técnica y adapta la intensidad.", new RoutineMetadata(RoutineMetadata.Origin.MANUAL, progression));
+				planTag + "Rutina manual. Revisa la técnica y adapta la intensidad.", new RoutineMetadata(RoutineMetadata.Origin.MANUAL, progression));
 			if (!routine.isValidFor(profile))
 				throw new IllegalArgumentException("Añade ejercicios compatibles y respeta el tiempo disponible.");
 		} catch (RuntimeException invalid) {
