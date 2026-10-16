@@ -64,8 +64,10 @@ public final class BodyProfile {
 	public final Cooking cooking;
 	public final int mealsPerDay;
 	public final String dislikes;
-	/** Euros al día para la comida; 0 si no hay límite. */
-	public final double budget;
+	/** Euros al mes para la comida; 0 si no hay límite. */
+	public final double monthlyBudget;
+	/** Días medios de un mes, para repartir el presupuesto mensual por día. */
+	public static final double DAYS_PER_MONTH = 30.4;
 
 	public BodyProfile(Sex sex, int age, double heightCm, double weightKg, Activity activity, Goal goal,
 		String allergies) {
@@ -78,10 +80,10 @@ public final class BodyProfile {
 	}
 
 	public BodyProfile(Sex sex, int age, double heightCm, double weightKg, Activity activity, Goal goal,
-		String allergies, Diet diet, Cooking cooking, int mealsPerDay, String dislikes, double budget) {
-		if (!(budget >= 0 && budget <= 200))
-			throw new IllegalArgumentException("Presupuesto entre 0 y 200 € al día.");
-		this.budget = budget;
+		String allergies, Diet diet, Cooking cooking, int mealsPerDay, String dislikes, double monthlyBudget) {
+		if (!(monthlyBudget >= 0 && monthlyBudget <= 5000))
+			throw new IllegalArgumentException("Presupuesto entre 0 y 5000 € al mes.");
+		this.monthlyBudget = monthlyBudget;
 		this.diet = diet == null ? Diet.OMNIVORE : diet;
 		this.cooking = cooking == null ? Cooking.NORMAL : cooking;
 		if (mealsPerDay < 2 || mealsPerDay > 6)
@@ -107,8 +109,13 @@ public final class BodyProfile {
 			throw new IllegalArgumentException("Alergias: máximo 300 caracteres.");
 	}
 
+	/** Parte del presupuesto mensual que toca a cada día; 0 si no hay límite. */
+	public double dailyBudget() {
+		return monthlyBudget / DAYS_PER_MONTH;
+	}
+
 	public BodyProfile withWeight(double kg) {
-		return new BodyProfile(sex, age, heightCm, kg, activity, goal, allergies, diet, cooking, mealsPerDay, dislikes, budget);
+		return new BodyProfile(sex, age, heightCm, kg, activity, goal, allergies, diet, cooking, mealsPerDay, dislikes, monthlyBudget);
 	}
 
 	/**

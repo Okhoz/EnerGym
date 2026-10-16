@@ -134,9 +134,11 @@ public class DietPlannerTest {
 		assertEquals(FoodEntry.Meal.DINNER, plan.meals.get(1).diaryMeal());
 	}
 
+	/** Presupuesto expresado al día para las cuentas del test; el perfil lo guarda al mes. */
 	private static BodyProfile budget(double euros) {
 		return new BodyProfile(BodyProfile.Sex.MALE, 30, 178, 78, BodyProfile.Activity.MODERATE,
-			BodyProfile.Goal.MAINTAIN, "", BodyProfile.Diet.OMNIVORE, BodyProfile.Cooking.QUICK, 4, "", euros);
+			BodyProfile.Goal.MAINTAIN, "", BodyProfile.Diet.OMNIVORE, BodyProfile.Cooking.QUICK, 4, "",
+			euros * BodyProfile.DAYS_PER_MONTH);
 	}
 
 	@Test
@@ -147,7 +149,8 @@ public class DietPlannerTest {
 		for (DietPlan.Meal m : cheap.meals)
 			assertNotEquals("Salmón al horno con patata y brócoli", m.dish);
 		String prompt = DietRules.prompt(budget(6), budget(6).targets(), "", Collections.emptyList());
-		assertTrue(prompt.contains("PRESUPUESTO: 6 €"));
+		assertTrue(prompt, prompt.contains("PRESUPUESTO: 182 € al mes, unos 6.00 € al día"));
+		assertEquals(6, budget(6).dailyBudget(), 0.001);
 		assertTrue(prompt.contains("\"coste\""));
 		assertFalse(DietRules.prompt(budget(0), budget(0).targets(), "", Collections.emptyList()).contains("PRESUPUESTO"));
 	}

@@ -106,7 +106,7 @@ public final class DietPlanner {
 			note = "La IA propuso un alimento que evitas; te dejo un menú base seguro.";
 		} else if (ai != null && (ai = ai.scaledTo(targets.kcal)) == null)
 			note = "El menú de la IA no cuadraba con tus calorías; te dejo un menú base con tus datos.";
-		else if (ai != null && body.budget > 0 && ai.cost() > body.budget * 1.25) {
+		else if (ai != null && body.monthlyBudget > 0 && ai.cost() > body.dailyBudget() * 1.25) {
 			ai = null;
 			note = "El menú de la IA superaba tu presupuesto; te dejo un menú económico con tus datos.";
 		} else if (ai == null && output != null)
@@ -114,8 +114,8 @@ public final class DietPlanner {
 		else if (ai == null)
 			note = "La IA del móvil aún no está lista; te dejo un menú base con tus datos.";
 		DietPlan result = ai != null ? ai : DietRules.local(body, targets, variant, now);
-		if (note.isEmpty() && body.budget > 0 && result.cost() > body.budget * 1.05)
-			note = "Con " + NutritionController.format(body.budget) + " € no llega para todo: este es el menú más " +
+		if (note.isEmpty() && body.monthlyBudget > 0 && result.cost() > body.dailyBudget() * 1.05)
+			note = "Con " + NutritionController.format(body.monthlyBudget) + " € al mes no llega para todo: este es el menú más " +
 				"económico que cuadra con tus calorías.";
 		String message = note;
 		delivery.execute(() -> {

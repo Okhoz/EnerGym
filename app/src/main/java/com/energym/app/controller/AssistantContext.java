@@ -96,8 +96,8 @@ public final class AssistantContext {
 				.append(b.sex == BodyProfile.Sex.FEMALE ? "mujer" : "hombre").append(". Objetivo de dieta: ")
 				.append(b.goal.label).append(". Alimentación ").append(b.diet.label.toLowerCase(Locale.ROOT)).append(", ")
 				.append(b.mealsPerDay).append(" comidas al día");
-			if (b.budget > 0)
-				s.append(", presupuesto ").append(NutritionController.format(b.budget)).append(" €/día");
+			if (b.monthlyBudget > 0)
+				s.append(", presupuesto ").append(NutritionController.format(b.monthlyBudget)).append(" €/mes para comida");
 			s.append('.');
 			if (!b.allergies.isEmpty())
 				s.append(" Alergias: ").append(b.allergies).append('.');

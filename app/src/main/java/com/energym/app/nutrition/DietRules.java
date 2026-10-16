@@ -105,8 +105,9 @@ public final class DietRules {
 			p.append("ALERGIAS (prohibido usarlos ni sus derivados): ").append(body.allergies).append(".\n");
 		if (!body.dislikes.isEmpty())
 			p.append("No incluyas: ").append(body.dislikes).append(".\n");
-		if (body.budget > 0)
-			p.append("PRESUPUESTO: ").append(NutritionController.format(body.budget))
+		if (body.monthlyBudget > 0)
+			p.append("PRESUPUESTO: ").append(Math.round(body.monthlyBudget)).append(" € al mes, unos ")
+				.append(String.format(java.util.Locale.ROOT, "%.2f", body.dailyBudget()))
 				.append(" € al día en total (precios de supermercado en España). Elige los alimentos con mejor relación ")
 				.append("nutrientes/precio: legumbres, huevos, arroz, pasta, avena, patata, pollo, atún en lata, ")
 				.append("congelados, fruta y verdura de temporada, marca blanca. Indica el coste estimado de cada comida ")
@@ -123,7 +124,7 @@ public final class DietRules {
 			.append("{\"consejo\":\"un consejo breve para su objetivo\",\"comidas\":[{\"nombre\":\"Desayuno\",")
 			.append("\"plato\":\"nombre del plato\",\"ingredientes\":\"cantidades en gramos, separadas por comas\",")
 			.append("\"kcal\":500,\"proteinas\":30,\"hidratos\":60,\"grasas\":15")
-			.append(body.budget > 0 ? ",\"coste\":1.5" : "").append("}]}\n");
+			.append(body.monthlyBudget > 0 ? ",\"coste\":1.5" : "").append("}]}\n");
 		return p.toString();
 	}
 
@@ -218,7 +219,7 @@ public final class DietRules {
 					t.carbs * share, t.fat * share));
 				continue;
 			}
-			if (body.budget > 0) {
+			if (body.monthlyBudget > 0) {
 				// Con presupuesto se eligen los platos más baratos (la mitad más económica de los compatibles).
 				options.sort(Comparator.comparingDouble(d -> COST.getOrDefault(d.name, 2.0)));
 				options = new ArrayList<>(options.subList(0, Math.max(1, (options.size() + 1) / 2)));
@@ -228,7 +229,7 @@ public final class DietRules {
 			meals.add(new DietPlan.Meal(slot, d.name, d.ingredients, kcal, t.protein * share, t.carbs * share,
 				t.fat * share, COST.getOrDefault(d.name, 2.0) * kcal / 500));
 		}
-		return new DietPlan(meals, body.budget > 0 ? "Menú económico: compra legumbres secas, huevos, arroz, avena y " +
+		return new DietPlan(meals, body.monthlyBudget > 0 ? "Menú económico: compra legumbres secas, huevos, arroz, avena y " +
 			"fruta de temporada; los congelados y la marca blanca abaratan sin perder nutrientes." :
 			"Menú base preparado en el móvil con tus datos. Ajusta las raciones a tu hambre y reparte la proteína a lo " +
 				"largo del día.", "Plan base del móvil", now);

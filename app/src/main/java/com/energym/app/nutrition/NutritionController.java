@@ -285,7 +285,7 @@ public final class NutritionController {
 		bodyDraft.put("cooking", b == null ? BodyProfile.Cooking.NORMAL.name() : b.cooking.name());
 		bodyDraft.put("mealsPerDay", Integer.toString(b == null ? 4 : b.mealsPerDay));
 		bodyDraft.put("dislikes", b == null ? "" : b.dislikes);
-		bodyDraft.put("budget", b == null || b.budget == 0 ? "" : format(b.budget));
+		bodyDraft.put("budget", b == null || b.monthlyBudget == 0 ? "" : format(b.monthlyBudget));
 	}
 
 	/**

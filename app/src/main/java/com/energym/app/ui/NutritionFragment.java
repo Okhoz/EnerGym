@@ -133,11 +133,12 @@ public final class NutritionFragment extends ScreenFragment {
 		LinearLayout card = card("✦ Tu dieta con IA", planner.busy ? "Preparando tu menú en el móvil…" :
 			plan == null ? "Un menú de un día con tus " + Math.round(targets.kcal) + " kcal, " +
 				current.mealsPerDay + " comidas y tu alimentación " + current.diet.label.toLowerCase(SPANISH) +
-				(current.budget > 0 ? ", con un presupuesto de " + euros(current.budget) + " al día" : "") +
+				(current.monthlyBudget > 0 ? ", con un presupuesto de " + Math.round(current.monthlyBudget) + " € al mes" : "") +
 				". Se tienen en cuenta tus alergias y lo que no tomas." :
 				plan.source + " · " + Math.round(plan.totals()[0]) + " de " + Math.round(targets.kcal) + " kcal" +
-					(plan.cost() >= 0 ? " · ≈ " + euros(plan.cost()) + (current.budget > 0 ? " de " + euros(current.budget) : "") +
-						" al día" : ""));
+					(plan.cost() >= 0 ? " · ≈ " + euros(plan.cost()) + " al día (≈ " +
+						Math.round(plan.cost() * BodyProfile.DAYS_PER_MONTH) + " €/mes" +
+						(current.monthlyBudget > 0 ? " de " + Math.round(current.monthlyBudget) + " €" : "") + ")" : ""));
 		card.setTag("nutrition_diet");
 		if (planner.busy)
 			return;
