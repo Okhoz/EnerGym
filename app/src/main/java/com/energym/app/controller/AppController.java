@@ -397,6 +397,16 @@ public final class AppController {
 	 * Rutina de hoy sin elección explícita: en un plan semanal, el día que sigue al último entreno terminado; si el
 	 * plan aún no se ha empezado, su día 1; si no hay plan, la más reciente.
 	 */
+	/** Nombre del entreno en curso o del que toca ahora (para el widget); "" si aún no hay rutinas. */
+	public String nextWorkoutTitle() {
+		if (sessions.session != null && sessions.session.getStatus() == Session.Status.DRAFT)
+			return "En curso: " + sessions.session.getRoutine().getTitle();
+		if (versions.isEmpty())
+			return "";
+		Routine next = defaultRoutine();
+		return next == null ? "" : next.getTitle();
+	}
+
 	private Routine defaultRoutine() {
 		Session last = null;
 		for (Session s : history)

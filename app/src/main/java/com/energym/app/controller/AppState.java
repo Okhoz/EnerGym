@@ -319,9 +319,39 @@ public final class AppState extends AndroidViewModel {
 					com.energym.app.nutrition.WaterLog.goal(nutrition.effectiveBody()), trained);
 			}
 		}
+		if (app != null && nutrition != null && water != null)
+			try {
+				updateWidget();
+			} catch (RuntimeException ignored) {
+				// El widget es un extra: nunca debe romper la app.
+			}
 		if (visualization != null && app != null)
 			visualization.context(app.owner(), app.navigationRevision(), app.screen, app.exercise);
 		observer.run();
+	}
+
+	private void updateWidget() {
+		java.time.LocalDate today = java.time.LocalDate.now();
+		String training, food, drink;
+		if (app.owner() == null) {
+			training = "Entra en EnerGym para empezar";
+			food = "";
+			drink = "";
+		} else {
+			String next = app.nextWorkoutTitle();
+			boolean trained = false;
+			for (com.energym.app.domain.Session s : app.history)
+				if (s.getStatus() == com.energym.app.domain.Session.Status.FINISHED && java.time.Instant
+					.ofEpochMilli(s.getCompletedAt()).atZone(java.time.ZoneId.systemDefault()).toLocalDate().equals(today))
+					trained = true;
+			training = trained ? "✓ Entreno de hoy hecho" : next.isEmpty() ? "🏋️ Crea tu rutina en Entreno" : "🏋️ " + next;
+			double kcal = nutrition.totals(today)[0];
+			com.energym.app.nutrition.BodyProfile.Targets targets = nutrition.targets();
+			food = "🍽 " + Math.round(kcal) + (targets == null ? "" : " / " + Math.round(targets.kcal)) + " kcal";
+			drink = "💧 " + com.energym.app.nutrition.WaterLog.liters(water.ml(today)) + " de " +
+				com.energym.app.nutrition.WaterLog.liters(com.energym.app.nutrition.WaterLog.goal(nutrition.effectiveBody()));
+		}
+		com.energym.app.widget.TodayWidget.publish(getApplication(), training, food, drink);
 	}
 
 	public String accountText() {
