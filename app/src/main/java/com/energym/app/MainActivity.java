@@ -56,6 +56,21 @@ public final class MainActivity extends AppCompatActivity {
 		return state;
 	}
 
+	/** Si está activado, reenvía a Health Connect lo nuevo como mucho una vez cada hora (sin duplicar nada). */
+	private void syncHealth() {
+		if (state == null || state.app == null || state.app.owner() == null ||
+			!com.energym.app.health.HealthSync.enabled(this))
+			return;
+		android.content.SharedPreferences p = getSharedPreferences("health_connect", MODE_PRIVATE);
+		long now = System.currentTimeMillis();
+		if (now - p.getLong("lastSync", 0) < 3600_000L)
+			return;
+		p.edit().putLong("lastSync", now).apply();
+		com.energym.app.health.HealthSync.sync(this, state.app.history,
+			state.nutrition == null ? new java.util.TreeMap<>() : state.nutrition.weights, message -> {
+			});
+	}
+
 	@Override
 	protected void onCreate(Bundle saved) {
 		super.onCreate(saved);
@@ -455,6 +470,7 @@ public final class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		syncHealth();
 		if (backdrop != null)
 			backdrop.resume();
 		render();

@@ -31,6 +31,17 @@ public final class AccountFragment extends ScreenFragment {
 	private final androidx.activity.result.ActivityResultLauncher<String[]> importCsv = registerForActivityResult(
 		new androidx.activity.result.contract.ActivityResultContracts.OpenDocument(), this::readCsv);
 
+	private final androidx.activity.result.ActivityResultLauncher<String[]> healthPermissions = registerForActivityResult(
+		new androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(), result -> {
+			boolean ok = com.energym.app.health.HealthSync.granted(requireContext());
+			com.energym.app.health.HealthSync.setEnabled(requireContext(), ok);
+			if (ok)
+				syncHealth();
+			else
+				toast("Sin permiso no se puede enviar a Health Connect");
+			render();
+		});
+
 	public AccountFragment() {
 		super(R.layout.fragment_account);
 	}
@@ -183,6 +194,27 @@ public final class AccountFragment extends ScreenFragment {
 			v -> Units.setLb(requireContext(), "lb".equals(v)));
 		if (app.owner() == null)
 			return;
+		if (com.energym.app.health.HealthSync.available()) {
+			LinearLayout health = card("Health Connect", "Envía tus entrenos terminados y tu peso a Health Connect para " +
+				"verlos en Samsung Health u otras apps. EnerGym no lee nada de allí.");
+			toggle(health, "Enviar a Health Connect", com.energym.app.health.HealthSync.enabled(requireContext()), on -> {
+				if (!on) {
+					com.energym.app.health.HealthSync.setEnabled(requireContext(), false);
+					render();
+				} else if (com.energym.app.health.HealthSync.granted(requireContext())) {
+					com.energym.app.health.HealthSync.setEnabled(requireContext(), true);
+					syncHealth();
+					render();
+				} else
+					try {
+						healthPermissions.launch(com.energym.app.health.HealthSync.PERMISSIONS);
+					} catch (RuntimeException e) {
+						toast("Health Connect no está disponible en este móvil");
+					}
+			});
+			if (com.energym.app.health.HealthSync.enabled(requireContext()))
+				action(health, "Enviar ahora", true, this::syncHealth).setTag("health_sync");
+		}
 		LinearLayout data = card("Tus datos en CSV", "Exporta tus entrenos serie a serie, comidas (últimas " +
 			com.energym.app.nutrition.NutritionController.HISTORY_DAYS / 7 + " semanas), peso y medidas para abrirlos en " +
 			"Excel o Google Sheets. Al importar se recuperan comidas, peso y medidas sin duplicarlas.");
@@ -248,6 +280,15 @@ public final class AccountFragment extends ScreenFragment {
 						"\nLos entrenos ya están en tu cuenta, así que no se importan de nuevo.")
 					.setPositiveButton("Vale", null).show();
 		});
+	}
+
+	private void syncHealth() {
+		com.energym.app.nutrition.NutritionController n = state.nutrition;
+		com.energym.app.health.HealthSync.sync(requireContext(), app.history,
+			n == null ? new java.util.TreeMap<>() : n.weights, message -> {
+				if (isAdded())
+					toast(message);
+			});
 	}
 
 	private void toast(String text) {
