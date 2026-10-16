@@ -39,13 +39,15 @@ public final class ProfileFragment extends ScreenFragment {
 				check(fields, f, helper);
 			else if (!f.values.isEmpty())
 				choice(fields, f.key, label, f.values, f.labels, f.value, helper, v -> app.profileInput(f.key, v));
-			else
-				textField(fields, f.key, label, f.value, f.number, f.number && !f.key.equals("durationHours"), helper,
-					v -> {
-						app.profileInput(f.key, v);
-						if (f.key.equals("experience"))
-							syncLevel();
-					});
+			else {
+				textField(fields, f.key, label, f.value, f.number, f.number, helper, v -> {
+					app.profileInput(f.key, v);
+					if (f.key.equals("experience"))
+						syncLevel();
+				});
+				if (f.key.equals("durationHours"))
+					timeInput(fields, f.key);
+			}
 		}
 		primary(action(rows, "Guardar perfil", !app.profileSaving(), app::saveProfile));
 	}

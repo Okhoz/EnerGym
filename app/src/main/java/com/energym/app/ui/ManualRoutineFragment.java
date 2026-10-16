@@ -105,8 +105,9 @@ public final class ManualRoutineFragment extends ScreenFragment {
 		enumChoice(box, "environment", "Entorno", Environment.values());
 		enumChoice(box, "focus", "Enfoque", Focus.values());
 		listChoice(box, "level", "Nivel", AppController.LEVELS, AppController.LEVELS, "");
-		field(box, "manual_duration", "Tiempo disponible (horas)", AppController.hours(c.contextValue("durationMinutes")),
-			true, false, v -> c.contextInput("durationMinutes", AppController.minutes(v)));
+		field(box, "manual_duration", "Tiempo disponible", AppController.hours(c.contextValue("durationMinutes")),
+			false, false, v -> c.contextInput("durationMinutes", AppController.minutes(v)));
+		timeInput(box, "manual_duration");
 		for (Resource resource : Resource.values()) {
 			String key = "resource." + resource.name();
 			check(box, "manual_" + key, AppController.label(resource.name()), Boolean.parseBoolean(c.contextValue(key)),

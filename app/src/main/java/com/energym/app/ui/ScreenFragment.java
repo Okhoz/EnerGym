@@ -247,6 +247,21 @@ public abstract class ScreenFragment extends Fragment {
 		target.addView(row);
 	}
 
+	/** Convierte un campo ya creado en una duración «h:mm» con teclado numérico y sufijo « h». */
+	protected void timeInput(LinearLayout target, String key) {
+		View view = target.findViewWithTag(key);
+		if (!(view instanceof EditText))
+			return;
+		EditText edit = (EditText) view;
+		edit.setInputType(android.text.InputType.TYPE_CLASS_DATETIME |
+			android.text.InputType.TYPE_DATETIME_VARIATION_TIME);
+		for (android.view.ViewParent p = edit.getParent(); p != null; p = p.getParent())
+			if (p instanceof TextInputLayout) {
+				((TextInputLayout) p).setSuffixText("h");
+				break;
+			}
+	}
+
 	protected void choice(LinearLayout target, String key, String label, List<String> values, List<String> labels,
 		String value, Consumer<String> event) {
 		choice(target, key, label, values, labels, value, "", event);

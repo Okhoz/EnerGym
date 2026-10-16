@@ -596,7 +596,7 @@ public final class AppController {
 				}
 			});
 		} catch (RuntimeException e) {
-			error("Revisa el perfil: días 1–7, tiempo por sesión entre 0.1 y 4 horas y nivel obligatorio.");
+			error("Revisa el perfil: días 1–7, tiempo por sesión entre 0:05 y 4:00 h y nivel obligatorio.");
 		}
 	}
 
@@ -668,10 +668,10 @@ public final class AppController {
 			f.add(new InputField(key, d.label, profileDraft.getOrDefault(key, ""), v, t, false, false));
 		}
 		f.add(list("daysPerWeek", "Días por semana", DAYS, DAY_LABELS));
-		// El tiempo admite cualquier valor, así que se escribe, y en horas (1,5 = hora y media).
-		f.add(new InputField("durationHours", form.durationLabel + " (horas)",
+		// El tiempo admite cualquier valor, así que se escribe, en formato horas:minutos (0:20 h).
+		f.add(new InputField("durationHours", form.durationLabel,
 			hours(profileDraft.getOrDefault("durationMinutes", "")), Collections.emptyList(), Collections.emptyList(),
-			false, true));
+			false, false));
 		// Experiencia y espacio necesitan detalle propio: siguen siendo texto libre.
 		f.add(field("experience", "Experiencia previa", false, false));
 		f.add(list("level", "Nivel", LEVELS, LEVELS));
@@ -690,23 +690,32 @@ public final class AppController {
 	private static final List<String> DAYS = Arrays.asList("1", "2", "3", "4", "5", "6", "7"),
 		DAY_LABELS = Arrays.asList("1 día", "2 días", "3 días", "4 días", "5 días", "6 días", "7 días");
 
-	/** Minutos guardados → horas para mostrar («90» → «1,5»); vacío o texto no numérico se deja igual. */
+	/** Minutos guardados → horas:minutos para mostrar («20» → «0:20»); un texto no numérico se deja igual. */
 	public static String hours(String minutes) {
 		try {
-			double h = Integer.parseInt(minutes.trim()) / 60.0;
-			String text = Math.abs(h - Math.round(h)) < 1e-9 ? Long.toString(Math.round(h)) :
-				new java.math.BigDecimal(h).setScale(2, java.math.RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
-			return text;
+			int total = Integer.parseInt(minutes.trim());
+			return String.format(Locale.ROOT, "%d:%02d", total / 60, total % 60);
 		} catch (RuntimeException e) {
 			return minutes;
 		}
 	}
 
-	/** Horas escritas («1,5», «0.75», «2») → minutos enteros; texto no válido se conserva para avisar al guardar. */
+	/**
+	 * Tiempo escrito como horas:minutos («0:20», «1:30 h»), o solo horas («2», «1.5»), → minutos enteros; un
+	 * texto no válido se conserva para avisar al guardar.
+	 */
 	public static String minutes(String hours) {
-		String h = hours == null ? "" : hours.trim().replace(',', '.');
+		String h = hours == null ? "" : hours.trim().toLowerCase(Locale.ROOT).replaceAll("\\s*h$", "").trim()
+			.replace(',', '.');
+		if (h.isEmpty())
+			return "";
+		java.util.regex.Matcher clock = java.util.regex.Pattern.compile("(\\d+):(\\d{1,2})").matcher(h);
+		if (clock.matches()) {
+			int m = Integer.parseInt(clock.group(2));
+			return m >= 60 ? "horas no válidas" : Long.toString(Integer.parseInt(clock.group(1)) * 60L + m);
+		}
 		if (!h.matches("\\d+(?:\\.\\d+)?") && !h.matches("\\.\\d+"))
-			return h.isEmpty() ? "" : "horas no válidas";
+			return "horas no válidas";
 		return Long.toString(Math.round(Double.parseDouble(h) * 60));
 	}
 
