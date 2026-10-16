@@ -59,6 +59,7 @@ public final class AppState extends AndroidViewModel {
 	public com.energym.app.progress.GoalsController goals;
 	public com.energym.app.nutrition.DietPlanner diet;
 	public com.energym.app.nutrition.WaterLog water;
+	public com.energym.app.reminders.ReminderController reminders;
 	private com.energym.app.nutrition.SyncedNutritionStore nutritionStore;
 	// Consultas a Open Food Facts: independientes del chat y de SQLite.
 	private final ExecutorService lookupWorker = Executors.newSingleThreadExecutor();
@@ -142,6 +143,8 @@ public final class AppState extends AndroidViewModel {
 				glasses.edit().putInt(key, ml).apply();
 			}
 		}, this::changed);
+		// Recordatorios de entreno y agua: alarmas y avisos locales, sin servidor.
+		reminders = new com.energym.app.reminders.ReminderController(context, this::changed);
 		// Dietas con la misma IA del móvil; el último menú de cada cuenta se guarda solo en este teléfono.
 		android.content.SharedPreferences diets = context.getSharedPreferences("diet_plans", android.content.Context.MODE_PRIVATE);
 		diet = new com.energym.app.nutrition.DietPlanner(onDevice, new com.energym.app.nutrition.DietPlanner.Store() {
@@ -234,6 +237,8 @@ public final class AppState extends AndroidViewModel {
 			training.resetFor(app.owner());
 			exerciseBrowser.resetFor(app.owner(), 0);
 			manualExerciseBrowser.resetFor(app.owner(), app.manual.draftRevision());
+			if (reminders != null && app.profile != null)
+				reminders.syncDays(app.profile.getDaysPerWeek());
 		}
 		if (visualization != null && app != null)
 			visualization.context(app.owner(), app.navigationRevision(), app.screen, app.exercise);

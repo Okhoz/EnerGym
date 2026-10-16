@@ -49,6 +49,8 @@ public final class MainActivity extends AppCompatActivity {
 	private boolean rendering;
 	private GlassBackdropController backdrop;
 	private MotionLayout screenMotion;
+	/** Pantalla pedida por una notificación de recordatorio; se abre en cuanto la app está lista. */
+	private String pendingOpen;
 
 	public AppState state() {
 		return state;
@@ -74,7 +76,8 @@ public final class MainActivity extends AppCompatActivity {
 		});
 		if (saved != null) {
 			launchedLease = saved.getString("viewerLease");
-		}
+		} else
+			pendingOpen = getIntent().getStringExtra(com.energym.app.reminders.Reminders.EXTRA_OPEN);
 		viewer = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
 			String token =
 				result.getData() == null ? launchedLease : result.getData().getStringExtra(AnatomyActivity.EXTRA_LEASE);
@@ -145,6 +148,13 @@ public final class MainActivity extends AppCompatActivity {
 				state.accountText() + " · " + state.syncText());
 		if (state.app == null)
 			return;
+		if (pendingOpen != null) {
+			String open = pendingOpen;
+			pendingOpen = null;
+			// navigate() vuelve a pintar a través del observador.
+			state.app.navigate("NUTRITION".equals(open) ? AppController.Screen.NUTRITION : AppController.Screen.TRAINING);
+			return;
+		}
 		queuePendingAvatar();
 		rendering = true;
 		try {
@@ -428,6 +438,14 @@ public final class MainActivity extends AppCompatActivity {
 			default:
 				return new HomeFragment();
 		}
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		setIntent(intent);
+		pendingOpen = intent.getStringExtra(com.energym.app.reminders.Reminders.EXTRA_OPEN);
+		render();
 	}
 
 	@Override
