@@ -23,6 +23,8 @@ public final class TrainingFragment extends ScreenFragment {
 	private ExerciseBrowser browser;
 	private Bundle restored;
 	private String featuredDraftId = "";
+	/** Sugerencia del entrenador pedida desde «+ Nuevo». */
+	private boolean suggesting;
 
 	public TrainingFragment() {
 		super(R.layout.fragment_training);
@@ -30,7 +32,7 @@ public final class TrainingFragment extends ScreenFragment {
 
 	@Override
 	protected void content() {
-		heading("", "Entreno", "Elige una rutina, entrena y apunta lo que haces. Tus rutinas suben de nivel solas.");
+		heading("", "Entreno", "");
 		restoreSelection();
 		// La referencia anterior se captura antes de retirar las filas y después se libera.
 		browser = null;
@@ -41,10 +43,9 @@ public final class TrainingFragment extends ScreenFragment {
 			return;
 		}
 		boolean hasNextStep = nextStep();
-		suggestion();
 		routines(hasNextStep);
 		otherDrafts();
-		createSection(hasNextStep);
+		createSection();
 	}
 
 	/** Dos pestañas: todas las rutinas juntas (las haya creado quien sea) y la biblioteca de ejercicios. */
@@ -82,8 +83,7 @@ public final class TrainingFragment extends ScreenFragment {
 		Session draft = active != null ? active : pending.isEmpty() ? null : pending.get(0);
 		if (draft != null) {
 			featuredDraftId = draft.getSyncId();
-			section("Ahora", 0);
-			int saved = draft.getResults().size(), total = draft.getRoutine().getItems().size();
+				int saved = draft.getResults().size(), total = draft.getRoutine().getItems().size();
 			LinearLayout resume = card("⏸ Entreno a medias", draft.getRoutine().getTitle());
 			add(resume, new com.energym.app.ui.charts.ProgressBarView(requireContext()), 4)
 				.set(total == 0 ? 0 : saved / (double) total, saved + " de " + total + " ejercicios hechos");
@@ -98,31 +98,23 @@ public final class TrainingFragment extends ScreenFragment {
 		}
 		if (app.routines.preview != null) {
 			Routine preview = app.routines.preview;
-			section("Ahora", 0);
-			LinearLayout proposal = card("✨ Tienes una rutina nueva", preview.getTitle() + "\n" + summary(preview) +
-				"\nRevísala y acéptala para poder entrenar con ella.");
+				LinearLayout proposal = card("✨ Rutina nueva: " + preview.getTitle(), summary(preview));
 			primary(action(proposal, "Revisar rutina nueva", !app.routines.busy, () -> app.navigate(Screen.ROUTINE)));
 			return true;
 		}
 		ProgressionEngine.Plan progression = app.progression();
 		if (progression != null) {
-			section("Ahora", 0);
-			LinearLayout next = card("📈 ¡Toca subir de nivel!", "Lo has hecho bien en «" +
-				(app.routines.accepted == null ? "tu rutina" : app.routines.accepted.getTitle()) +
-				"». Mira qué subimos (repeticiones o carga) y entrena con la versión nueva.");
+				LinearLayout next = card("📈 ¡Toca subir de nivel!", "Has cumplido «" +
+				(app.routines.accepted == null ? "tu rutina" : app.routines.accepted.getTitle()) + "».");
 			primary(action(next, "Ver qué sube", !app.routines.busy, app::reviewProgression));
 			action(next, "Repetir sin cambios", !app.sessions.busy, app::startSession);
 			return true;
 		}
 		if (app.routines.accepted == null) return false;
 		Routine selected = app.routines.accepted;
-		section("Hoy", 0);
-		LinearLayout ready = card("Tu entreno de hoy", selected.getTitle() + "\n" + summary(selected) +
-			(selected.isProgressionEnabled() ? "\n📈 Sube de nivel sola cuando la completas" : ""));
-		action(ready, "Ver ejercicios", !app.routines.busy, app::viewSelectedRoutine);
-		action(ready, "✏️ Editar", !app.routines.busy && !app.trainingMutation, () -> app.editRoutine(selected))
-			.setTag("training_edit_today");
+		LinearLayout ready = card("Hoy: " + selected.getTitle(), summary(selected));
 		primary(action(ready, "Empezar entreno", !app.sessions.busy, app::startSession));
+		action(ready, "Ver ejercicios", !app.routines.busy, app::viewSelectedRoutine);
 		return true;
 	}
 
@@ -131,12 +123,13 @@ public final class TrainingFragment extends ScreenFragment {
 	 * antes de guardarla o pedir otra.
 	 */
 	private void suggestion() {
-		if (app.owner() == null || app.sessions.session != null || !distinctDrafts().isEmpty())
+		if (app.owner() == null)
 			return;
 		Routine s = app.suggest();
-		if (s == null)
+		if (s == null) {
+			card("💡 Sin sugerencia", "Aún no hay ejercicios compatibles con tu perfil para sugerirte algo.");
 			return;
-		section("Sugerencia de tu entrenador", 32);
+		}
 		LinearLayout card = card("💡 " + s.getTitle(), app.suggestionReason + "\n" + summary(s));
 		card.setTag("training_suggestion");
 		for (com.energym.app.domain.RoutineItem item : s.getItems()) {
@@ -162,62 +155,71 @@ public final class TrainingFragment extends ScreenFragment {
 		routines.sort(Comparator.comparingInt((Routine r) -> com.energym.app.domain.WeeklyPlan.dayOf(r) == null ? 1 : 0)
 			.thenComparingInt(r -> com.energym.app.domain.WeeklyPlan.dayOf(r) == null ? 0 :
 				com.energym.app.domain.WeeklyPlan.dayOf(r)[0]));
-		if (!app.lastProgression.isEmpty()) {
-			section("Última subida de nivel", hasNextStep ? 32 : 0);
-			card("📈 Tu rutina ha mejorado", "• " + String.join("\n• ", app.lastProgression));
-			hasNextStep = true;
-		}
-		section("Tus rutinas", hasNextStep ? 32 : 0);
-		if (routines.isEmpty()) {
-			card("Empieza aquí", "Aún no tienes rutinas. Pídele una al entrenador con lo que quieras trabajar " +
-				"(por ejemplo «piernas, 30 minutos») o créala tú eligiendo los ejercicios.");
+		if (routines.isEmpty())
 			return;
-		}
-		if (routines.size() > 1)
-			text(rows, "Toca una rutina para entrenar con ella hoy. Con ⋮ la editas o la borras.",
-				R.style.EnerGym_FieldCaption, 0);
+		section("Tus rutinas", hasNextStep ? 32 : 0);
 		for (Routine routine : routines)
 			routineRow(routine);
 	}
 
-	/** Crear siempre a la vista: con el entrenador, a mano o una automática al momento. */
-	private void createSection(boolean hasNextStep) {
+	/**
+	 * Todo lo que crea algo nuevo detrás de un solo botón: entreno libre, sugerencia, IA, plan semanal, a mano o
+	 * automática. Sin rutinas se muestra abierto.
+	 */
+	private void createSection() {
 		boolean ready = app.owner() != null && !app.loading;
-		section("Sin rutina", 32);
-		LinearLayout free = card("🏋️ Entreno libre", "Como en un cuaderno: eliges los ejercicios sobre la marcha y apuntas " +
-			"cada serie. Solo ves los compatibles con tu lugar y material.");
-		MaterialButton freeStart = action(free, "Empezar entreno libre", ready && !app.trainingMutation && app.profile != null,
+		if (app.owner() == null)
+			return;
+		boolean open = state.training.optionsExpanded || app.versions.isEmpty();
+		section("Nuevo", 32);
+		if (!app.versions.isEmpty()) {
+			MaterialButton toggle = action(rows, open ? "Cerrar ▴" : "+ Nuevo entreno o rutina", true, () -> {
+				state.training.optionsExpanded = !state.training.optionsExpanded;
+				suggesting = false;
+				render();
+			});
+			toggle.setTag("training_new");
+			if (!open)
+				primary(toggle);
+		}
+		if (!open)
+			return;
+		LinearLayout create = card(app.versions.isEmpty() ? "Crea tu primer entreno" : "¿Qué quieres hacer?", "");
+		MaterialButton freeStart = option(create, "🏋️ Entreno libre", "Eliges los ejercicios sobre la marcha.",
+			ready && !app.trainingMutation && app.profile != null,
 			() -> ExercisePicker.show(requireContext(), "Primer ejercicio", app.freeCandidates(), app::addFreeExercise));
 		freeStart.setTag("training_free");
-		section("Crear una rutina", 32);
-		LinearLayout create = card("¿Cómo la quieres crear?", "");
-		MaterialButton ai = action(create, "✦ Pedírsela al entrenador", ready && !state.assistant.busy, () -> {
-			if (state.assistant.busy)
-				return;
-			state.assistant.selectLocalGuidance(false);
-			state.assistant.messageInput("Prepara una rutina para mí.");
-			app.navigate(Screen.ASSISTANT);
-		});
+		option(create, "💡 Que me sugiera uno", "Para lo que menos has trabajado.", ready && !app.trainingMutation, () -> {
+			suggesting = true;
+			render();
+		}).setTag("training_suggest");
+		MaterialButton ai = option(create, "✦ Pedírsela al entrenador", "Dile qué quieres trabajar y cuánto tiempo tienes.",
+			ready && !state.assistant.busy, () -> {
+				if (state.assistant.busy)
+					return;
+				state.assistant.selectLocalGuidance(false);
+				state.assistant.messageInput("Prepara una rutina para mí.");
+				app.navigate(Screen.ASSISTANT);
+			});
 		ai.setTag("training_create_ai");
 		ai.setContentDescription("Crear rutina con IA");
-		text(create, "Dile qué quieres trabajar, cuánto tiempo tienes o cómo te encuentras.", R.style.EnerGym_FieldCaption, 6)
-			;
-		MaterialButton plan = action(create, "📅 Plan semanal", ready && !app.trainingMutation, () -> app.createPlan(""));
-		plan.setTag("training_create_plan");
-		text(create, "Una rutina por día según los días que entrenas (Empuje / Tirón / Pierna, Torso / Pierna…).",
-			R.style.EnerGym_FieldCaption, 6);
-		MaterialButton manual = action(create, "✍ Hacerla yo", ready && !app.manual.busy, app::createManualRoutine);
+		option(create, "📅 Plan semanal", "Una rutina por día (Empuje / Tirón / Pierna…).",
+			ready && !app.trainingMutation, () -> app.createPlan("")).setTag("training_create_plan");
+		MaterialButton manual = option(create, "✍ Hacerla yo", "Eliges ejercicios, series y carga.",
+			ready && !app.manual.busy, app::createManualRoutine);
 		manual.setTag("training_create_manual");
 		manual.setContentDescription("Crear rutina manual");
-		text(create, "Eliges los ejercicios, series, repeticiones y carga.", R.style.EnerGym_FieldCaption, 6)
-			;
-		MaterialButton quick = action(create, "⚡ Una automática ya",
-			ready && !app.profileSaving() && !app.routines.busy, app::createRoutine);
-		quick.setTag("training_more_options");
-		text(create, "Te propongo una al momento con tu perfil, sin IA. La revisas antes de guardarla.",
-			R.style.EnerGym_FieldCaption, 6);
-		if (!hasNextStep && app.versions.isEmpty())
-			primary(ai);
+		option(create, "⚡ Una automática ya", "Con tu perfil, al momento y sin IA.",
+			ready && !app.profileSaving() && !app.routines.busy, app::createRoutine).setTag("training_more_options");
+		if (suggesting)
+			suggestion();
+	}
+
+	/** Botón de una opción con su explicación de una línea debajo. */
+	private MaterialButton option(LinearLayout target, String label, String help, boolean enabled, Runnable click) {
+		MaterialButton b = action(target, label, enabled, click);
+		text(target, help, R.style.EnerGym_FieldCaption, 4);
+		return b;
 	}
 
 	/** Fila de rutina: título, datos clave y menú; la elegida lleva borde dorado. */
