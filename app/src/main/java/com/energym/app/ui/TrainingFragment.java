@@ -155,7 +155,9 @@ public final class TrainingFragment extends ScreenFragment {
 		routines.sort(Comparator.comparingInt((Routine r) -> com.energym.app.domain.WeeklyPlan.dayOf(r) == null ? 1 : 0)
 			.thenComparingInt(r -> com.energym.app.domain.WeeklyPlan.dayOf(r) == null ? 0 :
 				com.energym.app.domain.WeeklyPlan.dayOf(r)[0]));
-		if (routines.isEmpty())
+		// Si la única rutina es la de hoy, ya se ve arriba.
+		if (routines.isEmpty() || routines.size() == 1 && app.routines.accepted != null &&
+			routines.get(0).getProposalId().equals(app.routines.accepted.getProposalId()))
 			return;
 		section("Tus rutinas", hasNextStep ? 32 : 0);
 		for (Routine routine : routines)
@@ -170,9 +172,18 @@ public final class TrainingFragment extends ScreenFragment {
 		boolean ready = app.owner() != null && !app.loading;
 		if (app.owner() == null)
 			return;
-		boolean open = state.training.optionsExpanded || app.versions.isEmpty();
+		// Sin perfil no se puede crear nada útil: primero eso, con un solo botón.
+		if (app.profile == null) {
+			LinearLayout first = card("Primero, tu perfil", "Tu objetivo, días y material: con eso te preparamos los entrenos.");
+			MaterialButton setup = action(first, "Configurar mi perfil", true, () -> app.navigate(Screen.PROFILE));
+			setup.setTag("training_profile");
+			primary(setup);
+			return;
+		}
+		boolean first = app.versions.isEmpty() && app.routines.accepted == null;
+		boolean open = state.training.optionsExpanded || first;
 		section("Nuevo", 32);
-		if (!app.versions.isEmpty()) {
+		if (!first) {
 			MaterialButton toggle = action(rows, open ? "Cerrar ▴" : "+ Nuevo entreno o rutina", true, () -> {
 				state.training.optionsExpanded = !state.training.optionsExpanded;
 				suggesting = false;
@@ -184,8 +195,8 @@ public final class TrainingFragment extends ScreenFragment {
 		}
 		if (!open)
 			return;
-		LinearLayout create = card(app.versions.isEmpty() ? "Crea tu primer entreno" : "¿Qué quieres hacer?", "");
-		MaterialButton freeStart = option(create, "🏋️ Entreno libre", "Eliges los ejercicios sobre la marcha.",
+		LinearLayout create = card(first ? "Crea tu primer entreno" : "¿Qué quieres hacer?", "");
+		View freeStart = option(create, "🏋️ Entreno libre", "Eliges los ejercicios sobre la marcha.",
 			ready && !app.trainingMutation && app.profile != null,
 			() -> ExercisePicker.show(requireContext(), "Primer ejercicio", app.freeCandidates(), app::addFreeExercise));
 		freeStart.setTag("training_free");
@@ -193,7 +204,7 @@ public final class TrainingFragment extends ScreenFragment {
 			suggesting = true;
 			render();
 		}).setTag("training_suggest");
-		MaterialButton ai = option(create, "✦ Pedírsela al entrenador", "Dile qué quieres trabajar y cuánto tiempo tienes.",
+		View ai = option(create, "✦ Pedírsela al entrenador", "Dile qué quieres trabajar y cuánto tiempo tienes.",
 			ready && !state.assistant.busy, () -> {
 				if (state.assistant.busy)
 					return;
@@ -205,7 +216,7 @@ public final class TrainingFragment extends ScreenFragment {
 		ai.setContentDescription("Crear rutina con IA");
 		option(create, "📅 Plan semanal", "Una rutina por día (Empuje / Tirón / Pierna…).",
 			ready && !app.trainingMutation, () -> app.createPlan("")).setTag("training_create_plan");
-		MaterialButton manual = option(create, "✍ Hacerla yo", "Eliges ejercicios, series y carga.",
+		View manual = option(create, "✍ Hacerla yo", "Eliges ejercicios, series y carga.",
 			ready && !app.manual.busy, app::createManualRoutine);
 		manual.setTag("training_create_manual");
 		manual.setContentDescription("Crear rutina manual");
@@ -215,11 +226,9 @@ public final class TrainingFragment extends ScreenFragment {
 			suggestion();
 	}
 
-	/** Botón de una opción con su explicación de una línea debajo. */
-	private MaterialButton option(LinearLayout target, String label, String help, boolean enabled, Runnable click) {
-		MaterialButton b = action(target, label, enabled, click);
-		text(target, help, R.style.EnerGym_FieldCaption, 4);
-		return b;
+	/** Opción del menú «Nuevo»: fila compacta con su explicación de una línea. */
+	private View option(LinearLayout target, String label, String help, boolean enabled, Runnable click) {
+		return listRow(target, label, help, "›", enabled, click);
 	}
 
 	/** Fila de rutina: título, datos clave y menú; la elegida lleva borde dorado. */

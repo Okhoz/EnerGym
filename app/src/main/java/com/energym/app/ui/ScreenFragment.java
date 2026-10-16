@@ -360,6 +360,30 @@ public abstract class ScreenFragment extends Fragment {
 			androidx.core.content.ContextCompat.getColor(c, R.color.surface)}));
 	}
 
+	/**
+	 * Fila de lista compacta (título, una línea de detalle y un indicador a la derecha, normalmente ›): para menús y
+	 * opciones, mucho más ligera que un botón grande con texto debajo.
+	 */
+	protected View listRow(LinearLayout target, String title, String detail, String end, boolean enabled, Runnable click) {
+		View row = getLayoutInflater().inflate(R.layout.row_food, target, false);
+		((TextView) row.findViewById(R.id.food_name)).setText(title);
+		TextView sub = row.findViewById(R.id.food_detail);
+		sub.setText(detail);
+		sub.setVisibility(detail == null || detail.isEmpty() ? View.GONE : View.VISIBLE);
+		TextView arrow = row.findViewById(R.id.food_kcal);
+		arrow.setText(end);
+		arrow.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.gold));
+		row.setEnabled(enabled);
+		row.setAlpha(enabled ? 1f : 0.45f);
+		row.setContentDescription(title + (detail == null || detail.isEmpty() ? "" : ". " + detail));
+		row.setOnClickListener(v -> {
+			if (v.isEnabled())
+				click.run();
+		});
+		target.addView(row);
+		return row;
+	}
+
 	protected void textField(LinearLayout target, String key, String label, String value, boolean number,
 		boolean integer, Consumer<String> event) {
 		textField(target, key, label, value, number, integer,

@@ -110,13 +110,14 @@ public final class AccountFragment extends ScreenFragment {
 	/** Cabecera plegable de un ajuste; devuelve si está abierto. Abrir uno cierra el anterior. */
 	private boolean fold(String key, String label) {
 		boolean open = key.equals(openSetting);
-		com.google.android.material.button.MaterialButton header = action(rows, label + (open ? "   ▴" : "   ›"), true, () -> {
+		android.view.View header = listRow(rows, label, "", open ? "▴" : "›", true, () -> {
 			openSetting = open ? "" : key;
 			render();
 		});
 		header.setTag("setting_" + key);
-		header.setTextAlignment(android.view.View.TEXT_ALIGNMENT_VIEW_START);
-		header.setGravity(android.view.Gravity.START | android.view.Gravity.CENTER_VERTICAL);
+		header.setPadding(dp(20), dp(14), dp(20), dp(14));
+		header.setBackground(rounded(open ? R.color.surface_selected : R.color.surface_card, 18, R.color.gold, open ? 1 : 0));
+		((LinearLayout.LayoutParams) header.getLayoutParams()).bottomMargin = dp(10);
 		return open;
 	}
 

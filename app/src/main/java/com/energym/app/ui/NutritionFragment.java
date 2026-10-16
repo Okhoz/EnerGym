@@ -52,7 +52,7 @@ public final class NutritionFragment extends ScreenFragment {
 		next.setContentDescription("Día siguiente");
 		next.setTextSize(22);
 		((LinearLayout.LayoutParams) today.getLayoutParams()).weight = 3;
-		add(rows, new android.widget.Space(requireContext()), 8);
+		add(rows, new android.widget.Space(requireContext()), 16);
 
 		double[] totals = n.totals(day);
 		BodyProfile.Targets targets = n.targets();
@@ -300,7 +300,8 @@ public final class NutritionFragment extends ScreenFragment {
 		MaterialButton edit = action(goal, n.body == null ? "Configurar mi objetivo" : "Cambiar objetivo", !n.busy, () -> open(Screen.BODY));
 		edit.setTag("nutrition_change_goal");
 		if (targets == null) primary(edit);
-		action(goal, "Consultar mi alimentación con IA", state.assistant != null && !state.assistant.busy, () -> {
+		if (targets != null)
+			action(goal, "Consultar mi alimentación con IA", state.assistant != null && !state.assistant.busy, () -> {
 			if (state.assistant == null || state.assistant.busy) return;
 			state.assistant.selectLocalGuidance(false);
 			state.assistant.messageInput(n.coachBrief());

@@ -102,10 +102,7 @@ public final class SessionFragment extends ScreenFragment {
 		}
 		if (e.getMetricType() != MetricType.STRENGTH)
 			rest();
-		if (app.sessions.selected + 1 < ids.size())
-			action(rows, "Siguiente ejercicio", !app.sessions.busy,
-				() -> app.sessions.select(app.sessions.selected + 1));
-		section("Terminar", 32);
+		add(rows, new android.view.View(requireContext()), 24);
 		boolean done = saved >= ids.size();
 		LinearLayout finish = card(done ? "🎉 ¡Todo apuntado!" : "Terminar el entreno", done ?
 			"Termina para guardarlo en tu historial y que tu rutina pueda subir de nivel." :
@@ -135,14 +132,19 @@ public final class SessionFragment extends ScreenFragment {
 		int at = app.sessions.selected, count = names.size();
 		section("Ejercicio " + (at + 1) + " de " + count + " · " + saved + " apuntados", 8);
 		LinearLayout nav = columns(rows, 0);
-		compact(nav, "‹", at > 0 && !app.sessions.busy, () -> app.sessions.select(at - 1))
-			.setContentDescription("Ejercicio anterior");
+		com.google.android.material.button.MaterialButton back =
+			compact(nav, "‹", at > 0 && !app.sessions.busy, () -> app.sessions.select(at - 1));
+		back.setContentDescription("Ejercicio anterior");
+		back.setTextSize(26);
 		compact(nav, showList ? "Ocultar lista" : "☰ Todos", true, () -> {
 			showList = !showList;
 			render();
 		}).setTag("session_list_toggle");
-		compact(nav, "›", at + 1 < count && !app.sessions.busy, () -> app.sessions.select(at + 1))
-			.setContentDescription("Ejercicio siguiente");
+		com.google.android.material.button.MaterialButton forward =
+			compact(nav, "›", at + 1 < count && !app.sessions.busy, () -> app.sessions.select(at + 1));
+		forward.setContentDescription("Ejercicio siguiente");
+		forward.setTextSize(26);
+		add(rows, new android.view.View(requireContext()), 12);
 		if (!showList)
 			return;
 		LinearLayout list = card("Ejercicios de hoy", "Toca uno para ir a él.");
@@ -680,7 +682,7 @@ public final class SessionFragment extends ScreenFragment {
 
 	/** Temporizador de descanso entre series: cuenta atrás visible y vibración al terminar. */
 	private void rest() {
-		section("Descanso", 32);
+		add(rows, new android.view.View(requireContext()), 8);
 		LinearLayout card = card("⏱ Descanso", "");
 		restLabel = text(card, "", R.style.EnerGym_CardTitle, 0);
 		LinearLayout presets = columns(card, 8);

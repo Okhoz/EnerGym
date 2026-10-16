@@ -106,7 +106,7 @@ public final class HomeFragment extends ScreenFragment {
 		LinearLayout food = card("Tu día", (targets == null ? "🍽 Escanea tus alimentos y controla calorías y macros." :
 			"🍽 " + Math.round(today[0]) + " de " + Math.round(targets.kcal) + " kcal") + water);
 		LinearLayout buttons = columns(food, 16);
-		compact(buttons, targets == null ? "Empezar" : "+ Comida", true, () -> app.navigate(Screen.NUTRITION))
+		compact(buttons, targets == null ? "Nutrición" : "+ Comida", true, () -> app.navigate(Screen.NUTRITION))
 			.setTag("home_add_food");
 		if (state.water != null)
 			compact(buttons, "+ Vaso", true, () -> state.water.add(state.nutrition.today(),

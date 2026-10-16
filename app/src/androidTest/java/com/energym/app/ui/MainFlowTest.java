@@ -59,7 +59,7 @@ public class MainFlowTest {
 			trainingPane(scenario, "mine");
 			click(scenario, "⚡ Una automática ya");
 			capture("proposal");
-			click(scenario, "Aceptar propuesta");
+			click(scenario, "Guardar rutina");
 			await();
 			click(scenario, "Empezar entreno");
 			await();
@@ -250,7 +250,7 @@ public class MainFlowTest {
 		s.onActivity(a -> {
 			View v = a.getWindow().getDecorView().findViewWithTag("setting_" + key);
 			assertNotNull("Ajuste ausente: " + key, v);
-			if (((android.widget.TextView) v).getText().toString().endsWith("›"))
+			if ("›".contentEquals(((android.widget.TextView) v.findViewById(com.energym.app.R.id.food_kcal)).getText()))
 				v.performClick();
 		});
 		await();
