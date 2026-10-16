@@ -298,6 +298,9 @@ public final class EnerGymDatabase extends SQLiteOpenHelper {
 			case GOAL:
 				GoalRepository.canonical(r.getSyncId(), r.getPayload());
 				break;
+			case EXTRA:
+				ExtrasRepository.canonical(r.getSyncId(), r.getPayload());
+				break;
 			case SESSION:
 				Session session = SnapshotCodec.decodeSession(r.getPayload());
 				// versionId=0 es el marcador portátil de nube, nunca una prueba de aceptación local.

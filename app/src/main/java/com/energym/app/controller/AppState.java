@@ -64,6 +64,8 @@ public final class AppState extends AndroidViewModel {
 	public com.energym.app.catalog.CustomExercises customExercises;
 	public com.energym.app.nutrition.SavedMeals savedMeals;
 	public com.energym.app.nutrition.BodyMeasures measures;
+	/** Copia en la cuenta de medidas, comidas guardadas, ejercicios propios y superseries. */
+	public ExtrasSync extras;
 	private com.energym.app.nutrition.SyncedNutritionStore nutritionStore;
 	// Consultas a Open Food Facts: independientes del chat y de SQLite.
 	private final ExecutorService lookupWorker = Executors.newSingleThreadExecutor();
@@ -113,11 +115,22 @@ public final class AppState extends AndroidViewModel {
 					// Una restauración también puede traer diario, peso y objetivos de otro dispositivo.
 					if (nutrition != null)
 						nutrition.reload();
+					if (extras != null)
+						extras.pull();
 					if (goals != null)
 						goals.reload();
 				}
 				changed();
 			});
+		// Lo que llega de la cuenta se aplica en local y las funciones vuelven a leerlo.
+		extras = new ExtrasSync(context, sync, () -> {
+			if (app == null)
+				return;
+			customExercises.activate(app.owner());
+			savedMeals.activate(app.owner());
+			measures.activate(app.owner());
+			changed();
+		});
 		AndroidAppStore store = new AndroidAppStore(sync);
 		app = new AppController(store, catalog);
 		nutritionStore = new com.energym.app.nutrition.SyncedNutritionStore(context, sync);
@@ -173,6 +186,8 @@ public final class AppState extends AndroidViewModel {
 				for (com.energym.app.domain.Exercise e : exercises)
 					rows.put(com.energym.app.data.SnapshotCodec.encodeExercise(e));
 				customPrefs.edit().putString(owner, rows.toString()).apply();
+				if (extras != null)
+					extras.push("exercises", "all", rows.toString());
 			}
 		}, catalog, this::changed);
 		android.content.SharedPreferences mealPrefs = context.getSharedPreferences("saved_meals",
@@ -184,6 +199,8 @@ public final class AppState extends AndroidViewModel {
 
 			public void save(String owner, String encoded) {
 				mealPrefs.edit().putString(owner, encoded).apply();
+				if (extras != null)
+					extras.push("meals", "all", encoded);
 			}
 		});
 		android.content.SharedPreferences measurePrefs = context.getSharedPreferences("body_measures",
@@ -195,6 +212,8 @@ public final class AppState extends AndroidViewModel {
 
 			public void save(String owner, String encoded) {
 				measurePrefs.edit().putString(owner, encoded).apply();
+				if (extras != null)
+					extras.push("measures", "all", encoded);
 			}
 		});
 		// Recordatorios de entreno y agua: alarmas y avisos locales, sin servidor.
@@ -272,6 +291,8 @@ public final class AppState extends AndroidViewModel {
 			customExercises.activate(app.owner());
 			savedMeals.activate(app.owner());
 			measures.activate(app.owner());
+			if (extras != null)
+				extras.activate(app.owner());
 			changed();
 		});
 		accounts = new AccountController(gateway, sync, main, (status, value, error) -> {

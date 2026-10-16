@@ -360,6 +360,8 @@ public final class SessionFragment extends ScreenFragment {
 	private void saveLinks(Set<Integer> links) {
 		requireContext().getSharedPreferences("supersets", android.content.Context.MODE_PRIVATE).edit()
 			.putString(app.sessions.session.getSyncId(), Supersets.encode(links)).apply();
+		if (state.extras != null)
+			state.extras.push("supersets", app.sessions.session.getSyncId(), Supersets.encode(links));
 	}
 
 	/** «Calentamiento · RPE 8 · detalle»: tipo y esfuerzo de una serie delante del detalle que ya hubiera. */

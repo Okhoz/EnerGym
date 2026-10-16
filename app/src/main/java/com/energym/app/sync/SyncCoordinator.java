@@ -76,6 +76,7 @@ public final class SyncCoordinator {
 			return;
 		}
 		busy = true;
+		deferred.clear();
 		long token = generation;
 		LocalSyncStore target = store;
 		status(Status.SYNCING, null);
@@ -126,7 +127,9 @@ public final class SyncCoordinator {
 		if (!current(token, target))
 			return;
 		if (index == pending.size()) {
-			boolean newerPending = !target.pending().isEmpty();
+			boolean newerPending = false;
+			for (SyncRecord r : target.pending())
+				newerPending |= !deferred.contains(key(r));
 			if (newerPending && !conflict)
 				repeat = true;
 			finish(conflict ? Status.CONFLICT : newerPending ? Status.IDLE : Status.SYNCED, null);
@@ -158,6 +161,16 @@ public final class SyncCoordinator {
 					}
 
 					public void onFailure(Exception e) {
+						if (record.getKind() == SyncRecord.Kind.EXTRA) {
+							// Datos extra: no bloquean la copia de entrenos y comidas; se reintentan en el siguiente ciclo.
+							schedule(token, target, () -> {
+								synchronized (SyncCoordinator.this) {
+									deferred.add(key(record));
+									uploadNext(token, target, pending, versions, index + 1, conflict);
+								}
+							});
+							return;
+						}
 						schedule(token, target, () -> failed(token, target, e));
 					}
 				});
@@ -165,6 +178,9 @@ public final class SyncCoordinator {
 			failed(token, target, e);
 		}
 	}
+
+	/** Extras que no se pudieron subir en este ciclo: quedan pendientes sin forzar repeticiones inmediatas. */
+	private final Set<String> deferred = new HashSet<>();
 
 	private boolean current(long token, LocalSyncStore target) {
 		if (token != generation || target != store)

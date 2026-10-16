@@ -16,7 +16,7 @@ service cloud.firestore {
 				&& ((kind == 'PROFILE' && d.identity == '' && d.terminal == false)
 				|| ((kind == 'ROUTINE' || kind == 'TRAINING_ARCHIVE') && d.identity.matches('[a-f0-9]{64}') && d.terminal == true)
 				|| (kind == 'SESSION' && d.identity.matches('[a-f0-9]{64}'))
-				|| ((kind == 'BODY' || kind == 'WEIGHT') && d.identity == '' && d.terminal == false)
+				|| ((kind == 'BODY' || kind == 'WEIGHT' || kind == 'EXTRA') && d.identity == '' && d.terminal == false)
 				|| ((kind == 'FOOD' || kind == 'GOAL') && d.identity.matches('[a-f0-9]{64}')));
 		}
 		function nextVersion() {
@@ -77,6 +77,15 @@ service cloud.firestore {
 			// Activo → lápida (terminal) una sola vez, con la misma identidad.
 			allow update: if owns(uid) && valid(uid, 'GOAL', id) && nextVersion()
 				&& request.resource.data.identity == resource.data.identity && resource.data.terminal == false;
+			allow delete: if false;
+		}
+		// Medidas, comidas guardadas, ejercicios propios y superseries («tipo_clave»): editables con versión.
+		match /users/{uid}/extras/{id} {
+			allow read: if owns(uid);
+			allow create: if owns(uid) && valid(uid, 'EXTRA', id)
+				&& id.matches('(measures|meals|exercises|supersets)_[A-Za-z0-9_-]{1,100}')
+				&& request.resource.data.cloudVersion == 1;
+			allow update: if owns(uid) && valid(uid, 'EXTRA', id) && nextVersion();
 			allow delete: if false;
 		}
 		// Sólo el backend autenticado mediante IAM administra las cuotas; ningún cliente accede.

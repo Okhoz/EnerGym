@@ -32,6 +32,8 @@ public final class CloudDocumentCodec {
 				return "goals";
 			case TRAINING_ARCHIVE:
 				return "trainingArchive";
+			case EXTRA:
+				return "extras";
 			default:
 				return "sessions";
 		}
@@ -93,6 +95,10 @@ public final class CloudDocumentCodec {
 				payload = GoalRepository.canonical(record.getSyncId(), record.getPayload());
 				identity = hash(record.getSyncId() + ":" + GoalRepository.createdAt(payload));
 				terminal = GoalRepository.deleted(payload);
+				break;
+			case EXTRA:
+				// Medidas, comidas guardadas, ejercicios propios y superseries: editables, gana el último.
+				payload = ExtrasRepository.canonical(record.getSyncId(), record.getPayload());
 				break;
 			case FOOD:
 				// Identidad estable entre alta y lápida; la lápida es definitiva.

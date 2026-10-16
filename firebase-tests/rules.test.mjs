@@ -177,6 +177,18 @@ test('own nutrition body weights and food sync with versioned updates', async ()
 	await assertFails(deleteDoc(weight));
 	await assertFails(getDoc(doc(db('bob'), 'users/alice/body/current')));
 });
+test('extras sync only for the owner, with known types and versioned updates', async () => {
+	const own = db('alice');
+	const ref = doc(own, 'users/alice/extras/measures_all');
+	await assertSucceeds(setDoc(ref, nutrition('EXTRA', 'measures_all')));
+	await assertSucceeds(setDoc(ref, nutrition('EXTRA', 'measures_all', {cloudVersion: 2, updatedAt: 1001})));
+	await assertFails(setDoc(ref, nutrition('EXTRA', 'measures_all', {cloudVersion: 2, updatedAt: 1002})));
+	await assertFails(setDoc(doc(own, 'users/alice/extras/photos_all'), nutrition('EXTRA', 'photos_all')));
+	await assertFails(setDoc(doc(own, 'users/alice/extras/meals_all'), nutrition('EXTRA', 'meals_all', {terminal: true})));
+	await assertFails(deleteDoc(ref));
+	await assertFails(getDoc(doc(db('bob'), 'users/alice/extras/measures_all')));
+	await assertFails(setDoc(doc(db('bob'), 'users/alice/extras/meals_all'), nutrition('EXTRA', 'meals_all')));
+});
 test('food can only move once from active to terminal tombstone', async () => {
 	const ref = doc(db('alice'), 'users/alice/food/meal-1');
 	await assertSucceeds(setDoc(ref, nutrition('FOOD', 'meal-1')));

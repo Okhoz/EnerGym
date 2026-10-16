@@ -248,6 +248,36 @@ public class SyncCoordinatorTest {
 		assertEquals(SyncCoordinator.Status.SYNCED, statuses.get(statuses.size() - 1));
 	}
 
+	@Test
+	public void rejectedExtraStaysPendingWithoutFailingOrLoopingTheBackup() {
+		Store s = new Store("alice");
+		s.value = new SyncRecord(SyncRecord.Kind.EXTRA, "measures_all", "alice",
+			"{\"type\":\"measures\",\"key\":\"all\",\"data\":\"\"}", 1, 1, SyncRecord.State.PENDING);
+		SyncCoordinator c = coordinator();
+		c.activate(s);
+		c.sync();
+		cloud.download.onSuccess(Collections.emptyList());
+		// Reglas sin publicar: Firestore rechaza el extra; la copia termina bien y lo deja para el siguiente ciclo.
+		cloud.upload.onFailure(new IllegalStateException("PERMISSION_DENIED"));
+		assertEquals(SyncCoordinator.Status.SYNCED, statuses.get(statuses.size() - 1));
+		assertEquals(SyncRecord.State.PENDING, s.value.getState());
+		assertEquals("Sin repetir en bucle", 1, cloud.restores);
+		c.sync();
+		assertEquals("Se reintenta en el siguiente ciclo", 2, cloud.restores);
+	}
+
+	@Test
+	public void rejectedCoreRecordStillReportsError() {
+		Store s = new Store("alice");
+		s.value = record("alice", 1, "local");
+		SyncCoordinator c = coordinator();
+		c.activate(s);
+		c.sync();
+		cloud.download.onSuccess(Collections.emptyList());
+		cloud.upload.onFailure(new IllegalStateException("PERMISSION_DENIED"));
+		assertEquals(SyncCoordinator.Status.ERROR, statuses.get(statuses.size() - 1));
+	}
+
 	static final class Store implements LocalSyncStore {
 		final String owner;
 		SyncRecord value;

@@ -81,6 +81,10 @@ public final class FirebaseCloudGateway implements CloudSyncGateway {
 			query.get(Source.SERVER).addOnCompleteListener(worker, task -> {
 				try {
 					requireOwner(owner);
+					if (!task.isSuccessful() && kind == SyncRecord.Kind.EXTRA && denied(task.getException())) {
+						readPage(owner, kinds, index + 1, null, result, callback);
+						return;
+					}
 					if (!task.isSuccessful())
 						throw task.getException() == null ? new IllegalStateException("Restauración fallida") :
 							task.getException();
@@ -102,6 +106,13 @@ public final class FirebaseCloudGateway implements CloudSyncGateway {
 		} catch (Exception e) {
 			callback.onFailure(e);
 		}
+	}
+
+	/** Permiso denegado por las reglas de Firestore (p. ej. un tipo nuevo antes de publicarlas). */
+	static boolean denied(Exception e) {
+		return e instanceof com.google.firebase.firestore.FirebaseFirestoreException &&
+			((com.google.firebase.firestore.FirebaseFirestoreException) e).getCode() ==
+				com.google.firebase.firestore.FirebaseFirestoreException.Code.PERMISSION_DENIED;
 	}
 
 	public void upload(SyncRecord record, long expectedVersion, Callback<UploadResult> callback) {
