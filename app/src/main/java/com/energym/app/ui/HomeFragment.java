@@ -46,8 +46,6 @@ public final class HomeFragment extends ScreenFragment {
 		}
 		today();
 		food();
-		MaterialButton open = action(rows, "📊 Ver tu progreso", true, () -> app.navigate(Screen.HISTORY));
-		open.setContentDescription(getString(R.string.home_view_history));
 		if (!app.notice.isEmpty())
 			text(rows, app.notice, R.style.EnerGym_FieldCaption, 4);
 	}
@@ -92,15 +90,27 @@ public final class HomeFragment extends ScreenFragment {
 		primary(action(create, "Crear mi rutina", !app.routines.busy, () -> app.navigate(Screen.TRAINING)));
 	}
 
+	/** Tu día de un vistazo: calorías y agua, con añadir comida o un vaso a un toque. */
 	private void food() {
 		if (state.nutrition == null)
 			return;
 		double[] today = state.nutrition.totals(state.nutrition.today());
 		BodyProfile.Targets targets = state.nutrition.targets();
-		LinearLayout food = card(getString(R.string.nutrition), targets == null ?
-			"Escanea tus alimentos y controla calorías y macros." :
-			"Hoy llevas " + Math.round(today[0]) + " de " + Math.round(targets.kcal) + " kcal.");
-		action(food, targets == null ? "Empezar" : "Añadir comida", () -> app.navigate(Screen.NUTRITION));
+		String water = "";
+		if (state.water != null) {
+			int ml = state.water.ml(state.nutrition.today());
+			water = "\n💧 " + com.energym.app.nutrition.WaterLog.liters(ml) + " de " +
+				com.energym.app.nutrition.WaterLog.liters(com.energym.app.nutrition.WaterLog.goal(state.nutrition.effectiveBody())) +
+				" de agua";
+		}
+		LinearLayout food = card("Tu día", (targets == null ? "🍽 Escanea tus alimentos y controla calorías y macros." :
+			"🍽 " + Math.round(today[0]) + " de " + Math.round(targets.kcal) + " kcal") + water);
+		LinearLayout buttons = columns(food, 16);
+		compact(buttons, targets == null ? "Empezar" : "+ Comida", true, () -> app.navigate(Screen.NUTRITION))
+			.setTag("home_add_food");
+		if (state.water != null)
+			compact(buttons, "+ Vaso", true, () -> state.water.add(state.nutrition.today(),
+				com.energym.app.nutrition.WaterLog.GLASS)).setContentDescription("Añadir un vaso de agua");
 	}
 
 	static String summary(com.energym.app.domain.ProgressionEngine.Plan plan) {
