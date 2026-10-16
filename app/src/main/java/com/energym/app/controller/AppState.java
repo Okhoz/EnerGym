@@ -57,6 +57,7 @@ public final class AppState extends AndroidViewModel {
 	public VisualizationController visualization;
 	public com.energym.app.nutrition.NutritionController nutrition;
 	public com.energym.app.progress.GoalsController goals;
+	public com.energym.app.nutrition.DietPlanner diet;
 	private com.energym.app.nutrition.SyncedNutritionStore nutritionStore;
 	// Consultas a Open Food Facts: independientes del chat y de SQLite.
 	private final ExecutorService lookupWorker = Executors.newSingleThreadExecutor();
@@ -127,9 +128,21 @@ public final class AppState extends AndroidViewModel {
 			this::changed, message -> app.error(message));
 		// Entrenador personal con Gemini Nano en el propio móvil: sin servidor de IA ni coste. Si el móvil no lo
 		// admite, el chat usa el guiado local por reglas (los clientes online quedan sin usar).
-		OnDeviceChatClient trainer = new OnDeviceChatClient(
-			new ChainedModel(new GeminiNanoModel(chatWorker), new GemmaModel(context, chatWorker)),
-			catalog.getExercises(), catalog.getVersion(), chatWorker, main);
+		ChainedModel onDevice = new ChainedModel(new GeminiNanoModel(chatWorker), new GemmaModel(context, chatWorker));
+		OnDeviceChatClient trainer = new OnDeviceChatClient(onDevice, catalog.getExercises(), catalog.getVersion(),
+			chatWorker, main);
+		// Dietas con la misma IA del móvil; el último menú de cada cuenta se guarda solo en este teléfono.
+		android.content.SharedPreferences diets = context.getSharedPreferences("diet_plans", android.content.Context.MODE_PRIVATE);
+		diet = new com.energym.app.nutrition.DietPlanner(onDevice, new com.energym.app.nutrition.DietPlanner.Store() {
+			public String load(String owner) {
+				return diets.getString(owner, "");
+			}
+
+			public void save(String owner, String json) {
+				diets.edit().putString(owner, json).apply();
+			}
+		}, main, this::changed, () -> app.profile == null ? "" : app.profile.getDaysPerWeek() + " días por semana de " +
+			app.disciplineName() + ", sesiones de " + app.profile.getDurationMinutes() + " min");
 		trainer.listen(this::changed);
 		// Al abrir la app (aunque aún no haya cuenta) se comprueba el modelo y, si falta, empieza su descarga.
 		trainer.activate(null);
@@ -176,6 +189,7 @@ public final class AppState extends AndroidViewModel {
 			assistant.activate(app.owner());
 			nutrition.activate(app.owner());
 			goals.activate(app.owner());
+			diet.activate(app.owner());
 			changed();
 		});
 		accounts = new AccountController(gateway, sync, main, (status, value, error) -> {

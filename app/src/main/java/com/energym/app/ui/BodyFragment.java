@@ -59,6 +59,26 @@ public final class BodyFragment extends ScreenFragment {
 			v -> { d.put("activity", v); refresh[0].run(); });
 		textField(plan, "allergies", "Alergias o intolerancias (opcional)", d.get("allergies"), false, false,
 			"Anota los alimentos que necesitas evitar. Puedes dejarlo vacío.", v -> d.put("allergies", v));
+		LinearLayout diet = card("Para tu dieta con IA", "Con esto el entrenador prepara menús a tu medida.");
+		List<String> diets = new ArrayList<>(), dietLabels = new ArrayList<>();
+		for (BodyProfile.Diet value : BodyProfile.Diet.values()) {
+			diets.add(value.name());
+			dietLabels.add(value.label);
+		}
+		choice(diet, "diet", "Tipo de alimentación", diets, dietLabels, d.getOrDefault("diet", "OMNIVORE"),
+			"Los menús solo usarán alimentos compatibles.", v -> d.put("diet", v));
+		choice(diet, "mealsPerDay", "Comidas al día", Arrays.asList("2", "3", "4", "5", "6"),
+			Arrays.asList("2 comidas", "3 comidas", "4 comidas", "5 comidas", "6 comidas"),
+			d.getOrDefault("mealsPerDay", "4"), "Reparte tus calorías en este número de tomas.", v -> d.put("mealsPerDay", v));
+		List<String> cooking = new ArrayList<>(), cookingLabels = new ArrayList<>();
+		for (BodyProfile.Cooking value : BodyProfile.Cooking.values()) {
+			cooking.add(value.name());
+			cookingLabels.add(value.label);
+		}
+		choice(diet, "cooking", "Tiempo para cocinar", cooking, cookingLabels, d.getOrDefault("cooking", "NORMAL"),
+			"", v -> d.put("cooking", v));
+		textField(diet, "dislikes", "Alimentos que no tomas (opcional)", d.getOrDefault("dislikes", ""), false, false,
+			"Por gusto o costumbre; las alergias van en su propio campo.", v -> d.put("dislikes", v));
 		LinearLayout goals = card("¿Qué quieres conseguir?", "Elige el ajuste de calorías. Se confirma al guardar tus datos.");
 		for (BodyProfile.Goal goal : BodyProfile.Goal.values()) {
 			boolean selected = goal.name().equals(d.get("goal"));

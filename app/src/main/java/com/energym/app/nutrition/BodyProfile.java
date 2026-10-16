@@ -31,15 +31,55 @@ public final class BodyProfile {
 		}
 	}
 
+	/** Estilo de alimentación para las dietas creadas con IA. */
+	public enum Diet {
+		OMNIVORE("Omnívora (de todo)"), VEGETARIAN("Vegetariana"), VEGAN("Vegana"), PESCATARIAN("Pescetariana"),
+		MEDITERRANEAN("Mediterránea");
+
+		public final String label;
+
+		Diet(String label) {
+			this.label = label;
+		}
+	}
+
+	/** Tiempo que la persona quiere dedicar a cocinar. */
+	public enum Cooking {
+		QUICK("Poco: platos de 15 min"), NORMAL("Normal: hasta 30 min"), ELABORATE("Me gusta cocinar");
+
+		public final String label;
+
+		Cooking(String label) {
+			this.label = label;
+		}
+	}
+
 	public final Sex sex;
 	public final Activity activity;
 	public final Goal goal;
 	public final int age;
 	public final double heightCm, weightKg;
 	public final String allergies;
+	public final Diet diet;
+	public final Cooking cooking;
+	public final int mealsPerDay;
+	public final String dislikes;
 
 	public BodyProfile(Sex sex, int age, double heightCm, double weightKg, Activity activity, Goal goal,
 		String allergies) {
+		this(sex, age, heightCm, weightKg, activity, goal, allergies, Diet.OMNIVORE, Cooking.NORMAL, 4, "");
+	}
+
+	public BodyProfile(Sex sex, int age, double heightCm, double weightKg, Activity activity, Goal goal,
+		String allergies, Diet diet, Cooking cooking, int mealsPerDay, String dislikes) {
+		this.diet = diet == null ? Diet.OMNIVORE : diet;
+		this.cooking = cooking == null ? Cooking.NORMAL : cooking;
+		if (mealsPerDay < 2 || mealsPerDay > 6)
+			throw new IllegalArgumentException("Comidas al día entre 2 y 6.");
+		this.mealsPerDay = mealsPerDay;
+		this.dislikes = dislikes == null ? "" : dislikes.trim();
+		if (this.dislikes.length() > 300)
+			throw new IllegalArgumentException("Alimentos que no tomas: máximo 300 caracteres.");
 		this.sex = Objects.requireNonNull(sex, "sex");
 		this.activity = Objects.requireNonNull(activity, "activity");
 		this.goal = Objects.requireNonNull(goal, "goal");
@@ -58,7 +98,7 @@ public final class BodyProfile {
 	}
 
 	public BodyProfile withWeight(double kg) {
-		return new BodyProfile(sex, age, heightCm, kg, activity, goal, allergies);
+		return new BodyProfile(sex, age, heightCm, kg, activity, goal, allergies, diet, cooking, mealsPerDay, dislikes);
 	}
 
 	/**

@@ -59,6 +59,7 @@ public final class FormFieldGuidance {
 			case "carbs100": return "Ej.: 5";
 			case "fat100": return "Ej.: 3";
 			case "allergies": return "Ej.: cacahuetes, lactosa";
+			case "dislikes": return "Ej.: champiñones, coliflor";
 			case "barcode": return "Ej.: 8412345678905";
 			case "assistant_endpoint": return "Ej.: https://ia.tudominio.es";
 			case "assistant_pairing": return "Pega tu código privado de emparejamiento";

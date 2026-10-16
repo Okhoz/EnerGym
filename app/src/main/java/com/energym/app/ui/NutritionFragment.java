@@ -57,6 +57,7 @@ public final class NutritionFragment extends ScreenFragment {
 		double[] totals = n.totals(day);
 		BodyProfile.Targets targets = n.targets();
 		dailyGoal(n, targets);
+		diet(n, targets);
 		remaining(n, day, totals, targets);
 
 		// Diario por comidas, como en un registro de calorías: cada comida con su total y su botón de añadir.
@@ -110,6 +111,48 @@ public final class NutritionFragment extends ScreenFragment {
 
 		text(rows, "Datos de Open Food Facts (ODbL): revisa la etiqueta. Objetivos estimados; no sustituyen a un " +
 			"dietista o médico.", R.style.EnerGym_FieldCaption, 4);
+	}
+
+	/** Dieta personalizada con la IA del móvil, a partir de los datos físicos y preferencias guardados. */
+	private void diet(NutritionController n, BodyProfile.Targets targets) {
+		com.energym.app.nutrition.DietPlanner planner = state.diet;
+		if (planner == null || n.body == null || targets == null)
+			return;
+		com.energym.app.nutrition.DietPlan plan = planner.plan;
+		BodyProfile current = n.effectiveBody();
+		LinearLayout card = card("✦ Tu dieta con IA", planner.busy ? "Preparando tu menú en el móvil…" :
+			plan == null ? "Un menú de un día con tus " + Math.round(targets.kcal) + " kcal, " +
+				current.mealsPerDay + " comidas y tu alimentación " + current.diet.label.toLowerCase(SPANISH) +
+				". Se tienen en cuenta tus alergias y lo que no tomas." :
+				plan.source + " · " + Math.round(plan.totals()[0]) + " de " + Math.round(targets.kcal) + " kcal");
+		card.setTag("nutrition_diet");
+		if (planner.busy)
+			return;
+		if (plan == null) {
+			primary(action(card, "Crear mi dieta con IA", !n.busy, () -> planner.create(current)));
+			return;
+		}
+		if (!planner.status.isEmpty())
+			text(card, planner.status, R.style.EnerGym_FieldCaption, 4);
+		for (int i = 0; i < plan.meals.size(); i++) {
+			com.energym.app.nutrition.DietPlan.Meal meal = plan.meals.get(i);
+			TextView title = text(card, meal.icon() + "  " + meal.name + " · " +
+				Math.round(meal.kcal) + " kcal", R.style.EnerGym_CardTitle, i == 0 ? 16 : 24);
+			title.setTextSize(17);
+			text(card, meal.dish, R.style.EnerGym_Body, 4);
+			if (!meal.ingredients.isEmpty())
+				text(card, meal.ingredients, R.style.EnerGym_FieldCaption, 4);
+			text(card, "P " + Math.round(meal.protein) + " g · H " + Math.round(meal.carbs) + " g · G " +
+				Math.round(meal.fat) + " g", R.style.EnerGym_FieldCaption, 4);
+			MaterialButton log = action(card, "Anotar en mi diario", !n.busy, () ->
+				n.logPlanned(meal, () -> { }));
+			log.setTag("diet_log_" + i);
+		}
+		if (!plan.advice.isEmpty())
+			text(card, "💡 " + plan.advice, R.style.EnerGym_Body, 20);
+		action(card, "🔄 Otra propuesta", !n.busy, () -> planner.create(current)).setTag("diet_again");
+		text(card, "Menú orientativo; no sustituye a un dietista. Cambia tus preferencias en Datos físicos.",
+			R.style.EnerGym_FieldCaption, 8);
 	}
 
 	/** Objetivo confirmado y visible; el formulario mantiene su propio borrador hasta pulsar Guardar. */

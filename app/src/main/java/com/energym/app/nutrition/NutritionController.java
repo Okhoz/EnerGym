@@ -281,6 +281,10 @@ public final class NutritionController {
 		bodyDraft.put("activity", b == null ? "MODERATE" : b.activity.name());
 		bodyDraft.put("goal", b == null ? "MAINTAIN" : b.goal.name());
 		bodyDraft.put("allergies", b == null ? "" : b.allergies);
+		bodyDraft.put("diet", b == null ? BodyProfile.Diet.OMNIVORE.name() : b.diet.name());
+		bodyDraft.put("cooking", b == null ? BodyProfile.Cooking.NORMAL.name() : b.cooking.name());
+		bodyDraft.put("mealsPerDay", Integer.toString(b == null ? 4 : b.mealsPerDay));
+		bodyDraft.put("dislikes", b == null ? "" : b.dislikes);
 	}
 
 	/**
@@ -342,7 +346,10 @@ public final class NutritionController {
 		return new BodyProfile(BodyProfile.Sex.valueOf(bodyDraft.get("sex")),
 			Integer.parseInt(bodyDraft.getOrDefault("age", "").trim()), number(bodyDraft.get("heightCm")),
 			number(bodyDraft.get("weightKg")), BodyProfile.Activity.valueOf(bodyDraft.get("activity")),
-			BodyProfile.Goal.valueOf(bodyDraft.get("goal")), bodyDraft.get("allergies"));
+			BodyProfile.Goal.valueOf(bodyDraft.get("goal")), bodyDraft.get("allergies"),
+			BodyProfile.Diet.valueOf(bodyDraft.getOrDefault("diet", "OMNIVORE")),
+			BodyProfile.Cooking.valueOf(bodyDraft.getOrDefault("cooking", "NORMAL")),
+			Integer.parseInt(bodyDraft.getOrDefault("mealsPerDay", "4")), bodyDraft.getOrDefault("dislikes", ""));
 	}
 
 	/** Elegir una opción modifica sólo el borrador; Guardar es la única confirmación durable. */
@@ -520,6 +527,24 @@ public final class NutritionController {
 	/**
 	 * Alimentos distintos registrados recientemente (más reciente primero), para añadirlos de nuevo con un toque.
 	 */
+	/**
+	 * Anota en el diario de hoy un plato del menú como una ración: 100 g con los valores del plato completo.
+	 */
+	public void logPlanned(DietPlan.Meal meal, Runnable done) {
+		if (owner == null || busy)
+			return;
+		selected = clock.get();
+		startManual(meal.diaryMeal());
+		foodDraft.put("name", meal.dish.length() > 80 ? meal.dish.substring(0, 80) : meal.dish);
+		foodDraft.put("unit", "G");
+		foodDraft.put("amount", "100");
+		foodDraft.put("kcal100", format(Math.round(meal.kcal)));
+		foodDraft.put("protein100", format(Math.round(meal.protein)));
+		foodDraft.put("carbs100", format(Math.round(meal.carbs)));
+		foodDraft.put("fat100", format(Math.round(meal.fat)));
+		addFood(done);
+	}
+
 	/** Alimento ya anotado cuyo nombre empieza por lo escrito (3 letras o más); null si no hay ninguno. */
 	public FoodEntry known(String name) {
 		String q = name == null ? "" : name.trim().toLowerCase(Locale.ROOT);

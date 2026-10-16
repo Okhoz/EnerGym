@@ -94,9 +94,19 @@ public final class NutritionRepository {
 		try {
 			return new JSONObject().put("sex", b.sex.name()).put("age", b.age).put("heightCm", b.heightCm)
 				.put("weightKg", b.weightKg).put("activity", b.activity.name()).put("goal", b.goal.name())
-				.put("allergies", b.allergies).toString();
+				.put("allergies", b.allergies).put("diet", b.diet.name()).put("cooking", b.cooking.name())
+				.put("mealsPerDay", b.mealsPerDay).put("dislikes", b.dislikes).toString();
 		} catch (JSONException e) {
 			throw new IllegalArgumentException("Perfil físico inválido", e);
+		}
+	}
+
+	/** Un valor desconocido (versión más nueva u omitido) vuelve al valor por defecto en vez de fallar. */
+	private static <E extends Enum<E>> E enumOr(Class<E> type, String name, E fallback) {
+		try {
+			return name == null || name.isEmpty() ? fallback : Enum.valueOf(type, name);
+		} catch (IllegalArgumentException e) {
+			return fallback;
 		}
 	}
 
@@ -105,7 +115,10 @@ public final class NutritionRepository {
 			JSONObject o = new JSONObject(json);
 			return new BodyProfile(BodyProfile.Sex.valueOf(o.getString("sex")), o.getInt("age"),
 				o.getDouble("heightCm"), o.getDouble("weightKg"), BodyProfile.Activity.valueOf(o.getString("activity")),
-				BodyProfile.Goal.valueOf(o.getString("goal")), o.getString("allergies"));
+				BodyProfile.Goal.valueOf(o.getString("goal")), o.getString("allergies"),
+				enumOr(BodyProfile.Diet.class, o.optString("diet"), BodyProfile.Diet.OMNIVORE),
+				enumOr(BodyProfile.Cooking.class, o.optString("cooking"), BodyProfile.Cooking.NORMAL),
+				o.optInt("mealsPerDay", 4), o.optString("dislikes", ""));
 		} catch (JSONException e) {
 			throw new IllegalArgumentException("Perfil físico inválido", e);
 		}

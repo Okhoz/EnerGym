@@ -100,7 +100,7 @@ public final class TrainerPrompt {
 	public static String reply(String output, ChatClient.Request r, List<Exercise> catalog, int catalogVersion) {
 		String text = output == null ? "" : output.trim();
 		Map<String, Object> routine = null;
-		Map<String, Object> parsed = json(text);
+		Map<String, Object> parsed = extractJson(text);
 		if (parsed != null) {
 			Object t = parsed.get("texto");
 			text = t instanceof String ? ((String) t).trim() : "";
@@ -118,7 +118,7 @@ public final class TrainerPrompt {
 		String source = text;
 		int brace = text.indexOf('{');
 		if (brace >= 0) {
-			Map<String, Object> embedded = json(text.substring(brace));
+			Map<String, Object> embedded = extractJson(text.substring(brace));
 			if (routine == null && embedded != null)
 				routine = embedded.get("rutina") instanceof Map ? cast(embedded.get("rutina")) :
 					embedded.get("ejercicios") instanceof List ? embedded : null;
@@ -359,7 +359,7 @@ public final class TrainerPrompt {
 	/**
 	 * Primer objeto JSON de la salida (tolera vallas ``` y texto alrededor); null si no hay uno legible.
 	 */
-	private static Map<String, Object> json(String text) {
+	public static Map<String, Object> extractJson(String text) {
 		int start = text.indexOf('{');
 		if (start < 0)
 			return null;
