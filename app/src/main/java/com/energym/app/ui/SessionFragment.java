@@ -25,6 +25,8 @@ public final class SessionFragment extends ScreenFragment {
 	private String trackKey = "", kgInput = "", repsInput = "", kindInput = "N", rpeInput = "";
 	private static final List<String> RPE = Arrays.asList("", "6", "7", "7.5", "8", "8.5", "9", "9.5", "10");
 	private int trackTab, selectedSet = -1;
+	/** Unidad de peso elegida en Cuenta: se muestra y escribe en ella, se guarda siempre en kg. */
+	private boolean lb;
 
 	public SessionFragment() {
 		super(R.layout.fragment_session);
@@ -150,14 +152,16 @@ public final class SessionFragment extends ScreenFragment {
 	 * cada serie se guarda al momento y las que baten tu récord llevan 🏆.
 	 */
 	private void tracker(RoutineItem item, Exercise e) {
-		String key = app.sessions.session.getSyncId() + "/" + e.getId();
+		lb = Units.lb(requireContext());
+		String key = app.sessions.session.getSyncId() + "/" + e.getId() + "/" + lb;
 		if (!key.equals(trackKey)) {
 			trackKey = key;
 			selectedSet = -1;
 			// Lo escrito en − / + vive en el controlador: sobrevive a girar la pantalla y a salir y volver.
 			Map<String, String> typed = app.sessions.inputs();
 			seedInputs(item, e);
-			kgInput = typed.getOrDefault("trackKg", kgInput);
+			if (Plates.unit(lb).equals(typed.get("trackUnit")))
+				kgInput = typed.getOrDefault("trackKg", kgInput);
 			repsInput = typed.getOrDefault("trackReps", repsInput);
 			kindInput = typed.getOrDefault("trackKind", "N");
 			rpeInput = typed.getOrDefault("trackRpe", "");
@@ -188,9 +192,10 @@ public final class SessionFragment extends ScreenFragment {
 		com.google.android.material.button.MaterialButton technique =
 			action(log, "Ver técnica", true, () -> app.openExercise(e));
 		technique.setContentDescription("Ver técnica: " + e.getName());
-		stepper(log, "Peso (kg)", "track_kg", kgInput, 2.5, true, v -> {
+		stepper(log, "Peso (" + Plates.unit(lb) + ")", "track_kg", kgInput, lb ? 5 : 2.5, true, v -> {
 			kgInput = v;
 			app.sessions.input("trackKg", v);
+			app.sessions.input("trackUnit", Plates.unit(lb));
 		});
 		stepper(log, "Repeticiones", "track_reps", repsInput, 1, false, v -> {
 			repsInput = v;
@@ -219,7 +224,8 @@ public final class SessionFragment extends ScreenFragment {
 		LinearLayout buttons = columns(log, 12);
 		com.google.android.material.button.MaterialButton save =
 			compact(buttons, editing ? "Actualizar" : "Guardar serie", !app.sessions.busy, () -> {
-				double kg = number(kgInput, -1);
+				double typedKg = number(kgInput, -1);
+				double kg = typedKg < 0 ? typedKg : Plates.toKg(typedKg, lb);
 				int reps = (int) number(repsInput, 0);
 				SetLog.Kind kind = SetLog.Kind.valueOf(kindName(kindInput));
 				double rpe = number(rpeInput, 0);
@@ -242,6 +248,9 @@ public final class SessionFragment extends ScreenFragment {
 				render();
 			}
 		});
+		double best = Math.max(previousBest(e.getId()), SetLog.best(sets));
+		action(log, "🏋️ Discos y tabla 1RM", true, () -> PlateDialog.show(requireContext(),
+			Plates.toKg(number(kgInput, 0), lb), best, lb)).setTag("track_plates");
 		if (editing)
 			action(log, "Cancelar edición", true, () -> {
 				selectedSet = -1;
@@ -266,7 +275,7 @@ public final class SessionFragment extends ScreenFragment {
 			((TextView) row.findViewById(R.id.food_name)).setText((i + 1) + ".   " + weight(s.kg) + " × " + s.reps +
 				(s.reps == 1 ? " rep" : " reps"));
 			((TextView) row.findViewById(R.id.food_detail)).setText(tags(s, pr ? "Nuevo récord personal" :
-				s.kg > 0 && s.counts() ? "1RM estimado " + SetLog.format(Math.round(s.oneRepMax() * 2) / 2.0) + " kg" : ""));
+				s.kg > 0 && s.counts() ? "1RM estimado " + weight(Math.round(s.oneRepMax() * 2) / 2.0) : ""));
 			((TextView) row.findViewById(R.id.food_kcal)).setText(pr ? "🏆" : "");
 			int index = i;
 			row.setTag("track_set_" + i);
@@ -277,7 +286,7 @@ public final class SessionFragment extends ScreenFragment {
 				row.setBackground(rounded(R.color.surface_selected, 12, R.color.gold, 1));
 			row.setOnClickListener(v -> {
 				selectedSet = index;
-				kgInput = SetLog.format(s.kg);
+				kgInput = SetLog.format(Plates.toUnit(s.kg, lb));
 				repsInput = Integer.toString(s.reps);
 				kindInput = Character.toString(s.kind.code);
 				rpeInput = s.rpe > 0 ? SetLog.format(s.rpe) : "";
@@ -330,7 +339,7 @@ public final class SessionFragment extends ScreenFragment {
 		String target = item.getPrescription().getOrDefault("loadKg", "0");
 		if (seed == null && number(target, 0) == 0 && !before.isEmpty() && before.get(0).kg > 0)
 			target = SetLog.format(before.get(0).kg);
-		kgInput = seed != null ? SetLog.format(seed.kg) : target;
+		kgInput = SetLog.format(Plates.toUnit(seed != null ? seed.kg : number(target, 0), lb));
 		repsInput = seed != null ? Integer.toString(seed.reps) : item.getPrescription().getOrDefault("repetitions", "8");
 	}
 
@@ -442,7 +451,7 @@ public final class SessionFragment extends ScreenFragment {
 			List<SetLog.Entry> sets = SetLog.of(recent.get(i).getResults().get(e.getId()));
 			double v = 0;
 			for (SetLog.Entry x : sets)
-				v = Math.max(v, bodyweight ? x.reps : x.oneRepMax());
+				v = Math.max(v, bodyweight ? x.reps : Plates.toUnit(x.oneRepMax(), lb));
 			values[i] = Math.round(v * 10) / 10.0;
 			labels[i] = day(recent.get(i));
 			top = Math.max(top, values[i]);
@@ -450,8 +459,8 @@ public final class SessionFragment extends ScreenFragment {
 		LinearLayout card = card(bodyweight ? "Repeticiones máximas" : "1RM estimado",
 			bodyweight ? "Mejor serie de cada día." : "Peso que podrías levantar una vez, calculado con tu mejor serie de cada día.");
 		add(card, new com.energym.app.ui.charts.LineChartView(requireContext()), 12).set(values, labels,
-			bodyweight ? "reps" : "kg", (bodyweight ? "Repeticiones máximas" : "1RM estimado") + " de " + e.getName());
-		text(card, "🏆 Mejor marca: " + SetLog.format(top) + (bodyweight ? " repeticiones" : " kg"),
+			bodyweight ? "reps" : Plates.unit(lb), (bodyweight ? "Repeticiones máximas" : "1RM estimado") + " de " + e.getName());
+		text(card, "🏆 Mejor marca: " + SetLog.format(top) + (bodyweight ? " repeticiones" : " " + Plates.unit(lb)),
 			R.style.EnerGym_Body, 12);
 	}
 
@@ -497,16 +506,16 @@ public final class SessionFragment extends ScreenFragment {
 		return best;
 	}
 
-	private static String planned(RoutineItem item) {
+	private String planned(RoutineItem item) {
 		Map<String, String> p = item.getPrescription();
 		String load = p.getOrDefault("loadKg", "0");
 		return p.getOrDefault("sets", "?") + " × " + p.getOrDefault("repetitions", "?") + " · " +
-			(number(load, 0) > 0 ? SetLog.format(number(load, 0)) + " kg" : "peso corporal") +
+			(number(load, 0) > 0 ? weight(number(load, 0)) : "peso corporal") +
 			" · descanso " + p.getOrDefault("restSeconds", "60") + " s";
 	}
 
 	/** «2 × 8 · 20 kg» si todas las series son iguales; si no, «20×8, 22,5×6…». */
-	private static String compactSets(List<SetLog.Entry> sets) {
+	private String compactSets(List<SetLog.Entry> sets) {
 		boolean same = true;
 		for (SetLog.Entry x : sets)
 			same &= x.equals(sets.get(0));
@@ -514,12 +523,12 @@ public final class SessionFragment extends ScreenFragment {
 			return sets.size() + " × " + sets.get(0).reps + " · " + weight(sets.get(0).kg).toLowerCase(Locale.ROOT);
 		List<String> parts = new ArrayList<>();
 		for (SetLog.Entry x : sets)
-			parts.add((x.kg > 0 ? SetLog.format(x.kg) : "PC") + "×" + x.reps);
+			parts.add((x.kg > 0 ? SetLog.format(Plates.toUnit(x.kg, lb)) : "PC") + "×" + x.reps);
 		return String.join(", ", parts);
 	}
 
-	private static String weight(double kg) {
-		return kg > 0 ? SetLog.format(kg) + " kg" : "Peso corporal";
+	private String weight(double kg) {
+		return Plates.text(kg, lb);
 	}
 
 	private static double number(String value, double fallback) {

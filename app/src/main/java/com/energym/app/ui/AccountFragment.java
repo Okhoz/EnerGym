@@ -68,6 +68,7 @@ public final class AccountFragment extends ScreenFragment {
 			getString(R.string.account_separation));
 		assistantServer();
 		reminders();
+		preferences();
 		LinearLayout local = card("Datos de este dispositivo",
 			getString(R.string.account_local_data));
 		action(local, "Borrar datos locales", app.owner() != null && !signing, () -> {
@@ -165,6 +166,15 @@ public final class AccountFragment extends ScreenFragment {
 				new android.content.Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
 					.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, requireContext().getPackageName())));
 		}
+	}
+
+	/** Preferencias de este móvil: unidad de peso del registro de entreno. */
+	private void preferences() {
+		LinearLayout card = card("Preferencias", "Se guardan en este móvil.");
+		choice(card, "weight_unit", "Unidad de peso en el entreno", java.util.Arrays.asList("kg", "lb"),
+			java.util.Arrays.asList("Kilos (kg)", "Libras (lb)"), Units.lb(requireContext()) ? "lb" : "kg",
+			"Tus registros se guardan igual; solo cambia cómo se muestran y escriben.",
+			v -> Units.setLb(requireContext(), "lb".equals(v)));
 	}
 
 	/** Explicación bajo un interruptor, separada del siguiente control. */
