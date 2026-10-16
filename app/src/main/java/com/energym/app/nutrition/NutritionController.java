@@ -507,6 +507,20 @@ public final class NutritionController {
 		foodDraft.put("fat100", format(recent.fat100));
 	}
 
+	/** Rellena el formulario con un alimento genérico: valores orientativos y su ración típica, editables. */
+	public void startCommon(CommonFoods.Food food) {
+		if (busy) return;
+		FoodEntry.Meal meal = FoodEntry.Meal.valueOf(foodDraft.getOrDefault("meal", defaultMeal().name()));
+		startManual(meal);
+		foodDraft.put("name", food.name);
+		foodDraft.put("unit", food.unit.name());
+		foodDraft.put("amount", format(food.portion));
+		foodDraft.put("kcal100", format(food.kcal100));
+		foodDraft.put("protein100", format(food.protein100));
+		foodDraft.put("carbs100", format(food.carbs100));
+		foodDraft.put("fat100", format(food.fat100));
+	}
+
 	/** Abre la misma entrada, conservando ID, día y fecha de alta para la sincronización. */
 	public void edit(FoodEntry entry) {
 		if (owner == null || busy || entry == null) return;

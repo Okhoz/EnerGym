@@ -14,6 +14,9 @@ import java.util.*;
  * Con ficha escaneada la unidad sigue la etiqueta (g o ml); no se convierte volumen en peso.
  */
 public final class FoodFragment extends ScreenFragment {
+	/** Texto de la búsqueda de alimentos habituales; sobrevive a los repintados de esta pantalla. */
+	private String commonQuery = "";
+
 	public FoodFragment() {
 		super(R.layout.fragment_screen);
 	}
@@ -150,6 +153,7 @@ public final class FoodFragment extends ScreenFragment {
 	 */
 	private void recents(NutritionController n) {
 		primary(action(rows, "Escanear código de barras", !n.busy, () -> NutritionFragment.scan(this)));
+		common(n);
 		List<FoodEntry> recent = n.recentFoods(8);
 		if (recent.isEmpty())
 			return;
@@ -166,6 +170,43 @@ public final class FoodFragment extends ScreenFragment {
 				app.changed();
 			});
 			list.addView(row);
+		}
+	}
+
+	/** Búsqueda en los alimentos genéricos de la app: un toque rellena valores y ración. */
+	private void common(NutritionController n) {
+		LinearLayout card = card("Alimentos habituales",
+			"Busca un alimento básico y se rellenan sus valores orientativos. Si tienes la etiqueta, mejor usa sus datos.");
+		LinearLayout results = new LinearLayout(requireContext());
+		results.setOrientation(LinearLayout.VERTICAL);
+		textField(card, "common_food", "Buscar alimento", commonQuery, false, false, "Ej.: arroz, pollo, plátano", "", v -> {
+			commonQuery = v;
+			showCommon(n, results);
+		});
+		card.addView(results);
+		showCommon(n, results);
+	}
+
+	private void showCommon(NutritionController n, LinearLayout results) {
+		results.removeAllViews();
+		List<CommonFoods.Food> found = CommonFoods.search(commonQuery, 6);
+		if (found.isEmpty() && commonQuery.trim().length() >= 2) {
+			text(results, "No está en la lista: escribe abajo los datos de la etiqueta.", R.style.EnerGym_FieldCaption, 4);
+			return;
+		}
+		for (CommonFoods.Food f : found) {
+			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, results, false);
+			((TextView) row.findViewById(R.id.food_name)).setText(f.name);
+			((TextView) row.findViewById(R.id.food_detail)).setText("Ración " + NutritionController.format(f.portion) + " " +
+				f.unit.symbol + " · " + NutritionController.format(f.kcal100) + " kcal/100 " + f.unit.symbol);
+			((TextView) row.findViewById(R.id.food_kcal)).setText("+");
+			row.setContentDescription("Usar " + f.name);
+			row.setOnClickListener(v -> {
+				commonQuery = "";
+				n.startCommon(f);
+				app.changed();
+			});
+			results.addView(row);
 		}
 	}
 
