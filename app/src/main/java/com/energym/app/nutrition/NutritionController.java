@@ -491,6 +491,15 @@ public final class NutritionController {
 		startManual();
 	}
 
+	/** Descarta el alimento elegido (escaneado, buscado o reciente) para elegir otro; conserva la comida. */
+	public void changeFood() {
+		if (busy || editing != null)
+			return;
+		startManual(FoodEntry.Meal.valueOf(foodDraft.getOrDefault("meal", defaultMeal().name())));
+		onlineResults = Collections.emptyList();
+		onlineQuery = "";
+	}
+
 	/**
 	 * Rellena el formulario con un alimento ya registrado: misma ficha, cantidad a confirmar.
 	 */

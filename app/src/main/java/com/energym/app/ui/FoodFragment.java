@@ -36,8 +36,20 @@ public final class FoodFragment extends ScreenFragment {
 		}
 		Map<String, String> d = n.foodDraft;
 		FoodProduct p = n.product;
-		if (!n.editingFood() && p == null && d.getOrDefault("barcode", "").isEmpty() && d.getOrDefault("name", "").isEmpty())
+		boolean chosen = p != null || !d.getOrDefault("barcode", "").isEmpty() || !d.getOrDefault("name", "").isEmpty();
+		if (!n.editingFood() && !chosen)
 			recents(n);
+		// Con un alimento ya elegido, siempre se puede volver al buscador y escoger otro.
+		if (!n.editingFood() && chosen) {
+			com.google.android.material.button.MaterialButton other = action(rows, "↺ Elegir otro alimento", !n.busy, () -> {
+				commonQuery = "";
+				n.changeFood();
+				render();
+				if (getView() instanceof android.widget.ScrollView)
+					getView().post(() -> ((android.widget.ScrollView) getView()).smoothScrollTo(0, 0));
+			});
+			other.setTag("food_change");
+		}
 		if (!n.editingFood())
 			alreadyInMeal(n, d);
 		FoodEntry.Unit unit = FoodEntry.Unit.valueOf(d.getOrDefault("unit", "G"));
