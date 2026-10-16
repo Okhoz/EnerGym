@@ -47,6 +47,25 @@ public class OnDeviceTrainerTest {
 	}
 
 	@Test
+	public void fullAppContextStillFitsTheOnDeviceInput() {
+		List<Exercise> big = new ArrayList<>();
+		for (int i = 0; i < 300; i++)
+			big.add(exercise("exercise-" + i, "Ejercicio con un nombre bastante largo número " + i, MetricType.STRENGTH));
+		char[] longText = new char[5000];
+		Arrays.fill(longText, 'a');
+		List<ConversationStore.Message> recent = new ArrayList<>();
+		for (int i = 0; i < 20; i++)
+			recent.add(new ConversationStore.Message(i % 2 == 0 ? "user" : "assistant", new String(longText)));
+		ChatClient.Request r = request(profile, new String(longText), recent);
+		char[] context = new char[3200];
+		Arrays.fill(context, 'c');
+		r.training = new String(context);
+		String prompt = TrainerPrompt.build(r, big);
+		assertTrue(prompt.contains("TODO LO QUE HA HECHO EN LA APP"));
+		assertTrue(prompt.length() + " caracteres", prompt.length() < 13000);
+	}
+
+	@Test
 	public void promptStaysWithinTheOnDeviceInputLimit() {
 		List<Exercise> big = new ArrayList<>();
 		for (int i = 0; i < 300; i++)

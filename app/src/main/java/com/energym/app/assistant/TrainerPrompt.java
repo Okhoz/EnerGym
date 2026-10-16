@@ -12,7 +12,7 @@ import java.util.*;
  */
 public final class TrainerPrompt {
 	static final int MAX_EXERCISES = 30, MAX_RECENT = 6, MAX_RECENT_CHARS = 300, MAX_DESCRIPTION = 800,
-		MAX_MESSAGE = 1200;
+		MAX_MESSAGE = 1200, MAX_PROMPT = 12500;
 	private static final List<String> REQUIRED = Arrays.asList("sportId", "goal", "environment", "focus", "category",
 		"resources", "daysPerWeek", "durationMinutes", "level");
 	static final String NOTICE = "Rutina creada por la IA de tu móvil (Gemini Nano), sin enviar datos a ningún " +
@@ -64,11 +64,12 @@ public final class TrainerPrompt {
 				.append("Ten en cuenta el nivel, la experiencia, las limitaciones y los datos de su disciplina.\n");
 		p.append("\nPERFIL DEL CLIENTE\n").append(profile(r.profileData)).append('\n');
 		if (!r.training.isEmpty())
-			p.append("\nSU ENTRENAMIENTO (datos reales de la app)\n").append(cut(r.training, 1400)).append('\n')
-				.append("Úsalo para responder sobre su progreso, comentar sus últimas sesiones y ajustar lo que ")
-				.append("propongas (no repitas lo que ya le cuesta, sube poco a poco lo que domina; relaciona su dieta con su objetivo). Si hay una ")
-				.append("subida de nivel automática reciente, felicítale y explica qué subió y por qué; si hay un entreno a ")
-				.append("medias, díselo: puede usar los botones del chat para continuar o empezar el entreno.\n");
+			p.append("\nSU ENTRENAMIENTO Y TODO LO QUE HA HECHO EN LA APP (datos reales)\n")
+				.append(cut(r.training, 3300)).append('\n')
+				.append("Conoces todo esto: úsalo en cada respuesta y cita sus datos concretos (sesiones, cargas, peso, ")
+				.append("comidas, objetivos). No inventes datos que no aparezcan. Relaciona entreno y dieta con su objetivo, ")
+				.append("no repitas lo que ya le cuesta y sube poco a poco lo que domina. Si hay una subida de nivel reciente, ")
+				.append("felicítale y explica qué subió; si hay un entreno a medias, díselo (botones del chat).\n");
 		if (r.profile == null) {
 			List<String> missing = missing(r.profileData);
 			p.append("Perfil incompleto (falta: ").append(String.join(", ", missing)).append("). Responde a su ")
@@ -84,13 +85,24 @@ public final class TrainerPrompt {
 		if (asked != null)
 			p.append("\nEJERCICIO QUE CONSULTA: ").append(asked.getName()).append(". Técnica: ")
 				.append(cut(asked.getDescription(), MAX_DESCRIPTION)).append('\n');
-		if (!r.recent.isEmpty()) {
-			p.append("\nCONVERSACIÓN RECIENTE\n");
-			for (ConversationStore.Message m : r.recent)
-				p.append(m.role.equals("user") ? "Cliente: " : "Entrenador: ").append(cut(m.text, MAX_RECENT_CHARS))
-					.append('\n');
+		String message = "\nMENSAJE DEL CLIENTE: " + cut(r.message, MAX_MESSAGE) + '\n';
+		// La conversación reciente usa solo el espacio que queda: se conservan los mensajes más nuevos.
+		int room = MAX_PROMPT - p.length() - message.length() - 40;
+		List<String> lines = new ArrayList<>();
+		for (int i = r.recent.size() - 1; i >= 0 && lines.size() < MAX_RECENT; i--) {
+			ConversationStore.Message m = r.recent.get(i);
+			String line = (m.role.equals("user") ? "Cliente: " : "Entrenador: ") + cut(m.text, MAX_RECENT_CHARS) + '\n';
+			if (line.length() > room)
+				break;
+			room -= line.length();
+			lines.add(0, line);
 		}
-		p.append("\nMENSAJE DEL CLIENTE: ").append(cut(r.message, MAX_MESSAGE)).append('\n');
+		if (!lines.isEmpty()) {
+			p.append("\nCONVERSACIÓN RECIENTE\n");
+			for (String line : lines)
+				p.append(line);
+		}
+		p.append(message);
 		return p.toString();
 	}
 

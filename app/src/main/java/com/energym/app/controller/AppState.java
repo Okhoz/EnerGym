@@ -151,10 +151,8 @@ public final class AppState extends AndroidViewModel {
 			app.routineAccepted(r);
 		});
 		assistant.carryOver(app::continueFrom);
-		assistant.trainingContext(() -> {
-			String training = app.trainingSummary(), food = nutrition.summary();
-			return training.isEmpty() ? food : food.isEmpty() ? training : food + "\n" + training;
-		});
+		// El entrenador ve todo lo que la persona ha hecho en la app (solo en el móvil, nunca en la red).
+		assistant.trainingContext(() -> AssistantContext.build(app, nutrition, goals, diet, java.time.LocalDate.now()));
 		ExerciseResourcePolicy resourcePolicy;
 		try {
 			resourcePolicy = new ExerciseResourcePolicy(catalog, PackagedResources.load(context).all());
