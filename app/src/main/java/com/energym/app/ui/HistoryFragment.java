@@ -26,6 +26,17 @@ public final class HistoryFragment extends ScreenFragment {
 	private LocalDate selected;
 	/** Análisis por grupo muscular: false = este mes, true = últimos 90 días. */
 	private boolean recentPeriod;
+	/** Fotos de progreso: de la galería (selector del sistema, sin permisos) o de la cámara. */
+	private final androidx.activity.result.ActivityResultLauncher<androidx.activity.result.PickVisualMediaRequest> pickPhoto =
+		registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia(), uri -> {
+			if (uri != null)
+				storePhoto(uri);
+		});
+	private final androidx.activity.result.ActivityResultLauncher<android.net.Uri> takePhoto =
+		registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.TakePicture(), ok -> {
+			if (Boolean.TRUE.equals(ok))
+				storePhoto(cameraUri());
+		});
 
 	public HistoryFragment() {
 		super(R.layout.fragment_history);
@@ -110,8 +121,154 @@ public final class HistoryFragment extends ScreenFragment {
 			add(weight, new LineChartView(requireContext()), 8).set(kg,
 				new String[]{short_(days.get(0)), short_(days.get(days.size() - 1))}, "kg", "Evolución del peso");
 		}
+		body();
 		calendar(stats, n);
 		breakdown();
+	}
+
+	// ---------------- Cuerpo: medidas y fotos ----------------
+
+	private void body() {
+		if (app.owner() == null || state.measures == null)
+			return;
+		section("Cuerpo", 32);
+		com.energym.app.nutrition.BodyMeasures m = state.measures;
+		SortedMap<LocalDate, Map<com.energym.app.nutrition.BodyMeasures.Part, Double>> days = m.days();
+		StringBuilder s = new StringBuilder();
+		if (days.isEmpty())
+			s.append("Mide cintura, pecho, brazo… cada 2–4 semanas: a veces el cuerpo cambia aunque la báscula no se mueva.");
+		else {
+			LocalDate last = days.lastKey();
+			s.append("Última medición: ").append(short_(last));
+			for (Map.Entry<com.energym.app.nutrition.BodyMeasures.Part, Double> e : days.get(last).entrySet()) {
+				s.append('\n').append(e.getKey().label).append(": ").append(NutritionController.format(e.getValue()))
+					.append(' ').append(e.getKey().unit);
+				double[] change = m.change(e.getKey());
+				if (change != null && Math.abs(change[1] - change[0]) >= 0.05)
+					s.append("   (").append(change[1] > change[0] ? "▲ +" : "▼ ")
+						.append(NutritionController.format(Math.abs(Math.round((change[1] - change[0]) * 10) / 10.0)))
+						.append(" desde ").append(short_(days.firstKey())).append(')');
+			}
+		}
+		LinearLayout card = card("📏 Medidas", s.toString());
+		action(card, days.isEmpty() ? "Anotar medidas" : "Anotar medidas de hoy", true, this::measureDialog)
+			.setTag("progress_measures");
+
+		List<java.io.File> photos = ProgressPhotos.list(requireContext(), app.owner());
+		LinearLayout album = card("📸 Fotos de progreso", photos.isEmpty() ?
+			"Haz una foto cada pocas semanas con la misma luz y postura para comparar. Se guardan solo en este móvil." :
+			photos.size() + (photos.size() == 1 ? " foto" : " fotos") + " · solo en este móvil. Toca para verla, " +
+				"mantén pulsado para borrarla.");
+		if (!photos.isEmpty()) {
+			android.widget.HorizontalScrollView scroll = new android.widget.HorizontalScrollView(requireContext());
+			LinearLayout strip = new LinearLayout(requireContext());
+			strip.setOrientation(LinearLayout.HORIZONTAL);
+			scroll.addView(strip);
+			List<java.io.File> recent = new ArrayList<>(photos);
+			Collections.reverse(recent);
+			for (java.io.File f : recent.subList(0, Math.min(20, recent.size())))
+				strip.addView(photo(f), new LinearLayout.LayoutParams(dp(96), dp(128)));
+			add(album, scroll, 12);
+		}
+		LinearLayout buttons = columns(album, 12);
+		compact(buttons, "Hacer foto", true, () -> {
+			try {
+				takePhoto.launch(cameraUri());
+			} catch (RuntimeException e) {
+				android.widget.Toast.makeText(requireContext(), "No hay cámara disponible", android.widget.Toast.LENGTH_SHORT).show();
+			}
+		}).setTag("progress_camera");
+		compact(buttons, "De la galería", true, () -> pickPhoto.launch(new androidx.activity.result.PickVisualMediaRequest.Builder()
+			.setMediaType(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+			.build())).setTag("progress_gallery");
+	}
+
+	private android.view.View photo(java.io.File f) {
+		LinearLayout box = new LinearLayout(requireContext());
+		box.setOrientation(LinearLayout.VERTICAL);
+		box.setPadding(0, 0, dp(8), 0);
+		android.widget.ImageView image = new android.widget.ImageView(requireContext());
+		image.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+		image.setImageBitmap(ProgressPhotos.thumbnail(f, dp(96)));
+		image.setContentDescription("Foto de progreso del " + ProgressPhotos.date(f));
+		box.addView(image, new LinearLayout.LayoutParams(dp(88), dp(104)));
+		TextView label = text(box, ProgressPhotos.date(f), R.style.EnerGym_FieldCaption, 2);
+		label.setGravity(Gravity.CENTER);
+		box.setOnClickListener(v -> {
+			android.widget.ImageView full = new android.widget.ImageView(requireContext());
+			full.setAdjustViewBounds(true);
+			full.setImageBitmap(ProgressPhotos.thumbnail(f, 1200));
+			new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+				.setTitle(ProgressPhotos.date(f)).setView(full).setPositiveButton("Cerrar", null).show();
+		});
+		box.setOnLongClickListener(v -> {
+			new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+				.setTitle("¿Borrar esta foto?").setMessage("Se borrará de este móvil.")
+				.setNegativeButton("Cancelar", null).setPositiveButton("Borrar", (d, w) -> {
+					//noinspection ResultOfMethodCallIgnored
+					f.delete();
+					render();
+				}).show();
+			return true;
+		});
+		return box;
+	}
+
+	private android.net.Uri cameraUri() {
+		return androidx.core.content.FileProvider.getUriForFile(requireContext(),
+			requireContext().getPackageName() + ".photos", ProgressPhotos.cameraFile(requireContext()));
+	}
+
+	private void storePhoto(android.net.Uri uri) {
+		if (app == null || app.owner() == null)
+			return;
+		boolean ok = ProgressPhotos.add(requireContext(), app.owner(), uri);
+		android.widget.Toast.makeText(requireContext(), ok ? "Foto guardada" : "No se pudo guardar la foto",
+			android.widget.Toast.LENGTH_SHORT).show();
+		//noinspection ResultOfMethodCallIgnored
+		ProgressPhotos.cameraFile(requireContext()).delete();
+		render();
+	}
+
+	private void measureDialog() {
+		LinearLayout form = new LinearLayout(requireContext());
+		form.setOrientation(LinearLayout.VERTICAL);
+		form.setPadding(dp(24), dp(8), dp(24), 0);
+		Map<com.energym.app.nutrition.BodyMeasures.Part, android.widget.EditText> fields =
+			new EnumMap<>(com.energym.app.nutrition.BodyMeasures.Part.class);
+		Map<com.energym.app.nutrition.BodyMeasures.Part, Double> today = state.measures.days().get(LocalDate.now());
+		for (com.energym.app.nutrition.BodyMeasures.Part p : com.energym.app.nutrition.BodyMeasures.Part.values()) {
+			com.google.android.material.textfield.TextInputLayout layout =
+				new com.google.android.material.textfield.TextInputLayout(requireContext());
+			layout.setHint(p.label + " (" + p.unit + ")");
+			com.google.android.material.textfield.TextInputEditText edit =
+				new com.google.android.material.textfield.TextInputEditText(layout.getContext());
+			edit.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			edit.setTag("measure_" + p.key);
+			if (today != null && today.containsKey(p))
+				edit.setText(NutritionController.format(today.get(p)));
+			layout.addView(edit);
+			form.addView(layout);
+			fields.put(p, edit);
+		}
+		android.widget.ScrollView scroll = new android.widget.ScrollView(requireContext());
+		scroll.addView(form);
+		androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+			.setTitle("Medidas de hoy").setMessage("Rellena solo las que midas. Mide siempre en el mismo sitio y a la misma hora.")
+			.setView(scroll).setNegativeButton("Cancelar", null).setPositiveButton("Guardar medidas", null).show();
+		dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
+			Map<com.energym.app.nutrition.BodyMeasures.Part, String> typed =
+				new EnumMap<>(com.energym.app.nutrition.BodyMeasures.Part.class);
+			for (Map.Entry<com.energym.app.nutrition.BodyMeasures.Part, android.widget.EditText> e : fields.entrySet())
+				typed.put(e.getKey(), e.getValue().getText().toString());
+			String error = state.measures.save(LocalDate.now(), typed);
+			if (!error.isEmpty()) {
+				android.widget.Toast.makeText(requireContext(), error, android.widget.Toast.LENGTH_LONG).show();
+				return;
+			}
+			dialog.dismiss();
+			render();
+		});
 	}
 
 	/** Lo guardado en una sesión sin finalizar también cuenta como avance visible. */

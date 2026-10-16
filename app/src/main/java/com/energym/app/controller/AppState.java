@@ -63,6 +63,7 @@ public final class AppState extends AndroidViewModel {
 	/** Ejercicios creados por la persona, por cuenta y solo en este móvil. */
 	public com.energym.app.catalog.CustomExercises customExercises;
 	public com.energym.app.nutrition.SavedMeals savedMeals;
+	public com.energym.app.nutrition.BodyMeasures measures;
 	private com.energym.app.nutrition.SyncedNutritionStore nutritionStore;
 	// Consultas a Open Food Facts: independientes del chat y de SQLite.
 	private final ExecutorService lookupWorker = Executors.newSingleThreadExecutor();
@@ -185,6 +186,17 @@ public final class AppState extends AndroidViewModel {
 				mealPrefs.edit().putString(owner, encoded).apply();
 			}
 		});
+		android.content.SharedPreferences measurePrefs = context.getSharedPreferences("body_measures",
+			android.content.Context.MODE_PRIVATE);
+		measures = new com.energym.app.nutrition.BodyMeasures(new com.energym.app.nutrition.BodyMeasures.Store() {
+			public String load(String owner) {
+				return measurePrefs.getString(owner, "");
+			}
+
+			public void save(String owner, String encoded) {
+				measurePrefs.edit().putString(owner, encoded).apply();
+			}
+		});
 		// Recordatorios de entreno y agua: alarmas y avisos locales, sin servidor.
 		reminders = new com.energym.app.reminders.ReminderController(context, this::changed);
 		// Dietas con la misma IA del móvil; el último menú de cada cuenta se guarda solo en este teléfono.
@@ -259,6 +271,7 @@ public final class AppState extends AndroidViewModel {
 			water.activate(app.owner());
 			customExercises.activate(app.owner());
 			savedMeals.activate(app.owner());
+			measures.activate(app.owner());
 			changed();
 		});
 		accounts = new AccountController(gateway, sync, main, (status, value, error) -> {
