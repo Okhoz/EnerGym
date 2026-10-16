@@ -24,6 +24,8 @@ public final class ProposalController {
 	private Boolean conversationHistoryConsent;
 	private Boolean lastProfileHistoryConsent;
 	private boolean planningDialogue, pendingHistory;
+	/** Lo pedido durante el diálogo de planificación («piernas», «suave»…) aunque llegue en varios mensajes. */
+	private String planningAsk = "";
 	private final AppStore store;
 	private final ConversationStore conversations;
 	private final ChatClient client;
@@ -402,6 +404,7 @@ public final class ProposalController {
 			changed.run();
 			return;
 		}
+		planningAsk = planningDialogue ? (planningAsk + " " + raw).trim() : raw;
 		planningDialogue = true;
 		parse(text);
 		List<String> missing = missing();
@@ -412,7 +415,8 @@ public final class ProposalController {
 		} else {
 			try {
 				TrainingProfile proposed = build();
-				setPreview(new RoutinePlanner().create(proposed, catalog), base);
+				setPreview(new RoutinePlanner().create(proposed, catalog, RoutineRequest.parse(planningAsk),
+					System.nanoTime()), base);
 				planningDialogue = false;
 				add("assistant", preview.isEmpty() ? preview.getExplanation() :
 					"He preparado una vista previa: " + proposed.getDaysPerWeek() + " días por semana, " +

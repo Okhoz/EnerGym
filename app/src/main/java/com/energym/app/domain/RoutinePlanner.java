@@ -45,6 +45,57 @@ public final class RoutinePlanner {
 			new RoutineMetadata(RoutineMetadata.Origin.LOCAL_RULES, true));
 	}
 
+	/**
+	 * Propuesta local según lo que pide la persona (zonas, intensidad, número de ejercicios): equilibrada, con
+	 * calentamiento y distinta en cada petición gracias a la semilla. Sin petición concreta, cuerpo completo variado.
+	 */
+	public Routine create(TrainingProfile profile, List<Exercise> catalog, RoutineRequest request, long seed) {
+		Objects.requireNonNull(profile, "profile");
+		Objects.requireNonNull(catalog, "catalog");
+		List<Exercise> compatible = new ArrayList<>();
+		Set<String> ids = new HashSet<>();
+		for (Exercise exercise : catalog)
+			if (engine.isCompatible(exercise, profile) && ids.add(exercise.getId()))
+				compatible.add(exercise);
+		int max = request.count > 0 ? request.count : request.intensity == RoutineRequest.Intensity.EASY ? 4 : 5;
+		List<RoutineItem> items = new ArrayList<>();
+		int remaining = profile.getDurationMinutes();
+		for (Exercise exercise : request.compose(compatible, seed, max)) {
+			if (remaining < 3)
+				break;
+			boolean endurance = exercise.getMetricType() == MetricType.ENDURANCE;
+			int minutes = endurance ? Math.max(2, remaining - 3) : exercise.getMetricType() == MetricType.MOBILITY ? 3 : 5;
+			if (!endurance && minutes > remaining)
+				break;
+			Map<String, String> values = prescription(exercise.getMetricType(), minutes);
+			if (exercise.getMetricType() == MetricType.STRENGTH && request.intensity != RoutineRequest.Intensity.NORMAL) {
+				boolean hard = request.intensity == RoutineRequest.Intensity.HARD;
+				values.put("sets", hard ? "3" : "2");
+				values.put("repetitions", hard ? "12" : "8");
+				values.put("restSeconds", hard ? "45" : "75");
+			}
+			Set<RoutineRequest.Area> worked = RoutineRequest.areas(exercise);
+			List<String> labels = new ArrayList<>();
+			for (RoutineRequest.Area a : worked)
+				labels.add(a.label);
+			items.add(new RoutineItem(exercise, values, minutes, (labels.isEmpty() ? "Encaja con tu perfil" :
+				"Trabaja " + String.join(", ", labels)) + (request.areas.isEmpty() ? "." : ", como pediste.") +
+				" Ejemplo sin revisión profesional."));
+			remaining -= minutes;
+			if (endurance)
+				break;
+		}
+		String title = request.title();
+		String explanation = items.isEmpty() ?
+			"No hay ejercicios de " + (request.areas.isEmpty() ? "ese tipo" : request.title().toLowerCase(Locale.ROOT)) +
+				" compatibles con tu perfil (objetivo, lugar y material). Pide otra zona o cambia tu objetivo o material en " +
+				"Perfil." :
+			"Propuesta local por reglas según lo que has pedido. Ejemplos sin revisión profesional; adapta la intensidad a " +
+				"tu situación. No utiliza modelos de IA ni requiere conexión. La duración estimada incluye descansos y transiciones.";
+		return new Routine(UUID.randomUUID().toString(), 0, title.isEmpty() ? "Propuesta de entrenamiento" : title, profile,
+			items, explanation, new RoutineMetadata(RoutineMetadata.Origin.LOCAL_RULES, true));
+	}
+
 	private Map<String, String> prescription(MetricType type, int minutes) {
 		Map<String, String> values = new LinkedHashMap<>();
 		switch (type) {

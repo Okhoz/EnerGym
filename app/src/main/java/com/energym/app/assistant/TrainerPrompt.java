@@ -35,6 +35,48 @@ public final class TrainerPrompt {
 		return result;
 	}
 
+	/** Todos los ejercicios compatibles con el perfil, en el orden del catálogo. */
+	static List<Exercise> compatible(TrainingProfile profile, List<Exercise> catalog) {
+		List<Exercise> result = new ArrayList<>();
+		if (profile == null)
+			return result;
+		CompatibilityEngine engine = new CompatibilityEngine();
+		for (Exercise e : catalog)
+			if (engine.isCompatible(e, profile))
+				result.add(e);
+		return result;
+	}
+
+	/**
+	 * Lo que pide en este mensaje; si no concreta nada (p. ej. «sí, venga»), lo de sus últimos mensajes.
+	 */
+	static RoutineRequest request(ChatClient.Request r) {
+		RoutineRequest asked = RoutineRequest.parse(r.message);
+		if (!asked.isEmpty())
+			return asked;
+		StringBuilder before = new StringBuilder();
+		int seen = 0;
+		for (int i = r.recent.size() - 1; i >= 0 && seen < 2; i--)
+			if (r.recent.get(i).role.equals("user")) {
+				before.insert(0, r.recent.get(i).text + " ");
+				seen++;
+			}
+		return RoutineRequest.parse(before.toString());
+	}
+
+	static long seed(ChatClient.Request r) {
+		return r.requestId == null ? 0 : r.requestId.hashCode();
+	}
+
+	/**
+	 * Lista para el modelo: los compatibles más afines a lo pedido (varían entre peticiones), no siempre los
+	 * primeros del catálogo.
+	 */
+	static List<Exercise> eligible(ChatClient.Request r, List<Exercise> catalog) {
+		List<Exercise> ranked = request(r).rank(compatible(r.profile, catalog), seed(r));
+		return ranked.size() > MAX_EXERCISES ? new ArrayList<>(ranked.subList(0, MAX_EXERCISES)) : ranked;
+	}
+
 	public static String build(ChatClient.Request r, List<Exercise> catalog) {
 		StringBuilder p = new StringBuilder();
 		p.append("Eres el entrenador personal de la app EnerGym y hablas con tu cliente dentro de la app. ")
@@ -49,7 +91,8 @@ public final class TrainerPrompt {
 			.append("ejercicios de apoyo, errores frecuentes). No pidas datos si no hacen falta para responder.\n")
 			.append("Responde SOLO con un objeto JSON, sin texto fuera de él, con esta forma:\n")
 			.append("{\"texto\":\"tu respuesta\",\"rutina\":null}\n");
-		List<Exercise> eligible = eligible(r.profile, catalog);
+		List<Exercise> eligible = eligible(r, catalog);
+		RoutineRequest wants = request(r);
 		if (r.profile != null && !eligible.isEmpty())
 			p.append("Si el cliente pide una rutina, un entrenamiento o qué hacer hoy, usa en su lugar:\n")
 				.append("{\"texto\":\"explicación breve\",\"rutina\":{\"titulo\":\"nombre corto\",\"ejercicios\":[")
@@ -62,6 +105,10 @@ public final class TrainerPrompt {
 				.append("Para la sobrecarga progresiva, conserva los ejercicios que ya hizo si encajan: la app parte de su ")
 				.append("última carga y sube sola la rutina tras cada sesión (repeticiones, luego carga). ")
 				.append("Ten en cuenta el nivel, la experiencia, las limitaciones y los datos de su disciplina.\n");
+		if (r.profile != null && !wants.describe().isEmpty())
+			p.append("LO QUE PIDE PARA HOY: ").append(wants.describe()).append(". La rutina debe trabajar exactamente ")
+				.append("eso: elige ejercicios de esas zonas (la lista está ordenada de más a menos afín) y respeta lo que ")
+				.append("quiere evitar. Ponle un título que lo refleje.\n");
 		p.append("\nPERFIL DEL CLIENTE\n").append(profile(r.profileData)).append('\n');
 		if (!r.training.isEmpty())
 			p.append("\nSU ENTRENAMIENTO Y TODO LO QUE HA HECHO EN LA APP (datos reales)\n")
@@ -137,7 +184,7 @@ public final class TrainerPrompt {
 			text = text.substring(0, brace).replaceAll("(?i)(^|\\n)[^\\n]{0,20}rutina[^\\n]{0,10}:\\s*$", "").trim();
 		}
 		if (routine == null && r.profile != null)
-			routine = fromNames(source, eligible(r.profile, catalog));
+			routine = fromNames(source, eligible(r, catalog));
 		// Si pidió una rutina y el modelo no la dio, se arma con los primeros ejercicios compatibles del catálogo.
 		if (routine == null && r.profile != null && asksForRoutine(r.message))
 			routine = new LinkedHashMap<>();
@@ -192,28 +239,31 @@ public final class TrainerPrompt {
 
 	private static Map<String, Object> proposal(Map<String, Object> routine, ChatClient.Request r,
 		List<Exercise> catalog) {
-		List<Exercise> eligible = eligible(r.profile, catalog);
+		List<Exercise> eligible = eligible(r, catalog);
 		if (eligible.isEmpty())
 			return null;
+		RoutineRequest wants = request(r);
+		int max = wants.count > 0 ? wants.count : 5;
 		Map<String, Exercise> byId = new LinkedHashMap<>();
 		for (Exercise e : eligible)
 			byId.put(e.getId(), e);
 		List<Exercise> chosen = new ArrayList<>();
-		Map<String, Map<String, Object>> asked = new HashMap<>();
+		Map<String, Map<String, Object>> hints = new HashMap<>();
 		if (routine.get("ejercicios") instanceof List)
 			for (Object x : (List<?>) routine.get("ejercicios")) {
 				if (!(x instanceof Map))
 					continue;
 				Map<String, Object> item = cast(x);
 				Exercise e = byId.get(String.valueOf(item.get("id")).trim());
-				if (e != null && !asked.containsKey(e.getId()) && chosen.size() < 5) {
+				if (e != null && !hints.containsKey(e.getId()) && chosen.size() < max) {
 					chosen.add(e);
-					asked.put(e.getId(), item);
+					hints.put(e.getId(), item);
 				}
 			}
-		// Si el modelo no acertó ningún ID, la rutina se arma con los primeros compatibles del catálogo.
+		// Si el modelo no acertó ningún ID, la rutina se arma con lo que pidió (o de cuerpo completo), no con los
+		// primeros del catálogo.
 		if (chosen.isEmpty())
-			chosen.addAll(eligible.subList(0, Math.min(3, eligible.size())));
+			chosen.addAll(wants.compose(compatible(r.profile, catalog), seed(r), max));
 		// El bloque de resistencia consume el tiempo restante: siempre al final.
 		List<Exercise> ordered = new ArrayList<>();
 		for (Exercise e : chosen)
@@ -223,13 +273,20 @@ public final class TrainerPrompt {
 			if (!ordered.contains(e))
 				ordered.add(e);
 		TrainingProfile profile = r.profile;
-		boolean beginner = beginner(profile.getLevel());
+		boolean beginner = beginner(profile.getLevel()) || wants.intensity == RoutineRequest.Intensity.EASY;
 		// Margen libre para que la progresión pueda añadir series o minutos sin pasarse del tiempo declarado.
 		int remaining = Math.max(5, (int) Math.floor(profile.getDurationMinutes() * 0.85));
 		List<Object> items = new ArrayList<>();
 		for (Exercise e : ordered) {
-			Map<String, Object> hint = asked.getOrDefault(e.getId(), Collections.emptyMap());
+			Map<String, Object> hint = hints.getOrDefault(e.getId(), Collections.emptyMap());
 			Prescription p = prescribe(e, hint, beginner, profile.getGoal(), remaining);
+			// Pidió algo intenso: una serie más en fuerza, sin pasar de 4.
+			if (p != null && wants.intensity == RoutineRequest.Intensity.HARD && e.getMetricType() == MetricType.STRENGTH &&
+				!beginner(profile.getLevel())) {
+				int sets = Math.min(4, Integer.parseInt(p.values.get("sets")) + 1);
+				p.minutes += (sets - Integer.parseInt(p.values.get("sets"))) * 2;
+				p.values.put("sets", Integer.toString(sets));
+			}
 			if (p == null || p.minutes > remaining)
 				continue;
 			remaining -= p.minutes;
@@ -247,8 +304,9 @@ public final class TrainerPrompt {
 		if (items.isEmpty())
 			return null;
 		Object title = routine.get("titulo");
+		String fallback = wants.title().isEmpty() ? "Entrenamiento de tu entrenador" : wants.title();
 		return StrictJson.map("title", title instanceof String && !((String) title).trim().isEmpty() ?
-			cut(((String) title).trim(), 200) : "Entrenamiento de tu entrenador", "items", items);
+			cut(((String) title).trim(), 200) : fallback, "items", items);
 	}
 
 	static final class Prescription {
