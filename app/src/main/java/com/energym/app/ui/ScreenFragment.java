@@ -220,10 +220,23 @@ public abstract class ScreenFragment extends Fragment {
 		// En una fila, cada botón cabe en una línea: el texto se reduce un poco antes de partirse.
 		b.setMaxLines(1);
 		b.setPadding(dp(16), b.getPaddingTop(), dp(16), b.getPaddingBottom());
-		androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(b, 11, 15, 1,
-			android.util.TypedValue.COMPLEX_UNIT_SP);
+		// Las flechas de navegación (‹ ›) van grandes y fijas; el resto se ajusta para caber en una línea.
+		if (label.equals("‹") || label.equals("›")) {
+			// Misma altura que los botones vecinos; la flecha de la fuente cae baja, se sube un poco para centrarla.
+			b.setTextSize(24);
+			b.setIncludeFontPadding(false);
+			b.setPadding(0, 0, 0, dp(4));
+			b.setMinHeight(0);
+			b.setMinimumHeight(0);
+			b.setGravity(android.view.Gravity.CENTER);
+		} else
+			androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(b, 11, 15, 1,
+				android.util.TypedValue.COMPLEX_UNIT_SP);
 		b.setOnClickListener(v -> event.run());
-		return column(row, b, 16);
+		MaterialButton added = column(row, b, 16);
+		if (label.equals("‹") || label.equals("›"))
+			added.getLayoutParams().height = getResources().getDimensionPixelSize(R.dimen.primary_touch_target);
+		return added;
 	}
 
 	/**
@@ -366,12 +379,28 @@ public abstract class ScreenFragment extends Fragment {
 	 */
 	protected View listRow(LinearLayout target, String title, String detail, String end, boolean enabled, Runnable click) {
 		View row = getLayoutInflater().inflate(R.layout.row_food, target, false);
-		((TextView) row.findViewById(R.id.food_name)).setText(title);
+		// Icono inicial (emoji o símbolo) en una columna fija: todos los textos empiezan a la misma altura.
+		String icon = "", label = title;
+		int space = title.indexOf(' ');
+		if (space > 0 && !Character.isLetterOrDigit(title.codePointAt(0))) {
+			icon = title.substring(0, space);
+			label = title.substring(space).trim();
+		}
+		((TextView) row.findViewById(R.id.food_name)).setText(label);
+		if (!icon.isEmpty()) {
+			TextView glyph = new TextView(requireContext());
+			glyph.setText(icon);
+			glyph.setTextSize(18);
+			glyph.setGravity(android.view.Gravity.CENTER);
+			glyph.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+			((LinearLayout) row).addView(glyph, 0, new LinearLayout.LayoutParams(dp(40), ViewGroup.LayoutParams.WRAP_CONTENT));
+		}
 		TextView sub = row.findViewById(R.id.food_detail);
 		sub.setText(detail);
 		sub.setVisibility(detail == null || detail.isEmpty() ? View.GONE : View.VISIBLE);
 		TextView arrow = row.findViewById(R.id.food_kcal);
 		arrow.setText(end);
+		arrow.setTextSize(20);
 		arrow.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.gold));
 		row.setEnabled(enabled);
 		row.setAlpha(enabled ? 1f : 0.45f);

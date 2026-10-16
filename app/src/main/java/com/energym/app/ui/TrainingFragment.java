@@ -204,7 +204,7 @@ public final class TrainingFragment extends ScreenFragment {
 			suggesting = true;
 			render();
 		}).setTag("training_suggest");
-		View ai = option(create, "✦ Pedírsela al entrenador", "Dile qué quieres trabajar y cuánto tiempo tienes.",
+		View ai = option(create, "✦ Pedírsela al entrenador", "Dile qué quieres trabajar.",
 			ready && !state.assistant.busy, () -> {
 				if (state.assistant.busy)
 					return;

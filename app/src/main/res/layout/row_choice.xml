@@ -65,6 +65,7 @@
 		android:layout_height="wrap_content"
 		android:layout_marginTop="@dimen/label_gap"
 		android:paddingHorizontal="16dp"
+		android:lineSpacingExtra="0dp"
 		android:visibility="gone"
 		tools:text="Elige la opción que mejor refleje una semana habitual."
 		tools:visibility="visible" />

@@ -110,14 +110,27 @@ public final class AccountFragment extends ScreenFragment {
 	/** Cabecera plegable de un ajuste; devuelve si está abierto. Abrir uno cierra el anterior. */
 	private boolean fold(String key, String label) {
 		boolean open = key.equals(openSetting);
-		android.view.View header = listRow(rows, label, "", open ? "▴" : "›", true, () -> {
+		// La tarjeta desplegada del apartado anterior queda a la misma distancia que el resto de cabeceras.
+		if (rows.getChildCount() > 0) {
+			android.view.View previous = rows.getChildAt(rows.getChildCount() - 1);
+			if (previous.findViewById(R.id.card_actions) != null &&
+				previous.getLayoutParams() instanceof LinearLayout.LayoutParams) {
+				((LinearLayout.LayoutParams) previous.getLayoutParams()).bottomMargin = dp(16);
+				previous.requestLayout();
+			}
+		}
+		android.view.View header = listRow(rows, label, "", open ? "▴" : "▾", true, () -> {
 			openSetting = open ? "" : key;
 			render();
 		});
 		header.setTag("setting_" + key);
 		header.setPadding(dp(20), dp(14), dp(20), dp(14));
 		header.setBackground(rounded(open ? R.color.surface_selected : R.color.surface_card, 18, R.color.gold, open ? 1 : 0));
-		((LinearLayout.LayoutParams) header.getLayoutParams()).bottomMargin = dp(10);
+		// Misma separación entre cabeceras y entre una cabecera y su contenido desplegado.
+		LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) header.getLayoutParams();
+		lp.topMargin = 0;
+		lp.bottomMargin = dp(16);
+		header.setLayoutParams(lp);
 		return open;
 	}
 

@@ -135,7 +135,6 @@ public final class SessionFragment extends ScreenFragment {
 		com.google.android.material.button.MaterialButton back =
 			compact(nav, "‹", at > 0 && !app.sessions.busy, () -> app.sessions.select(at - 1));
 		back.setContentDescription("Ejercicio anterior");
-		back.setTextSize(26);
 		compact(nav, showList ? "Ocultar lista" : "☰ Todos", true, () -> {
 			showList = !showList;
 			render();
@@ -143,8 +142,7 @@ public final class SessionFragment extends ScreenFragment {
 		com.google.android.material.button.MaterialButton forward =
 			compact(nav, "›", at + 1 < count && !app.sessions.busy, () -> app.sessions.select(at + 1));
 		forward.setContentDescription("Ejercicio siguiente");
-		forward.setTextSize(26);
-		add(rows, new android.view.View(requireContext()), 12);
+		add(rows, new android.view.View(requireContext()), 16);
 		if (!showList)
 			return;
 		LinearLayout list = card("Ejercicios de hoy", "Toca uno para ir a él.");

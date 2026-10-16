@@ -41,7 +41,6 @@ public final class NutritionFragment extends ScreenFragment {
 		LinearLayout dates = columns(rows, 0);
 		MaterialButton previous = compact(dates, "‹", true, () -> n.select(day.minusDays(1)));
 		previous.setContentDescription("Día anterior");
-		previous.setTextSize(22);
 		// El botón central muestra el día; si no es hoy, pulsarlo vuelve a hoy.
 		MaterialButton today = compact(dates, label(day, n.today()), !day.equals(n.today()), () -> n.select(n.today()));
 		today.setContentDescription("Día mostrado: " + label(day, n.today()) + (day.equals(n.today()) ? "" : ". Ir a hoy"));
@@ -50,9 +49,8 @@ public final class NutritionFragment extends ScreenFragment {
 		today.setEllipsize(android.text.TextUtils.TruncateAt.END);
 		MaterialButton next = compact(dates, "›", day.isBefore(n.today()), () -> n.select(day.plusDays(1)));
 		next.setContentDescription("Día siguiente");
-		next.setTextSize(22);
 		((LinearLayout.LayoutParams) today.getLayoutParams()).weight = 3;
-		add(rows, new android.widget.Space(requireContext()), 16);
+		add(rows, new android.widget.Space(requireContext()), 24);
 
 		double[] totals = n.totals(day);
 		BodyProfile.Targets targets = n.targets();
