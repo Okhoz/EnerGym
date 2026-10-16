@@ -125,6 +125,10 @@ public final class TrainingFragment extends ScreenFragment {
 
 	private void routines(boolean hasNextStep) {
 		List<Routine> routines = new ArrayList<>(app.versions);
+		// Los días de un plan semanal van juntos y en orden (Día 1, Día 2…), como las rutinas de FitNotes.
+		routines.sort(Comparator.comparingInt((Routine r) -> com.energym.app.domain.WeeklyPlan.dayOf(r) == null ? 1 : 0)
+			.thenComparingInt(r -> com.energym.app.domain.WeeklyPlan.dayOf(r) == null ? 0 :
+				com.energym.app.domain.WeeklyPlan.dayOf(r)[0]));
 		if (!app.lastProgression.isEmpty()) {
 			section("Última subida de nivel", hasNextStep ? 32 : 0);
 			card("📈 Tu rutina ha mejorado", "• " + String.join("\n• ", app.lastProgression));
@@ -159,6 +163,10 @@ public final class TrainingFragment extends ScreenFragment {
 		ai.setContentDescription("Crear rutina con IA");
 		text(create, "Dile qué quieres trabajar, cuánto tiempo tienes o cómo te encuentras.", R.style.EnerGym_FieldCaption, 0)
 			.setPadding(dp(4), 0, dp(4), dp(8));
+		MaterialButton plan = action(create, "📅 Plan semanal", ready && !app.trainingMutation, () -> app.createPlan(""));
+		plan.setTag("training_create_plan");
+		text(create, "Una rutina por día según los días que entrenas (Empuje / Tirón / Pierna, Torso / Pierna…).",
+			R.style.EnerGym_FieldCaption, 0).setPadding(dp(4), 0, dp(4), dp(8));
 		MaterialButton manual = action(create, "✍ Hacerla yo", ready && !app.manual.busy, app::createManualRoutine);
 		manual.setTag("training_create_manual");
 		manual.setContentDescription("Crear rutina manual");

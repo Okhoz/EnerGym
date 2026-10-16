@@ -11,7 +11,7 @@ import java.util.*;
 public final class AppController {
 	public TrainingProfile profile;
 
-	public enum Screen {HOME, TRAINING, ASSISTANT, HISTORY, PROFILE, ROUTINE, MANUAL_ROUTINE, SESSION, EXERCISE, ACCOUNT, NUTRITION, FOOD, BODY}
+	public enum Screen {HOME, TRAINING, ASSISTANT, HISTORY, PROFILE, ROUTINE, MANUAL_ROUTINE, SESSION, EXERCISE, ACCOUNT, NUTRITION, FOOD, BODY, PLAN}
 
 	/**
 	 * Descriptor de edición: la vista infla XML y remite texto, no interpreta enums ni reglas.
@@ -154,6 +154,7 @@ public final class AppController {
 		});
 		sessions = new SessionController(store, this::changed, this::error, () -> {
 			notice = "Sesión finalizada y guardada localmente.";
+			selectNextPlanDay();
 			reload();
 			navigate(Screen.HISTORY);
 		});
@@ -200,6 +201,7 @@ public final class AppController {
 		history = Collections.emptyList();
 		pending = Collections.emptyList();
 		versions = Collections.emptyList();
+		planPreview = Collections.emptyList();
 		selectedRoutineId = null;
 		lastLoadedRoutine = null;
 		progression = null;
@@ -308,6 +310,91 @@ public final class AppController {
 		routines.create();
 		if (routines.preview != null)
 			navigate(Screen.ROUTINE);
+	}
+
+	/** Plan semanal: al terminar un día queda seleccionado el siguiente, como en una rutina de FitNotes. */
+	private void selectNextPlanDay() {
+		Routine next = sessions.session == null ? null : WeeklyPlan.next(sessions.session.getRoutine(), versions);
+		if (next != null) {
+			selectedRoutineId = next.getProposalId();
+			routines.accepted = next;
+			notice = "Sesión guardada. Siguiente: " + next.getTitle() + ".";
+		}
+	}
+
+	/** Plan semanal pendiente de revisar (una rutina por día) y lo pedido para rehacerlo. */
+	public List<Routine> planPreview = Collections.emptyList();
+	private String planAsk = "";
+
+	/** Prepara un plan semanal sin guardar nada y abre su revisión. */
+	public void createPlan(String asked) {
+		if (trainingMutation) return;
+		if (owner == null) {
+			navigate(Screen.ACCOUNT);
+			return;
+		}
+		if (profile == null) {
+			error("Guarda tu perfil (días por semana, lugar y material) antes de crear un plan.");
+			return;
+		}
+		planAsk = asked == null ? "" : asked;
+		planPreview = WeeklyPlan.create(profile, catalog.getExercises(), planAsk, System.nanoTime());
+		if (planPreview.isEmpty()) {
+			error("No hay ejercicios compatibles con tu perfil para armar un plan. Revisa lugar y material.");
+			return;
+		}
+		navigate(Screen.PLAN);
+	}
+
+	/** Otra combinación de ejercicios con el mismo reparto de días. */
+	public void shufflePlan() {
+		if (trainingMutation || profile == null) return;
+		planPreview = WeeklyPlan.create(profile, catalog.getExercises(), planAsk, System.nanoTime());
+		changed();
+	}
+
+	public void cancelPlan() {
+		planPreview = Collections.emptyList();
+		back();
+	}
+
+	/** Guarda todos los días del plan como rutinas y deja seleccionado el día 1. */
+	public void acceptPlan() {
+		if (trainingMutation || planPreview.isEmpty()) return;
+		trainingMutation = true;
+		List<Routine> pending = new ArrayList<>(planPreview);
+		List<Routine> saved = new ArrayList<>();
+		long token = generation;
+		changed();
+		acceptNext(pending, saved, token);
+	}
+
+	private void acceptNext(List<Routine> pending, List<Routine> saved, long token) {
+		if (pending.isEmpty()) {
+			trainingMutation = false;
+			planPreview = Collections.emptyList();
+			notice = "📅 Plan guardado: " + saved.size() + " días. Hoy toca " + saved.get(0).getTitle() + ".";
+			routines.accepted = saved.get(0);
+			selectedRoutineId = saved.get(0).getProposalId();
+			reload();
+			navigate(Screen.TRAINING);
+			return;
+		}
+		store.accept(pending.remove(0), new AppStore.Callback<Routine>() {
+			public void success(Routine value) {
+				if (token != generation)
+					return;
+				saved.add(value);
+				acceptNext(pending, saved, token);
+			}
+
+			public void failure(Exception e) {
+				if (token != generation)
+					return;
+				trainingMutation = false;
+				error(e.getMessage());
+			}
+		});
 	}
 
 	public void startSession() {

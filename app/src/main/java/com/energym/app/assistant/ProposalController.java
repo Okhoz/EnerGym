@@ -133,6 +133,16 @@ public final class ProposalController {
 		training = summary == null ? () -> "" : summary;
 	}
 
+	private java.util.function.Function<String, String> weeklyPlan;
+
+	/**
+	 * Plan semanal estilo FitNotes: recibe lo pedido, prepara una rutina por día para revisar y devuelve la
+	 * respuesta del entrenador. Sin esto, la petición sigue como una rutina normal.
+	 */
+	public void weeklyPlan(java.util.function.Function<String, String> planner) {
+		weeklyPlan = planner;
+	}
+
 	private java.util.function.UnaryOperator<Routine> carryOver = r -> r;
 
 	/** Ajusta una propuesta nueva a lo último que la persona registró (sin reiniciar cargas ya conseguidas). */
@@ -918,6 +928,14 @@ public final class ProposalController {
 	 * Online usa la cuenta actual; el guiado local se elige explícitamente. Debug vacío conserva pairing.
 	 */
 	public void send(String text) {
+		// «Hazme un plan semanal / empuje tirón pierna…»: un plan de varios días, igual con o sin IA.
+		if (weeklyPlan != null && current.get() != null && WeeklyPlan.asksForPlan(text) && ready(text)) {
+			add("user", text.trim());
+			add("assistant", weeklyPlan.apply(text));
+			persist();
+			changed.run();
+			return;
+		}
 		if (automaticConnection() && !localGuidance) {
 			// La IA del móvil aún no responde (sin soporte o descargando): el aviso promete el guiado local,
 			// que tampoco sale del móvil, así que se contesta con él en vez de dejar el mensaje sin enviar.

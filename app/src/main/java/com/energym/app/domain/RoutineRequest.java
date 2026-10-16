@@ -41,6 +41,13 @@ public final class RoutineRequest {
 		this.count = count;
 	}
 
+	/** Petición para un día concreto de un plan (p. ej. Empuje = pecho y hombros). */
+	public static RoutineRequest of(Set<Area> areas, Intensity intensity, int count) {
+		Set<Area> copy = EnumSet.noneOf(Area.class);
+		copy.addAll(areas);
+		return new RoutineRequest(copy, EnumSet.noneOf(Area.class), intensity, count);
+	}
+
 	public static RoutineRequest none() {
 		return new RoutineRequest(EnumSet.noneOf(Area.class), EnumSet.noneOf(Area.class), Intensity.NORMAL, 0);
 	}

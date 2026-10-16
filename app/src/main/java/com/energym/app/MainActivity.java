@@ -435,6 +435,8 @@ public final class MainActivity extends AppCompatActivity {
 				return new FoodFragment();
 			case BODY:
 				return new BodyFragment();
+			case PLAN:
+				return new PlanFragment();
 			default:
 				return new HomeFragment();
 		}

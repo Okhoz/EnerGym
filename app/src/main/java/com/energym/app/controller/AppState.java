@@ -166,6 +166,17 @@ public final class AppState extends AndroidViewModel {
 			app.routineAccepted(r);
 		});
 		assistant.carryOver(app::continueFrom);
+		assistant.weeklyPlan(asked -> {
+			app.createPlan(asked);
+			if (app.planPreview.isEmpty())
+				return "No he podido preparar el plan: revisa en Perfil tus días por semana, lugar y material.";
+			java.util.List<String> days = new java.util.ArrayList<>();
+			for (com.energym.app.domain.Routine r : app.planPreview)
+				days.add("• " + r.getTitle() + " (" + r.getItems().size() + " ejercicios)");
+			return "📅 Te he preparado un plan de " + app.planPreview.size() + " días:\n" + String.join("\n", days) +
+				"\n\nRevísalo y pulsa «Guardar plan». Al terminar cada día te dejo listo el siguiente y subo las " +
+				"cargas cuando cumplas el objetivo. 💪";
+		});
 		// El entrenador ve todo lo que la persona ha hecho en la app (solo en el móvil, nunca en la red).
 		assistant.trainingContext(() -> AssistantContext.build(app, nutrition, goals, diet, java.time.LocalDate.now(), water));
 		ExerciseResourcePolicy resourcePolicy;

@@ -86,8 +86,11 @@ public final class ProgressionEngine {
 		}
 		if (changes.isEmpty())
 			return null;
+		// Un día de plan semanal conserva su marca de plan para seguir encadenando con los demás días.
+		java.util.regex.Matcher plan = java.util.regex.Pattern.compile("Plan semanal \\([^)]+\\)")
+			.matcher(accepted.getExplanation() == null ? "" : accepted.getExplanation());
 		Routine routine = new Routine(UUID.randomUUID().toString(), 0, title(accepted.getTitle()), profile, items,
-			"Sobrecarga progresiva con tus sesiones registradas: primero repeticiones y después carga, solo con " +
+			(plan.find() ? plan.group() + " · " : "") + "Sobrecarga progresiva con tus sesiones registradas: primero repeticiones y después carga, solo con " +
 				"esfuerzo asumible; un mal día mantiene y dos seguidos bajan un poco. Ejemplo sin revisión " +
 				"profesional; ajusta si notas molestias.",
 			accepted.getMetadata());
