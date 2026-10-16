@@ -21,7 +21,10 @@ import com.google.android.material.button.MaterialButton;
  * Objetivos (metas propias con barra de avance y gráfica). Solo representa datos guardados.
  */
 public final class HistoryFragment extends ScreenFragment {
-	private boolean goalsTab;
+	/** 0 Resumen · 1 Calendario · 2 Cuerpo · 3 Metas. */
+	private int tab;
+	/** Logros: todos (también los conseguidos) o solo los 3 siguientes. */
+	private boolean allBadges;
 	private YearMonth month;
 	private LocalDate selected;
 	/** Análisis por grupo muscular: false = este mes, true = últimos 90 días. */
@@ -43,14 +46,23 @@ public final class HistoryFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		heading("TU EVOLUCIÓN", "Progreso", "Todo lo que entrenas y comes, sumado y en gráficas.");
-		segmented("history", new String[]{"Resumen", "Objetivos"}, new String[]{"history_tab_summary", "history_tab_goals"},
-			goalsTab ? 1 : 0, index -> {
-				goalsTab = index == 1;
+		heading("", "Progreso", "");
+		// Cuatro pestañas cortas en vez de una página interminable.
+		segmented("history", new String[]{"Resumen", "Calendario", "Cuerpo", "Metas"},
+			new String[]{"history_tab_summary", "history_tab_calendar", "history_tab_body", "history_tab_goals"}, tab,
+			index -> {
+				tab = index;
 				render();
 			});
 		ProgressStats stats = new ProgressStats(app.history, ZoneId.systemDefault(), LocalDate.now());
-		if (goalsTab)
+		NutritionController n = state.nutrition;
+		if (tab == 1) {
+			calendar(stats, n);
+			breakdown();
+		} else if (tab == 2) {
+			weight(n);
+			body();
+		} else if (tab == 3)
 			goals(stats);
 		else
 			summary(stats);
@@ -108,7 +120,25 @@ public final class HistoryFragment extends ScreenFragment {
 			}
 		}
 		nutrition(n);
-		if (n != null && n.weights.size() > 1) {
+		achievements(stats, n);
+	}
+
+	/** Peso: anotar el de hoy y su evolución. */
+	private void weight(NutritionController n) {
+		if (n == null || app.owner() == null)
+			return;
+		section("Peso", 0);
+		com.energym.app.nutrition.BodyProfile current = n.effectiveBody();
+		LinearLayout log = card("⚖️ Peso", current == null ? "Anota tu peso para seguir su evolución." :
+			"Actual: " + NutritionController.format(current.weightKg) + " kg");
+		String[] typed = {""};
+		textField(log, "weight", "Peso de hoy (kg)", "", true, false, v -> typed[0] = v);
+		action(log, "Anotar peso", !n.busy, () -> n.logWeight(typed[0])).setTag("progress_log_weight");
+		action(log, n.body == null ? "Completar mis datos" : "Editar mis datos físicos", true, () -> {
+			n.fillBody();
+			app.navigate(com.energym.app.controller.AppController.Screen.BODY);
+		});
+		if (n.weights.size() > 1) {
 			List<LocalDate> days = new ArrayList<>(n.weights.keySet());
 			double[] kg = new double[days.size()];
 			for (int i = 0; i < kg.length; i++)
@@ -121,10 +151,6 @@ public final class HistoryFragment extends ScreenFragment {
 			add(weight, new LineChartView(requireContext()), 8).set(kg,
 				new String[]{short_(days.get(0)), short_(days.get(days.size() - 1))}, "kg", "Evolución del peso");
 		}
-		achievements(stats, n);
-		body();
-		calendar(stats, n);
-		breakdown();
 	}
 
 	/** Logros que se ganan solos: los conseguidos y el siguiente de cada tipo con lo que falta. */
@@ -136,8 +162,14 @@ public final class HistoryFragment extends ScreenFragment {
 			if (b.earned()) earned++;
 		section("Logros", 32);
 		LinearLayout card = card("🏅 " + earned + (earned == 1 ? " logro conseguido" : " logros conseguidos"),
-			"Se ganan solos al entrenar y anotar. Debajo de cada tipo, lo que te falta para el siguiente.");
-		for (Achievements.Badge b : badges) {
+			allBadges ? "Todos los logros." : "Los siguientes que puedes conseguir.");
+		List<Achievements.Badge> shown = new ArrayList<>();
+		for (Achievements.Badge b : badges)
+			if (allBadges || !b.earned())
+				shown.add(b);
+		if (!allBadges && shown.size() > 3)
+			shown = shown.subList(0, 3);
+		for (Achievements.Badge b : shown) {
 			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, card, false);
 			((TextView) row.findViewById(R.id.food_name)).setText(b.icon + "  " + b.title);
 			((TextView) row.findViewById(R.id.food_detail)).setText(b.detail);
@@ -147,6 +179,10 @@ public final class HistoryFragment extends ScreenFragment {
 			row.setContentDescription(b.title + ". " + b.detail);
 			card.addView(row);
 		}
+		action(card, allBadges ? "Ver menos" : "Ver todos los logros", true, () -> {
+			allBadges = !allBadges;
+			render();
+		}).setTag("progress_all_badges");
 	}
 
 	// ---------------- Cuerpo: medidas y fotos ----------------
@@ -360,7 +396,7 @@ public final class HistoryFragment extends ScreenFragment {
 			month = YearMonth.from(today);
 		if (selected == null)
 			selected = today;
-		section("Calendario", 32);
+		section("Calendario", 0);
 		LinearLayout calendar = card("Calendario", "Dorado: entreno · puntos de color: grupos musculares · punto blanco: comida anotada");
 		Map<LocalDate, Set<RoutineRequest.Area>> worked = MuscleBreakdown.byDay(app.history, ZoneId.systemDefault());
 		Map<LocalDate, int[]> dots = new HashMap<>();
