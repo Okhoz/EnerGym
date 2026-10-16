@@ -208,6 +208,8 @@ public final class SessionFragment extends ScreenFragment {
 			kinds.add(Character.toString(k.code));
 			kindNames.add(k == SetLog.Kind.NORMAL ? "Normal" : k.label);
 		}
+		// Separa los selectores de los botones − / + de repeticiones.
+		add(log, new android.view.View(requireContext()), 12);
 		choice(log, "track_kind", "Tipo de serie", kinds, kindNames, kindInput, v -> {
 			kindInput = v;
 			app.sessions.input("trackKind", v);
@@ -259,8 +261,10 @@ public final class SessionFragment extends ScreenFragment {
 			}
 		});
 		double best = Math.max(previousBest(e.getId()), SetLog.best(sets));
-		action(log, "🏋️ Discos y tabla 1RM", true, () -> PlateDialog.show(requireContext(),
-			Plates.toKg(number(kgInput, 0), lb), best, lb)).setTag("track_plates");
+		// Sin carga (peso corporal) no hay discos que calcular ni 1RM en kg.
+		if (best > 0 || number(kgInput, 0) > 0)
+			action(log, "🏋️ Discos y tabla 1RM", true, () -> PlateDialog.show(requireContext(),
+				Plates.toKg(number(kgInput, 0), lb), best, lb)).setTag("track_plates");
 		int count = app.sessions.session.getRoutine().getItems().size();
 		int at = app.sessions.selected;
 		if (!editing && at + 1 < count) {
