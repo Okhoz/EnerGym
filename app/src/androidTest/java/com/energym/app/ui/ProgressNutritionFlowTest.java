@@ -61,11 +61,16 @@ public final class ProgressNutritionFlowTest {
 				a.state().app.navigate(AppController.Screen.HISTORY);
 			});
 			MainFlowTest.await();
+			// Progreso va por pestañas: el peso en Cuerpo y la comida del día en Calendario.
+			scenario.onActivity(a -> a.getWindow().getDecorView().findViewWithTag("history_tab_body").performClick());
+			MainFlowTest.await();
+			scenario.onActivity(a -> assertNotNull("La evolución del peso no depende de haber entrenado",
+				MainFlowTest.text(a.getWindow().getDecorView(), "Peso corporal")));
+			scenario.onActivity(a -> a.getWindow().getDecorView().findViewWithTag("history_tab_calendar").performClick());
+			MainFlowTest.await();
 			scenario.onActivity(a -> {
 				assertNotNull("El calendario no depende de haber entrenado",
 					MainFlowTest.text(a.getWindow().getDecorView(), "Calendario"));
-				assertNotNull("La evolución del peso no depende de haber entrenado",
-					MainFlowTest.text(a.getWindow().getDecorView(), "Peso corporal"));
 				assertTrue("Debe mostrar la comida del día seleccionado", containsText(a.getWindow().getDecorView(),
 					"Comida: 250 kcal"));
 			});

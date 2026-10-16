@@ -87,11 +87,14 @@ public class MainFlowTest {
 			click(scenario, "Terminar entreno");
 			await();
 			capture("history");
+			// El detalle de cada día está en Progreso › Calendario.
 			scenario.onActivity(a -> {
 				assertEquals(1, a.state().app.history.size());
 				assertEquals(AppController.Screen.HISTORY, a.state().app.screen);
-				assertTrue(textContaining(a.getWindow().getDecorView(), "Peso corporal × 8"));
+				a.getWindow().getDecorView().findViewWithTag("history_tab_calendar").performClick();
 			});
+			await();
+			scenario.onActivity(a -> assertTrue(textContaining(a.getWindow().getDecorView(), "Peso corporal × 8")));
 			click(scenario, "Cuenta");
 			click(scenario, "Salir de la cuenta / demo");
 			await();

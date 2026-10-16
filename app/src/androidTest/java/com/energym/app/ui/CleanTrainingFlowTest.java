@@ -51,9 +51,27 @@ public final class CleanTrainingFlowTest {
 		try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
 			ready(scenario);
 			pane(scenario, "training_tab_mine");
+			// Con rutinas, las formas de crear están detrás de un único «+ Nuevo»; sin rutinas ya se ven.
+			scenario.onActivity(activity -> {
+				View toggle = activity.getWindow().getDecorView().findViewWithTag("training_new");
+				if (toggle != null && MainFlowTest.text(activity.getWindow().getDecorView(), "Crear rutina manual") == null)
+					toggle.performClick();
+			});
+			MainFlowTest.await();
+			boolean[] signedIn = {false};
+			scenario.onActivity(activity -> signedIn[0] = activity.state().app.owner() != null);
+			if (!signedIn[0]) {
+				// Sin cuenta no hay nada que crear: solo el acceso a elegirla.
+				scenario.onActivity(activity -> {
+					View root = activity.getWindow().getDecorView();
+					assertNotNull(MainFlowTest.text(root, "Elegir cuenta"));
+					assertNull(MainFlowTest.text(root, "Crear rutina manual"));
+				});
+				return;
+			}
 			scenario.onActivity(activity -> {
 				View root = activity.getWindow().getDecorView();
-				// Rutinas reúne todas las formas de crear, a la vista y sin menús escondidos.
+				// Rutinas reúne todas las formas de crear.
 				assertNotNull(MainFlowTest.text(root, "Crear rutina manual"));
 				assertNotNull(MainFlowTest.text(root, "Crear rutina con IA"));
 				assertNotNull(MainFlowTest.text(root, "⚡ Una automática ya"));

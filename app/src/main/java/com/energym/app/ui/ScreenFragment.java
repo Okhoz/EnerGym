@@ -380,6 +380,10 @@ public abstract class ScreenFragment extends Fragment {
 			if (v.isEnabled())
 				click.run();
 		});
+		// El título también responde (y sin anunciarse aparte): pulsarlo equivale a pulsar la fila.
+		TextView name = row.findViewById(R.id.food_name);
+		name.setOnClickListener(v -> row.performClick());
+		name.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
 		target.addView(row);
 		return row;
 	}
