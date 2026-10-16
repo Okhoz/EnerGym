@@ -57,7 +57,7 @@ public class MainFlowTest {
 			await();
 			capture("training");
 			trainingPane(scenario, "mine");
-			click(scenario, "⚡ Una automática ya");
+			click(scenario, "Una automática ya");
 			capture("proposal");
 			click(scenario, "Guardar rutina");
 			await();

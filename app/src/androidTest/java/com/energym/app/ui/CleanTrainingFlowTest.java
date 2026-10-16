@@ -74,7 +74,7 @@ public final class CleanTrainingFlowTest {
 				// Rutinas reúne todas las formas de crear.
 				assertNotNull(MainFlowTest.text(root, "Crear rutina manual"));
 				assertNotNull(MainFlowTest.text(root, "Crear rutina con IA"));
-				assertNotNull(MainFlowTest.text(root, "⚡ Una automática ya"));
+				assertNotNull(MainFlowTest.text(root, "Una automática ya"));
 				assertNull(root.findViewWithTag("exercise_search"));
 				assertNull("Ya no hay pestaña separada para la IA", root.findViewWithTag("training_tab_ai"));
 			});
