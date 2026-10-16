@@ -30,20 +30,12 @@ public final class HistoryFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		heading("TU EVOLUCIÓN", "Progreso", "");
-		LinearLayout tabs = columns(rows, 0);
-		MaterialButton summary = compact(tabs, "Resumen", true, () -> {
-			goalsTab = false;
-			render();
-		});
-		MaterialButton goals = compact(tabs, "Objetivos", true, () -> {
-			goalsTab = true;
-			render();
-		});
-		primary(goalsTab ? goals : summary);
-		summary.setSelected(!goalsTab);
-		goals.setSelected(goalsTab);
-		add(rows, new android.widget.Space(requireContext()), 8);
+		heading("TU EVOLUCIÓN", "Progreso", "Todo lo que entrenas y comes, sumado y en gráficas.");
+		segmented("history", new String[]{"Resumen", "Objetivos"}, new String[]{"history_tab_summary", "history_tab_goals"},
+			goalsTab ? 1 : 0, index -> {
+				goalsTab = index == 1;
+				render();
+			});
 		ProgressStats stats = new ProgressStats(app.history, ZoneId.systemDefault(), LocalDate.now());
 		if (goalsTab)
 			goals(stats);
@@ -55,6 +47,7 @@ public final class HistoryFragment extends ScreenFragment {
 
 	private void summary(ProgressStats stats) {
 		NutritionController n = state.nutrition;
+		section("Totales", 0);
 		LinearLayout totals = card("Todo lo que has hecho", stats.total() == 0 ?
 			"Finaliza tu primera sesión y aquí se irá sumando todo." : "");
 		LinearLayout row1 = columns(totals, 4);
@@ -69,6 +62,7 @@ public final class HistoryFragment extends ScreenFragment {
 		inProgress();
 
 		if (stats.total() > 0) {
+			section("Tu mejora", 32);
 			LinearLayout trend = card("Tu mejora", "Últimas 4 semanas frente a las 4 anteriores");
 			text(trend, "Sesiones: " + trend(stats.sessionsTrend(), ""), R.style.EnerGym_Body, 8);
 			text(trend, "Tiempo: " + trend(stats.minutesTrend(), " min"), R.style.EnerGym_Body, 4);
@@ -130,6 +124,7 @@ public final class HistoryFragment extends ScreenFragment {
 					done.append("\n✓ ").append(item.getExercise().getName()).append(" · ")
 						.append(com.energym.app.controller.AppController.metrics(item.getExercise().getMetricType(), values));
 			}
+			section("En curso", 32);
 			LinearLayout card = card("Entreno en curso: " + s.getRoutine().getTitle(), done.toString());
 			add(card, new ProgressBarView(requireContext()), 12).set(total == 0 ? 0 : saved / (double) total,
 				saved + " de " + total + " ejercicios");
@@ -148,6 +143,7 @@ public final class HistoryFragment extends ScreenFragment {
 		for (double v : kcal)
 			if (v > 0) logged++;
 		com.energym.app.nutrition.BodyProfile.Targets targets = n.targets();
+		section("Alimentación", 32);
 		LinearLayout card = card("Alimentación", logged == 0 ?
 			"Anota comidas en Alimentación y aquí verás tu evolución." : "Últimos " + days + " días");
 		if (logged == 0)
@@ -181,6 +177,7 @@ public final class HistoryFragment extends ScreenFragment {
 			month = YearMonth.from(today);
 		if (selected == null)
 			selected = today;
+		section("Calendario", 32);
 		LinearLayout calendar = card("Calendario", "Dorado: entreno · punto: comida anotada");
 		LinearLayout nav = columns(calendar, 4);
 		compact(nav, "‹", true, () -> {

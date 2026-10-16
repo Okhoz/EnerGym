@@ -56,9 +56,13 @@ public final class NutritionFragment extends ScreenFragment {
 
 		double[] totals = n.totals(day);
 		BodyProfile.Targets targets = n.targets();
+		section("Tu objetivo", 20);
 		dailyGoal(n, targets);
 		diet(n, targets);
+		if (targets != null)
+			section("Hoy", 32);
 		remaining(n, day, totals, targets);
+		section("Tus comidas", 32);
 
 		// Diario por comidas, como en un registro de calorías: cada comida con su total y su botón de añadir.
 		List<FoodEntry> entries = n.entriesOn(day);
@@ -93,6 +97,7 @@ public final class NutritionFragment extends ScreenFragment {
 		if (!n.status.isEmpty())
 			text(rows, n.status, R.style.EnerGym_FieldCaption, 0);
 
+		section("Tu semana", 32);
 		LinearLayout week = card("Últimos 7 días", "Calorías por día" + (targets == null ? "." :
 			"; la línea discontinua marca tu objetivo de " + Math.round(targets.kcal) + " kcal."));
 		double[] series = n.caloriesSeries(7);
@@ -124,6 +129,7 @@ public final class NutritionFragment extends ScreenFragment {
 			return;
 		com.energym.app.nutrition.DietPlan plan = planner.plan;
 		BodyProfile current = n.effectiveBody();
+		section("Dieta con IA", 32);
 		LinearLayout card = card("✦ Tu dieta con IA", planner.busy ? "Preparando tu menú en el móvil…" :
 			plan == null ? "Un menú de un día con tus " + Math.round(targets.kcal) + " kcal, " +
 				current.mealsPerDay + " comidas y tu alimentación " + current.diet.label.toLowerCase(SPANISH) +

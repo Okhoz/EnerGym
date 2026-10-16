@@ -175,6 +175,97 @@ public abstract class ScreenFragment extends Fragment {
 		return add(target, view, topDp);
 	}
 
+	/** Última opción elegida de cada control segmentado: la burbuja sale de ahí al volver a pintar. */
+	private static final Map<String, Integer> SEGMENTS = new HashMap<>();
+
+	/**
+	 * Control segmentado con burbuja líquida: un contenedor redondeado y la opción elegida en dorado. La burbuja
+	 * se desliza desde la opción anterior; {@code select} recibe el índice tocado.
+	 */
+	protected LinearLayout segmented(String key, String[] labels, String[] tags, int selected, IntConsumer select) {
+		android.widget.FrameLayout frame = new android.widget.FrameLayout(requireContext());
+		frame.setPadding(dp(4), dp(4), dp(4), dp(4));
+		frame.setBackground(rounded(R.color.surface_card, 24, 0, 0));
+		LiquidIndicator bubble = new LiquidIndicator(requireContext());
+		bubble.setColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.gold));
+		frame.addView(bubble, new android.widget.FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+			ViewGroup.LayoutParams.MATCH_PARENT));
+		LinearLayout row = new LinearLayout(requireContext());
+		row.setOrientation(LinearLayout.HORIZONTAL);
+		frame.addView(row, new android.widget.FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+			ViewGroup.LayoutParams.WRAP_CONTENT));
+		for (int i = 0; i < labels.length; i++) {
+			int index = i;
+			boolean chosen = i == selected;
+			MaterialButton b = new MaterialButton(requireContext(), null,
+				com.google.android.material.R.attr.borderlessButtonStyle);
+			b.setText(labels[i]);
+			if (tags != null) b.setTag(tags[i]);
+			b.setAllCaps(false);
+			b.setTextSize(14);
+			b.setMinWidth(0);
+			b.setMinHeight(dp(44));
+			b.setMaxLines(1);
+			b.setPadding(dp(4), 0, dp(4), 0);
+			b.setInsetTop(0);
+			b.setInsetBottom(0);
+			b.setCornerRadius(dp(20));
+			b.setCheckable(true);
+			b.setChecked(chosen);
+			b.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.TRANSPARENT));
+			b.setRippleColor(android.content.res.ColorStateList.valueOf(0x22FFFFFF));
+			b.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(),
+				chosen ? R.color.surface : R.color.text_secondary));
+			b.setContentDescription(labels[i] + (chosen ? ", seleccionado" : ""));
+			b.setOnClickListener(v -> {
+				if (index != selected) select.accept(index);
+			});
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(44), 1);
+			if (i > 0) params.setMarginStart(dp(4));
+			row.addView(b, params);
+		}
+		int previous = SEGMENTS.containsKey(key) ? SEGMENTS.get(key) : selected;
+		SEGMENTS.put(key, selected);
+		row.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+			public void onLayoutChange(View v, int l, int t, int r, int b, int ol, int ot, int or, int ob) {
+				row.removeOnLayoutChangeListener(this);
+				bubble.jumpTo(segment(row, Math.min(previous, labels.length - 1)));
+				if (previous != selected)
+					bubble.slideTo(segment(row, selected),
+						com.energym.app.ui.effects.MotionPreferences.enabled(requireContext()), null);
+			}
+		});
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+			ViewGroup.LayoutParams.WRAP_CONTENT);
+		params.bottomMargin = dp(28);
+		rows.addView(frame, params);
+		return row;
+	}
+
+	private static android.graphics.RectF segment(LinearLayout row, int index) {
+		View child = row.getChildAt(index);
+		return new android.graphics.RectF(child.getLeft(), child.getTop(), child.getRight(), child.getBottom());
+	}
+
+	/** Rótulo de sección discreto, con aire por encima para separar bloques. */
+	protected TextView section(String label, int topDp) {
+		TextView view = text(rows, label.toUpperCase(new Locale("es", "ES")), R.style.EnerGym_FieldCaption, topDp);
+		view.setLetterSpacing(0.08f);
+		view.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_tertiary));
+		((LinearLayout.LayoutParams) view.getLayoutParams()).bottomMargin = dp(12);
+		ViewCompat.setAccessibilityHeading(view, true);
+		return view;
+	}
+
+	protected android.graphics.drawable.GradientDrawable rounded(int fill, int radiusDp, int stroke, int strokeDp) {
+		android.graphics.drawable.GradientDrawable d = new android.graphics.drawable.GradientDrawable();
+		d.setColor(androidx.core.content.ContextCompat.getColor(requireContext(), fill));
+		d.setCornerRadius(dp(radiusDp));
+		if (strokeDp > 0)
+			d.setStroke(dp(strokeDp), androidx.core.content.ContextCompat.getColor(requireContext(), stroke));
+		return d;
+	}
+
 	protected int dp(float value) {
 		return Math.round(value * getResources().getDisplayMetrics().density);
 	}

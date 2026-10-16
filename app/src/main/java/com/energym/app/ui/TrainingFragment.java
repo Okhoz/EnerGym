@@ -46,69 +46,25 @@ public final class TrainingFragment extends ScreenFragment {
 		moreOptions();
 	}
 
+	private static final TrainingViewState.Pane[] PANES = {TrainingViewState.Pane.MINE, TrainingViewState.Pane.AI,
+		TrainingViewState.Pane.EXERCISES};
+
 	private void sections() {
-		// Control segmentado: un solo contenedor redondeado y la opción elegida en dorado.
-		LinearLayout tabs = columns(rows, 4);
-		tabs.setPadding(dp(4), dp(4), dp(4), dp(4));
-		tabs.setBackground(rounded(R.color.surface_card, 24, 0, 0));
-		tab(tabs, "Mis rutinas", "mine", TrainingViewState.Pane.MINE);
-		tab(tabs, "Con IA", "ai", TrainingViewState.Pane.AI);
-		tab(tabs, "Ejercicios", "exercises", TrainingViewState.Pane.EXERCISES);
-		((LinearLayout.LayoutParams) tabs.getLayoutParams()).bottomMargin = dp(28);
-	}
-
-	private void tab(LinearLayout tabs, String label, String key, TrainingViewState.Pane pane) {
-		boolean selected = state.training.pane == pane;
-		MaterialButton button = new MaterialButton(requireContext(), null,
-			com.google.android.material.R.attr.materialButtonOutlinedStyle);
-		button.setText(label);
-		button.setTag("training_tab_" + key);
-		button.setTextSize(14);
-		button.setAllCaps(false);
-		button.setMinWidth(0);
-		button.setMinHeight(dp(44));
-		button.setMaxLines(1);
-		button.setPadding(dp(4), 0, dp(4), 0);
-		button.setInsetTop(0);
-		button.setInsetBottom(0);
-		button.setCornerRadius(dp(20));
-		button.setCheckable(true);
-		button.setChecked(selected);
-		button.setBackgroundTintList(ColorStateList.valueOf(color(selected ? R.color.gold : android.R.color.transparent)));
-		button.setStrokeWidth(0);
-		button.setTextColor(color(selected ? R.color.surface : R.color.text_secondary));
-		button.setOnClickListener(view -> {
-			if (browser != null) browser.capture();
-			state.training.select(pane);
-			InputMethodManager keyboard = (InputMethodManager) requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
-			if (keyboard != null) keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
-			render();
-			getView().post(() -> {
-				if (getView() instanceof android.widget.ScrollView)
-					((android.widget.ScrollView) getView()).smoothScrollTo(0, 0);
+		int current = Arrays.asList(PANES).indexOf(state.training.pane);
+		segmented("training", new String[]{"Mis rutinas", "Con IA", "Ejercicios"},
+			new String[]{"training_tab_mine", "training_tab_ai", "training_tab_exercises"}, current, index -> {
+				if (browser != null) browser.capture();
+				state.training.select(PANES[index]);
+				View view = getView();
+				InputMethodManager keyboard = (InputMethodManager) requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+				if (keyboard != null && view != null) keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
+				render();
+				if (getView() != null)
+					getView().post(() -> {
+						if (getView() instanceof android.widget.ScrollView)
+							((android.widget.ScrollView) getView()).smoothScrollTo(0, 0);
+					});
 			});
-		});
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(44), 1);
-		if (tabs.getChildCount() > 0) params.setMarginStart(dp(4));
-		tabs.addView(button, params);
-	}
-
-	/** Rótulo de sección discreto, con aire por encima para separar bloques. */
-	private void section(String label, int topDp) {
-		android.widget.TextView view = text(rows, label.toUpperCase(new Locale("es", "ES")), R.style.EnerGym_FieldCaption, topDp);
-		view.setLetterSpacing(0.08f);
-		view.setTextColor(color(R.color.text_tertiary));
-		((LinearLayout.LayoutParams) view.getLayoutParams()).bottomMargin = dp(12);
-		androidx.core.view.ViewCompat.setAccessibilityHeading(view, true);
-	}
-
-	private android.graphics.drawable.GradientDrawable rounded(int fill, int radiusDp, int stroke, int strokeDp) {
-		android.graphics.drawable.GradientDrawable d = new android.graphics.drawable.GradientDrawable();
-		d.setColor(color(fill));
-		d.setCornerRadius(dp(radiusDp));
-		if (strokeDp > 0)
-			d.setStroke(dp(strokeDp), color(stroke));
-		return d;
 	}
 
 	/** Continuar tiene prioridad; cada propuesta sigue siendo revisable antes de aceptarse. */

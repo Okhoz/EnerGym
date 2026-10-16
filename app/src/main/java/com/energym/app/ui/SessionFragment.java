@@ -49,6 +49,7 @@ public final class SessionFragment extends ScreenFragment {
 			ids.add(Integer.toString(i++));
 			names.add(item.getExercise().getName());
 		}
+		section("Ejercicio actual", 8);
 		choice(rows, "selectedExercise", "Ejercicio de la sesión", ids, names, Integer.toString(app.sessions.selected),
 			value -> app.sessions.select(Integer.parseInt(value)));
 		RoutineItem item = app.sessions.item();
@@ -73,6 +74,7 @@ public final class SessionFragment extends ScreenFragment {
 		if (app.sessions.selected + 1 < ids.size())
 			action(rows, "Siguiente ejercicio", !app.sessions.busy,
 				() -> app.sessions.select(app.sessions.selected + 1));
+		section("Cierre", 32);
 		LinearLayout finish = card("Cerrar el entrenamiento",
 			app.sessions.session.getResults().size() + " de " + ids.size() +
 				" ejercicios registrados. Guarda todos antes de finalizar.");
@@ -92,6 +94,7 @@ public final class SessionFragment extends ScreenFragment {
 
 	/** Temporizador de descanso entre series: cuenta atrás visible y vibración al terminar. */
 	private void rest() {
+		section("Descanso", 32);
 		LinearLayout card = card("⏱ Descanso", "");
 		restLabel = text(card, "", R.style.EnerGym_CardTitle, 0);
 		LinearLayout presets = columns(card, 8);

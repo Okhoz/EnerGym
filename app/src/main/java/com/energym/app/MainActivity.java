@@ -11,6 +11,7 @@ import com.energym.app.visual.VisualizationController;
 import java.util.function.Consumer;
 
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -95,6 +96,13 @@ public final class MainActivity extends AppCompatActivity {
 				state.app.back();
 		});
 		BottomNavigationView nav = findViewById(R.id.navigation);
+		// Burbuja líquida detrás del icono elegido: se desliza como el agua de una pestaña a otra.
+		navBubble = new com.energym.app.ui.LiquidIndicator(this);
+		navBubble.setColor(0x38E6B95C);
+		((android.widget.FrameLayout) findViewById(R.id.navigation_frame)).addView(navBubble, 0,
+			new android.widget.FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.MATCH_PARENT));
+		nav.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> placeNavBubble(false));
 		nav.setOnItemSelectedListener(item -> {
 			if (rendering || state.app == null)
 				return true;
@@ -152,6 +160,11 @@ public final class MainActivity extends AppCompatActivity {
 			else if (app.tab == AppController.Screen.NUTRITION)
 				tab = R.id.tab_nutrition;
 			nav.setSelectedItemId(tab);
+			if (tab != navBubbleTab) {
+				boolean first = navBubbleTab == 0;
+				navBubbleTab = tab;
+				nav.post(() -> placeNavBubble(!first));
+			}
 			findViewById(R.id.back).setVisibility(app.screen == app.tab ? View.GONE : View.VISIBLE);
 			Fragment current = getSupportFragmentManager().findFragmentById(R.id.content);
 			String tag = app.screen.name();
@@ -238,6 +251,28 @@ public final class MainActivity extends AppCompatActivity {
 	}
 
 	private ProfileSheet menuSheet;
+	private com.energym.app.ui.LiquidIndicator navBubble;
+	private int navBubbleTab;
+
+	/** Coloca (o desliza) la burbuja bajo el icono de la pestaña activa, en coordenadas del marco del menú. */
+	private void placeNavBubble(boolean animate) {
+		if (navBubble == null || navBubbleTab == 0)
+			return;
+		BottomNavigationView nav = findViewById(R.id.navigation);
+		View item = nav.findViewById(navBubbleTab);
+		if (item == null || item.getWidth() == 0)
+			return;
+		View icon = item.findViewById(com.google.android.material.R.id.navigation_bar_item_icon_view);
+		int[] frame = new int[2], at = new int[2];
+		findViewById(R.id.navigation_frame).getLocationInWindow(frame);
+		(icon != null ? icon : item).getLocationInWindow(at);
+		float density = getResources().getDisplayMetrics().density;
+		float cx = at[0] - frame[0] + (icon != null ? icon.getWidth() : item.getWidth()) / 2f;
+		float cy = at[1] - frame[1] + (icon != null ? icon.getHeight() / 2f : item.getHeight() / 3f);
+		android.graphics.RectF target = new android.graphics.RectF(cx - 32 * density, cy - 16 * density,
+			cx + 32 * density, cy + 16 * density);
+		navBubble.slideTo(target, animate && com.energym.app.ui.effects.MotionPreferences.enabled(this), null);
+	}
 
 
 	private AvatarStore avatars;

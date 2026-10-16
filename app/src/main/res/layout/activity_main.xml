@@ -137,13 +137,19 @@
 		android:layout_height="1dp"
 		android:background="@color/glass_highlight" />
 
+	<FrameLayout
+		android:id="@+id/navigation_frame"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:background="@drawable/glass_chrome">
+
 	<com.google.android.material.bottomnavigation.BottomNavigationView
 		android:id="@+id/navigation"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginHorizontal="0dp"
 		android:layout_marginBottom="0dp"
-		android:background="@drawable/glass_chrome"
+		android:background="@android:color/transparent"
 		app:menu="@menu/main_navigation"
 		app:labelVisibilityMode="labeled"
 		app:itemIconTint="@color/nav_colors"
@@ -153,4 +159,5 @@
 		app:itemTextAppearanceActive="@style/EnerGym.NavigationLabel"
 		app:itemTextAppearanceInactive="@style/EnerGym.NavigationLabel"
 		app:itemTextAppearanceActiveBoldEnabled="false" />
+	</FrameLayout>
 </LinearLayout>
