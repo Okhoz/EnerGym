@@ -83,7 +83,20 @@ public final class NutritionFragment extends ScreenFragment {
 				foodRow(section, e, n);
 			if (items.isEmpty())
 				text(section, "Nada anotado todavía.", R.style.EnerGym_FieldCaption, 0);
+			List<FoodEntry> before = new ArrayList<>();
+			for (FoodEntry e : n.entriesOn(day.minusDays(1)))
+				if (e.meal == meal)
+					before.add(e);
+			// Lo de ayer a un toque (si hoy aún no has anotado esa comida) y guardar la comida para repetirla.
+			if (items.isEmpty() && !before.isEmpty())
+				action(section, "↺ Copiar de ayer (" + before.size() + (before.size() == 1 ? " alimento)" : " alimentos)"),
+					!n.busy, () -> n.logAll(before, meal, MEALS[meal.ordinal()] + " copiado de ayer", () -> {
+					})).setTag("copy_yesterday_" + meal.name());
+			if (!items.isEmpty())
+				action(section, "★ Guardar como comida", !n.busy, () -> saveMeal(items, MEALS[meal.ordinal()]))
+					.setTag("save_meal_" + meal.name());
 		}
+		savedMeals(n);
 		if (!n.status.isEmpty())
 			text(rows, n.status, R.style.EnerGym_FieldCaption, 0);
 
@@ -113,6 +126,60 @@ public final class NutritionFragment extends ScreenFragment {
 			n.startManual(n.defaultMeal());
 			scan(this);
 		}).setTag("nutrition_scan");
+	}
+
+	/** Pide un nombre y guarda esos alimentos como comida para anotarla otro día de un toque. */
+	private void saveMeal(List<FoodEntry> foods, String suggested) {
+		android.widget.EditText name = new android.widget.EditText(requireContext());
+		name.setText(suggested);
+		name.setSelectAllOnFocus(true);
+		name.setSingleLine(true);
+		android.widget.FrameLayout box = new android.widget.FrameLayout(requireContext());
+		box.setPadding(dp(24), dp(8), dp(24), 0);
+		box.addView(name);
+		new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+			.setTitle("Guardar comida").setMessage("Ponle un nombre, p. ej. «Mi desayuno» o «Pasta con atún».")
+			.setView(box).setNegativeButton("Cancelar", null)
+			.setPositiveButton("Guardar", (d, w) -> {
+				String error = state.savedMeals.save(name.getText().toString(), foods);
+				android.widget.Toast.makeText(requireContext(), error.isEmpty() ? "Comida guardada" : error,
+					android.widget.Toast.LENGTH_LONG).show();
+				render();
+			}).show();
+	}
+
+	/** Comidas guardadas: se anotan enteras en la comida que toca según la hora. */
+	private void savedMeals(NutritionController n) {
+		com.energym.app.nutrition.SavedMeals saved = state.savedMeals;
+		if (saved == null || saved.list().isEmpty())
+			return;
+		LinearLayout card = card("★ Comidas guardadas", "Toca una para anotarla entera en " +
+			MEALS[n.defaultMeal().ordinal()].toLowerCase(SPANISH) + ". Mantén pulsado para borrarla.");
+		for (com.energym.app.nutrition.SavedMeals.Meal m : saved.list()) {
+			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, card, false);
+			((TextView) row.findViewById(R.id.food_name)).setText(m.name);
+			List<String> names = new ArrayList<>();
+			for (FoodEntry f : m.foods)
+				names.add(f.name);
+			((TextView) row.findViewById(R.id.food_detail)).setText(String.join(", ", names));
+			((TextView) row.findViewById(R.id.food_kcal)).setText(Math.round(m.kcal()) + " kcal");
+			row.setContentDescription(m.name + ", " + Math.round(m.kcal()) + " kcal. Toca para anotarla");
+			row.setOnClickListener(v -> {
+				if (!n.busy)
+					n.logAll(m.foods, n.defaultMeal(), m.name, () -> {
+					});
+			});
+			row.setOnLongClickListener(v -> {
+				new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+					.setTitle("¿Borrar «" + m.name + "»?").setNegativeButton("Cancelar", null)
+					.setPositiveButton("Borrar", (d, w) -> {
+						saved.remove(m.name);
+						render();
+					}).show();
+				return true;
+			});
+			card.addView(row);
+		}
 	}
 
 	private static String euros(double value) {

@@ -817,6 +817,54 @@ public final class NutritionController {
 		else store.add(owner, entry, callback);
 	}
 
+	/**
+	 * Anota de una vez varios alimentos (una comida guardada o lo de ayer) en el día elegido; la comida es la indicada
+	 * o, si es null, la de cada alimento.
+	 */
+	public void logAll(List<FoodEntry> foods, FoodEntry.Meal meal, String label, Runnable done) {
+		if (owner == null || busy || foods.isEmpty())
+			return;
+		List<FoodEntry> copies = new ArrayList<>();
+		for (FoodEntry f : foods)
+			copies.add(FoodEntry.create(selected, meal == null ? f.meal : meal, f.name, f.barcode, f.unit, f.amount,
+				f.kcal100, f.protein100, f.carbs100, f.fat100));
+		busy = true;
+		long token = generation;
+		loadRequest++;
+		changed.run();
+		addNext(copies, 0, token, label, done);
+	}
+
+	private void addNext(List<FoodEntry> copies, int index, long token, String label, Runnable done) {
+		if (index >= copies.size()) {
+			busy = false;
+			double kcal = 0;
+			for (FoodEntry e : copies)
+				kcal += e.kcal();
+			status = label + ": " + copies.size() + (copies.size() == 1 ? " alimento, " : " alimentos, ") +
+				Math.round(kcal) + " kcal.";
+			done.run();
+			changed.run();
+			return;
+		}
+		FoodEntry entry = copies.get(index);
+		store.add(owner, entry, new NutritionStore.Callback<Void>() {
+			public void success(Void v) {
+				if (token != generation)
+					return;
+				List<FoodEntry> next = new ArrayList<>(entries);
+				next.add(entry);
+				entries = next;
+				dailyCalories.put(entry.day, totals(entry.day)[0]);
+				addNext(copies, index + 1, token, label, done);
+			}
+
+			public void failure(Exception e) {
+				fail(token, e);
+			}
+		});
+	}
+
 	public void remove(FoodEntry entry) {
 		if (owner == null || busy)
 			return;
