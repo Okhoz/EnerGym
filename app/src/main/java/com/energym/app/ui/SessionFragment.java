@@ -259,6 +259,29 @@ public final class SessionFragment extends ScreenFragment {
 		if (sets.isEmpty() && before.isEmpty())
 			text(log, "Ajusta con − y + (o escribe el número) y pulsa «Guardar serie» al acabar cada serie. " +
 				"Peso 0 = peso corporal. Tu objetivo sube solo cuando lo cumples.", R.style.EnerGym_FieldCaption, 12);
+		// Consejo del entrenador para la siguiente serie según el RPE de la última (objetivo RPE 8).
+		if (!editing && !sets.isEmpty()) {
+			Autoregulation.Advice advice = Autoregulation.next(sets.get(sets.size() - 1), lb ? Plates.toKg(5, true) : 2.5);
+			if (advice != null) {
+				String target = advice.kg > 0 ? SetLog.format(Plates.toUnit(advice.kg, lb)) : "";
+				boolean differs = advice.kg > 0 ? !target.equals(kgInput) : !Integer.toString(advice.reps).equals(repsInput);
+				text(log, "🧠 " + (lb && advice.kg > 0 ? advice.text.replaceAll("[0-9]+(,[0-9]+)? kg",
+					target.replace('.', ',') + " lb") : advice.text), R.style.EnerGym_Body, 12).setTag("track_advice");
+				if (differs)
+					action(log, advice.kg > 0 ? "Usar " + target.replace('.', ',') + " " + Plates.unit(lb) :
+						"Usar " + advice.reps + " repeticiones", true, () -> {
+						if (advice.kg > 0) {
+							kgInput = target;
+							app.sessions.input("trackKg", target);
+							app.sessions.input("trackUnit", Plates.unit(lb));
+						} else {
+							repsInput = Integer.toString(advice.reps);
+							app.sessions.input("trackReps", repsInput);
+						}
+						render();
+					}).setTag("track_use_advice");
+			}
+		}
 		LinearLayout buttons = columns(log, 16);
 		com.google.android.material.button.MaterialButton save =
 			compact(buttons, editing ? "Actualizar" : "Guardar serie", !app.sessions.busy, () -> {
@@ -386,6 +409,9 @@ public final class SessionFragment extends ScreenFragment {
 	/** Guarda una serie nueva; en superserie o circuito pasa al siguiente sin descanso y descansa al cerrar la vuelta. */
 	private void saveSet(RoutineItem item, double kg, int reps, SetLog.Kind kind, double rpe) {
 		int from = app.sessions.selected;
+		// Cada serie se valora por separado: el RPE no se arrastra a la siguiente.
+		rpeInput = "";
+		app.sessions.input("trackRpe", "");
 		Set<Integer> group = links();
 		app.sessions.addSet(kg, reps, kind, rpe, () -> {
 			int to = Supersets.after(group, from);

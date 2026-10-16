@@ -61,7 +61,23 @@ public final class TrainerPrompt {
 				before.insert(0, r.recent.get(i).text + " ");
 				seen++;
 			}
-		return RoutineRequest.parse(before.toString());
+		RoutineRequest earlier = RoutineRequest.parse(before.toString());
+		if (!earlier.isEmpty())
+			return earlier;
+		// Si no concreta nada, se priorizan los grupos que lleva 2 semanas sin trabajar (lo haría un entrenador).
+		return RoutineRequest.parse(neglected(r.training));
+	}
+
+	/** Grupos descuidados según el análisis del entrenador incluido en el contexto; "" si no hay. */
+	static String neglected(String training) {
+		if (training == null)
+			return "";
+		int at = training.indexOf(com.energym.app.progress.CoachInsights.NEGLECTED);
+		if (at < 0)
+			return "";
+		int end = training.indexOf('\n', at);
+		return training.substring(at + com.energym.app.progress.CoachInsights.NEGLECTED.length(),
+			end < 0 ? training.length() : end);
 	}
 
 	static long seed(ChatClient.Request r) {
@@ -89,6 +105,19 @@ public final class TrainerPrompt {
 			.append("a un profesional sanitario. No inventes datos del cliente ni material que no tenga.\n")
 			.append("Ante una duda, responde directamente con 2 a 4 consejos prácticos y concretos (técnica, ")
 			.append("ejercicios de apoyo, errores frecuentes). No pidas datos si no hacen falta para responder.\n")
+			.append("Piensa como un entrenador con experiencia: \n")
+			.append("• RPE = esfuerzo de 1 a 10 (8 = le quedaban 2 repeticiones; 10 = al fallo). Lo ideal es 7–8.\n")
+			.append("• Si el ANÁLISIS DEL ENTRENADOR avisa de molestias, no cargues esa zona, propón alternativas suaves ")
+			.append("y recomienda consultar a un profesional si persisten.\n")
+			.append("• Si hay ejercicios estancados, propón un cambio concreto (otro rango de repeticiones, una variante ")
+			.append("o una semana de descarga) en lugar de repetir lo mismo.\n")
+			.append("• Si el esfuerzo va muy alto o lleva días sin entrenar, baja la intensidad; si va sobrado, súbela.\n")
+			.append("• Si no pide nada concreto, prioriza los grupos que lleva tiempo sin trabajar.\n")
+			.append("• Usa sus números reales (kilos, repeticiones, RPE, fechas) y explica el porqué en una frase.\n")
+			.append("Ejemplo de buena respuesta a «¿subo peso en sentadilla?» con datos 80 kg × 8 a RPE 7:\n")
+			.append("{\"texto\":\"¡Sí! 💪 El martes hiciste 80 kg × 8 con RPE 7: te sobraban unas 3 repeticiones.\\n\\n")
+			.append("• Sube a 82,5 kg y busca 8 repeticiones a RPE 8.\\n• Si la técnica se rompe, vuelve a 80 kg.\",")
+			.append("\"rutina\":null}\n")
 			.append("Responde SOLO con un objeto JSON, sin texto fuera de él, con esta forma:\n")
 			.append("{\"texto\":\"tu respuesta\",\"rutina\":null}\n");
 		List<Exercise> eligible = eligible(r, catalog);
@@ -112,7 +141,7 @@ public final class TrainerPrompt {
 		p.append("\nPERFIL DEL CLIENTE\n").append(profile(r.profileData)).append('\n');
 		if (!r.training.isEmpty())
 			p.append("\nSU ENTRENAMIENTO Y TODO LO QUE HA HECHO EN LA APP (datos reales)\n")
-				.append(cut(r.training, 3300)).append('\n')
+				.append(cut(r.training, 3800)).append('\n')
 				.append("Conoces todo esto: úsalo en cada respuesta y cita sus datos concretos (sesiones, cargas, peso, ")
 				.append("comidas, objetivos). No inventes datos que no aparezcan. Relaciona entreno y dieta con su objetivo, ")
 				.append("no repitas lo que ya le cuesta y sube poco a poco lo que domina. Si hay una subida de nivel reciente, ")

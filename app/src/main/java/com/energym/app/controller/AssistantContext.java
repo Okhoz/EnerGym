@@ -13,7 +13,7 @@ import java.util.*;
  * Cada sección tiene un tope para que el conjunto quepa en la entrada del modelo.
  */
 public final class AssistantContext {
-	public static final int MAX = 3200;
+	public static final int MAX = 3800;
 
 	private AssistantContext() {
 	}
@@ -25,10 +25,19 @@ public final class AssistantContext {
 
 	public static String build(AppController app, NutritionController nutrition, GoalsController goals,
 		DietPlanner diet, LocalDate today, WaterLog water) {
+		return build(app, nutrition, goals, diet, today, water, null);
+	}
+
+	public static String build(AppController app, NutritionController nutrition, GoalsController goals,
+		DietPlanner diet, LocalDate today, WaterLog water, BodyMeasures measures) {
 		if (app == null || app.owner() == null)
 			return "";
 		List<String> parts = new ArrayList<>();
 		add(parts, "ENTRENAMIENTO", app.trainingSummary(), 1300);
+		// Lo que vería un entrenador en su historial: esfuerzo, estancamientos, grupos olvidados y molestias.
+		List<String> insights = CoachInsights.analyze(app.history, ZoneId.systemDefault(), today);
+		if (!insights.isEmpty())
+			add(parts, "ANÁLISIS DEL ENTRENADOR", "• " + String.join("\n• ", insights), 650);
 		ProgressStats stats = new ProgressStats(app.history, ZoneId.systemDefault(), today);
 		add(parts, "PROGRESO", progress(stats), 450);
 		add(parts, "OBJETIVOS", goals(goals, stats, nutrition), 350);
@@ -36,6 +45,7 @@ public final class AssistantContext {
 			" de " + WaterLog.liters(WaterLog.goal(nutrition.effectiveBody())) + ".";
 		add(parts, "CUERPO Y NUTRICIÓN", body(nutrition, today) + drink, 760);
 		add(parts, "SU DIETA CON IA", diet(diet), 350);
+		add(parts, "MEDIDAS", measures(measures), 200);
 		String text = String.join("\n", parts);
 		return text.length() > MAX ? text.substring(0, MAX - 1) + "…" : text;
 	}
@@ -136,6 +146,22 @@ public final class AssistantContext {
 		if (!week.isEmpty())
 			s.append('\n').append(week);
 		return s.toString();
+	}
+
+	/** Última medición y cambio desde la primera (cm o %). */
+	static String measures(BodyMeasures measures) {
+		if (measures == null || measures.days().isEmpty())
+			return "";
+		LocalDate last = measures.days().lastKey();
+		List<String> parts = new ArrayList<>();
+		for (Map.Entry<BodyMeasures.Part, Double> e : measures.days().get(last).entrySet()) {
+			double[] change = measures.change(e.getKey());
+			parts.add(e.getKey().label + " " + NutritionController.format(e.getValue()) + " " + e.getKey().unit +
+				(change == null ? "" : " (" + (change[1] >= change[0] ? "+" : "") +
+					NutritionController.format(Math.round((change[1] - change[0]) * 10) / 10.0) + " desde " +
+					measures.days().firstKey() + ")"));
+		}
+		return "Última medición " + last + ": " + String.join(", ", parts) + ".";
 	}
 
 	static String diet(DietPlanner diet) {

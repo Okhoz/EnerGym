@@ -309,6 +309,23 @@ public class OnDeviceTrainerTest {
 		assertTrue(withoutNano.downloadNeedsConsent());
 	}
 
+	@Test
+	public void withoutAConcreteRequestTheRoutineTargetsNeglectedGroups() {
+		ChatClient.Request r = new ChatClient.Request("c", "r", null, "dame una rutina", null, Collections.emptyMap(),
+			false, Collections.emptyList(), Collections.emptyList());
+		r.training = "[ANÁLISIS DEL ENTRENADOR]\n• " + com.energym.app.progress.CoachInsights.NEGLECTED +
+			"espalda, hombros.\n• Esfuerzo adecuado (RPE medio 7,5).";
+		assertEquals("espalda, hombros.", TrainerPrompt.neglected(r.training));
+		RoutineRequest wants = TrainerPrompt.request(r);
+		assertTrue(wants.areas.contains(RoutineRequest.Area.BACK));
+		assertTrue(wants.areas.contains(RoutineRequest.Area.SHOULDERS));
+		ChatClient.Request specific = new ChatClient.Request("c", "r", null, "rutina de piernas", null,
+			Collections.emptyMap(), false, Collections.emptyList(), Collections.emptyList());
+		specific.training = r.training;
+		assertEquals("Lo que pide manda", EnumSet.of(RoutineRequest.Area.LEGS), TrainerPrompt.request(specific).areas);
+		assertEquals("", TrainerPrompt.neglected(null));
+	}
+
 	private ChatClient.Request request(TrainingProfile p, String message, List<ConversationStore.Message> recent) {
 		return new ChatClient.Request("c", "r", null, message, p, ChatProtocol.profile(p), false,
 			Collections.emptyList(), recent);
