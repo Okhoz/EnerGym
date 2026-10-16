@@ -24,6 +24,8 @@ public final class HistoryFragment extends ScreenFragment {
 	private boolean goalsTab;
 	private YearMonth month;
 	private LocalDate selected;
+	/** Análisis por grupo muscular: false = este mes, true = últimos 90 días. */
+	private boolean recentPeriod;
 
 	public HistoryFragment() {
 		super(R.layout.fragment_history);
@@ -109,6 +111,7 @@ public final class HistoryFragment extends ScreenFragment {
 				new String[]{short_(days.get(0)), short_(days.get(days.size() - 1))}, "kg", "Evolución del peso");
 		}
 		calendar(stats, n);
+		breakdown();
 	}
 
 	/** Lo guardado en una sesión sin finalizar también cuenta como avance visible. */
@@ -178,7 +181,19 @@ public final class HistoryFragment extends ScreenFragment {
 		if (selected == null)
 			selected = today;
 		section("Calendario", 32);
-		LinearLayout calendar = card("Calendario", "Dorado: entreno · punto: comida anotada");
+		LinearLayout calendar = card("Calendario", "Dorado: entreno · puntos de color: grupos musculares · punto blanco: comida anotada");
+		Map<LocalDate, Set<RoutineRequest.Area>> worked = MuscleBreakdown.byDay(app.history, ZoneId.systemDefault());
+		Map<LocalDate, int[]> dots = new HashMap<>();
+		Set<RoutineRequest.Area> seen = EnumSet.noneOf(RoutineRequest.Area.class);
+		for (Map.Entry<LocalDate, Set<RoutineRequest.Area>> e : worked.entrySet()) {
+			int[] colors = new int[e.getValue().size()];
+			int i = 0;
+			for (RoutineRequest.Area a : e.getValue())
+				colors[i++] = areaColor(a);
+			dots.put(e.getKey(), colors);
+			if (YearMonth.from(e.getKey()).equals(month))
+				seen.addAll(e.getValue());
+		}
 		LinearLayout nav = columns(calendar, 4);
 		compact(nav, "‹", true, () -> {
 			month = month.minusMonths(1);
@@ -204,7 +219,9 @@ public final class HistoryFragment extends ScreenFragment {
 			stats.sessionsByDay().keySet(), n == null ? Collections.emptySet() : n.loggedDays(), day -> {
 				selected = day;
 				render();
-			});
+			}).groups(dots);
+		if (!seen.isEmpty())
+			text(calendar, legend(seen), R.style.EnerGym_FieldCaption, 8);
 		StringBuilder detail = new StringBuilder(NutritionFragment.label(selected, today));
 		List<Session> that = stats.sessionsOn(selected);
 		detail.append(that.isEmpty() ? " · sin entreno" : " · " + that.size() + (that.size() == 1 ? " sesión" : " sesiones"));
@@ -231,6 +248,87 @@ public final class HistoryFragment extends ScreenFragment {
 					.setPositiveButton("Eliminar", (dialog, button) -> {
 						if (scope == app.accountRevision()) app.deleteSession(session);
 					}).show());
+	}
+
+	/** Reparto por grupo muscular del mes o de los últimos 90 días, con anillo y lista (como FitNotes). */
+	private void breakdown() {
+		LocalDate today = LocalDate.now();
+		LocalDate from = recentPeriod ? today.minusDays(89) : today.withDayOfMonth(1);
+		List<MuscleBreakdown.Share> shares = MuscleBreakdown.of(app.history, ZoneId.systemDefault(), from, today);
+		section("Por grupo muscular", 32);
+		segmented("breakdown", new String[]{"Este mes", "Últimos 90 días"},
+			new String[]{"breakdown_month", "breakdown_90"}, recentPeriod ? 1 : 0, index -> {
+				recentPeriod = index == 1;
+				render();
+			});
+		if (shares.isEmpty()) {
+			card("Sin datos en este periodo", "Termina entrenos y aquí verás qué grupos musculares trabajas más.");
+			return;
+		}
+		double total = 0;
+		for (MuscleBreakdown.Share sh : shares)
+			total += sh.sets;
+		double[] values = new double[shares.size()];
+		int[] colors = new int[shares.size()];
+		for (int i = 0; i < shares.size(); i++) {
+			values[i] = shares.get(i).sets;
+			colors[i] = areaColor(shares.get(i).area);
+		}
+		MuscleBreakdown.Share top = shares.get(0);
+		LinearLayout card = card("Series por grupo", "Un ejercicio que trabaja varias zonas reparte sus series entre ellas.");
+		StringBuilder spoken = new StringBuilder("Reparto de series: ");
+		for (MuscleBreakdown.Share sh : shares)
+			spoken.append(sh.area.label).append(" ").append(Math.round(sh.sets / total * 100)).append(" %, ");
+		add(card, new com.energym.app.ui.charts.DonutView(requireContext()), 8).set(values, colors,
+			capital(top.area.label), Math.round(top.sets / total * 100) + " %", spoken.toString());
+		for (MuscleBreakdown.Share sh : shares) {
+			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, card, false);
+			TextView name = row.findViewById(R.id.food_name);
+			name.setText("●  " + capital(sh.area.label));
+			android.text.SpannableString dot = new android.text.SpannableString(name.getText());
+			dot.setSpan(new android.text.style.ForegroundColorSpan(areaColor(sh.area)), 0, 1, 0);
+			name.setText(dot);
+			((TextView) row.findViewById(R.id.food_detail)).setText(
+				NutritionController.format(Math.round(sh.sets * 10) / 10.0) + " series" +
+					(sh.kg > 0 ? " · " + Math.round(sh.kg) + " kg movidos" : ""));
+			((TextView) row.findViewById(R.id.food_kcal)).setText(Math.round(sh.sets / total * 100) + " %");
+			card.addView(row);
+		}
+	}
+
+	private static String legend(Set<RoutineRequest.Area> areas) {
+		List<String> parts = new ArrayList<>();
+		for (RoutineRequest.Area a : areas)
+			parts.add(capital(a.label));
+		return "Este mes: " + String.join(" · ", parts);
+	}
+
+	private static String capital(String s) {
+		return s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
+	}
+
+	/** Un color fijo por grupo muscular, igual en el calendario y en el anillo. */
+	static int areaColor(RoutineRequest.Area area) {
+		switch (area) {
+			case LEGS:
+				return 0xFF42A5F5;
+			case GLUTES:
+				return 0xFFBA68C8;
+			case CHEST:
+				return 0xFFEF5350;
+			case BACK:
+				return 0xFF66BB6A;
+			case SHOULDERS:
+				return 0xFFFFA726;
+			case ARMS:
+				return 0xFF26A69A;
+			case CORE:
+				return 0xFFEC407A;
+			case CARDIO:
+				return 0xFFFFEE58;
+			default:
+				return 0xFF90A4AE;
+		}
 	}
 
 	// ---------------- Objetivos ----------------

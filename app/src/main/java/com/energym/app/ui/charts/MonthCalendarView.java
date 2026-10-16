@@ -22,6 +22,9 @@ public final class MonthCalendarView extends View {
 	private LocalDate today = LocalDate.now(), selected;
 	private Set<LocalDate> training = Collections.emptySet(), nutrition = Collections.emptySet();
 	private Consumer<LocalDate> listener;
+	/** Colores de los grupos musculares entrenados cada día (puntos bajo el número, como en FitNotes). */
+	private Map<LocalDate, int[]> groups = Collections.emptyMap();
+	private final Paint groupDot = new Paint(Paint.ANTI_ALIAS_FLAG);
 
 	public MonthCalendarView(Context context) {
 		this(context, null);
@@ -61,6 +64,18 @@ public final class MonthCalendarView extends View {
 		return this;
 	}
 
+	public MonthCalendarView groups(Map<LocalDate, int[]> colors) {
+		groups = colors == null ? Collections.emptyMap() : colors;
+		requestLayout();
+		invalidate();
+		return this;
+	}
+
+	/** Alto de fila: la celda más un hueco para los puntos de colores si los hay. */
+	private float rowHeight(float cell) {
+		return cell + (groups.isEmpty() ? 0 : palette.dp(10));
+	}
+
 	private int offset() {
 		return month.atDay(1).getDayOfWeek().getValue() - 1;
 	}
@@ -73,7 +88,7 @@ public final class MonthCalendarView extends View {
 	protected void onMeasure(int widthSpec, int heightSpec) {
 		int width = MeasureSpec.getSize(widthSpec);
 		float cell = Math.min(width / 7f, palette.dp(52));
-		setMeasuredDimension(width, (int) (palette.dp(28) + cell * rows()));
+		setMeasuredDimension(width, (int) (palette.dp(28) + rowHeight(cell) * rows()));
 	}
 
 	@Override
@@ -87,7 +102,7 @@ public final class MonthCalendarView extends View {
 		for (int day = 1; day <= month.lengthOfMonth(); day++) {
 			int index = offset() + day - 1;
 			float cx = cellW * (index % 7) + cellW / 2;
-			float cy = headerH + cell * (index / 7) + cell / 2;
+			float cy = headerH + rowHeight(cell) * (index / 7) + cell / 2;
 			LocalDate date = month.atDay(day);
 			if (date.equals(selected))
 				canvas.drawCircle(cx, cy, radius + palette.dp(3), selectedFill);
@@ -100,6 +115,15 @@ public final class MonthCalendarView extends View {
 			canvas.drawText(Integer.toString(day), cx, cy - (text.descent() + text.ascent()) / 2, text);
 			if (nutrition.contains(date))
 				canvas.drawCircle(cx, cy + radius - palette.dp(2), palette.dp(2.5f), gold ? numberOnGold : dot);
+			int[] colors = groups.get(date);
+			if (colors != null && colors.length > 0) {
+				int shown = Math.min(5, colors.length);
+				float gap = palette.dp(6), start = cx - gap * (shown - 1) / 2f;
+				for (int i = 0; i < shown; i++) {
+					groupDot.setColor(colors[i]);
+					canvas.drawCircle(start + gap * i, cy + radius + palette.dp(6), palette.dp(2.5f), groupDot);
+				}
+			}
 		}
 	}
 
@@ -114,7 +138,7 @@ public final class MonthCalendarView extends View {
 		float y = event.getY() - palette.dp(28);
 		if (y < 0)
 			return true;
-		int index = (int) (y / cell) * 7 + (int) (event.getX() / cellW);
+		int index = (int) (y / rowHeight(cell)) * 7 + (int) (event.getX() / cellW);
 		int day = index - offset() + 1;
 		if (day >= 1 && day <= month.lengthOfMonth() && !month.atDay(day).isAfter(today)) {
 			performClick();
