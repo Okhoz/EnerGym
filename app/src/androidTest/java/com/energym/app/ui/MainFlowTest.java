@@ -90,7 +90,7 @@ public class MainFlowTest {
 			scenario.onActivity(a -> {
 				assertEquals(1, a.state().app.history.size());
 				assertEquals(AppController.Screen.HISTORY, a.state().app.screen);
-				assertTrue(textContaining(a.getWindow().getDecorView(), "Carga: peso corporal"));
+				assertTrue(textContaining(a.getWindow().getDecorView(), "Peso corporal × 8"));
 			});
 			click(scenario, "Cuenta");
 			click(scenario, "Salir de la cuenta / demo");

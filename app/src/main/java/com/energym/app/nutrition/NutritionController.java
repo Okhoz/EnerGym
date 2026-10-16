@@ -684,7 +684,33 @@ public final class NutritionController {
 		}
 	}
 
+	/**
+	 * Valor de la ficha escaneada que manda sobre el formulario (no se edita); null si la ficha no lo trae y
+	 * la persona debe copiarlo de la etiqueta.
+	 */
+	public String scannedValue(String key) {
+		if (product == null)
+			return null;
+		double v;
+		switch (key) {
+			case "kcal100": v = product.kcal100; break;
+			case "protein100": v = product.protein100; break;
+			case "carbs100": v = product.carbs100; break;
+			case "fat100": v = product.fat100; break;
+			case "name": return product.displayName();
+			case "unit": return product.unit.name();
+			default: return null;
+		}
+		return Double.isNaN(v) ? null : format(v);
+	}
+
 	private FoodEntry build() {
+		// Con un producto escaneado solo cuenta la cantidad: nombre, unidad y valores salen de su ficha.
+		for (String key : new String[]{"name", "unit", "kcal100", "protein100", "carbs100", "fat100"}) {
+			String fixed = scannedValue(key);
+			if (fixed != null)
+				foodDraft.put(key, fixed);
+		}
 		FoodEntry value = FoodEntry.create(editing == null ? selected : editing.day, FoodEntry.Meal.valueOf(foodDraft.getOrDefault("meal", "OTHER")),
 			foodDraft.getOrDefault("name", ""), foodDraft.get("barcode"),
 			FoodEntry.Unit.valueOf(foodDraft.getOrDefault("unit", "G")), number(foodDraft.get("amount")),

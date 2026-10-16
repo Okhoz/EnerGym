@@ -221,7 +221,7 @@ public final class HistoryFragment extends ScreenFragment {
 				render();
 			}).groups(dots);
 		if (!seen.isEmpty())
-			text(calendar, legend(seen), R.style.EnerGym_FieldCaption, 8);
+			text(calendar, "", R.style.EnerGym_FieldCaption, 8).setText(legend(seen));
 		StringBuilder detail = new StringBuilder(NutritionFragment.label(selected, today));
 		List<Session> that = stats.sessionsOn(selected);
 		detail.append(that.isEmpty() ? " · sin entreno" : " · " + that.size() + (that.size() == 1 ? " sesión" : " sesiones"));
@@ -231,8 +231,7 @@ public final class HistoryFragment extends ScreenFragment {
 			for (RoutineItem item : s.getRoutine().getItems()) {
 				Map<String, String> done = s.getResults().get(item.getExercise().getId());
 				if (done != null)
-					detail.append("\n\n").append(item.getExercise().getName()).append("\n")
-						.append(com.energym.app.controller.AppController.metrics(item.getExercise().getMetricType(), done));
+					detail.append("\n\n").append(item.getExercise().getName()).append("\n").append(done(item, done));
 			}
 		}
 		if (n != null && n.historyCalories(selected) > 0)
@@ -296,11 +295,30 @@ public final class HistoryFragment extends ScreenFragment {
 		}
 	}
 
-	private static String legend(Set<RoutineRequest.Area> areas) {
-		List<String> parts = new ArrayList<>();
-		for (RoutineRequest.Area a : areas)
-			parts.add(capital(a.label));
-		return "Este mes: " + String.join(" · ", parts);
+	/** Leyenda con el punto de color de cada grupo, igual que en el calendario. */
+	private static CharSequence legend(Set<RoutineRequest.Area> areas) {
+		android.text.SpannableStringBuilder b = new android.text.SpannableStringBuilder("Este mes:");
+		for (RoutineRequest.Area a : areas) {
+			b.append("   ");
+			int start = b.length();
+			b.append("●");
+			b.setSpan(new android.text.style.ForegroundColorSpan(areaColor(a)), start, start + 1, 0);
+			b.append(" ").append(capital(a.label));
+		}
+		return b;
+	}
+
+	/** Lo hecho en un ejercicio: series una a una en fuerza (como FitNotes); el resumen en lo demás. */
+	private static String done(RoutineItem item, Map<String, String> values) {
+		if (item.getExercise().getMetricType() != MetricType.STRENGTH)
+			return com.energym.app.controller.AppController.metrics(item.getExercise().getMetricType(), values);
+		List<SetLog.Entry> sets = SetLog.of(values);
+		StringBuilder b = new StringBuilder();
+		for (int i = 0; i < sets.size(); i++)
+			b.append(i == 0 ? "" : "\n").append(i + 1).append(".  ")
+				.append(sets.get(i).kg > 0 ? SetLog.format(sets.get(i).kg) + " kg" : "Peso corporal")
+				.append(" × ").append(sets.get(i).reps);
+		return b.toString();
 	}
 
 	private static String capital(String s) {

@@ -173,6 +173,33 @@ public class NutritionDomainTest {
 	}
 
 	@Test
+	public void scannedProductKeepsItsLabelValuesAndOnlyAmountChanges() {
+		Store store = new Store();
+		FoodProduct yogurt = new FoodProduct("8410000000017", "Yogur", "Marca", "125 g", FoodEntry.Unit.G,
+			61, 3.5, 4.7, Double.NaN);
+		NutritionController c = new NutritionController(store, (code, cb) -> cb.success(yogurt), () -> DAY, () -> {
+		}, e -> fail(e));
+		c.activate("uid");
+		assertTrue(c.scanned("8410000000017"));
+		assertEquals("61", c.scannedValue("kcal100"));
+		assertNull("La grasa no viene en la ficha: se pide", c.scannedValue("fat100"));
+		c.foodDraft.put("kcal100", "999");
+		c.foodDraft.put("name", "Otro nombre");
+		c.foodDraft.put("fat100", "3.3");
+		c.foodDraft.put("amount", "200");
+		c.addFood(() -> {
+		});
+		FoodEntry saved = store.saved.get(0);
+		assertEquals("Los valores de la ficha mandan", 61, saved.kcal100, 0.001);
+		assertEquals("Yogur · Marca", saved.name);
+		assertEquals("Lo que faltaba sí se toma del formulario", 3.3, saved.fat100, 0.001);
+		assertEquals(200, saved.amount, 0.001);
+		assertEquals("125", com.energym.app.ui.FoodFragmentTestAccess.pack("125 g", FoodEntry.Unit.G));
+		assertEquals("1000", com.energym.app.ui.FoodFragmentTestAccess.pack("1 l", FoodEntry.Unit.ML));
+		assertEquals("", com.energym.app.ui.FoodFragmentTestAccess.pack("6 x 125 g", FoodEntry.Unit.ML));
+	}
+
+	@Test
 	public void manualDraftSurvivesAnOlderLookupResponse() {
 		List<NutritionStore.Callback<FoodProduct>> pending = new ArrayList<>();
 		NutritionController c = new NutritionController(new Store(), (code, cb) -> pending.add(cb), () -> DAY,

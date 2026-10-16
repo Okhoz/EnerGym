@@ -305,7 +305,7 @@ public class AnatomyActivityTest {
 		save(automation.takeScreenshot(), "viewer-training.png");
 
 		MainFlowTest.edit(parent, "exercise_search", "Flexión estándar");
-		MainFlowTest.click(parent, "Abrir técnica de Flexión estándar");
+		MainFlowTest.click(parent, "Ver técnica de Flexión estándar");
 		save(automation.takeScreenshot(), "viewer-exercise.png");
 
 		MainFlowTest.click(parent, "Vista previa 3D");
@@ -373,7 +373,7 @@ public class AnatomyActivityTest {
 			MainFlowTest.trainingPane(parent, "exercises");
 			save(automation.takeScreenshot(), "viewer-training-font130.png");
 			MainFlowTest.edit(parent, "exercise_search", "Flexión estándar");
-			MainFlowTest.click(parent, "Abrir técnica de Flexión estándar");
+			MainFlowTest.click(parent, "Ver técnica de Flexión estándar");
 			save(automation.takeScreenshot(), "viewer-exercise-font130.png");
 			MainFlowTest.click(parent, "Vista previa 3D");
 			awaitReady();

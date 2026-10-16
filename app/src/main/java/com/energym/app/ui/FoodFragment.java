@@ -51,15 +51,23 @@ public final class FoodFragment extends ScreenFragment {
 			if (preview[0] == null)
 				return;
 			FoodEntry e = n.preview();
-			preview[0].setText(e == null ? "Completa cantidad y valores para ver el cálculo." :
-				Math.round(e.kcal()) + " kcal · Proteínas " + NutritionController.format(round(e.protein())) +
-					" g · Hidratos " + NutritionController.format(round(e.carbs())) + " g · Grasas " +
-					NutritionController.format(round(e.fat())) + " g");
+			// Se recalcula con cada cifra que escribes: lo que vas a tomar, no los valores por 100.
+			preview[0].setText(e == null ? "Escribe la cantidad para ver sus calorías y macros." :
+				"Con " + NutritionController.format(e.amount) + " " + e.unit.symbol + ": " + Math.round(e.kcal()) +
+					" kcal\nProteínas " + NutritionController.format(round(e.protein())).replace('.', ',') +
+					" g\nHidratos " + NutritionController.format(round(e.carbs())).replace('.', ',') +
+					" g\nGrasas " + NutritionController.format(round(e.fat())).replace('.', ',') + " g");
 		};
 		textField(amount, "amount", "Cantidad (" + unit.symbol + ")", d.getOrDefault("amount", ""), true, false, v -> {
 			d.put("amount", v);
 			refresh.run();
 		});
+		String pack = p == null ? "" : packAmount(p.quantity, unit);
+		if (!pack.isEmpty())
+			compact(columns(amount, 4), "Envase entero (" + pack + " " + unit.symbol + ")", !n.busy, () -> {
+				d.put("amount", pack);
+				render();
+			}).setTag("food_whole_pack");
 		choice(amount, "meal", "Comida", Arrays.asList("BREAKFAST", "LUNCH", "SNACK", "DINNER", "OTHER"),
 			Arrays.asList("Desayuno", "Comida", "Merienda", "Cena", "Otros"), d.getOrDefault("meal", "OTHER"),
 			v -> d.put("meal", v));
@@ -67,9 +75,12 @@ public final class FoodFragment extends ScreenFragment {
 		preview[0].setTextSize(16);
 		preview[0].setAccessibilityLiveRegion(android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE);
 
-		LinearLayout values = card(p == null ? "Datos de la etiqueta" : "Valores nutricionales",
-			p != null && p.complete() ? "Puedes corregirlos si tu envase indica otra cosa." :
-				"Copia los valores «por 100 g» o «por 100 ml» de la etiqueta.");
+		if (p != null) {
+			scannedValues(n, d, unit, refresh);
+			finish(n, d);
+			return;
+		}
+		LinearLayout values = card("Datos de la etiqueta", "Copia los valores «por 100 g» o «por 100 ml» de la etiqueta.");
 		com.google.android.material.button.MaterialButton[] reuse = new com.google.android.material.button.MaterialButton[1];
 		textField(values, "name", "Nombre del alimento", d.getOrDefault("name", ""), false, false, v -> {
 			d.put("name", v);
@@ -140,12 +151,63 @@ public final class FoodFragment extends ScreenFragment {
 			values.addView(more, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
 				LinearLayout.LayoutParams.WRAP_CONTENT) {{ topMargin = dp(16); }});
 		}
+		finish(n, d);
+	}
+
+	private void finish(NutritionController n, Map<String, String> d) {
 		primary(action(rows, n.editingFood() ? "Guardar cambios" : "Añadir al diario", !n.busy,
 			() -> n.addFood(() -> app.navigate(Screen.NUTRITION))));
 		action(rows, "Cancelar", !n.busy, () -> {
 			n.cancelFood();
 			app.navigate(Screen.NUTRITION);
 		});
+	}
+
+	/**
+	 * Producto escaneado: sus valores por 100 vienen de la ficha y no se tocan; solo se piden los que la ficha no
+	 * trae. Así la persona únicamente indica cuánto ha tomado.
+	 */
+	private void scannedValues(NutritionController n, Map<String, String> d, FoodEntry.Unit unit, Runnable refresh) {
+		String base = " por 100 " + unit.symbol;
+		String[][] fields = {{"kcal100", "Calorías", "kcal"}, {"protein100", "Proteínas", "g"},
+			{"carbs100", "Hidratos", "g"}, {"fat100", "Grasas", "g"}};
+		StringBuilder fixed = new StringBuilder();
+		boolean missing = false;
+		for (String[] f : fields) {
+			String v = n.scannedValue(f[0]);
+			if (v != null)
+				fixed.append(fixed.length() == 0 ? "" : "\n").append(f[1]).append(": ").append(v.replace('.', ','))
+					.append(" ").append(f[2]);
+			else
+				missing = true;
+		}
+		LinearLayout values = card("Valores" + base, (fixed.length() == 0 ? "" : fixed + "\n\n") +
+			"Datos de Open Food Facts para este código. Solo tienes que indicar la cantidad.");
+		values.setTag("food_scanned_values");
+		if (!missing)
+			return;
+		text(values, "A la ficha le faltan estos datos: cópialos de la etiqueta.", R.style.EnerGym_FieldCaption, 8);
+		for (String[] f : fields)
+			if (n.scannedValue(f[0]) == null)
+				field(values, d, f[0], f[1] + " (" + f[2] + ")" + base, refresh);
+	}
+
+	/** Cantidad del envase en la unidad de la ficha («500 g», «1 l» → 1000 ml); vacío si no se entiende. */
+	static String packAmount(String quantity, FoodEntry.Unit unit) {
+		java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+(?:[.,]\\d+)?)\\s*(kg|g|ml|cl|l)\\b")
+			.matcher(quantity == null ? "" : quantity.toLowerCase(java.util.Locale.ROOT));
+		if (!m.find())
+			return "";
+		double v = Double.parseDouble(m.group(1).replace(',', '.'));
+		switch (m.group(2)) {
+			case "kg": case "l": v *= 1000; break;
+			case "cl": v *= 10; break;
+			default: break;
+		}
+		boolean volume = m.group(2).endsWith("l");
+		if (volume != (unit == FoodEntry.Unit.ML) || v <= 0 || v > 5000)
+			return "";
+		return NutritionController.format(v);
 	}
 
 	/**
