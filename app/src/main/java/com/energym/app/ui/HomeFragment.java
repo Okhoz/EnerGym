@@ -31,13 +31,7 @@ public final class HomeFragment extends ScreenFragment {
 		String date = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", NutritionFragment.SPANISH));
 		heading(getString(R.string.home_eyebrow), greeting(),
 			Character.toUpperCase(date.charAt(0)) + date.substring(1));
-		View overview = getLayoutInflater().inflate(R.layout.row_home_overview, rows, false);
-		Locale locale = getResources().getConfiguration().getLocales().isEmpty() ? Locale.getDefault() :
-			getResources().getConfiguration().getLocales().get(0);
-		NumberFormat counts = NumberFormat.getIntegerInstance(locale);
-		((TextView) overview.findViewById(R.id.home_sessions)).setText(counts.format(app.history.size()));
-		((TextView) overview.findViewById(R.id.home_drafts)).setText(counts.format(app.pending.size()));
-		rows.addView(overview);
+		// Inicio solo dice qué toca hoy; todas las cifras y gráficas están en Progreso.
 
 		if (app.owner() == null) {
 			LinearLayout start = card(getString(R.string.home_next_step), getString(R.string.home_account_prompt));
@@ -52,7 +46,8 @@ public final class HomeFragment extends ScreenFragment {
 		}
 		today();
 		food();
-		streak();
+		MaterialButton open = action(rows, "📊 Ver tu progreso", true, () -> app.navigate(Screen.HISTORY));
+		open.setContentDescription(getString(R.string.home_view_history));
 		if (!app.notice.isEmpty())
 			text(rows, app.notice, R.style.EnerGym_FieldCaption, 4);
 	}
@@ -103,26 +98,9 @@ public final class HomeFragment extends ScreenFragment {
 		double[] today = state.nutrition.totals(state.nutrition.today());
 		BodyProfile.Targets targets = state.nutrition.targets();
 		LinearLayout food = card(getString(R.string.nutrition), targets == null ?
-			"Escanea tus alimentos y controla calorías y macros." : "");
-		if (targets != null) {
-			LinearLayout ring = columns(food, 0);
-			RingView kcal = column(ring, new RingView(requireContext()), 0);
-			kcal.set("Calorías", today[0], targets.kcal, "kcal", kcal.gold(), 7);
-			RingView protein = column(ring, new RingView(requireContext()), 8);
-			protein.set("Proteínas", today[1], targets.protein, "g", protein.protein(), 7);
-		}
+			"Escanea tus alimentos y controla calorías y macros." :
+			"Hoy llevas " + Math.round(today[0]) + " de " + Math.round(targets.kcal) + " kcal.");
 		action(food, targets == null ? "Empezar" : "Añadir comida", () -> app.navigate(Screen.NUTRITION));
-	}
-
-	private void streak() {
-		ProgressStats stats = new ProgressStats(app.history, ZoneId.systemDefault(), LocalDate.now());
-		LinearLayout progress = card(getString(R.string.history), "");
-		LinearLayout figures = columns(progress, 0);
-		stat(figures, Integer.toString(stats.weekStreak()), stats.weekStreak() == 1 ? "semana seguida" : "semanas seguidas");
-		stat(figures, Integer.toString(stats.daysThisMonth()), "días este mes");
-		MaterialButton open = action(progress, getString(R.string.home_view_history), true,
-			() -> app.navigate(Screen.HISTORY));
-		open.setContentDescription(getString(R.string.home_view_history));
 	}
 
 	static String summary(com.energym.app.domain.ProgressionEngine.Plan plan) {

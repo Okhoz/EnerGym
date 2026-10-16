@@ -57,7 +57,6 @@
 				tools:visibility="visible"
 				android:importantForAccessibility="noHideDescendants">
 				<!-- Solo editor: GONE en ejecución; ScreenFragment.render elimina estas filas. -->
-				<include layout="@layout/row_home_overview" />
 
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"

@@ -98,13 +98,9 @@ public final class NutritionFragment extends ScreenFragment {
 		if (!n.status.isEmpty())
 			text(rows, n.status, R.style.EnerGym_FieldCaption, 0);
 
-		section("Tu semana", 32);
-		LinearLayout week = card("Últimos 7 días", "Calorías por día" + (targets == null ? "." :
-			"; la línea discontinua marca tu objetivo de " + Math.round(targets.kcal) + " kcal."));
-		double[] series = n.caloriesSeries(7);
-		add(week, new BarChartView(requireContext()), 8).set(series, n.dayLabels(7), targets == null ? 0 : targets.kcal,
-			"Calorías de los últimos 7 días: " + Arrays.toString(round(series)));
-
+		// La evolución (calorías por día, peso…) se ve en Progreso; aquí solo se anota.
+		action(rows, "📊 Ver tu evolución en Progreso", true, () -> app.navigate(Screen.HISTORY))
+			.setTag("nutrition_to_progress");
 		BodyProfile current = n.effectiveBody();
 		LinearLayout body = card("Peso y datos físicos", current == null ? "Sin datos físicos." :
 			"Peso actual " + NutritionController.format(current.weightKg) + " kg" + (targets == null ? "" :

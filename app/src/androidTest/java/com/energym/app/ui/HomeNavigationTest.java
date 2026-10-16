@@ -61,10 +61,6 @@ public final class HomeNavigationTest {
 					scenario.onActivity(a -> a.state().accounts.signOut());
 					MainFlowTest.await();
 					home(scenario);
-					scenario.onActivity(a -> {
-						assertEquals("0", ((TextView) a.findViewById(R.id.home_drafts)).getText().toString());
-						assertEquals("0", ((TextView) a.findViewById(R.id.home_sessions)).getText().toString());
-					});
 					capture("home-signed-out-" + scale);
 					scenario.onActivity(a -> a.menuSelected(R.id.menu_profile));
 					MainFlowTest.await();
@@ -72,10 +68,6 @@ public final class HomeNavigationTest {
 					scenario.onActivity(a -> a.state().accounts.enterDemo());
 					MainFlowTest.await();
 					home(scenario);
-					scenario.onActivity(a -> {
-						assertEquals("1", ((TextView) a.findViewById(R.id.home_drafts)).getText().toString());
-						assertEquals("0", ((TextView) a.findViewById(R.id.home_sessions)).getText().toString());
-					});
 					capture("home-demo-" + scale);
 					scenario.onActivity(a -> a.menuSelected(R.id.menu_profile));
 					MainFlowTest.await();
@@ -105,32 +97,6 @@ public final class HomeNavigationTest {
 		} finally {
 			shell(font.equals("null") ? "settings delete system font_scale" : "settings put system font_scale " + font);
 		}
-	}
-
-	@Test
-	public void countersFit320And360AtLargeFont() {
-		InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
-			for (int width : new int[]{320, 360}) {
-				Configuration config = new Configuration(context.getResources().getConfiguration());
-				config.fontScale = 1.3f;
-				Context themed =
-					new ContextThemeWrapper(context.createConfigurationContext(config), R.style.Theme_EnerGym);
-				View view = LayoutInflater.from(themed).inflate(R.layout.row_home_overview, null, false);
-				((TextView) view.findViewById(R.id.home_sessions)).setText("128");
-				((TextView) view.findViewById(R.id.home_drafts)).setText("12");
-				int w = dp(themed, width - 40);
-				view.measure(View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY),
-					View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-				view.layout(0, 0, w, view.getMeasuredHeight());
-				inspect(view);
-				for (int id : new int[]{R.id.home_sessions, R.id.home_drafts}) {
-					View counter = view.findViewById(id);
-					Rect bounds = new Rect(0, 0, counter.getWidth(), counter.getHeight());
-					((ViewGroup) view).offsetDescendantRectToMyCoords(counter, bounds);
-					assertTrue(bounds.left >= 0 && bounds.right <= w);
-				}
-			}
-		});
 	}
 
 	private void inspect(View view) {
