@@ -45,6 +45,22 @@ public final class FoodEditingTest {
 		assertEquals(0, NutritionController.loggedAverage(new double[3], new double[3]), 0.001);
 	}
 
+	@Test public void typingAKnownFoodOffersItsLabelWithoutTouchingAmountOrMeal() {
+		Store store = new Store();
+		store.entries.add(entry("one", 150));
+		NutritionController c = controller(store);
+		assertNull(c.known("ar"));
+		assertNull(c.known("pan"));
+		FoodEntry known = c.known("arr");
+		assertNotNull(known);
+		c.startManual();
+		c.foodDraft.put("amount", "80");
+		c.useLabelOf(known);
+		assertEquals("Arroz", c.foodDraft.get("name"));
+		assertEquals("80", c.foodDraft.get("amount"));
+		assertEquals(NutritionController.format(known.kcal100), c.foodDraft.get("kcal100"));
+	}
+
 	@Test public void cancelOrSwitchingAccountCannotOverwriteThePreviousFood() {
 		Store store = new Store();
 		FoodEntry original = entry("one", 150);

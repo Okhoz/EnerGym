@@ -104,9 +104,8 @@ public final class ManualRoutineFragment extends ScreenFragment {
 		enumChoice(box, "goal", "Objetivo", Goal.values());
 		enumChoice(box, "environment", "Entorno", Environment.values());
 		enumChoice(box, "focus", "Enfoque", Focus.values());
-		field(box, "manual_level", "Nivel", c.contextValue("level"), false, false, v -> c.contextInput("level", v));
-		field(box, "manual_duration", "Tiempo disponible (min)", c.contextValue("durationMinutes"), true, true,
-			v -> c.contextInput("durationMinutes", v));
+		listChoice(box, "level", "Nivel", AppController.LEVELS, AppController.LEVELS, "");
+		listChoice(box, "durationMinutes", "Tiempo disponible", AppController.MINUTES, AppController.MINUTE_LABELS, " min");
 		for (Resource resource : Resource.values()) {
 			String key = "resource." + resource.name();
 			check(box, "manual_" + key, AppController.label(resource.name()), Boolean.parseBoolean(c.contextValue(key)),
@@ -181,6 +180,17 @@ public final class ManualRoutineFragment extends ScreenFragment {
 			labels.add(AppController.label(option.name()));
 		}
 		choose(box, key, label, values, labels);
+	}
+	/** Lista cerrada que conserva un valor antiguo fuera de ella para no perderlo. */
+	private void listChoice(LinearLayout box, String key, String label, List<String> values, List<String> labels,
+		String unit) {
+		String current = app.manual.contextValue(key);
+		List<String> v = new ArrayList<>(values), t = new ArrayList<>(labels);
+		if (!values.contains(current)) {
+			v.add(0, current);
+			t.add(0, current.isEmpty() ? "Sin indicar" : current + unit);
+		}
+		choose(box, key, label, v, t);
 	}
 	private void choose(LinearLayout box, String key, String label, List<String> values, List<String> labels) {
 		choice(box, "manual_" + key, label, values, labels, app.manual.contextValue(key), v -> app.manual.contextInput(key, v));

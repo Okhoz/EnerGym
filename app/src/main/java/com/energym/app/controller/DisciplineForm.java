@@ -111,7 +111,8 @@ public final class DisciplineForm {
 		List<Category> gym = Arrays.asList(Category.GYM, Category.HOME_EQUIPMENT, Category.NO_EQUIPMENT);
 		List<Environment> anywhere = Arrays.asList(Environment.OUTDOORS, Environment.GYM, Environment.HOME);
 		Detail hand = new Detail("hand", "Mano dominante", false, "Diestra|Diestra", "Zurda|Zurda");
-		Detail matches = new Detail("matchesPerWeek", "Partidos por semana", true);
+		Detail matches = new Detail("matchesPerWeek", "Partidos por semana", false, "0|Ninguno", "1|1", "2|2",
+			"3|3", "4|4 o más");
 
 		add(new Builder("strength").categories(gym)
 			.goals(Goal.STRENGTH, Goal.GENERAL_FITNESS, Goal.MOBILITY).resources(weights)

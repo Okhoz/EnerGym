@@ -483,6 +483,12 @@ public final class AppController {
 			return;
 		profileDraft.put(key, value);
 		profileDirty = true;
+		// La experiencia ya indica el nivel: se completa solo y la persona puede corregirlo.
+		if (key.equals("experience") && !levelFor(value).isEmpty() &&
+			!levelFor(value).equals(profileDraft.get("level"))) {
+			profileDraft.put("level", levelFor(value));
+			changed();
+		}
 		// Cambiar disciplina o tipo cambia qué se pregunta: se ajusta el borrador y se redibuja el formulario.
 		if (key.equals("sportId") || key.equals("category") || key.equals("focus")) {
 			normalizeProfileDraft();
@@ -655,18 +661,57 @@ public final class AppController {
 			}
 			f.add(new InputField(key, d.label, profileDraft.getOrDefault(key, ""), v, t, false, false));
 		}
-		f.add(field("daysPerWeek", "Días por semana (1–7)", false, true));
-		f.add(field("durationMinutes", form.durationLabel + " (5–240 min)", false, true));
-		f.add(field("level", "Nivel", false, false));
-		f.add(field("experience", "Experiencia previa", false, false));
+		f.add(list("daysPerWeek", "Días por semana", DAYS, DAY_LABELS));
+		f.add(list("durationMinutes", form.durationLabel, MINUTES, MINUTE_LABELS));
+		f.add(list("experience", "Experiencia previa", EXPERIENCE, EXPERIENCE));
+		f.add(list("level", "Nivel", LEVELS, LEVELS));
 		if (form.asksSpace)
-			f.add(field("space", "Espacio disponible", false, false));
+			f.add(list("space", "Espacio disponible", SPACES, SPACES));
 		f.add(field("preferences", "Preferencias", false, false));
 		f.add(field("limitations", "Limitaciones que quieras declarar", false, false));
 		for (TrainingProfile.Resource r : form.askedResources(category))
 			f.add(field("resource." + r.name(), "Disponible: " + label(r.name()), true, false));
-		f.add(field("historyConsent", "Permitir enviar mensajes anteriores al servidor opcional", true, false));
+		// El permiso de historial solo servía para un servidor de IA externo; el entrenador corre en el móvil.
 		return f;
+	}
+
+	public static final List<String> LEVELS = Collections.unmodifiableList(
+		Arrays.asList("Principiante", "Intermedio", "Avanzado"));
+	private static final List<String> DAYS = Arrays.asList("1", "2", "3", "4", "5", "6", "7"),
+		DAY_LABELS = Arrays.asList("1 día", "2 días", "3 días", "4 días", "5 días", "6 días", "7 días");
+	public static final List<String> MINUTES = Collections.unmodifiableList(
+		Arrays.asList("15", "20", "30", "45", "60", "75", "90", "120", "150", "180", "240"));
+	public static final List<String> MINUTE_LABELS = Collections.unmodifiableList(Arrays.asList("15 min", "20 min",
+		"30 min", "45 min", "1 h", "1 h 15 min", "1 h 30 min", "2 h", "2 h 30 min", "3 h", "4 h"));
+	private static final List<String> EXPERIENCE = Arrays.asList("Empiezo ahora", "Menos de 1 año", "De 1 a 3 años",
+		"Más de 3 años");
+	private static final List<String> SPACES = Arrays.asList("Poco (unos 2 × 2 m)", "Medio (salón o habitación)",
+		"Amplio (garaje, jardín o parque)");
+
+	/**
+	 * Lista cerrada que conserva un valor antiguo escrito a mano para no perderlo al editar el perfil.
+	 */
+	private InputField list(String key, String label, List<String> values, List<String> labels) {
+		List<String> v = new ArrayList<>(), t = new ArrayList<>();
+		String current = profileDraft.getOrDefault(key, "");
+		if (!values.contains(current)) {
+			v.add(current);
+			t.add(current.isEmpty() ? "Sin indicar" : key.equals("durationMinutes") ? current + " min" : current);
+		}
+		v.addAll(values);
+		t.addAll(labels);
+		return new InputField(key, label, current, v, t, false, false);
+	}
+
+	/** Nivel que se deduce de la experiencia elegida. */
+	static String levelFor(String experience) {
+		switch (experience) {
+			case "Empiezo ahora":
+			case "Menos de 1 año": return "Principiante";
+			case "De 1 a 3 años": return "Intermedio";
+			case "Más de 3 años": return "Avanzado";
+			default: return "";
+		}
 	}
 
 	private InputField options(String key, String label, List<? extends Enum<?>> values) {

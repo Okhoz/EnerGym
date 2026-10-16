@@ -90,6 +90,35 @@ public class DisciplineFormTest {
 			.details(Collections.singletonMap("note", new String(longText))).build());
 	}
 
+	@Test
+	public void closedAnswersAreListsAndExperienceFillsTheLevel() {
+		AppController c = controller();
+		c.profileInput("sportId", "strength");
+		Map<String, AppController.InputField> f = new HashMap<>();
+		for (AppController.InputField field : c.profileFields())
+			f.put(field.key, field);
+		for (String key : Arrays.asList("daysPerWeek", "durationMinutes", "level", "experience"))
+			assertFalse(key + " debe ser una lista", f.get(key).values.isEmpty());
+		assertFalse("El permiso del servidor externo ya no se pregunta", f.containsKey("historyConsent"));
+		assertTrue(f.get("daysPerWeek").values.contains("7"));
+		c.profileInput("experience", "Más de 3 años");
+		assertEquals("Avanzado", value(c, "level"));
+		c.profileInput("level", "Intermedio");
+		assertEquals("Intermedio", value(c, "level"));
+		c.profileInput("durationMinutes", "37");
+		AppController.InputField custom = null;
+		for (AppController.InputField field : c.profileFields())
+			if (field.key.equals("durationMinutes")) custom = field;
+		assertEquals("Un valor antiguo fuera de la lista no se pierde", "37", custom.values.get(0));
+		assertEquals("37 min", custom.labels.get(0));
+	}
+
+	private static String value(AppController c, String key) {
+		for (AppController.InputField f : c.profileFields())
+			if (f.key.equals(key)) return f.value;
+		return null;
+	}
+
 	private static Set<String> keys(AppController c) {
 		Set<String> keys = new LinkedHashSet<>();
 		for (AppController.InputField f : c.profileFields())

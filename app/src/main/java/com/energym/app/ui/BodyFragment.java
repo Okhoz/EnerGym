@@ -27,8 +27,11 @@ public final class BodyFragment extends ScreenFragment {
 			return;
 		}
 		WeightHistorySection.render(this, n);
-		if (n.bodyDraft.isEmpty())
+		if (n.bodyDraft.isEmpty()) {
 			n.fillBody();
+			if (app.profile != null)
+				n.suggestActivity(app.profile.getDaysPerWeek());
+		}
 		Map<String, String> d = n.bodyDraft;
 		Runnable[] refresh = {() -> {}};
 		LinearLayout basics = card("Sobre ti", "Escribe solo las cifras; las unidades aparecen en cada etiqueta.");
@@ -50,7 +53,9 @@ public final class BodyFragment extends ScreenFragment {
 			Arrays.asList("SEDENTARY", "LIGHT", "MODERATE", "HIGH", "VERY_HIGH"),
 			Arrays.asList("Sedentaria (poco movimiento)", "Ligera (1–3 entrenos/semana)",
 				"Moderada (3–5 entrenos/semana)", "Alta (6–7 entrenos/semana)", "Muy alta (trabajo físico + entreno)"),
-			d.get("activity"), "Elige la opción que mejor refleje una semana habitual, incluido el entrenamiento.",
+			d.get("activity"), n.body == null && app.profile != null ?
+				"Propuesta según los " + app.profile.getDaysPerWeek() + " días de entreno de tu perfil; cámbiala si no encaja." :
+				"Elige la opción que mejor refleje una semana habitual, incluido el entrenamiento.",
 			v -> { d.put("activity", v); refresh[0].run(); });
 		textField(plan, "allergies", "Alergias o intolerancias (opcional)", d.get("allergies"), false, false,
 			"Anota los alimentos que necesitas evitar. Puedes dejarlo vacío.", v -> d.put("allergies", v));

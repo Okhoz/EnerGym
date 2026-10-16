@@ -26,15 +26,13 @@ public final class ProfileFragment extends ScreenFragment {
 				details = true;
 			} else if (f.key.equals("daysPerWeek"))
 				fields = card("Tu disponibilidad", "Usa una disponibilidad que puedas mantener.");
-			else if (f.key.equals("level"))
-				fields = card("Sobre ti", "Indica tu nivel. Los demás datos de este bloque son opcionales.");
+			else if (f.key.equals("experience"))
+				fields = card("Sobre ti", "Al elegir tu experiencia se ajusta el nivel; puedes cambiarlo.");
 			else if (f.key.startsWith("resource.") && !resources) {
 				fields = card("Material disponible",
 					"Marca solo el material que podrás usar en las sesiones.");
 				resources = true;
-			} else if (f.key.equals("historyConsent"))
-				fields = card("Privacidad",
-					"Permiso opcional para enviar hasta 12 mensajes anteriores al servidor de IA que conectes en Cuenta. Solo se envían cuando chateas con la IA conectada; las sesiones históricas no se adjuntan. Puedes revocarlo aquí. El modo guiado local no envía datos.");
+			}
 			String label = FormFieldGuidance.profileLabel(f.key, f.label);
 			String helper = FormFieldGuidance.profileHelper(f.key);
 			if (f.bool)

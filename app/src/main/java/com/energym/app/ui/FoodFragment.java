@@ -65,10 +65,24 @@ public final class FoodFragment extends ScreenFragment {
 		LinearLayout values = card(p == null ? "Datos de la etiqueta" : "Valores nutricionales",
 			p != null && p.complete() ? "Puedes corregirlos si tu envase indica otra cosa." :
 				"Copia los valores «por 100 g» o «por 100 ml» de la etiqueta.");
+		com.google.android.material.button.MaterialButton[] reuse = new com.google.android.material.button.MaterialButton[1];
 		textField(values, "name", "Nombre del alimento", d.getOrDefault("name", ""), false, false, v -> {
 			d.put("name", v);
 			refresh.run();
+			if (reuse[0] != null)
+				suggest(n, reuse[0], v);
 		});
+		// Autocompletar: si ya anotaste este alimento, sus valores de etiqueta se reutilizan con un toque.
+		if (p == null && !n.editingFood()) {
+			reuse[0] = action(values, "", !n.busy, () -> {
+				FoodEntry known = n.known(d.getOrDefault("name", ""));
+				if (known != null) {
+					n.useLabelOf(known);
+					app.changed();
+				}
+			});
+			suggest(n, reuse[0], d.getOrDefault("name", ""));
+		}
 		choice(values, "unit", "La etiqueta indica valores por", Arrays.asList("G", "ML"),
 			Arrays.asList("100 g (sólidos)", "100 ml (líquidos)"), unit.name(), v -> {
 				d.put("unit", v);
@@ -113,6 +127,16 @@ public final class FoodFragment extends ScreenFragment {
 			});
 			list.addView(row);
 		}
+	}
+
+	private static void suggest(NutritionController n, android.widget.Button button, String typed) {
+		FoodEntry known = n.known(typed);
+		boolean same = known != null && known.name.equalsIgnoreCase(typed.trim()) &&
+			NutritionController.format(known.kcal100).equals(n.foodDraft.getOrDefault("kcal100", ""));
+		button.setVisibility(known == null || same ? android.view.View.GONE : android.view.View.VISIBLE);
+		if (known != null)
+			button.setText("↺ Usar «" + known.name + "» (" + NutritionController.format(known.kcal100) + " kcal/100 " +
+				known.unit.symbol + ")");
 	}
 
 	private void field(LinearLayout target, Map<String, String> d, String key, String label, Runnable refresh) {

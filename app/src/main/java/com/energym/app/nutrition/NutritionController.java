@@ -275,10 +275,21 @@ public final class NutritionController {
 		bodyDraft.put("sex", b == null ? "FEMALE" : b.sex.name());
 		bodyDraft.put("age", b == null ? "" : Integer.toString(b.age));
 		bodyDraft.put("heightCm", b == null ? "" : format(b.heightCm));
-		bodyDraft.put("weightKg", b == null ? "" : format(b.weightKg));
+		Map.Entry<LocalDate, Double> logged = latestWeight();
+		// Sin datos guardados se aprovecha el último peso anotado en el diario.
+		bodyDraft.put("weightKg", b != null ? format(b.weightKg) : logged == null ? "" : format(logged.getValue()));
 		bodyDraft.put("activity", b == null ? "MODERATE" : b.activity.name());
 		bodyDraft.put("goal", b == null ? "MAINTAIN" : b.goal.name());
 		bodyDraft.put("allergies", b == null ? "" : b.allergies);
+	}
+
+	/**
+	 * Primera vez: la actividad se deduce de los días de entreno del perfil (la persona puede cambiarla).
+	 */
+	public void suggestActivity(int trainingDays) {
+		if (body != null || trainingDays <= 0)
+			return;
+		bodyDraft.put("activity", trainingDays <= 2 ? "LIGHT" : trainingDays <= 5 ? "MODERATE" : "HIGH");
 	}
 
 	public void saveBody(Runnable done) {
@@ -509,6 +520,28 @@ public final class NutritionController {
 	/**
 	 * Alimentos distintos registrados recientemente (más reciente primero), para añadirlos de nuevo con un toque.
 	 */
+	/** Alimento ya anotado cuyo nombre empieza por lo escrito (3 letras o más); null si no hay ninguno. */
+	public FoodEntry known(String name) {
+		String q = name == null ? "" : name.trim().toLowerCase(Locale.ROOT);
+		if (q.length() < 3)
+			return null;
+		for (FoodEntry e : recentFoods(Integer.MAX_VALUE))
+			if (e.name.toLowerCase(Locale.ROOT).startsWith(q))
+				return e;
+		return null;
+	}
+
+	/** Copia la etiqueta (nombre y valores por 100) de un alimento ya anotado; cantidad y comida se conservan. */
+	public void useLabelOf(FoodEntry known) {
+		foodDraft.put("name", known.name);
+		foodDraft.put("barcode", known.barcode);
+		foodDraft.put("unit", known.unit.name());
+		foodDraft.put("kcal100", format(known.kcal100));
+		foodDraft.put("protein100", format(known.protein100));
+		foodDraft.put("carbs100", format(known.carbs100));
+		foodDraft.put("fat100", format(known.fat100));
+	}
+
 	public List<FoodEntry> recentFoods(int limit) {
 		List<FoodEntry> ordered = new ArrayList<>(entries);
 		ordered.sort((a, b) -> Long.compare(b.createdAt, a.createdAt));
