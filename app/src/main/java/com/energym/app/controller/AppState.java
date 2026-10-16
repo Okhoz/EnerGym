@@ -60,6 +60,8 @@ public final class AppState extends AndroidViewModel {
 	public com.energym.app.nutrition.DietPlanner diet;
 	public com.energym.app.nutrition.WaterLog water;
 	public com.energym.app.reminders.ReminderController reminders;
+	/** Ejercicios creados por la persona, por cuenta y solo en este móvil. */
+	public com.energym.app.catalog.CustomExercises customExercises;
 	private com.energym.app.nutrition.SyncedNutritionStore nutritionStore;
 	// Consultas a Open Food Facts: independientes del chat y de SQLite.
 	private final ExecutorService lookupWorker = Executors.newSingleThreadExecutor();
@@ -149,6 +151,28 @@ public final class AppState extends AndroidViewModel {
 				glasses.edit().putInt(key, ml).apply();
 			}
 		}, this::changed);
+		android.content.SharedPreferences customPrefs = context.getSharedPreferences("custom_exercises",
+			android.content.Context.MODE_PRIVATE);
+		customExercises = new com.energym.app.catalog.CustomExercises(new com.energym.app.catalog.CustomExercises.Store() {
+			public java.util.List<com.energym.app.domain.Exercise> load(String owner) {
+				java.util.List<com.energym.app.domain.Exercise> result = new java.util.ArrayList<>();
+				try {
+					org.json.JSONArray rows = new org.json.JSONArray(customPrefs.getString(owner, "[]"));
+					for (int i = 0; i < rows.length(); i++)
+						result.add(com.energym.app.data.SnapshotCodec.decodeExercise(rows.getString(i)));
+				} catch (Exception ignored) {
+					// Datos dañados: se empieza sin ejercicios propios.
+				}
+				return result;
+			}
+
+			public void save(String owner, java.util.List<com.energym.app.domain.Exercise> exercises) {
+				org.json.JSONArray rows = new org.json.JSONArray();
+				for (com.energym.app.domain.Exercise e : exercises)
+					rows.put(com.energym.app.data.SnapshotCodec.encodeExercise(e));
+				customPrefs.edit().putString(owner, rows.toString()).apply();
+			}
+		}, catalog, this::changed);
 		// Recordatorios de entreno y agua: alarmas y avisos locales, sin servidor.
 		reminders = new com.energym.app.reminders.ReminderController(context, this::changed);
 		// Dietas con la misma IA del móvil; el último menú de cada cuenta se guarda solo en este teléfono.
@@ -221,6 +245,7 @@ public final class AppState extends AndroidViewModel {
 			goals.activate(app.owner());
 			diet.activate(app.owner());
 			water.activate(app.owner());
+			customExercises.activate(app.owner());
 			changed();
 		});
 		accounts = new AccountController(gateway, sync, main, (status, value, error) -> {

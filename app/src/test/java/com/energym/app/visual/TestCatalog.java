@@ -27,6 +27,20 @@ public final class TestCatalog {
 		return exercises;
 	}
 
+	/** Catálogo completo (deportes y ejercicios) como el de la app. */
+	public static com.energym.app.catalog.CatalogRepository repository() throws Exception {
+		Map<?, ?> root = (Map<?, ?>) MiniJson.parse(new String(
+			Files.readAllBytes(Paths.get("src/main/assets/catalog.json")), StandardCharsets.UTF_8));
+		List<Sport> sports = new ArrayList<>();
+		for (Object value : (List<?>) root.get("sports")) {
+			Map<?, ?> row = (Map<?, ?>) value;
+			sports.add(new Sport((String) row.get("id"), (String) row.get("name"),
+				Sport.CoverageStatus.valueOf((String) row.get("specificCoverage")),
+				Sport.CoverageStatus.valueOf((String) row.get("complementaryCoverage"))));
+		}
+		return new com.energym.app.catalog.CatalogRepository(((Number) root.get("version")).intValue(), sports, exercises());
+	}
+
 	private static List<String> strings(Object values) {
 		List<String> result = new ArrayList<>();
 		for (Object value : (List<?>) values) result.add((String) value);

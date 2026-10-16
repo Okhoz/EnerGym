@@ -20,9 +20,13 @@ import java.util.*;
 public final class CatalogRepository {
 	private final int version;
 	private final List<Sport> sports;
-	private final List<Exercise> exercises;
+	/** Catálogo publicado más los ejercicios creados por la persona (al final); vista compartida y actualizada. */
+	private final List<Exercise> live = new java.util.concurrent.CopyOnWriteArrayList<>();
+	private final List<Exercise> exercises = Collections.unmodifiableList(live);
 	private final Map<String, Sport> sportById;
 	private final Map<String, Exercise> exerciseById;
+	private final Map<String, Exercise> customById = new java.util.concurrent.ConcurrentHashMap<>();
+	private int published;
 
 	public CatalogRepository(int version, List<Sport> sports, List<Exercise> exercises) {
 		if (version != 1 && version != 2)
@@ -59,7 +63,23 @@ public final class CatalogRepository {
 		sportById = Collections.unmodifiableMap(sportMap);
 		exerciseById = Collections.unmodifiableMap(exerciseMap);
 		this.sports = Collections.unmodifiableList(new ArrayList<>(sportMap.values()));
-		this.exercises = Collections.unmodifiableList(new ArrayList<>(exerciseMap.values()));
+		live.addAll(exerciseMap.values());
+		published = live.size();
+	}
+
+	/**
+	 * Sustituye los ejercicios propios de la cuenta activa (IDs «custom-…»). Aparecen en todas las búsquedas,
+	 * rutinas y entrenos como los del catálogo; los publicados no cambian.
+	 */
+	public synchronized void setCustom(List<Exercise> custom) {
+		List<Exercise> next = new ArrayList<>(live.subList(0, published));
+		customById.clear();
+		for (Exercise e : custom)
+			if (e.getId().startsWith("custom-") && !exerciseById.containsKey(e.getId()) &&
+				customById.put(e.getId(), e) == null)
+				next.add(e);
+		live.clear();
+		live.addAll(next);
 	}
 
 	private static void validateId(String id) {
@@ -76,7 +96,8 @@ public final class CatalogRepository {
 	}
 
 	public Exercise findExercise(String id) {
-		return exerciseById.get(id);
+		Exercise e = exerciseById.get(id);
+		return e != null ? e : customById.get(id);
 	}
 
 	public List<Sport> getSports() {

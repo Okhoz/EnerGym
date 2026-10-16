@@ -333,6 +333,7 @@ public final class TrainingFragment extends ScreenFragment {
 	}
 
 	private void library() {
+		myExercises();
 		LinearLayout library = card("Biblioteca de ejercicios", app.catalog.getExercises().size() + " ejercicios del catálogo. Toca uno para ver su técnica.");
 		ExerciseSearch search = new ExerciseSearch(app.catalog.getExercises());
 		browser = new ExerciseBrowser(this, library, state.exerciseBrowser, "exercise", false, new ExerciseBrowser.Results() {
@@ -357,6 +358,43 @@ public final class TrainingFragment extends ScreenFragment {
 				});
 			}
 		});
+	}
+
+	/** Ejercicios creados por la persona: se ven, se borran y se crean (botón al final). */
+	private void myExercises() {
+		com.energym.app.catalog.CustomExercises custom = state.customExercises;
+		if (custom == null || app.owner() == null)
+			return;
+		List<Exercise> mine = custom.mine();
+		LinearLayout card = card("Tus ejercicios", mine.isEmpty() ?
+			"¿Te falta alguno? Créalo con su grupo muscular y material, y úsalo en rutinas y entrenos." :
+			mine.size() + (mine.size() == 1 ? " ejercicio creado por ti." : " ejercicios creados por ti."));
+		card.setTag("training_my_exercises");
+		for (Exercise e : mine) {
+			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, card, false);
+			((android.widget.TextView) row.findViewById(R.id.food_name)).setText(e.getName());
+			com.energym.app.domain.RoutineRequest.Area area = com.energym.app.catalog.CustomExercises.area(e);
+			((android.widget.TextView) row.findViewById(R.id.food_detail)).setText(
+				(area == null ? "" : Character.toUpperCase(area.label.charAt(0)) + area.label.substring(1) + " · ") +
+					com.energym.app.controller.AppController.label(e.getMetricType().name()));
+			((android.widget.TextView) row.findViewById(R.id.food_kcal)).setText("⋮");
+			row.setContentDescription("Opciones de " + e.getName());
+			row.setOnClickListener(v -> new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+				.setTitle(e.getName())
+				.setItems(new String[]{"Ver ficha", "Borrar ejercicio"}, (dialog, which) -> {
+					if (which == 0)
+						app.openExercise(e);
+					else
+						new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+							.setTitle("¿Borrar «" + e.getName() + "»?")
+							.setMessage("Deja de aparecer para nuevas rutinas. Las rutinas y entrenos que ya lo usan lo conservan.")
+							.setNegativeButton("Cancelar", null)
+							.setPositiveButton("Borrar", (d2, w2) -> custom.remove(e.getId())).show();
+				}).setNegativeButton("Cancelar", null).show());
+			card.addView(row);
+		}
+		action(card, "+ Crear ejercicio", true, () -> CustomExerciseDialog.show(requireContext(), custom, app::error))
+			.setTag("training_create_exercise");
 	}
 
 	private int color(int resource) {

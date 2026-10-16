@@ -97,6 +97,15 @@ public final class RoutineRequest {
 	/** Zonas que trabaja un ejercicio, deducidas de su tipo, ID y nombre. */
 	public static Set<Area> areas(Exercise e) {
 		Set<Area> a = EnumSet.noneOf(Area.class);
+		// Ejercicio propio: su grupo muscular es el que eligió la persona al crearlo.
+		if (e.getId().startsWith("custom-") && e.getDescription().startsWith("Grupo muscular: ")) {
+			String label = e.getDescription().substring("Grupo muscular: ".length()).split("\\.")[0];
+			for (Area area : Area.values())
+				if (area.label.equals(label)) {
+					a.add(area);
+					return a;
+				}
+		}
 		if (e.getMetricType() == MetricType.MOBILITY) {
 			a.add(Area.MOBILITY);
 			return a;
