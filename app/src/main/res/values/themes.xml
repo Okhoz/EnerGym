@@ -118,7 +118,12 @@
 	</style>
 
 	<style name="EnerGym.GlassDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-		<item name="colorSurface">#F01C1E1C</item>
+		<!-- Opaco: el contenido de detrás no debe transparentarse bajo el texto del diálogo. -->
+		<item name="colorSurface">#FF1C1E1C</item>
+		<item name="android:backgroundDimAmount">0.7</item>
+		<!-- Material 3 pinta el diálogo con estos tonos y le mezcla el dorado: se fijan neutros. -->
+		<item name="colorSurfaceContainerHigh">#FF1C1E1C</item>
+		<item name="elevationOverlayEnabled">false</item>
 		<item name="colorOnSurface">@color/white</item>
 		<item name="colorOnSurfaceVariant">@color/text_secondary</item>
 		<item name="colorPrimary">@color/gold</item>
