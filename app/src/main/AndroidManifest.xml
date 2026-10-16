@@ -73,6 +73,10 @@
 		</receiver>
 
 		<activity
+			android:name=".ui.TutorialActivity"
+			android:exported="false"
+			android:theme="@style/Theme.EnerGym" />
+		<activity
 			android:name=".ui.AnatomyActivity"
 			android:exported="false"
 			android:process=":viewer" />

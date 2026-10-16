@@ -230,6 +230,9 @@ public final class AccountFragment extends ScreenFragment {
 			java.util.Arrays.asList("Kilos (kg)", "Libras (lb)"), Units.lb(requireContext()) ? "lb" : "kg",
 			"Tus registros se guardan igual; solo cambia cómo se muestran y escriben.",
 			v -> Units.setLb(requireContext(), "lb".equals(v)));
+		action(card, "Ver el tutorial otra vez", true,
+			() -> startActivity(new android.content.Intent(requireContext(), TutorialActivity.class)))
+			.setTag("replay_tutorial");
 		if (app.owner() == null)
 			return;
 		if (com.energym.app.health.HealthSync.available()) {

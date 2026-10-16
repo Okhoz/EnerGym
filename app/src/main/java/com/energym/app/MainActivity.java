@@ -76,6 +76,9 @@ public final class MainActivity extends AppCompatActivity {
 		super.onCreate(saved);
 		EdgeToEdge.enable(this);
 		setContentView(R.layout.activity_main);
+		// Primera vez en este móvil: tutorial obligatorio antes de usar la app.
+		if (saved == null)
+			com.energym.app.ui.TutorialActivity.showIfNeeded(this);
 		screenMotion = findViewById(R.id.screen_motion);
 		backdrop = new GlassBackdropController(this, findViewById(R.id.glass_decoration), false);
 		// El diseño es oscuro también con el sistema en modo claro: iconos blancos en ambas barras.
