@@ -92,10 +92,9 @@ abstract class ValidateReleaseConfiguration : DefaultTask() {
 				".example.com", ".example.net", ".example.org").any { host.endsWith(it) }
 		val dns = host.matches(Regex("(?=.{1,253}$)[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+")) &&
 			!host.substringAfterLast('.').all { it.isDigit() } && host.split('.').all { it.length <= 63 }
-		if (backendUrl.isBlank())
-			errors.add("Falta ENERGYM_BACKEND_URL (origen HTTPS del backend propio).")
-		else if (uri?.scheme != "https" || !dns || reserved || uri.userInfo != null || uri.rawQuery != null ||
-			uri.rawFragment != null || uri.port !in listOf(-1, 443) || uri.rawPath !in listOf("", "/"))
+		// El entrenador usa la IA del móvil: el backend online es opcional; si se indica, debe ser HTTPS público.
+		if (backendUrl.isNotBlank() && (uri?.scheme != "https" || !dns || reserved || uri.userInfo != null || uri.rawQuery != null ||
+			uri.rawFragment != null || uri.port !in listOf(-1, 443) || uri.rawPath !in listOf("", "/")))
 			errors.add("ENERGYM_BACKEND_URL requiere origen HTTPS público con dominio, sin IP/localhost, credenciales, ruta, query ni fragmento.")
 		val signing = externalFile(signingPath, "ENERGYM_RELEASE_SIGNING_PROPERTIES")
 		if (signing != null) {
