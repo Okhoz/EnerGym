@@ -53,7 +53,7 @@ Empieza hoy: elige tu objetivo, entrena y deja que EnerGym te ayude a progresar 
 
 **Categoría:** Salud y forma física
 **Etiquetas** (elige hasta 5 en la consola): Fitness, Gimnasio, Entrenamiento, Nutrición, Contador de calorías
-**Correo de contacto:** CORREO_DE_CONTACTO
+**Correo de contacto:** magnofit16@gmail.com
 **Política de privacidad:** https://okhoz.github.io/EnerGym/privacidad.html
 
 **Gráficos** (en `docs/google-play/graficos/`):
@@ -101,7 +101,6 @@ EnerGym escribe en Health Connect los entrenamientos que el usuario termina en l
 
 ## Antes de publicar (pendiente)
 
-1. Sustituir `CORREO_DE_CONTACTO` en `docs/privacidad.html` y aquí por tu correo de contacto.
 2. Activar GitHub Pages (Settings › Pages › Deploy from a branch › `codex/energym` › `/docs`).
 3. Añadir en la app la opción de **borrar la cuenta y los datos de la nube**: Google Play la exige a las apps con inicio de sesión.
 4. Tras subir el primer .aab: copiar la huella SHA-1 de «Firma de apps de Play» en Firebase para que funcione el inicio con Google.
