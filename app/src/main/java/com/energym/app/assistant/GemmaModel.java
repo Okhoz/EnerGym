@@ -243,9 +243,27 @@ public final class GemmaModel implements OnDeviceModel {
 	/**
 	 * Carga perezosa (varios segundos): GPU si el móvil la ofrece y, si falla, CPU.
 	 */
+	private boolean reverified;
+
 	private synchronized Engine engine() {
 		if (engine != null)
 			return engine;
+		// Hasta Android 9 otras apps con permiso de almacenamiento pueden escribir en Android/data: antes de cargar
+		// el modelo se comprueba de nuevo su huella (una vez por proceso). Desde Android 10 la carpeta es privada.
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && !reverified) {
+			try {
+				if (model().length() != BYTES || !SHA256.equals(sha256(model()))) {
+					model().delete();
+					verified().delete();
+					throw new IllegalStateException("Modelo modificado: se volverá a descargar");
+				}
+			} catch (IllegalStateException e) {
+				throw e;
+			} catch (Exception e) {
+				throw new IllegalStateException("No se pudo verificar el modelo", e);
+			}
+			reverified = true;
+		}
 		String path = model().getPath();
 		for (Backend backend : new Backend[]{new Backend.GPU(), new Backend.CPU()}) {
 			Engine candidate = new Engine(new EngineConfig(path, backend));

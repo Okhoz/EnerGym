@@ -394,7 +394,7 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 		if (reclaim)
 			new Handler(Looper.getMainLooper()).postDelayed(() -> {
 				if (liveActivities == 0 && expectedProcess.equals(processName(application))) {
-					Log.i("EnerGymViewer", "Private viewer process reclaimed after final close");
+					if (com.energym.app.BuildConfig.DEBUG) Log.i("EnerGymViewer", "Private viewer process reclaimed after final close");
 					android.os.Process.killProcess(android.os.Process.myPid());
 				}
 			}, 200);

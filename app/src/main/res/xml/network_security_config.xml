@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Solo HTTPS y solo certificados del sistema: un certificado instalado por el usuario o una app no puede
+     interceptar el tráfico (Firebase, Open Food Facts, foto de Google y descarga del modelo). -->
+<network-security-config>
+	<base-config cleartextTrafficPermitted="false">
+		<trust-anchors>
+			<certificates src="system" />
+		</trust-anchors>
+	</base-config>
+</network-security-config>

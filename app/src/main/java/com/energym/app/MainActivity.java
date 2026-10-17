@@ -95,7 +95,7 @@ public final class MainActivity extends AppCompatActivity {
 		if (saved != null) {
 			launchedLease = saved.getString("viewerLease");
 		} else
-			pendingOpen = getIntent().getStringExtra(com.energym.app.reminders.Reminders.EXTRA_OPEN);
+			pendingOpen = openTarget(getIntent());
 		viewer = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
 			String token =
 				result.getData() == null ? launchedLease : result.getData().getStringExtra(AnatomyActivity.EXTRA_LEASE);
@@ -466,8 +466,36 @@ public final class MainActivity extends AppCompatActivity {
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
 		setIntent(intent);
-		pendingOpen = intent.getStringExtra(com.energym.app.reminders.Reminders.EXTRA_OPEN);
+		pendingOpen = openTarget(intent);
 		render();
+	}
+
+	/**
+	 * La pantalla de inicio es pública: cualquier app puede abrirla con extras. Solo se aceptan los destinos
+	 * conocidos y un extra malformado (Parcelable desconocido) no puede cerrar la app.
+	 */
+	static String openTarget(Intent intent) {
+		try {
+			String open = intent == null ? null : intent.getStringExtra(com.energym.app.reminders.Reminders.EXTRA_OPEN);
+			return "NUTRITION".equals(open) || "SESSION".equals(open) || "TRAINING".equals(open) ? open : null;
+		} catch (RuntimeException malformed) {
+			return null;
+		}
+	}
+
+	/**
+	 * Protección frente a «tapjacking» en Android 8–11: si otra app dibuja una capa encima, los toques que la
+	 * atraviesan se ignoran. Desde Android 12 el sistema ya bloquea esas capas por sí mismo.
+	 */
+	@Override
+	public boolean dispatchTouchEvent(android.view.MotionEvent event) {
+		if (android.os.Build.VERSION.SDK_INT < 31 && (event.getFlags() & android.view.MotionEvent.FLAG_WINDOW_IS_OBSCURED) != 0) {
+			if (event.getActionMasked() == android.view.MotionEvent.ACTION_DOWN)
+				android.widget.Toast.makeText(this, "Otra app está tapando EnerGym; ciérrala para poder tocar.",
+					android.widget.Toast.LENGTH_SHORT).show();
+			return true;
+		}
+		return super.dispatchTouchEvent(event);
 	}
 
 	@Override
