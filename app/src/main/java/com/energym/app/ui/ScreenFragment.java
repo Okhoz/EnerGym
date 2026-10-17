@@ -281,6 +281,7 @@ public abstract class ScreenFragment extends Fragment {
 			ViewGroup.LayoutParams.MATCH_PARENT));
 		LinearLayout row = new LinearLayout(requireContext());
 		row.setOrientation(LinearLayout.HORIZONTAL);
+		row.setBaselineAligned(false);
 		frame.addView(row, new android.widget.FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 			ViewGroup.LayoutParams.WRAP_CONTENT));
 		for (int i = 0; i < labels.length; i++) {
@@ -295,6 +296,9 @@ public abstract class ScreenFragment extends Fragment {
 			b.setMinWidth(0);
 			b.setMinHeight(dp(44));
 			b.setMaxLines(1);
+			b.setGravity(android.view.Gravity.CENTER);
+			androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(b, 10, 14, 1,
+				android.util.TypedValue.COMPLEX_UNIT_SP);
 			b.setPadding(dp(4), 0, dp(4), 0);
 			b.setInsetTop(0);
 			b.setInsetBottom(0);
