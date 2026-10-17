@@ -33,6 +33,13 @@ public final class GoogleAccountGateway implements AccountGateway, GoogleTokenSo
 		int resource = app.getResources().getIdentifier("default_web_client_id", "string", app.getPackageName());
 		webClientId = resource == 0 ? "" : app.getString(resource);
 		FirebaseApp firebase = FirebaseApp.initializeApp(app);
+		// App Check antes de cualquier llamada a Firebase: prueba que las peticiones vienen de esta app.
+		if (firebase != null)
+			try {
+				AppCheckSetup.install(firebase);
+			} catch (RuntimeException unavailable) {
+				// Sin servicios de Google Play la app sigue funcionando; Firebase decide si acepta la petición.
+			}
 		auth = firebase == null || webClientId.isEmpty() ? null : FirebaseAuth.getInstance(firebase);
 	}
 
