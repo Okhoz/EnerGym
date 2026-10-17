@@ -12,10 +12,10 @@ plugins {
 }
 
 // Las entradas privadas de release se suministran fuera del repositorio, nunca como -Pcontraseña.
-val releaseFirebasePath = providers.environmentVariable("ENERGYM_FIREBASE_CONFIG").orElse("").get()
-val releaseBackendUrl = providers.environmentVariable("ENERGYM_BACKEND_URL").orElse("").get()
+val releaseFirebasePath = providers.environmentVariable("ENERGYM_FIREBASE_CONFIG").orElse(providers.gradleProperty("ENERGYM_FIREBASE_CONFIG")).orElse("").get()
+val releaseBackendUrl = providers.environmentVariable("ENERGYM_BACKEND_URL").orElse(providers.gradleProperty("ENERGYM_BACKEND_URL")).orElse("").get()
 val debugBackendUrl = releaseBackendUrl.trim().removeSuffix("/")
-val releaseSigningPath = providers.environmentVariable("ENERGYM_RELEASE_SIGNING_PROPERTIES").orElse("").get()
+val releaseSigningPath = providers.environmentVariable("ENERGYM_RELEASE_SIGNING_PROPERTIES").orElse(providers.gradleProperty("ENERGYM_RELEASE_SIGNING_PROPERTIES")).orElse("").get()
 val releaseFirebaseFile = releaseFirebasePath.takeIf { it.isNotBlank() }?.let { File(it) }
 val releaseSigningFile = releaseSigningPath.takeIf { it.isNotBlank() }?.let { File(it) }
 val releaseSigning = Properties().apply {
