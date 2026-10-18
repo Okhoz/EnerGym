@@ -1747,5 +1747,15 @@
 	<string name="guide_pf_subtitle">Cuéntanos cómo quieres entrenar para que tus rutinas se ajusten a ti. Después, tus datos físicos.</string>
 	<string name="guide_body_eyebrow">PRIMEROS PASOS · 2 DE 2</string>
 	<string name="guide_body_subtitle">Último paso: con estos datos calculamos tus calorías y macros diarios. Al guardar, ya puedes empezar.</string>
+	<string name="menu_language">Idioma</string>
+	<string name="language_system">Idioma del móvil</string>
+	<!-- Entrenador IA -->
+	<string name="tp_notice">Rutina creada por la IA de tu móvil, sin enviar datos a ningún servidor. Es un ejemplo sin revisión profesional: adapta la intensidad y para si notas dolor.</string>
+	<string name="tp_here_is_routine">Aquí tienes tu entrenamiento de hoy. Revísalo antes de aceptarlo.</string>
+	<string name="tp_no_answer">No he podido preparar una respuesta. ¿Puedes repetírmelo con otras palabras?</string>
+	<string name="tp_fits">Encaja con tu disciplina, objetivo, lugar y material.</string>
+	<string name="tp_title">Entrenamiento de tu entrenador</string>
+	<string name="pc_device_too_long">Tu mensaje y tus datos no caben de una vez en la IA del móvil. Prueba a dividirlo en mensajes más cortos.</string>
+	<string name="as_new_routine_message">Hazme una rutina para hoy</string>
 </resources>
 

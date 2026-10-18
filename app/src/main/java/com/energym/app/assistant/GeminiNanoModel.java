@@ -88,6 +88,22 @@ public final class GeminiNanoModel implements OnDeviceModel {
 		return response.getCandidates().get(0).getText();
 	}
 
+	/** Solo «ocupado» o «cuota» invitan a esperar; un prompt demasiado largo o un fallo no se arreglan esperando. */
+	static String code(Throwable cause) {
+		if (!(cause instanceof GenAiException))
+			return "MODEL_FAILED";
+		switch (((GenAiException) cause).getErrorCode()) {
+			case GenAiException.ErrorCode.BUSY:
+			case GenAiException.ErrorCode.PER_APP_BATTERY_USE_QUOTA_EXCEEDED:
+			case GenAiException.ErrorCode.BACKGROUND_USE_BLOCKED:
+				return "MODEL_BUSY_OR_QUOTA";
+			case GenAiException.ErrorCode.REQUEST_TOO_LARGE:
+				return "MODEL_TOO_LONG";
+			default:
+				return "MODEL_FAILED";
+		}
+	}
+
 	private interface Mapper<A, B> {
 		B map(A value);
 	}
@@ -98,7 +114,7 @@ public final class GeminiNanoModel implements OnDeviceModel {
 			try {
 				value = mapper.map(future.get());
 			} catch (ExecutionException e) {
-				result.failure(e.getCause() instanceof GenAiException ? "MODEL_BUSY_OR_QUOTA" : "MODEL_FAILED");
+				result.failure(code(e.getCause()));
 				return;
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();

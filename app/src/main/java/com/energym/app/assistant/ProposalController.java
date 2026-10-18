@@ -319,7 +319,8 @@ public final class ProposalController {
 		}
 		if (busy)
 			return false;
-		if (text == null || text.trim().isEmpty() || text.length() > 2000) {
+		// Sin límite de longitud: el entrenador recibe el mensaje entero o, si es enorme, su principio y su final.
+		if (text == null || text.trim().isEmpty()) {
 			status = Txt.t(R.string.pc_message_length);
 			changed.run();
 			return false;
@@ -470,7 +471,8 @@ public final class ProposalController {
 		return Normalizer.normalize(text.toLowerCase(Locale.ROOT), Normalizer.Form.NFD).replaceAll("\\p{M}", "");
 	}
 
-	private static final Pattern PLANNING_WORDS = Pattern.compile("\\b(?:rutinas?|plan(?:es)?|entrenamientos?)\\b");
+	private static final Pattern PLANNING_WORDS = Pattern.compile(
+		"\\b(?:rutinas?|plan(?:es)?|entrenamientos?|routines?|workouts?)\\b");
 
 	private static boolean planningIntent(String text) {
 		return PLANNING_WORDS.matcher(text).find();
@@ -499,6 +501,10 @@ public final class ProposalController {
 		boolean request = Pattern.compile("\\b(?:prepar[ae]\\w*|cre[ae]\\w*|haz\\w*|haces?|disen[ae]\\w*|" +
 			"gener[ae]\\w*|ajust[ae]\\w*|modifi[qc]\\w*|quiero|necesito|dame|recomiend[ae]\\w*|propon\\w*|elabor[ae]\\w*)\\s+" +
 			planObject).matcher(text).find();
+		// En inglés: «make me a routine», «give me a workout plan», «I want a new workout»…
+		request |= Pattern.compile("\\b(?:make|create|build|give|prepare|design|plan|suggest|want|need)\\s+" +
+			"(?:(?:me|a|an|my|new|another|the|this|today'?s?|workout)\\s+){0,4}(?:routines?|workouts?|plan)\\b")
+			.matcher(text).find();
 		request |= Pattern.compile("\\b(?:puedes|podrias)\\s+(?:hacer(?:me)?|preparar(?:me)?|crear(?:me)?|darme|" +
 			"proponer(?:me)?|disenar(?:me)?)\\s+" + planObject).matcher(text).find();
 		request |= Pattern.compile("^\\s*(?:un\\s+|una\\s+)?(?:plan|rutina)\\s+para\\s+mi\\b").matcher(text).find();
@@ -1001,7 +1007,9 @@ public final class ProposalController {
 				proposed = missing().isEmpty() ? build() : null;
 				data = proposed == null ? partial : ChatProtocol.profile(proposed);
 			} else {
-				proposed = null;
+				// Con la IA del móvil el perfil guardado viaja también en la conversación: si pide una rutina con
+				// otras palabras («¿qué hago hoy?», en inglés…), el entrenador puede preparársela.
+				proposed = client.onDevice() ? observed : null;
 				data = conversationalProfile(observed);
 			}
 		} catch (RuntimeException e) {
@@ -1026,6 +1034,7 @@ public final class ProposalController {
 			exercise == null ? null : exercise.getId(), text.trim(), proposed, data, consent, h, recent);
 		if (client.onDevice())
 			request.training = training.get();
+		request.conversation = !planning;
 		add("user", text.trim());
 		persist();
 		pendingHistory = consent;
@@ -1079,8 +1088,8 @@ public final class ProposalController {
 				if (code.equals("PROVIDER_NOT_CONFIGURED"))
 					remoteDisabled = true;
 				if (client.onDevice()) {
-					status = code.equals("MODEL_BUSY_OR_QUOTA") ?
-						Txt.t(R.string.pc_device_busy) : Txt.t(R.string.pc_device_failed);
+					status = code.equals("MODEL_BUSY_OR_QUOTA") ? Txt.t(R.string.pc_device_busy) :
+						code.equals("MODEL_TOO_LONG") ? Txt.t(R.string.pc_device_too_long) : Txt.t(R.string.pc_device_failed);
 					changed.run();
 					return;
 				}

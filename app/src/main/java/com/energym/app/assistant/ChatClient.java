@@ -22,6 +22,11 @@ public interface ChatClient {
 		 * Resumen del entrenamiento (rutina, sesiones, progresión) solo para el modelo del móvil; no se serializa.
 		 */
 		public String training = "";
+		/**
+		 * Turno de conversación (no se ha pedido una rutina): el perfil viaja solo para poder preparar una si el
+		 * cliente la pide con otras palabras; nunca se arma una rutina a partir de ejercicios citados en la charla.
+		 */
+		public boolean conversation;
 
 		public Request(String conversation, String request, String exercise, String message, TrainingProfile profile,
 			boolean consent, List<ConversationStore.Message> history) {

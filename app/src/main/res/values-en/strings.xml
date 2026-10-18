@@ -1719,4 +1719,14 @@
 	<string name="guide_pf_subtitle">Tell us how you want to train so your routines fit you. Then, your body details.</string>
 	<string name="guide_body_eyebrow">FIRST STEPS · 2 OF 2</string>
 	<string name="guide_body_subtitle">Last step: with these details we calculate your daily calories and macros. Once saved, you are ready to go.</string>
+	<string name="menu_language">Language</string>
+	<string name="language_system">Phone language</string>
+	<!-- Entrenador IA -->
+	<string name="tp_notice">Routine created by your phone\'s AI, without sending data to any server. It\'s an example without professional review: adapt the intensity and stop if you feel pain.</string>
+	<string name="tp_here_is_routine">Here\'s your workout for today. Review it before accepting.</string>
+	<string name="tp_no_answer">I couldn\'t prepare an answer. Could you say it in other words?</string>
+	<string name="tp_fits">It fits your discipline, goal, place and equipment.</string>
+	<string name="tp_title">Your trainer\'s workout</string>
+	<string name="pc_device_too_long">Your message and data don\'t fit in the phone\'s AI at once. Try splitting it into shorter messages.</string>
+	<string name="as_new_routine_message">Make me a routine for today</string>
 </resources>

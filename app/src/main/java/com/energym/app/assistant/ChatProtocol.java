@@ -51,7 +51,8 @@ public final class ChatProtocol {
 		m.put("conversationId", r.conversationId);
 		m.put("requestId", r.requestId);
 		m.put("exerciseId", r.exerciseId);
-		m.put("message", r.message);
+		// El servidor opcional admite hasta 2000 caracteres; el chat no limita lo que se escribe.
+		m.put("message", r.message.length() <= 2000 ? r.message : r.message.substring(0, 2000));
 		m.put("profile", r.profileData);
 		m.put("historyConsent", r.historyConsent);
 		List<Object> h = new ArrayList<>();

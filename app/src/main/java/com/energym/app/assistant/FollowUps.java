@@ -26,19 +26,21 @@ public final class FollowUps {
 	public static List<Topic> suggest(String user, String reply, boolean routine) {
 		String u = normalize(user), r = normalize(reply), all = u + " " + r;
 		LinkedHashSet<Topic> result = new LinkedHashSet<>();
-		if (has(all, "dolor", "molest", "lesion", "duele"))
+		if (has(all, "dolor", "molest", "lesion", "duele", "pain", "hurt", "injur"))
 			add(result, Topic.ALTERNATIVE, Topic.REST);
-		if (routine || has(all, "rutina", "entreno de hoy", "sesion", "calient", "calent"))
+		if (routine || has(all, "rutina", "entreno de hoy", "sesion", "calient", "calent", "routine", "workout",
+			"session", "warm"))
 			add(result, Topic.WARMUP, Topic.ALTERNATIVE);
-		if (has(all, "estanc", "descarga", "no avanzo", "no mejoro"))
+		if (has(all, "estanc", "descarga", "no avanzo", "no mejoro", "plateau", "deload", "stall", "stuck"))
 			add(result, Topic.DELOAD, Topic.TECHNIQUE);
-		if (has(all, "kg", "peso", "carga", "rpe", "subir", "progres"))
+		if (has(all, "kg", "peso", "carga", "rpe", "subir", "progres", "weight", "load", "increase"))
 			add(result, Topic.PROGRESSION, Topic.DELOAD);
-		if (has(all, "tecnica", "postura", "espalda", "rodilla", "ejecucion"))
+		if (has(all, "tecnica", "postura", "espalda", "rodilla", "ejecucion", "technique", "form", "posture", "knee"))
 			add(result, Topic.TECHNIQUE, Topic.ALTERNATIVE);
-		if (has(all, "comida", "comer", "proteina", "dieta", "kcal", "caloria", "nutri"))
+		if (has(all, "comida", "comer", "proteina", "dieta", "kcal", "caloria", "nutri", "food", "eat", "protein",
+			"diet", "calorie"))
 			add(result, Topic.NUTRITION, Topic.REST);
-		if (has(all, "descans", "dormir", "sueno", "cansad", "agujetas"))
+		if (has(all, "descans", "dormir", "sueno", "cansad", "agujetas", "sleep", "tired", "sore", "rest day"))
 			add(result, Topic.REST, Topic.MOTIVATION);
 		add(result, Topic.ROUTINE_TODAY, Topic.PROGRESSION, Topic.MOTIVATION);
 		// No sugerir justo lo que acaba de preguntar: la respuesta ya está arriba.
@@ -52,17 +54,17 @@ public final class FollowUps {
 	}
 
 	private static Topic asked(String user) {
-		if (has(user, "rutina", "que hago hoy", "entreno de hoy"))
+		if (has(user, "rutina", "que hago hoy", "entreno de hoy", "routine", "workout for today", "what should i do"))
 			return Topic.ROUTINE_TODAY;
-		if (has(user, "subo", "subir peso", "progres"))
+		if (has(user, "subo", "subir peso", "progres", "increase", "add weight"))
 			return Topic.PROGRESSION;
-		if (has(user, "calent", "calient"))
+		if (has(user, "calent", "calient", "warm"))
 			return Topic.WARMUP;
-		if (has(user, "descarga"))
+		if (has(user, "descarga", "deload"))
 			return Topic.DELOAD;
-		if (has(user, "tecnica"))
+		if (has(user, "tecnica", "technique", "form"))
 			return Topic.TECHNIQUE;
-		if (has(user, "comer", "dieta", "proteina"))
+		if (has(user, "comer", "dieta", "proteina", "eat", "diet", "protein"))
 			return Topic.NUTRITION;
 		return null;
 	}
