@@ -1621,5 +1621,49 @@
 	<string name="pc_paired">Servidor de IA emparejado. El chat responderá con IA.</string>
 	<string name="pc_pair_failed">No se conectó: %1$s. El chat seguirá con el asistente guiado local.</string>
 	<string name="pc_disconnected">Servidor desconectado y revocación solicitada. El chat sigue con el asistente guiado local.</string>
+	<!-- Tarjeta de rutina del chat -->
+	<plurals name="card_exercises">
+		<item quantity="one">%1$d ejercicio</item>
+		<item quantity="many">%1$d ejercicios</item>
+		<item quantity="other">%1$d ejercicios</item>
+	</plurals>
+	<string name="card_accept_reject">✅ «Aceptar» la guarda en Entreno · «Rechazar» para pedir otra.</string>
+	<string name="card_not_reviewed">ℹ️ Ejemplo sin revisión profesional.</string>
+	<string name="card_side">lado %1$s</string>
+	<string name="card_in_blocks">en %1$s bloques</string>
+	<string name="card_blocks">%1$s bloques × %2$s min</string>
+	<!-- Planificador -->
+	<string name="rp_no_exercises">No hay ejercicios compatibles con este objetivo, entorno, recursos y cobertura. Ajusta el perfil; el contenido especializado puede estar pendiente de validación.</string>
+	<string name="rp_local_rules">Propuesta local por reglas. Ejemplos sin revisión profesional; adapta la intensidad a tu situación. No utiliza modelos de IA ni requiere conexión. La duración estimada incluye descansos y transiciones.</string>
+	<string name="rp_title">Propuesta de entrenamiento</string>
+	<string name="rp_no_exercises_for">No hay ejercicios de %1$s compatibles con tu perfil (objetivo, lugar y material). Pide otra zona o cambia tu objetivo o material en Perfil.</string>
+	<string name="rp_that_type">ese tipo</string>
+	<string name="rp_local_rules_request">Propuesta local por reglas según lo que has pedido. Ejemplos sin revisión profesional; adapta la intensidad a tu situación. No utiliza modelos de IA ni requiere conexión. La duración estimada incluye descansos y transiciones.</string>
+	<string name="rq_upper_body">Tren superior</string>
+	<string name="rq_and">%1$s y %2$s</string>
+	<string name="rq_easy">suave</string>
+	<string name="rq_hard">intensa</string>
+	<!-- Recursos 3D -->
+	<string name="rm_schematic">Animación esquemática</string>
+	<string name="rm_capture">Captura de movimiento CC0</string>
+	<string name="rm_capture_similar">Captura CC0 de un gesto similar</string>
+	<string name="rm_schematic_body">Animación esquemática generada a partir del patrón de movimiento, con material simplificado. Es orientativa y no está revisada por un profesional.</string>
+	<string name="rm_capture_body">Captura de movimiento con licencia CC0. Referencia técnica sin revisión profesional.</string>
+	<string name="rm_capture_similar_body">Captura de movimiento CC0 de un gesto similar realizado en el sitio. Orientativa y sin revisión profesional.</string>
+	<string name="nr_unavailable">El visor nativo no está disponible en este dispositivo.</string>
+	<string name="nr_surface_failed">No se pudo preparar la superficie del visor.</string>
+	<string name="nr_resize_failed">No se pudo ajustar la superficie del visor.</string>
+	<!-- Dieta del mes -->
+	<string name="dp_over">%1$d kcal porque los últimos días te pasaste</string>
+	<string name="dp_under">%1$d kcal porque los últimos días te quedaste corto</string>
+	<string name="dp_daily_budget">≈ %1$.2f € para este día con lo que queda del mes</string>
+	<string name="dp_banned_food">La IA propuso un alimento que evitas; te dejo un menú base seguro.</string>
+	<string name="dp_kcal_mismatch">El menú de la IA no cuadraba con tus calorías; te dejo un menú base con tus datos.</string>
+	<string name="dp_over_budget">El menú de la IA superaba tu presupuesto; te dejo un menú económico con tus datos.</string>
+	<string name="dp_invalid">La IA no devolvió un menú válido; te dejo un menú base con tus datos.</string>
+	<string name="dp_not_ready">La IA del móvil aún no está lista; te dejo un menú base con tus datos.</string>
+	<string name="dp_budget_short">Con el presupuesto que queda no llega para todo: este es el menú más económico que cuadra con tus calorías.</string>
+	<string name="label_health_privacy">EnerGym y Health Connect</string>
+	<string name="label_widget">EnerGym · Tu día</string>
 </resources>
 

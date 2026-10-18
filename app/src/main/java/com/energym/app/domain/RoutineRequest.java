@@ -263,19 +263,21 @@ public final class RoutineRequest {
 	public String title() {
 		String base;
 		if (areas.containsAll(UPPER) && Collections.disjoint(areas, LOWER))
-			base = "Tren superior";
+			base = Txt.t(R.string.rq_upper_body);
 		else if (areas.size() >= 4)
-			base = "Cuerpo completo";
+			base = Txt.t(R.string.df_cuerpo_completo);
 		else {
 			List<String> names = new ArrayList<>();
 			for (Area a : areas)
-				names.add(a.label);
-			base = names.isEmpty() ? "" : join(names);
+				names.add(a.display());
+			base = names.isEmpty() ? "" : names.size() == 1 ? names.get(0) :
+				Txt.t(R.string.rq_and, String.join(", ", names.subList(0, names.size() - 1)), names.get(names.size() - 1));
 		}
 		if (base.isEmpty())
 			return "";
 		base = Character.toUpperCase(base.charAt(0)) + base.substring(1);
-		return base + (intensity == Intensity.EASY ? " · suave" : intensity == Intensity.HARD ? " · intensa" : "");
+		return base + (intensity == Intensity.EASY ? " · " + Txt.t(R.string.rq_easy) :
+			intensity == Intensity.HARD ? " · " + Txt.t(R.string.rq_hard) : "");
 	}
 
 	/** Resumen para el prompt del entrenador; vacío si la petición no concreta nada. */

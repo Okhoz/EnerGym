@@ -1,5 +1,7 @@
 package com.energym.app.assistant;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import com.energym.app.domain.*;
 
 import java.util.Map;
@@ -14,14 +16,14 @@ public final class RoutineCard {
 
 	public static String text(Routine routine) {
 		StringBuilder s = new StringBuilder("📋 ").append(routine.getTitle()).append("\n⏱️ ")
-			.append(routine.getEstimatedMinutes()).append(" min · ").append(routine.getItems().size())
-			.append(routine.getItems().size() == 1 ? " ejercicio" : " ejercicios").append('\n');
+			.append(routine.getEstimatedMinutes()).append(" min · ")
+			.append(Txt.n(R.plurals.card_exercises, routine.getItems().size())).append('\n');
 		for (RoutineItem item : routine.getItems())
 			s.append('\n').append(icon(item.getExercise().getMetricType())).append(' ')
 				.append(item.getExercise().getName()).append("\n      ")
 				.append(dose(item.getExercise().getMetricType(), item.getPrescription())).append('\n');
-		return s.append("\n✅ «Aceptar» la guarda en Entreno · «Rechazar» para pedir otra.\n")
-			.append("ℹ️ Ejemplo sin revisión profesional.").toString();
+		return s.append('\n').append(Txt.t(R.string.card_accept_reject)).append('\n')
+			.append(Txt.t(R.string.card_not_reviewed)).toString();
 	}
 
 	static String icon(MetricType type) {
@@ -56,20 +58,20 @@ public final class RoutineCard {
 			case MOBILITY:
 				s.append(p.get("repetitions")).append(" × ").append(p.get("durationSeconds")).append(" s");
 				if (p.containsKey("side") && !"ambos".equals(p.get("side")))
-					s.append(" · lado ").append(p.get("side"));
+					s.append(" · ").append(Txt.t(R.string.card_side, MetricValidator.choiceLabel(p.get("side"))));
 				break;
 			case ENDURANCE:
 				s.append(p.get("timeMinutes")).append(" min");
 				if (positive(p.get("distanceKm")))
 					s.append(" · ").append(p.get("distanceKm")).append(" km");
 				if (p.containsKey("intervals") && !"1".equals(p.get("intervals")))
-					s.append(" en ").append(p.get("intervals")).append(" bloques");
+					s.append(' ').append(Txt.t(R.string.card_in_blocks, p.get("intervals")));
 				break;
 			default:
-				s.append(p.get("blocks")).append(" bloques × ").append(p.get("durationMinutes")).append(" min");
+				s.append(Txt.t(R.string.card_blocks, p.get("blocks"), p.get("durationMinutes")));
 		}
 		if (positive(p.get("restSeconds")))
-			s.append(" · descanso ").append(p.get("restSeconds")).append(" s");
+			s.append(" · ").append(Txt.t(R.string.ses_rest_seconds, p.get("restSeconds")));
 		return s.toString();
 	}
 

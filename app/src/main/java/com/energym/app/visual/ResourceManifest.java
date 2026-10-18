@@ -1,5 +1,7 @@
 package com.energym.app.visual;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.*;
@@ -70,18 +72,16 @@ public final class ResourceManifest {
 	 */
 	public String label() {
 		if (kind == Kind.SCHEMATIC)
-			return "Animación esquemática";
-		return "EXACT".equals(match) ? "Captura de movimiento CC0" : "Captura CC0 de un gesto similar";
+			return Txt.t(R.string.rm_schematic);
+		return Txt.t("EXACT".equals(match) ? R.string.rm_capture : R.string.rm_capture_similar);
 	}
 
 	public String explanation() {
 		if (kind == Kind.SCHEMATIC)
-			return "Animación esquemática generada a partir del patrón de movimiento, con material simplificado. " +
-				"Es orientativa y no está revisada por un profesional.";
+			return Txt.t(R.string.rm_schematic_body);
 		if ("EXACT".equals(match))
-			return "Captura de movimiento con licencia CC0. Referencia técnica sin revisión profesional.";
-		return "Captura de movimiento CC0 de un gesto similar realizado en el sitio. Orientativa y sin revisión " +
-			"profesional.";
+			return Txt.t(R.string.rm_capture_body);
+		return Txt.t(R.string.rm_capture_similar_body);
 	}
 
 	/**

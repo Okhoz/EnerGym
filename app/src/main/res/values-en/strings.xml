@@ -1595,4 +1595,47 @@
 	<string name="pc_paired">AI server paired. The chat will answer with AI.</string>
 	<string name="pc_pair_failed">Not connected: %1$s. The chat will continue with the local guided assistant.</string>
 	<string name="pc_disconnected">Server disconnected and revocation requested. The chat continues with the local guided assistant.</string>
+	<!-- Tarjeta de rutina del chat -->
+	<plurals name="card_exercises">
+		<item quantity="one">%1$d exercise</item>
+		<item quantity="other">%1$d exercises</item>
+	</plurals>
+	<string name="card_accept_reject">✅ “Accept” saves it in Workout · “Reject” to ask for another.</string>
+	<string name="card_not_reviewed">ℹ️ Example without professional review.</string>
+	<string name="card_side">side %1$s</string>
+	<string name="card_in_blocks">in %1$s blocks</string>
+	<string name="card_blocks">%1$s blocks × %2$s min</string>
+	<!-- Planificador -->
+	<string name="rp_no_exercises">There are no exercises compatible with this goal, environment, equipment and coverage. Adjust the profile; specialised content may be pending validation.</string>
+	<string name="rp_local_rules">Local rule-based proposal. Examples without professional review; adapt the intensity to your situation. It uses no AI models and needs no connection. The estimated duration includes rests and transitions.</string>
+	<string name="rp_title">Training proposal</string>
+	<string name="rp_no_exercises_for">There are no %1$s exercises compatible with your profile (goal, place and equipment). Ask for another area or change your goal or equipment in Profile.</string>
+	<string name="rp_that_type">that type</string>
+	<string name="rp_local_rules_request">Local rule-based proposal based on what you asked. Examples without professional review; adapt the intensity to your situation. It uses no AI models and needs no connection. The estimated duration includes rests and transitions.</string>
+	<string name="rq_upper_body">Upper body</string>
+	<string name="rq_and">%1$s and %2$s</string>
+	<string name="rq_easy">easy</string>
+	<string name="rq_hard">hard</string>
+	<!-- Recursos 3D -->
+	<string name="rm_schematic">Schematic animation</string>
+	<string name="rm_capture">CC0 motion capture</string>
+	<string name="rm_capture_similar">CC0 capture of a similar movement</string>
+	<string name="rm_schematic_body">Schematic animation generated from the movement pattern, with simplified equipment. It\'s for guidance and not reviewed by a professional.</string>
+	<string name="rm_capture_body">CC0-licensed motion capture. Technical reference without professional review.</string>
+	<string name="rm_capture_similar_body">CC0 motion capture of a similar movement done on the spot. For guidance, without professional review.</string>
+	<string name="nr_unavailable">The native viewer isn\'t available on this device.</string>
+	<string name="nr_surface_failed">The viewer surface couldn\'t be prepared.</string>
+	<string name="nr_resize_failed">The viewer surface couldn\'t be resized.</string>
+	<!-- Dieta del mes -->
+	<string name="dp_over">%1$d kcal because you went over in recent days</string>
+	<string name="dp_under">%1$d kcal because you fell short in recent days</string>
+	<string name="dp_daily_budget">≈ %1$.2f € for this day with what\'s left of the month</string>
+	<string name="dp_banned_food">The AI suggested a food you avoid; here\'s a safe base menu instead.</string>
+	<string name="dp_kcal_mismatch">The AI\'s menu didn\'t fit your calories; here\'s a base menu from your details.</string>
+	<string name="dp_over_budget">The AI\'s menu was over your budget; here\'s an economical menu from your details.</string>
+	<string name="dp_invalid">The AI didn\'t return a valid menu; here\'s a base menu from your details.</string>
+	<string name="dp_not_ready">The phone\'s AI isn\'t ready yet; here\'s a base menu from your details.</string>
+	<string name="dp_budget_short">The remaining budget doesn\'t cover everything: this is the most economical menu that fits your calories.</string>
+	<string name="label_health_privacy">EnerGym and Health Connect</string>
+	<string name="label_widget">EnerGym · Your day</string>
 </resources>

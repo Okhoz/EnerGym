@@ -1,5 +1,7 @@
 package com.energym.app.visual;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
@@ -230,7 +232,7 @@ public final class NativeAnimationRenderer implements UiHelper.RendererCallback,
 		} catch (RuntimeException | LinkageError e) {
 			pause();
 			Log.e("EnerGymViewer", "Fallo del renderizador", e);
-			listener.failure("El visor nativo no está disponible en este dispositivo.");
+			listener.failure(Txt.t(R.string.nr_unavailable));
 		}
 	}
 
@@ -250,7 +252,7 @@ public final class NativeAnimationRenderer implements UiHelper.RendererCallback,
 		} catch (RuntimeException | LinkageError e) {
 			pause();
 			Log.e("EnerGymViewer", "Superficie no disponible", e);
-			listener.failure("No se pudo preparar la superficie del visor.");
+			listener.failure(Txt.t(R.string.nr_surface_failed));
 		}
 	}
 
@@ -281,7 +283,7 @@ public final class NativeAnimationRenderer implements UiHelper.RendererCallback,
 		} catch (RuntimeException | LinkageError e) {
 			pause();
 			Log.e("EnerGymViewer", "Cambio de superficie fallido", e);
-			listener.failure("No se pudo ajustar la superficie del visor.");
+			listener.failure(Txt.t(R.string.nr_resize_failed));
 		}
 	}
 
