@@ -459,6 +459,9 @@ public final class HistoryFragment extends ScreenFragment {
 		if (n != null && n.historyCalories(selected) > 0)
 			detail.append("\nComida: ").append(Math.round(n.historyCalories(selected))).append(" kcal");
 		text(calendar, detail.toString(), R.style.EnerGym_Body, 12);
+		for (Session session : that)
+			action(calendar, getString(R.string.share_history_button, session.getRoutine().getTitle()), true, () ->
+				ShareCard.share(requireContext(), com.energym.app.progress.ShareSummary.of(session, app.history)));
 		long scope = app.accountRevision();
 		for (Session session : that)
 			action(calendar, "Eliminar sesión: " + session.getRoutine().getTitle(), !app.trainingMutation, () ->

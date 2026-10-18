@@ -63,7 +63,17 @@ public final class SessionFragment extends ScreenFragment {
 			return;
 		}
 		if (app.sessions.session.getStatus() == Session.Status.FINISHED) {
-			card("Entreno terminado", "Lo tienes en Progreso.");
+			Session ended = app.sessions.session;
+			com.energym.app.progress.ShareSummary summary =
+				com.energym.app.progress.ShareSummary.of(ended, app.history);
+			List<String> records = summary.records();
+			LinearLayout done = card(getString(R.string.share_finished_title), records.isEmpty() ?
+				getString(R.string.share_finished_detail) :
+				getString(R.string.share_finished_record, String.join(", ", records)));
+			com.google.android.material.button.MaterialButton share = action(done, getString(records.isEmpty() ?
+				R.string.share_button : R.string.share_record_button), true, () -> ShareCard.share(requireContext(), summary));
+			share.setTag("session_share");
+			primary(share);
 			return;
 		}
 		List<String> ids = new ArrayList<>(), names = new ArrayList<>();

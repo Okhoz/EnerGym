@@ -76,5 +76,27 @@
 	<string name="overload_deload">📉 Sugerencia: %1$d sesiones sin mejorar con %2$s. Descarga a %3$s × %4$d y vuelve a subir.</string>
 	<string name="overload_use">Usar %1$s × %2$d</string>
 	<string name="overload_use_reps">Usar %1$d repeticiones</string>
+	<!-- Compartir entreno -->
+	<string name="share_button">📤 Compartir entreno</string>
+	<string name="share_record_button">🏆 Compartir récord</string>
+	<string name="share_chooser">Compartir entreno</string>
+	<string name="share_error">No se pudo preparar la imagen para compartir</string>
+	<string name="share_brand">ENERGYM</string>
+	<string name="share_minutes">%d min</string>
+	<string name="share_label_duration">Duración</string>
+	<string name="share_label_volume">Volumen</string>
+	<string name="share_label_exercises">Ejercicios</string>
+	<string name="share_record_title">🏆 ¡Nuevo récord personal!</string>
+	<string name="share_sets_kg">%1$d × %2$d · %3$s kg</string>
+	<string name="share_sets_bodyweight">%1$d × %2$d · peso corporal</string>
+	<string name="share_km">%s km</string>
+	<string name="share_more">y %d ejercicios más</string>
+	<string name="share_footer">Entrenado con EnerGym</string>
+	<string name="share_text">He terminado «%1$s» en EnerGym: %2$d min y %3$s de volumen.</string>
+	<string name="share_text_records">¡Nuevo récord en %s! 🏆</string>
+	<string name="share_finished_title">Entreno terminado</string>
+	<string name="share_finished_detail">Lo tienes en Progreso. Comparte tu tarjeta del entreno.</string>
+	<string name="share_finished_record">🏆 ¡Récord personal en %s!</string>
+	<string name="share_history_button">📤 Compartir: %s</string>
 </resources>
 
