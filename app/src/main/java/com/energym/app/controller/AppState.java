@@ -1,5 +1,7 @@
 package com.energym.app.controller;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import android.app.Application;
 import android.net.*;
 
@@ -97,7 +99,7 @@ public final class AppState extends AndroidViewModel {
 				});
 			} catch (Exception e) {
 				main.execute(() -> {
-					fatal = "No se pudo leer el catálogo: " + e.getMessage();
+					fatal = Txt.t(R.string.st_catalog_failed, e.getMessage());
 					changed();
 				});
 			}
@@ -242,13 +244,11 @@ public final class AppState extends AndroidViewModel {
 		assistant.weeklyPlan(asked -> {
 			app.createPlan(asked);
 			if (app.planPreview.isEmpty())
-				return "No he podido preparar el plan: revisa en Perfil tus días por semana, lugar y material.";
+				return Txt.t(R.string.st_plan_failed);
 			java.util.List<String> days = new java.util.ArrayList<>();
 			for (com.energym.app.domain.Routine r : app.planPreview)
-				days.add("• " + r.getTitle() + " (" + r.getItems().size() + " ejercicios)");
-			return "📅 Te he preparado un plan de " + app.planPreview.size() + " días:\n" + String.join("\n", days) +
-				"\n\nRevísalo y pulsa «Guardar plan». Al terminar cada día te dejo listo el siguiente y subo las " +
-				"cargas cuando cumplas el objetivo. 💪";
+				days.add("• " + r.getTitle() + " (" + Txt.t(R.string.st_exercises_count, r.getItems().size()) + ")");
+			return Txt.t(R.string.st_plan_ready, app.planPreview.size(), String.join("\n", days));
 		});
 		// El entrenador ve todo lo que la persona ha hecho en la app (solo en el móvil, nunca en la red).
 		assistant.trainingContext(() -> AssistantContext.build(app, nutrition, goals, diet, java.time.LocalDate.now(), water,
@@ -276,7 +276,7 @@ public final class AppState extends AndroidViewModel {
 			if (!visualization.assistant(command.snapshot, assistant.exercise, command.conversationId,
 				command.requestId, command.originRevision)) {
 				assistant.status =
-					"Esta referencia no está disponible en el contexto actual. Consulta la explicación escrita del ejercicio seleccionado.";
+					Txt.t(R.string.st_reference_unavailable);
 			}
 		});
 		app.explanations((exercise, profile) -> {
@@ -308,7 +308,7 @@ public final class AppState extends AndroidViewModel {
 			else if (status != AccountController.Status.ERROR)
 				app.activate(null);
 			if (error != null)
-				app.error("Cuenta: " + error.getMessage());
+				app.error(Txt.t(R.string.st_account_error, error.getMessage()));
 			changed();
 		});
 		accounts.start();
@@ -356,7 +356,7 @@ public final class AppState extends AndroidViewModel {
 		java.time.LocalDate today = java.time.LocalDate.now();
 		String training, food, drink;
 		if (app.owner() == null) {
-			training = "Entra en EnerGym para empezar";
+			training = Txt.t(R.string.st_widget_sign_in);
 			food = "";
 			drink = "";
 		} else {
@@ -366,24 +366,24 @@ public final class AppState extends AndroidViewModel {
 				if (s.getStatus() == com.energym.app.domain.Session.Status.FINISHED && java.time.Instant
 					.ofEpochMilli(s.getCompletedAt()).atZone(java.time.ZoneId.systemDefault()).toLocalDate().equals(today))
 					trained = true;
-			training = trained ? "✓ Entreno de hoy hecho" : next.isEmpty() ? "🏋️ Crea tu rutina en Entreno" : "🏋️ " + next;
+			training = trained ? Txt.t(R.string.st_widget_done) : next.isEmpty() ? Txt.t(R.string.st_widget_create) : "🏋️ " + next;
 			double kcal = nutrition.totals(today)[0];
 			com.energym.app.nutrition.BodyProfile.Targets targets = nutrition.targets();
 			food = "🍽 " + Math.round(kcal) + (targets == null ? "" : " / " + Math.round(targets.kcal)) + " kcal";
-			drink = "💧 " + com.energym.app.nutrition.WaterLog.liters(water.ml(today)) + " de " +
-				com.energym.app.nutrition.WaterLog.liters(com.energym.app.nutrition.WaterLog.goal(nutrition.effectiveBody()));
+			drink = Txt.t(R.string.st_widget_water, com.energym.app.nutrition.WaterLog.liters(water.ml(today)),
+				com.energym.app.nutrition.WaterLog.liters(com.energym.app.nutrition.WaterLog.goal(nutrition.effectiveBody())));
 		}
 		com.energym.app.widget.TodayWidget.publish(getApplication(), training, food, drink);
 	}
 
 	public String accountText() {
 		if (accountStatus == AccountController.Status.DEMO_LOCAL)
-			return "Demo · solo en este dispositivo";
+			return Txt.t(R.string.st_demo);
 		if (user != null)
 			return "Google · " + (user.getDisplayName().isEmpty() ? user.getEmail() : user.getDisplayName());
 		if (accountStatus == AccountController.Status.SIGNING_IN)
-			return "Conectando con Google…";
-		return "Cuenta sin conectar";
+			return Txt.t(R.string.google_connecting);
+		return Txt.t(R.string.st_not_connected);
 	}
 
 	/**
@@ -404,7 +404,7 @@ public final class AppState extends AndroidViewModel {
 				deletingLocalData = false;
 				if (!cleared) {
 					app.notice =
-						"Datos locales borrados. Al conectar Google de nuevo se restaurarán los datos confirmados en Firebase.";
+						Txt.t(R.string.st_local_deleted);
 					app.navigate(AppController.Screen.ACCOUNT);
 				}
 			}
@@ -412,7 +412,7 @@ public final class AppState extends AndroidViewModel {
 			public void onFailure(Exception error) {
 				deletingLocalData = false;
 				if (!cleared)
-					app.error("No se pudo completar el borrado local: " + error.getMessage());
+					app.error(Txt.t(R.string.st_local_delete_failed, error.getMessage()));
 			}
 		});
 		accounts.signOut();
@@ -421,20 +421,20 @@ public final class AppState extends AndroidViewModel {
 
 	public String syncText() {
 		if (app != null && EnerGymDatabase.DEMO_OWNER_UID.equals(app.owner()))
-			return "Sin respaldo cloud · demo local";
+			return Txt.t(R.string.st_sync_demo);
 		switch (syncStatus) {
 			case SYNCED:
-				return "Respaldo confirmado";
+				return Txt.t(R.string.st_sync_ok);
 			case SYNCING:
-				return "Sincronizando · respaldo pendiente";
+				return Txt.t(R.string.st_sync_syncing);
 			case CONFLICT:
-				return "Conflicto · cambios locales pendientes";
+				return Txt.t(R.string.st_sync_conflict);
 			case ERROR:
-				return "Error de respaldo · reintenta con conexión";
+				return Txt.t(R.string.st_sync_error);
 			case IDLE:
-				return "Respaldo pendiente";
+				return Txt.t(R.string.st_sync_pending);
 			default:
-				return "Conecta Google para respaldar";
+				return Txt.t(R.string.st_sync_connect);
 		}
 	}
 

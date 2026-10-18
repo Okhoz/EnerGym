@@ -1,5 +1,7 @@
 package com.energym.app.reminders;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,7 +27,8 @@ public final class ReminderPlan {
 		{DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY,
 			DayOfWeek.SATURDAY},
 		DayOfWeek.values()};
-	private static final String[] SHORT = {"lun", "mar", "mié", "jue", "vie", "sáb", "dom"};
+	private static final int[] SHORT = {R.string.day_mon, R.string.day_tue, R.string.day_wed, R.string.day_thu,
+		R.string.day_fri, R.string.day_sat, R.string.day_sun};
 
 	public final boolean training, water;
 	/** Minuto del día (0–1439) del aviso de entreno. */
@@ -78,7 +81,7 @@ public final class ReminderPlan {
 	public String daysText() {
 		StringBuilder out = new StringBuilder();
 		for (DayOfWeek d : SPREAD[daysPerWeek])
-			out.append(out.length() == 0 ? "" : ", ").append(SHORT[d.getValue() - 1]);
+			out.append(out.length() == 0 ? "" : ", ").append(Txt.t(SHORT[d.getValue() - 1]));
 		return out.toString();
 	}
 

@@ -1,5 +1,7 @@
 package com.energym.app.controller;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import com.energym.app.assistant.ChatProtocol;
 import com.energym.app.catalog.ExerciseSearch;
 import com.energym.app.domain.*;
@@ -64,7 +66,7 @@ public final class ManualRoutineController {
 
 	public void begin(TrainingProfile profile) {
 		if (busy) return;
-		if (owner == null) { fail("Selecciona una cuenta antes de crear una rutina."); return; }
+		if (owner == null) { fail(Txt.t(R.string.mr_account_before_create)); return; }
 		clear(profile);
 		changed.run();
 	}
@@ -96,7 +98,7 @@ public final class ManualRoutineController {
 			Exercise canonical = ChatProtocol.find(catalog, item.getExercise().getId());
 			if (canonical == null) {
 				clear(original.getProfile());
-				fail("Hay un ejercicio que ya no está en el catálogo. La versión guardada se conserva.");
+				fail(Txt.t(R.string.mr_exercise_gone));
 				return;
 			}
 			Draft draft = new Draft(canonical);
@@ -138,7 +140,7 @@ public final class ManualRoutineController {
 	}
 
 	private void fail(String message) {
-		error = message == null ? "Revisa la rutina." : message;
+		error = message == null ? Txt.t(R.string.mr_check_routine) : message;
 		changed.run();
 	}
 
@@ -205,18 +207,18 @@ public final class ManualRoutineController {
 
 	public String compatibilityMessage(Exercise exercise) {
 		for (Draft draft : drafts)
-			if (draft.exercise.getId().equals(exercise.getId())) return "Ya añadido.";
-		if (drafts.size() >= MAX_EXERCISES) return "Máximo 20 ejercicios por rutina.";
+			if (draft.exercise.getId().equals(exercise.getId())) return Txt.t(R.string.mr_already_added);
+		if (drafts.size() >= MAX_EXERCISES) return Txt.t(R.string.mr_max_exercises);
 		return contextCompatibility(exercise);
 	}
 
 	public String contextCompatibility(Exercise exercise) {
 		try {
 			if (!new CompatibilityEngine().isCompatible(exercise, context()))
-				return "No coincide con la disciplina, objetivo, entorno, enfoque o material de esta rutina.";
+				return Txt.t(R.string.mr_incompatible);
 			return "";
 		} catch (RuntimeException invalid) {
-			return "Completa primero el contexto de la rutina.";
+			return Txt.t(R.string.mr_context_first);
 		}
 	}
 
@@ -224,7 +226,7 @@ public final class ManualRoutineController {
 	public boolean add(String exerciseId) {
 		if (busy || owner == null) return false;
 		Exercise exercise = ChatProtocol.find(catalog, exerciseId);
-		if (exercise == null) { fail("El ejercicio no está en el catálogo."); return false; }
+		if (exercise == null) { fail(Txt.t(R.string.mr_not_in_catalog)); return false; }
 		String reason = compatibilityMessage(exercise);
 		if (!reason.isEmpty()) { fail(reason); return false; }
 		touch();
@@ -271,7 +273,7 @@ public final class ManualRoutineController {
 		if (busy || index < 0 || index >= drafts.size()) return;
 		Draft draft = drafts.get(index);
 		if (key.equals("loadKg") && !externalLoad(draft.exercise) && !"0".equals(value)) {
-			fail("Este ejercicio usa peso corporal: la carga debe ser 0 kg.");
+			fail(Txt.t(R.string.mr_bodyweight_load));
 			return;
 		}
 		if (key.equals("estimatedMinutes")) { touch(); draft.minutes = value; return; }
@@ -311,16 +313,16 @@ public final class ManualRoutineController {
 
 	public void save() {
 		if (busy || saved != null) return;
-		if (owner == null) { fail("Selecciona una cuenta antes de guardar."); return; }
+		if (owner == null) { fail(Txt.t(R.string.mr_account_before_save)); return; }
 		final Routine routine;
 		try {
 			if (title.trim().isEmpty() || title.trim().length() > 120)
-				throw new IllegalArgumentException("Nombre obligatorio, máximo 120 caracteres.");
+				throw new IllegalArgumentException(Txt.t(R.string.mr_name_required));
 			TrainingProfile profile = context();
 			List<RoutineItem> items = new ArrayList<>();
 			for (Draft draft : drafts) {
 				int minutes = Integer.parseInt(draft.minutes.trim());
-				if (minutes < 1 || minutes > 240) throw new IllegalArgumentException("Minutos por ejercicio: 1–240.");
+				if (minutes < 1 || minutes > 240) throw new IllegalArgumentException(Txt.t(R.string.mr_minutes_range));
 				Map<String, String> prescription = new MetricValidator().normalized(draft.exercise.getMetricType(), draft.values);
 				ChatProtocol.validatePrescription(draft.exercise, prescription, minutes);
 				items.add(new RoutineItem(draft.exercise, prescription, minutes, "Prescripción elegida por la persona en el editor manual."));
@@ -328,9 +330,9 @@ public final class ManualRoutineController {
 			routine = new Routine(proposalId, 0, title.trim(), profile, items,
 				planTag + "Rutina manual. Revisa la técnica y adapta la intensidad.", new RoutineMetadata(RoutineMetadata.Origin.MANUAL, progression));
 			if (!routine.isValidFor(profile))
-				throw new IllegalArgumentException("Añade ejercicios compatibles y respeta el tiempo disponible.");
+				throw new IllegalArgumentException(Txt.t(R.string.mr_add_compatible));
 		} catch (RuntimeException invalid) {
-			fail("Revisa el editor: " + invalid.getMessage());
+			fail(Txt.t(R.string.mr_check_editor, invalid.getMessage()));
 			return;
 		}
 		busy = true;
@@ -343,7 +345,7 @@ public final class ManualRoutineController {
 					if (token != generation) return;
 					busy = false;
 					if (value == null || value.getVersionId() <= 0 || !routine.getProposalId().equals(value.getProposalId())) {
-						fail("El guardado no devolvió una versión válida.");
+						fail(Txt.t(R.string.mr_invalid_version));
 						return;
 					}
 					saved = value;
@@ -359,7 +361,7 @@ public final class ManualRoutineController {
 			if (editingId == null) store.acceptManual(routine, callback);
 			else store.replaceManual(editingId, routine, callback);
 		} catch (RuntimeException failure) {
-			if (token == generation) { busy = false; fail("No se pudo guardar la rutina manual."); }
+			if (token == generation) { busy = false; fail(Txt.t(R.string.mr_save_failed)); }
 		}
 	}
 }

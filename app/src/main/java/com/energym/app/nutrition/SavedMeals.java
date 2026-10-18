@@ -1,5 +1,7 @@
 package com.energym.app.nutrition;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -53,15 +55,15 @@ public final class SavedMeals {
 	public String save(String name, List<FoodEntry> foods) {
 		String clean = name == null ? "" : name.replaceAll("[\\t\\r\\n#]", " ").replaceAll("\\s+", " ").trim();
 		if (owner == null)
-			return "Entra en tu cuenta para guardar comidas.";
+			return Txt.t(R.string.sm_signed_out);
 		if (clean.isEmpty() || clean.length() > 60)
-			return "Ponle un nombre (máximo 60 caracteres).";
+			return Txt.t(R.string.sm_name);
 		if (foods == null || foods.isEmpty())
-			return "No hay alimentos que guardar.";
+			return Txt.t(R.string.sm_empty);
 		List<Meal> next = new ArrayList<>(meals);
 		next.removeIf(m -> m.name.equalsIgnoreCase(clean));
 		if (next.size() >= MAX_MEALS)
-			return "Has llegado al máximo de " + MAX_MEALS + " comidas guardadas.";
+			return Txt.t(R.string.sm_max, MAX_MEALS);
 		next.add(0, new Meal(clean, foods.subList(0, Math.min(MAX_FOODS, foods.size()))));
 		meals = Collections.unmodifiableList(next);
 		store.save(owner, encode(meals));

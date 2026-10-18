@@ -1,5 +1,7 @@
 package com.energym.app.controller;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import com.energym.app.domain.*;
 import com.energym.app.assistant.ChatProtocol;
 
@@ -34,7 +36,7 @@ public final class RoutineController {
 		if (busy)
 			return;
 		if (profile.get() == null) {
-			error.accept("Guarda tu perfil antes de crear una propuesta.");
+			error.accept(Txt.t(R.string.rc_profile_first));
 			return;
 		}
 		// Cada propuesta automática varía (cuerpo completo equilibrado) en vez de repetir los primeros del catálogo.
@@ -57,7 +59,7 @@ public final class RoutineController {
 		if (busy)
 			return;
 		if (preview == null || !preview.isValidFor(previewProfile())) {
-			error.accept("La propuesta está vacía o el perfil ha cambiado. Crea una nueva propuesta.");
+			error.accept(Txt.t(R.string.rc_proposal_stale));
 			return;
 		}
 		busy = true;
@@ -134,7 +136,7 @@ public final class RoutineController {
 				try {
 					ChatProtocol.validatePrescription(e, prescription, old.getEstimatedMinutes());
 				} catch (IllegalArgumentException invalid) {
-					error.accept("La prescripción no es compatible con la sustitución. Revisa el ejercicio y su duración.");
+					error.accept(Txt.t(R.string.rc_swap_incompatible));
 					return;
 				}
 				items.set(index, new RoutineItem(e, prescription, old.getEstimatedMinutes(), "Sustitución compatible con el mismo objetivo, métrica, recursos y cobertura."));
@@ -142,6 +144,6 @@ public final class RoutineController {
 				changed.run();
 				return;
 			}
-		error.accept("No hay una sustitución compatible disponible.");
+		error.accept(Txt.t(R.string.rc_no_swap));
 	}
 }

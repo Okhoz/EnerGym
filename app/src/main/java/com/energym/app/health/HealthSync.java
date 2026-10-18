@@ -1,5 +1,7 @@
 package com.energym.app.health;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -53,7 +55,7 @@ public final class HealthSync {
 	/** Envía todo (idempotente); {@code done} recibe un texto con el resultado. */
 	public static void sync(Context c, List<Session> history, SortedMap<LocalDate, Double> weights, Consumer<String> done) {
 		if (!available() || !granted(c)) {
-			done.accept("Health Connect no tiene permiso.");
+			done.accept(Txt.t(R.string.hs_no_permission));
 			return;
 		}
 		Api34.sync(c.getApplicationContext(), history, weights, done);
@@ -65,7 +67,7 @@ public final class HealthSync {
 			android.health.connect.HealthConnectManager manager =
 				c.getSystemService(android.health.connect.HealthConnectManager.class);
 			if (manager == null) {
-				done.accept("Health Connect no está disponible en este móvil.");
+				done.accept(Txt.t(R.string.hs_unavailable));
 				return;
 			}
 			List<android.health.connect.datatypes.Record> records = new ArrayList<>();
@@ -88,7 +90,7 @@ public final class HealthSync {
 					w.getKey().atTime(9, 0).atZone(ZoneId.systemDefault()).toInstant(),
 					android.health.connect.datatypes.units.Mass.fromGrams(w.getValue() * 1000)).build());
 			if (records.isEmpty()) {
-				done.accept("Nada que enviar todavía.");
+				done.accept(Txt.t(R.string.hs_nothing));
 				return;
 			}
 			int sent = sessions;
@@ -97,12 +99,12 @@ public final class HealthSync {
 			manager.insertRecords(records, Runnable::run, new android.os.OutcomeReceiver<
 				android.health.connect.InsertRecordsResponse, android.health.connect.HealthConnectException>() {
 				public void onResult(android.health.connect.InsertRecordsResponse r) {
-					main.post(() -> done.accept("Enviado a Health Connect: " + sent + (sent == 1 ? " entreno" : " entrenos") +
-						" y " + kilos + (kilos == 1 ? " peso." : " pesos.")));
+					main.post(() -> done.accept(Txt.t(R.string.hs_sent, Txt.n(R.plurals.hs_workouts, sent),
+						Txt.n(R.plurals.nc_weights, kilos))));
 				}
 
 				public void onError(android.health.connect.HealthConnectException e) {
-					main.post(() -> done.accept("Health Connect no aceptó los datos: " + e.getMessage()));
+					main.post(() -> done.accept(Txt.t(R.string.hs_rejected, e.getMessage())));
 				}
 			});
 		}

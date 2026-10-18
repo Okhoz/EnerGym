@@ -1,5 +1,7 @@
 package com.energym.app.assistant;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 /**
  * Puerto del modelo de lenguaje que corre en el propio móvil (Gemini Nano vía AICore o Gemma descargado).
  * Sin servidor: los callbacks pueden llegar en cualquier hilo; quien lo usa decide dónde entregarlos.
@@ -59,6 +61,6 @@ public interface OnDeviceModel {
 	 * Nombre que ve el usuario («Gemini Nano», «Gemma»).
 	 */
 	default String label() {
-		return "IA del móvil";
+		return Txt.t(R.string.as_device_ai);
 	}
 }

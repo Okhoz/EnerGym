@@ -1,5 +1,7 @@
 package com.energym.app.nutrition;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Supplier;
@@ -93,7 +95,7 @@ public final class NutritionController {
 
 				public void failure(Exception e) {
 					if (token == generation && request == loadRequest)
-						error.accept("No se pudo leer tu diario: " + e.getMessage());
+						error.accept(Txt.t(R.string.nc_read_failed, e.getMessage()));
 				}
 			});
 	}
@@ -306,7 +308,7 @@ public final class NutritionController {
 			if (!next.estimationIssue().isEmpty())
 				throw new IllegalArgumentException(next.estimationIssue());
 		} catch (RuntimeException e) {
-			error.accept("Revisa tus datos: " + message(e, "edad, altura y peso son obligatorios."));
+			error.accept(Txt.t(R.string.nc_check_body, message(e, Txt.t(R.string.nc_body_required))));
 			return;
 		}
 		busy = true;
@@ -326,7 +328,7 @@ public final class NutritionController {
 						busy = false;
 						weights.put(day, next.weightKg);
 						bodyDraft.clear();
-						status = "Datos guardados. Objetivos diarios recalculados.";
+						status = Txt.t(R.string.nc_body_saved);
 						done.run();
 						changed.run();
 					}
@@ -369,7 +371,7 @@ public final class NutritionController {
 
 	public String bodyPreviewIssue() {
 		try { return bodyFromDraft().estimationIssue(); }
-		catch (RuntimeException incomplete) { return "Completa edad, altura, peso, sexo y actividad para ver la estimación."; }
+		catch (RuntimeException incomplete) { return Txt.t(R.string.nc_complete_for_estimate); }
 	}
 
 	/** No cambia el perfil confirmado, las cantidades del diario ni los objetivos ya guardados. */
@@ -422,9 +424,9 @@ public final class NutritionController {
 		try {
 			kg = number(text);
 			if (!(kg >= 30 && kg <= 300))
-				throw new IllegalArgumentException("Peso entre 30 y 300 kg.");
+				throw new IllegalArgumentException(Txt.t(R.string.body_err_weight));
 		} catch (RuntimeException e) {
-			error.accept(message(e, "Introduce tu peso en kg."));
+			error.accept(message(e, Txt.t(R.string.nc_enter_weight)));
 			return;
 		}
 		busy = true;
@@ -440,7 +442,7 @@ public final class NutritionController {
 				weights.put(day, kg);
 				if (updated == null) {
 					busy = false;
-					status = "Peso anotado.";
+					status = Txt.t(R.string.nc_weight_logged);
 					changed.run();
 					return;
 				}
@@ -450,7 +452,7 @@ public final class NutritionController {
 							return;
 						busy = false;
 						body = updated;
-						status = "Peso anotado y objetivos actualizados.";
+						status = Txt.t(R.string.nc_weight_logged_targets);
 						changed.run();
 					}
 
@@ -622,12 +624,12 @@ public final class NutritionController {
 			return false;
 		String digits = FoodProduct.extractCode(code);
 		if (digits == null) {
-			error.accept("El código leído no identifica un alimento. Escanea el código de barras (EAN/UPC) o un QR GS1 del envase.");
+			error.accept(Txt.t(R.string.nc_bad_code));
 			return false;
 		}
 		looking = true;
 		product = null;
-		status = "Buscando " + digits + " en Open Food Facts…";
+		status = Txt.t(R.string.nc_searching_code, digits);
 		changed.run();
 		long token = generation;
 		long request = ++foodRevision;
@@ -639,7 +641,7 @@ public final class NutritionController {
 				startManual();
 				foodDraft.put("barcode", digits);
 				if (found == null) {
-					status = "Producto " + digits + " no encontrado. Copia los valores de la etiqueta.";
+					status = Txt.t(R.string.nc_product_not_found, digits);
 				} else {
 					product = found;
 					foodDraft.put("name", found.displayName());
@@ -648,8 +650,7 @@ public final class NutritionController {
 					put("protein100", found.protein100);
 					put("carbs100", found.carbs100);
 					put("fat100", found.fat100);
-					status = found.complete() ? "Ficha encontrada. Indica cuánto has tomado." :
-						"Ficha incompleta: completa los valores que faltan con la etiqueta.";
+					status = Txt.t(found.complete() ? R.string.nc_product_found : R.string.nc_product_incomplete);
 				}
 				changed.run();
 			}
@@ -660,7 +661,7 @@ public final class NutritionController {
 				looking = false;
 				startManual();
 				foodDraft.put("barcode", digits);
-				status = "Sin conexión con Open Food Facts. Puedes introducir los valores de la etiqueta.";
+				status = Txt.t(R.string.nc_offline_code);
 				changed.run();
 			}
 		});
@@ -679,7 +680,7 @@ public final class NutritionController {
 		searchingOnline = true;
 		onlineQuery = query.trim();
 		onlineResults = Collections.emptyList();
-		status = "Buscando «" + onlineQuery + "» en Open Food Facts…";
+		status = Txt.t(R.string.nc_searching_text, onlineQuery);
 		changed.run();
 		long token = generation;
 		String asked = onlineQuery;
@@ -689,7 +690,7 @@ public final class NutritionController {
 					return;
 				searchingOnline = false;
 				onlineResults = found;
-				status = found.isEmpty() ? "Open Food Facts no tiene productos con «" + asked + "»." : "";
+				status = found.isEmpty() ? Txt.t(R.string.nc_no_products, asked) : "";
 				changed.run();
 			}
 
@@ -697,7 +698,7 @@ public final class NutritionController {
 				if (token != generation || !asked.equals(onlineQuery))
 					return;
 				searchingOnline = false;
-				status = "Sin conexión con Open Food Facts. Prueba con la lista de habituales o la etiqueta.";
+				status = Txt.t(R.string.nc_offline_text);
 				changed.run();
 			}
 		});
@@ -718,8 +719,7 @@ public final class NutritionController {
 		put("carbs100", found.carbs100);
 		put("fat100", found.fat100);
 		onlineResults = Collections.emptyList();
-		status = found.complete() ? "Ficha de Open Food Facts. Indica cuánto has tomado." :
-			"Ficha incompleta: completa los valores que faltan con la etiqueta.";
+		status = Txt.t(found.complete() ? R.string.nc_off_product : R.string.nc_product_incomplete);
 	}
 
 	private void put(String key, double value) {
@@ -791,7 +791,7 @@ public final class NutritionController {
 		try {
 			entry = build();
 		} catch (RuntimeException e) {
-			error.accept("Revisa el alimento: " + message(e, "cantidad y valores por 100 son obligatorios."));
+			error.accept(Txt.t(R.string.nc_check_food, message(e, Txt.t(R.string.nc_food_required))));
 			return;
 		}
 		busy = true;
@@ -813,7 +813,7 @@ public final class NutritionController {
 				foodDraft.clear();
 				editing = null;
 				foodRevision++;
-				status = entry.name + (update ? " actualizado: " : " añadido: ") + Math.round(entry.kcal()) + " kcal.";
+				status = Txt.t(update ? R.string.nc_food_updated : R.string.nc_food_added, entry.name, Math.round(entry.kcal()));
 				done.run();
 				changed.run();
 			}
@@ -850,8 +850,7 @@ public final class NutritionController {
 			double kcal = 0;
 			for (FoodEntry e : copies)
 				kcal += e.kcal();
-			status = label + ": " + copies.size() + (copies.size() == 1 ? " alimento, " : " alimentos, ") +
-				Math.round(kcal) + " kcal.";
+			status = label + ": " + Txt.n(R.plurals.nc_foods_kcal, copies.size(), copies.size(), Math.round(kcal));
 			done.run();
 			changed.run();
 			return;
@@ -901,8 +900,7 @@ public final class NutritionController {
 			busy = true;
 			importWeights(newWeights, 0, token, () -> {
 				busy = false;
-				status = "Importado: " + fresh.size() + (fresh.size() == 1 ? " comida" : " comidas") + " y " +
-					newWeights.size() + (newWeights.size() == 1 ? " peso." : " pesos.");
+				status = Txt.t(R.string.nc_imported, Txt.n(R.plurals.nc_meals, fresh.size()), Txt.n(R.plurals.nc_weights, newWeights.size()));
 				done.accept(fresh.size(), newWeights.size());
 				changed.run();
 			});
@@ -954,7 +952,7 @@ public final class NutritionController {
 					dailyCalories.put(entry.day, totals(entry.day)[0]);
 				else
 					dailyCalories.remove(entry.day);
-				status = entry.name + " eliminado del diario.";
+				status = Txt.t(R.string.nc_food_removed, entry.name);
 				changed.run();
 			}
 
@@ -968,15 +966,15 @@ public final class NutritionController {
 		if (token != generation)
 			return;
 		busy = false;
-		error.accept("No se pudo guardar: " + e.getMessage());
+		error.accept(Txt.t(R.string.nc_save_failed, e.getMessage()));
 	}
 
 	static double number(String text) {
 		if (text == null || text.trim().isEmpty())
-			throw new IllegalArgumentException("faltan valores numéricos.");
+			throw new IllegalArgumentException(Txt.t(R.string.nc_missing_numbers));
 		String value = text.trim().replace(',', '.');
 		if (!value.matches("\\d+(?:\\.\\d+)?"))
-			throw new IllegalArgumentException("«" + text.trim() + "» no es un número válido.");
+			throw new IllegalArgumentException(Txt.t(R.string.nc_not_a_number, text.trim()));
 		return Double.parseDouble(value);
 	}
 
