@@ -1,5 +1,7 @@
 package com.energym.app.assistant;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import com.energym.app.controller.*;
 import com.energym.app.domain.*;
 
@@ -103,7 +105,7 @@ public final class ProposalController {
 			}
 			if (messages.isEmpty())
 				add("assistant",
-					"¡Hola! Soy tu asistente de entrenamiento. Podemos hablar de tus dudas, técnica, hábitos y cómo te va entrenando. Si quieres una rutina, pídemela y la revisamos antes de guardarla.");
+					Txt.t(R.string.pc_welcome));
 		}
 		changed.run();
 	}
@@ -204,30 +206,26 @@ public final class ProposalController {
 			String model = client.modelLabel();
 			int progress = client.downloadProgress();
 			if (unavailable.equals("MODEL_NEEDS_DOWNLOAD"))
-				return "Tu móvil no trae Gemini Nano, pero puede usar " + model + " sin internet. Descárgalo una vez " +
-					"(gratis) y tu entrenador usará IA en el propio móvil. Mientras, responde el guiado local.";
+				return Txt.t(R.string.pc_model_needs_download, model);
 			if (unavailable.equals("MODEL_DOWNLOAD_FAILED"))
-				return "No se pudo completar la descarga de " + model + ". Comprueba la conexión y vuelve a intentarlo; " +
-					"mientras, responde el guiado local.";
+				return Txt.t(R.string.pc_model_download_failed, model);
 			if (unavailable.equals("MODEL_DOWNLOADING"))
-				return "Preparando tu entrenador IA: descargando " + model + " (2,6 GB, solo la primera vez" +
-					(progress >= 0 ? ", " + progress + " %" : "") + "). Mientras tanto te responde el guiado local.";
+				return Txt.t(R.string.pc_model_downloading, model, progress >= 0 ? ", " + progress + " %" : "");
 			if (unavailable.equals("MODEL_CHECKING"))
-				return "Comprobando qué IA puede usar tu móvil…";
+				return Txt.t(R.string.pc_model_checking);
 			if (unavailable.equals("MODEL_UNAVAILABLE"))
-				return "Este móvil no puede ejecutar la IA en el dispositivo. Tu entrenador responde con el guiado " +
-					"local, sin IA y sin coste.";
-			return "Tu entrenador usa " + model + " en el propio móvil: sin internet, sin servidor y sin coste.";
+				return Txt.t(R.string.pc_model_unavailable);
+			return Txt.t(R.string.pc_model_ready, model);
 		}
 		if (unavailable.equals("BACKEND_NOT_CONFIGURED"))
-			return "La IA online aún no está disponible en esta versión. Puedes elegir el guiado local, que funciona sin IA.";
+			return Txt.t(R.string.pc_online_not_configured);
 		if (unavailable.equals("CONFIGURACION_INVALIDA"))
-			return "La configuración de la IA online no es válida. Puedes seguir usando las funciones locales.";
+			return Txt.t(R.string.pc_online_invalid);
 		if (unavailable.equals("SIGN_IN_REQUIRED"))
-			return "Vuelve a iniciar sesión con Google para usar la IA online con tu cuenta.";
+			return Txt.t(R.string.pc_online_sign_in);
 		if (remoteDisabled)
-			return "La IA online no está activada en el servidor. Puedes reintentar más tarde o elegir el guiado local.";
-		return "La IA online usa tu cuenta de Google. No necesitas conectar un ordenador ni introducir códigos.";
+			return Txt.t(R.string.pc_online_disabled);
+		return Txt.t(R.string.pc_online_ready);
 	}
 
 	/** Cambiar de modo es una elección explícita; no envía mensajes ni reintenta una petición. */
@@ -237,7 +235,7 @@ public final class ProposalController {
 		localGuidance = enabled;
 		if (!enabled)
 			remoteDisabled = false;
-		status = enabled ? "Guiado local seleccionado: respuestas por reglas, sin IA." : connectionNotice();
+		status = enabled ? Txt.t(R.string.pc_local_selected) : connectionNotice();
 		changed.run();
 	}
 
@@ -249,7 +247,7 @@ public final class ProposalController {
 		busy = false;
 		pendingHistory = false;
 		client.cancelPending();
-		status = "Solicitud cancelada en el chat. Cualquier respuesta pendiente se descartará.";
+		status = Txt.t(R.string.pc_cancelled);
 		changed.run();
 	}
 
@@ -273,7 +271,7 @@ public final class ProposalController {
 			client.cancelPending();
 			busy = false;
 			pendingHistory = false;
-			status = "Contexto desactivado. Se ha descartado la respuesta pendiente.";
+			status = Txt.t(R.string.pc_context_off);
 		}
 		changed.run();
 	}
@@ -315,14 +313,14 @@ public final class ProposalController {
 
 	private boolean ready(String text) {
 		if (owner == null) {
-			status = "Entra en demo local o conecta tu cuenta para conservar esta conversación.";
+			status = Txt.t(R.string.pc_sign_in_to_keep);
 			changed.run();
 			return false;
 		}
 		if (busy)
 			return false;
 		if (text == null || text.trim().isEmpty() || text.length() > 2000) {
-			status = "Escribe un mensaje de 1 a 2000 caracteres.";
+			status = Txt.t(R.string.pc_message_length);
 			changed.run();
 			return false;
 		}
@@ -365,8 +363,7 @@ public final class ProposalController {
 		boolean planning = planningTurn(text);
 		// Con la IA del móvil la cabecera ya explica el modo: no se repite el aviso bajo cada respuesta.
 		status = client.onDevice() ? "" :
-			automaticConnection() ? "Guiado local seleccionado · respuestas por reglas, sin IA." :
-			"Guiado local · sin IA. Conecta tu servidor en Cuenta para conversar con la IA.";
+			automaticConnection() ? Txt.t(R.string.pc_local_selected_short) : Txt.t(R.string.pc_local_connect);
 		if (exercise != null && !planning && !greeting(text)) {
 			add("assistant", explanation(exercise));
 			persist();
@@ -398,17 +395,16 @@ public final class ProposalController {
 		if (!planning) {
 			String response;
 			if (greeting(text))
-				response = "¡Hola! Podemos hablar de tus entrenamientos. ¿Qué te gustaría mejorar o qué duda tienes hoy?";
+				response = Txt.t(R.string.pc_hello);
 			else if (text.contains("constan") || text.contains("habito") || text.contains("motiv"))
-				response = "Para ganar constancia, prueba una meta pequeña que puedas repetir y reserva un momento concreto. Si un día no sale, retoma en la siguiente ocasión sin intentar compensarlo todo. ¿Qué suele dificultarte empezar?";
+				response = Txt.t(R.string.pc_habit);
 			else if (text.contains("cans") || text.contains("descans"))
-				response = "El descanso también forma parte del entrenamiento. Ajusta la sesión a cómo te encuentres y evita forzar si estás muy cansado. Si hay dolor o malestar persistente, consulta a un profesional sanitario.";
+				response = Txt.t(R.string.pc_rest);
 			else if (techniqueReply(raw) != null)
 				response = techniqueReply(raw);
 			else
-				response = "Puedo explicarte la técnica de un ejercicio (por ejemplo «¿cómo hago una sentadilla?»), " +
-					"darte ideas de constancia y descanso o preparar una rutina si me la pides." +
-					(client.onDevice() ? "" : " En este modo local uso respuestas guiadas; para conversar con IA, elige el modo online cuando esté disponible.");
+				response = Txt.t(R.string.pc_help) +
+					(client.onDevice() ? "" : " " + Txt.t(R.string.pc_help_local));
 			add("assistant", response);
 			persist();
 			changed.run();
@@ -419,8 +415,7 @@ public final class ProposalController {
 		parse(text);
 		List<String> missing = missing();
 		if (!missing.isEmpty()) {
-			add("assistant", "Para preparar la propuesta me falta: " + String.join(", ", missing) +
-				". Por ejemplo: fuerza y nivel principiante.");
+			add("assistant", Txt.t(R.string.pc_missing, String.join(", ", missing)));
 			clearPreview();
 		} else {
 			try {
@@ -429,13 +424,11 @@ public final class ProposalController {
 					System.nanoTime()), base);
 				planningDialogue = false;
 				add("assistant", preview.isEmpty() ? preview.getExplanation() :
-					"He preparado una vista previa: " + proposed.getDaysPerWeek() + " días por semana, " +
-						proposed.getDurationMinutes() + " min disponibles, " +
-						AppController.label(proposed.getEnvironment().name()) +
-						". Revisa los ejercicios, el perfil y los recursos. Solo guardaré al aceptar. La rutina es un ejemplo por sesión; no crea un calendario semanal.");
+					Txt.t(R.string.pc_preview_ready, proposed.getDaysPerWeek(), proposed.getDurationMinutes(),
+						AppController.label(proposed.getEnvironment().name())));
 			} catch (RuntimeException e) {
 				clearPreview();
-				status = "Revisa los días (1–7), tiempo (5–240 min) y el material disponible.";
+				status = Txt.t(R.string.pc_check_days);
 			}
 		}
 		persist();
@@ -527,14 +520,14 @@ public final class ProposalController {
 
 	private static String conflict(String text) {
 		if (text.contains("casa") && text.contains("gimnasio"))
-			return "Aclara el lugar: ¿entrenarás en casa o en el gimnasio?";
+			return Txt.t(R.string.pc_clarify_place);
 		if (text.contains("sin material") || text.contains("sin equipo"))
 			for (String resource : Arrays.asList("mancuern", "barra", "banda", "esterilla", "banco", "silla", "pared",
 				"maquina"))
 				if (text.contains(resource) &&
 					!Pattern.compile("(?:no (?:tengo|hay|uso|dispongo de)|sin)\\s+(?:\\w+\\s+){0,2}" + resource)
 						.matcher(text).find())
-					return "Aclara el material: indicas sin material y también un recurso. ¿Cuál estará disponible para esta rutina?";
+					return Txt.t(R.string.pc_clarify_material);
 		return "";
 	}
 
@@ -614,8 +607,9 @@ public final class ProposalController {
 
 	private List<String> missing() {
 		List<String> m = new ArrayList<>();
-		String[][] keys = {{"days", "días por semana"}, {"duration", "minutos por sesión"}, {"environment", "lugar"},
-			{"resources", "material (o sin material)"}, {"goal", "objetivo"}, {"level", "nivel"}};
+		String[][] keys = {{"days", Txt.t(R.string.pc_missing_days)}, {"duration", Txt.t(R.string.pc_missing_duration)},
+			{"environment", Txt.t(R.string.pc_missing_place)}, {"resources", Txt.t(R.string.pc_missing_material)},
+			{"goal", Txt.t(R.string.pc_missing_goal)}, {"level", Txt.t(R.string.pc_missing_level)}};
 		for (String[] k : keys)
 			if (!fields.containsKey(k[0]))
 				m.add(k[1]);
@@ -714,23 +708,21 @@ public final class ProposalController {
 		for (Exercise e : family.subList(0, Math.min(8, family.size())))
 			names.add(e.getName());
 		String base = family.get(0).getName().split(" ")[0];
-		return "Hay " + family.size() + " variantes de " + base.toLowerCase(Locale.ROOT) + " en el catálogo: " +
-			String.join(", ", names) + (family.size() > names.size() ? " y más" : "") +
-			". ¿Cuál te interesa? Escribe su nombre, por ejemplo «¿cómo hago " +
-			Collections.min(names, Comparator.comparingInt(String::length)).toLowerCase(Locale.ROOT) + "?»";
+		return Txt.t(R.string.pc_variants, family.size(), base.toLowerCase(Locale.ROOT),
+			String.join(", ", names) + (family.size() > names.size() ? " " + Txt.t(R.string.pc_and_more) : ""),
+			Collections.min(names, Comparator.comparingInt(String::length)).toLowerCase(Locale.ROOT));
 	}
 
 	private String explanation(Exercise e) {
-		return "Técnica de " + e.getName() + "\n" + e.getDescription() + "\nMaterial de esta versión: " +
-			(e.getRequiredResources().isEmpty() ? "ninguno" : AppController.labels(e.getRequiredResources())) +
-			". Practica con control; detente si aparece dolor. Explicación orientativa del catálogo, sin revisión profesional.";
+		return Txt.t(R.string.pc_technique, e.getName(), e.getDescription(),
+			e.getRequiredResources().isEmpty() ? Txt.t(R.string.app_none) : AppController.labels(e.getRequiredResources()));
 	}
 
 	public void reject() {
 		if (busy)
 			return;
 		clearPreview();
-		add("assistant", "Propuesta rechazada. Tu perfil, rutina aceptada y sesiones guardadas se conservan.");
+		add("assistant", Txt.t(R.string.pc_rejected));
 		persist();
 		changed.run();
 	}
@@ -742,7 +734,7 @@ public final class ProposalController {
 		if (busy || preview == null)
 			return;
 		if (!Objects.equals(previewBase, current.get()) || !preview.isValidFor(preview.getProfile())) {
-			status = "El perfil o sus recursos cambiaron. Solicita una nueva propuesta antes de aceptar.";
+			status = Txt.t(R.string.pc_profile_changed);
 			changed.run();
 			return;
 		}
@@ -762,7 +754,7 @@ public final class ProposalController {
 				fields.clear();
 				seed(base);
 				add("assistant",
-					"✅ Rutina guardada y lista en Entreno. Cuando quieras, pulsa «▶ Empezar entreno» aquí abajo y te acompaño sesión a sesión.");
+					Txt.t(R.string.pc_saved));
 				persist();
 				onAccepted.accept(r);
 				changed.run();
@@ -772,7 +764,7 @@ public final class ProposalController {
 				if (token != generation)
 					return;
 				busy = false;
-				status = "No se guardó la propuesta: " + e.getMessage();
+				status = Txt.t(R.string.pc_save_failed, e.getMessage());
 				changed.run();
 			}
 		});
@@ -787,7 +779,7 @@ public final class ProposalController {
 	 */
 	public void substitute(int index) {
 		if (preview == null || preview.isEmpty() || index < 0 || index >= preview.getItems().size()) {
-			add("assistant", "Primero prepara una propuesta para sustituir un ejercicio.");
+			add("assistant", Txt.t(R.string.pc_swap_needs_proposal));
 			persist();
 			changed.run();
 			return;
@@ -800,7 +792,7 @@ public final class ProposalController {
 			seen.clear();
 			seen.add(first.getExercise().getId());
 			if (!replace(index, first, seen)) {
-				status = "No hay otra alternativa compatible para " + first.getExercise().getName() + " con tu perfil.";
+				status = Txt.t(R.string.pc_no_alternative, first.getExercise().getName());
 				changed.run();
 			}
 		}
@@ -828,7 +820,7 @@ public final class ProposalController {
 				preview = new Routine(UUID.randomUUID().toString(), 0, preview.getTitle(), preview.getProfile(), items,
 					preview.getExplanation(), preview.getMetadata());
 				swapped.get(index).add(e.getId());
-				status = "🔄 Cambiado " + first.getExercise().getName() + " por " + e.getName() + ".";
+				status = Txt.t(R.string.pc_swapped, first.getExercise().getName(), e.getName());
 				persist();
 				changed.run();
 				return true;
@@ -845,7 +837,7 @@ public final class ProposalController {
 			return;
 		List<RoutineItem> items = new ArrayList<>(preview.getItems());
 		if (items.size() <= 1) {
-			status = "⏱️ Ya solo queda un ejercicio; no se puede quitar más.";
+			status = Txt.t(R.string.pc_one_left);
 			changed.run();
 			return;
 		}
@@ -854,7 +846,7 @@ public final class ProposalController {
 		do
 			removed.add(items.remove(items.size() - 1).getExercise().getName());
 		while (items.size() > 1 && before - total(items) < 5);
-		update(items, "⏱️ Quitado " + String.join(", ", removed) + " (" + before + " → " + total(items) + " min).");
+		update(items, Txt.t(R.string.pc_removed, String.join(", ", removed), before, total(items)));
 	}
 
 	/**
@@ -880,12 +872,11 @@ public final class ProposalController {
 			added.add(next.getExercise().getName());
 		}
 		if (added.isEmpty()) {
-			status = limit - before < 3 ? "⏱️ Ya ocupa tus " + limit + " min por sesión. Súbelos en Perfil para añadir más." :
-				"⏱️ No quedan más ejercicios compatibles con tu perfil para añadir.";
+			status = limit - before < 3 ? Txt.t(R.string.pc_time_full, limit) : Txt.t(R.string.pc_nothing_to_add);
 			changed.run();
 			return;
 		}
-		update(items, "⏱️ Añadido " + String.join(", ", added) + " (" + before + " → " + total(items) + " min).");
+		update(items, Txt.t(R.string.pc_added, String.join(", ", added), before, total(items)));
 	}
 
 	private void update(List<RoutineItem> items, String message) {
@@ -965,7 +956,7 @@ public final class ProposalController {
 		if (!ready(text))
 			return;
 		if (!client.connected()) {
-			status = "Conecta el servidor de IA en Cuenta para usar la IA.";
+			status = Txt.t(R.string.pc_connect_server);
 			changed.run();
 			return;
 		}
@@ -978,7 +969,7 @@ public final class ProposalController {
 		}
 		if (exercise != null && !sameExercise(exercise, ChatProtocol.find(catalog, exercise.getId()))) {
 			status =
-				"Esta versión histórica del ejercicio difiere del catálogo vigente del servidor. Consulta su explicación guiada original o selecciona un ejercicio actual antes de enviar a IA.";
+				Txt.t(R.string.pc_historic_version);
 			changed.run();
 			return;
 		}
@@ -1014,7 +1005,7 @@ public final class ProposalController {
 				data = conversationalProfile(observed);
 			}
 		} catch (RuntimeException e) {
-			status = "Aclara los días (1–7), tiempo (5–240 min) y material antes de enviar a IA.";
+			status = Txt.t(R.string.pc_clarify_before_ai);
 			changed.run();
 			return;
 		}
@@ -1052,7 +1043,7 @@ public final class ProposalController {
 					if (token == generation) {
 						busy = false;
 						pendingHistory = false;
-						status = "Respuesta descartada: revocaste el consentimiento.";
+						status = Txt.t(R.string.pc_consent_revoked);
 						changed.run();
 					}
 					return;
@@ -1075,7 +1066,7 @@ public final class ProposalController {
 						command.accept(
 							new OpenExercise(exercise, request.conversationId, request.requestId, requestOrigin));
 				} catch (RuntimeException e) {
-					status = "Respuesta inválida o desactualizada. No se ha guardado ni abierto ningún ejercicio.";
+					status = Txt.t(R.string.pc_invalid_reply);
 				}
 				changed.run();
 			}
@@ -1089,8 +1080,7 @@ public final class ProposalController {
 					remoteDisabled = true;
 				if (client.onDevice()) {
 					status = code.equals("MODEL_BUSY_OR_QUOTA") ?
-						"La IA de tu móvil está ocupada o ha llegado a su límite por ahora. Inténtalo en un momento." :
-						"La IA de tu móvil no ha podido responder. Vuelve a enviarlo o usa el guiado local.";
+						Txt.t(R.string.pc_device_busy) : Txt.t(R.string.pc_device_failed);
 					changed.run();
 					return;
 				}
@@ -1098,11 +1088,10 @@ public final class ProposalController {
 					status = connectionNotice();
 				else if (automaticConnection() && (code.equals("UNAUTHORIZED") || code.equals("SIGN_IN_REQUIRED") ||
 					code.equals("AUTHENTICATION_UNAVAILABLE")))
-					status = "No se pudo verificar tu sesión. Vuelve a iniciar sesión con Google y envía el mensaje de nuevo.";
+					status = Txt.t(R.string.pc_session_unverified);
 				else
 					status = code.equals("PROVIDER_NOT_CONFIGURED") ?
-					"El conector opcional está desactivado en el servidor. Vuelve a enviar tu mensaje y te responderá el asistente guiado local." :
-					"No he podido contactar con la IA (" + code + "). Inténtalo de nuevo en un momento.";
+					Txt.t(R.string.pc_connector_disabled) : Txt.t(R.string.pc_unreachable, code);
 				changed.run();
 			}
 		});
@@ -1151,7 +1140,7 @@ public final class ProposalController {
 					return;
 				busy = false;
 				remoteDisabled = false;
-				status = "Servidor de IA emparejado. El chat responderá con IA.";
+				status = Txt.t(R.string.pc_paired);
 				changed.run();
 			}
 
@@ -1159,7 +1148,7 @@ public final class ProposalController {
 				if (token != generation)
 					return;
 				busy = false;
-				status = "No se conectó: " + error + ". El chat seguirá con el asistente guiado local.";
+				status = Txt.t(R.string.pc_pair_failed, error);
 				changed.run();
 			}
 		});
@@ -1171,7 +1160,7 @@ public final class ProposalController {
 		busy = false;
 		client.disconnect();
 		pairingCode = "";
-		status = "Servidor desconectado y revocación solicitada. El chat sigue con el asistente guiado local.";
+		status = Txt.t(R.string.pc_disconnected);
 		changed.run();
 	}
 }

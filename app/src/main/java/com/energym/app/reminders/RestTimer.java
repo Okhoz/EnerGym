@@ -1,5 +1,6 @@
 package com.energym.app.reminders;
 
+import com.energym.app.i18n.Txt;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -41,8 +42,8 @@ public final class RestTimer {
 		if (left <= 0 || !Reminders.canNotify(c))
 			return;
 		ensureChannels(c);
-		NotificationCompat.Builder n = base(c, CHANNEL_COUNTDOWN).setContentTitle("⏱ Descanso")
-			.setContentText(exercise == null || exercise.isEmpty() ? "Siguiente serie al acabar" : "Siguiente: " + exercise)
+		NotificationCompat.Builder n = base(c, CHANNEL_COUNTDOWN).setContentTitle(Txt.t(R.string.ses_rest))
+			.setContentText(exercise == null || exercise.isEmpty() ? Txt.t(R.string.rest_next_set) : Txt.t(R.string.rest_next, exercise))
 			.setWhen(System.currentTimeMillis() + left).setShowWhen(true).setUsesChronometer(true)
 			.setChronometerCountDown(true).setOngoing(true).setOnlyAlertOnce(true).setSilent(true)
 			.setTimeoutAfter(left + 1000).setCategory(NotificationCompat.CATEGORY_STOPWATCH);
@@ -74,8 +75,8 @@ public final class RestTimer {
 		if (inFront || !Reminders.canNotify(c))
 			return;
 		ensureChannels(c);
-		notify(c, base(c, CHANNEL_DONE).setContentTitle("💪 ¡Descanso terminado!")
-			.setContentText("A por la siguiente serie.").setAutoCancel(true).setTimeoutAfter(5 * 60_000L)
+		notify(c, base(c, CHANNEL_DONE).setContentTitle(Txt.t(R.string.rest_done))
+			.setContentText(Txt.t(R.string.rest_done_body)).setAutoCancel(true).setTimeoutAfter(5 * 60_000L)
 			.setPriority(NotificationCompat.PRIORITY_HIGH).setVibrate(new long[]{0, 300, 150, 300})
 			.setCategory(NotificationCompat.CATEGORY_ALARM));
 	}
@@ -107,12 +108,12 @@ public final class RestTimer {
 		NotificationManager manager = c.getSystemService(NotificationManager.class);
 		if (manager == null)
 			return;
-		NotificationChannel countdown = new NotificationChannel(CHANNEL_COUNTDOWN, "Descanso en curso",
+		NotificationChannel countdown = new NotificationChannel(CHANNEL_COUNTDOWN, Txt.t(R.string.rest_channel_countdown),
 			NotificationManager.IMPORTANCE_LOW);
-		countdown.setDescription("Cuenta atrás del descanso entre series.");
-		NotificationChannel done = new NotificationChannel(CHANNEL_DONE, "Fin del descanso",
+		countdown.setDescription(Txt.t(R.string.rest_channel_countdown_body));
+		NotificationChannel done = new NotificationChannel(CHANNEL_DONE, Txt.t(R.string.rest_channel_done),
 			NotificationManager.IMPORTANCE_HIGH);
-		done.setDescription("Vibra y avisa cuando toca la siguiente serie.");
+		done.setDescription(Txt.t(R.string.rest_channel_done_body));
 		done.enableVibration(true);
 		done.setVibrationPattern(new long[]{0, 300, 150, 300});
 		manager.createNotificationChannel(countdown);

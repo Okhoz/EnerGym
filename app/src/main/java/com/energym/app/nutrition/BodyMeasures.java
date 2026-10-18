@@ -1,5 +1,7 @@
 package com.energym.app.nutrition;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -15,15 +17,23 @@ public final class BodyMeasures {
 	}
 
 	public enum Part {
-		WAIST("waist", "Cintura", "cm"), CHEST("chest", "Pecho", "cm"), ARM("arm", "Brazo", "cm"),
-		HIPS("hips", "Cadera", "cm"), THIGH("thigh", "Muslo", "cm"), FAT("fat", "Grasa corporal", "%");
+		WAIST("waist", "Cintura", R.string.measure_waist, "cm"), CHEST("chest", "Pecho", R.string.measure_chest, "cm"),
+		ARM("arm", "Brazo", R.string.measure_arm, "cm"), HIPS("hips", "Cadera", R.string.measure_hips, "cm"),
+		THIGH("thigh", "Muslo", R.string.measure_thigh, "cm"), FAT("fat", "Grasa corporal", R.string.measure_fat, "%");
 
+		/** label: en español para la IA; display(): en el idioma del móvil. */
 		public final String key, label, unit;
+		private final int text;
 
-		Part(String key, String label, String unit) {
+		Part(String key, String label, int text, String unit) {
 			this.key = key;
 			this.label = label;
+			this.text = text;
 			this.unit = unit;
+		}
+
+		public String display() {
+			return Txt.t(text);
 		}
 	}
 
@@ -47,7 +57,7 @@ public final class BodyMeasures {
 	/** Guarda las medidas escritas de un día (texto con coma o punto); devuelve un error o "". */
 	public String save(LocalDate day, Map<Part, String> typed) {
 		if (owner == null)
-			return "Entra en tu cuenta para guardar medidas.";
+			return Txt.t(R.string.measure_signed_out);
 		Map<Part, Double> values = new EnumMap<>(Part.class);
 		for (Map.Entry<Part, String> e : typed.entrySet()) {
 			String t = e.getValue() == null ? "" : e.getValue().trim().replace(',', '.');
@@ -57,15 +67,15 @@ public final class BodyMeasures {
 			try {
 				v = Double.parseDouble(t);
 			} catch (NumberFormatException ex) {
-				return e.getKey().label + ": escribe un número.";
+				return Txt.t(R.string.measure_not_number, e.getKey().display());
 			}
 			double max = e.getKey() == Part.FAT ? 70 : 250;
 			if (!(v > 0) || v > max)
-				return e.getKey().label + ": entre 0 y " + (int) max + " " + e.getKey().unit + ".";
+				return Txt.t(R.string.measure_range, e.getKey().display(), (int) max, e.getKey().unit);
 			values.put(e.getKey(), Math.round(v * 10) / 10.0);
 		}
 		if (values.isEmpty())
-			return "Escribe al menos una medida.";
+			return Txt.t(R.string.measure_none);
 		days.put(day, values);
 		store.save(owner, encode(days));
 		return "";

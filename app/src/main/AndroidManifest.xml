@@ -14,6 +14,7 @@
 	<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
 
 	<application
+		android:name=".EnerGymApp"
 		android:allowBackup="false"
 		android:dataExtractionRules="@xml/data_extraction_rules"
 		android:fullBackupContent="@xml/backup_rules"
@@ -42,7 +43,7 @@
 		<activity
 			android:name=".health.HealthPrivacyActivity"
 			android:exported="true"
-			android:label="EnerGym y Health Connect"
+			android:label="@string/label_health_privacy"
 			android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
@@ -53,7 +54,7 @@
 		<receiver
 			android:name=".widget.TodayWidget"
 			android:exported="false"
-			android:label="EnerGym · Tu día">
+			android:label="@string/label_widget">
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
 			</intent-filter>

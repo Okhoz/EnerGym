@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import android.os.Bundle;
 import android.text.*;
 import android.view.*;
@@ -53,10 +54,9 @@ public abstract class ScreenFragment extends Fragment {
 		beforeContentReset();
 		rows.removeAllViews();
 		if (app.owner() != null && !app.initialDataReady && app.screen != AppController.Screen.ACCOUNT) {
-			heading("", "Restaurando tus datos", "Estamos comprobando los datos guardados de esta cuenta.");
-			LinearLayout actions = card("Restauración inicial",
-				"Espera a que termine antes de editar. Si no hay conexión, puedes reintentar desde Cuenta.");
-			action(actions, "Ir a Cuenta", () -> app.navigate(AppController.Screen.ACCOUNT));
+			heading("", Txt.t(R.string.sf_restoring), Txt.t(R.string.sf_restoring_body));
+			LinearLayout actions = card(Txt.t(R.string.sf_initial_restore), Txt.t(R.string.sf_initial_restore_body));
+			action(actions, Txt.t(R.string.man_go_account), () -> app.navigate(AppController.Screen.ACCOUNT));
 			return;
 		}
 		content();

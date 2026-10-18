@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -20,10 +21,9 @@ public final class BodyFragment extends ScreenFragment {
 
 	protected void content() {
 		NutritionController n = state.nutrition;
-		heading("NUTRICIÓN", "Tus datos físicos",
-			"Completa tus datos para estimar calorías y macros. Al guardar confirmas tu objetivo; después puedes pedir a la IA ideas de comidas.");
+		heading(Txt.t(R.string.nut_eyebrow), Txt.t(R.string.body_title), Txt.t(R.string.body_subtitle));
 		if (n == null || app.owner() == null) {
-			card("Entra para empezar", "");
+			card(Txt.t(R.string.nut_sign_in), "");
 			return;
 		}
 		WeightHistorySection.render(this, n);
@@ -34,61 +34,63 @@ public final class BodyFragment extends ScreenFragment {
 		}
 		Map<String, String> d = n.bodyDraft;
 		Runnable[] refresh = {() -> {}};
-		LinearLayout basics = card("Sobre ti", "Escribe solo las cifras; las unidades aparecen en cada etiqueta.");
-		choice(basics, "sex", "Sexo biológico (para la fórmula)", Arrays.asList("FEMALE", "MALE"),
-			Arrays.asList("Mujer", "Hombre"), d.get("sex"), "La fórmula usa este dato para estimar tu gasto en reposo.",
+		LinearLayout basics = card(Txt.t(R.string.body_about_you), Txt.t(R.string.body_about_you_body));
+		choice(basics, "sex", Txt.t(R.string.body_sex), Arrays.asList("FEMALE", "MALE"),
+			Arrays.asList(Txt.t(R.string.body_female), Txt.t(R.string.body_male)), d.get("sex"), Txt.t(R.string.body_sex_help),
 			v -> { d.put("sex", v); refresh[0].run(); });
-		textField(basics, "age", "Edad (años)", d.get("age"), true, true,
-			"Tu edad actual ayuda a estimar el gasto de energía en reposo.",
+		textField(basics, "age", Txt.t(R.string.body_age), d.get("age"), true, true,
+			Txt.t(R.string.body_age_help),
 			v -> { d.put("age", v); refresh[0].run(); });
-		textField(basics, "heightCm", "Altura (cm)", d.get("heightCm"), true, false,
-			"Se usa junto a tu edad y peso para estimar el gasto diario.",
+		textField(basics, "heightCm", Txt.t(R.string.body_height), d.get("heightCm"), true, false,
+			Txt.t(R.string.body_height_help),
 			v -> { d.put("heightCm", v); refresh[0].run(); });
-		textField(basics, "weightKg", "Peso actual (kg)", d.get("weightKg"), true, false,
-			"Es la referencia para estimar calorías, proteínas y grasas.",
+		textField(basics, "weightKg", Txt.t(R.string.body_weight), d.get("weightKg"), true, false,
+			Txt.t(R.string.body_weight_help),
 			v -> { d.put("weightKg", v); refresh[0].run(); });
 
-		LinearLayout plan = card("Tu actividad", "Incluye tu movimiento habitual y tus entrenamientos.");
-		choice(plan, "activity", "Actividad habitual",
+		LinearLayout plan = card(Txt.t(R.string.body_activity_title), Txt.t(R.string.body_activity_body));
+		choice(plan, "activity", Txt.t(R.string.body_activity),
 			Arrays.asList("SEDENTARY", "LIGHT", "MODERATE", "HIGH", "VERY_HIGH"),
-			Arrays.asList("Sedentaria (poco movimiento)", "Ligera (1–3 entrenos/semana)",
-				"Moderada (3–5 entrenos/semana)", "Alta (6–7 entrenos/semana)", "Muy alta (trabajo físico + entreno)"),
+			Arrays.asList(Txt.t(R.string.body_activity_sedentary), Txt.t(R.string.body_activity_light),
+				Txt.t(R.string.body_activity_moderate), Txt.t(R.string.body_activity_high), Txt.t(R.string.body_activity_very_high)),
 			d.get("activity"), n.body == null && app.profile != null ?
-				"Propuesta según los " + app.profile.getDaysPerWeek() + " días de entreno de tu perfil; cámbiala si no encaja." :
-				"Elige la opción que mejor refleje una semana habitual, incluido el entrenamiento.",
+				Txt.t(R.string.body_activity_proposed, app.profile.getDaysPerWeek()) :
+				Txt.t(R.string.body_activity_help),
 			v -> { d.put("activity", v); refresh[0].run(); });
-		textField(plan, "allergies", "Alergias o intolerancias (opcional)", d.get("allergies"), false, false,
-			"Anota los alimentos que necesitas evitar. Puedes dejarlo vacío.", v -> d.put("allergies", v));
-		LinearLayout diet = card("Para tu dieta con IA", "Con esto el entrenador prepara menús a tu medida.");
+		textField(plan, "allergies", Txt.t(R.string.body_allergies), d.get("allergies"), false, false,
+			Txt.t(R.string.body_allergies_help), v -> d.put("allergies", v));
+		LinearLayout diet = card(Txt.t(R.string.body_ai_diet), Txt.t(R.string.body_ai_diet_body));
 		List<String> diets = new ArrayList<>(), dietLabels = new ArrayList<>();
 		for (BodyProfile.Diet value : BodyProfile.Diet.values()) {
 			diets.add(value.name());
-			dietLabels.add(value.label);
+			dietLabels.add(value.display());
 		}
-		choice(diet, "diet", "Tipo de alimentación", diets, dietLabels, d.getOrDefault("diet", "OMNIVORE"),
-			"Los menús solo usarán alimentos compatibles.", v -> d.put("diet", v));
-		choice(diet, "mealsPerDay", "Comidas al día", Arrays.asList("2", "3", "4", "5", "6"),
-			Arrays.asList("2 comidas", "3 comidas", "4 comidas", "5 comidas", "6 comidas"),
-			d.getOrDefault("mealsPerDay", "4"), "Reparte tus calorías en este número de tomas.", v -> d.put("mealsPerDay", v));
+		choice(diet, "diet", Txt.t(R.string.body_diet_type), diets, dietLabels, d.getOrDefault("diet", "OMNIVORE"),
+			Txt.t(R.string.body_diet_type_help), v -> d.put("diet", v));
+		List<String> mealCounts = new ArrayList<>();
+		for (int count = 2; count <= 6; count++)
+			mealCounts.add(Txt.n(R.plurals.body_meals_count, count));
+		choice(diet, "mealsPerDay", Txt.t(R.string.body_meals_per_day), Arrays.asList("2", "3", "4", "5", "6"),
+			mealCounts,
+			d.getOrDefault("mealsPerDay", "4"), Txt.t(R.string.body_meals_help), v -> d.put("mealsPerDay", v));
 		List<String> cooking = new ArrayList<>(), cookingLabels = new ArrayList<>();
 		for (BodyProfile.Cooking value : BodyProfile.Cooking.values()) {
 			cooking.add(value.name());
-			cookingLabels.add(value.label);
+			cookingLabels.add(value.display());
 		}
-		choice(diet, "cooking", "Tiempo para cocinar", cooking, cookingLabels, d.getOrDefault("cooking", "NORMAL"),
+		choice(diet, "cooking", Txt.t(R.string.body_cooking_time), cooking, cookingLabels, d.getOrDefault("cooking", "NORMAL"),
 			"", v -> d.put("cooking", v));
-		textField(diet, "budget", "Presupuesto mensual para comida en € (opcional)", d.getOrDefault("budget", ""), true,
-			false, "Lo que gastas al mes en comida; la IA lo reparte por días y elige los alimentos con mejor relación calidad-precio. Vacío = sin límite.",
+		textField(diet, "budget", Txt.t(R.string.body_budget), d.getOrDefault("budget", ""), true,
+			false, Txt.t(R.string.body_budget_help),
 			v -> d.put("budget", v));
-		textField(diet, "dislikes", "Alimentos que no tomas (opcional)", d.getOrDefault("dislikes", ""), false, false,
-			"Por gusto o costumbre; las alergias van en su propio campo.", v -> d.put("dislikes", v));
-		LinearLayout goals = card("¿Qué quieres conseguir?", "Elige el ajuste de calorías. Se confirma al guardar tus datos.");
+		textField(diet, "dislikes", Txt.t(R.string.body_dislikes), d.getOrDefault("dislikes", ""), false, false,
+			Txt.t(R.string.body_dislikes_help), v -> d.put("dislikes", v));
+		LinearLayout goals = card(Txt.t(R.string.body_goal_title), Txt.t(R.string.body_goal_body));
 		for (BodyProfile.Goal goal : BodyProfile.Goal.values()) {
 			boolean selected = goal.name().equals(d.get("goal"));
-			String description = goal == BodyProfile.Goal.LOSE ? "Reducir calorías para perder grasa." :
-				goal == BodyProfile.Goal.GAIN ? "Aumentar calorías para apoyar la ganancia muscular." :
-					"Cubrir tu gasto para mantener el peso.";
-			MaterialButton button = action(goals, goal.label + "\n" + description, !n.busy,
+			String description = Txt.t(goal == BodyProfile.Goal.LOSE ? R.string.body_goal_lose_help :
+				goal == BodyProfile.Goal.GAIN ? R.string.body_goal_gain_help : R.string.body_goal_maintain_help);
+			MaterialButton button = action(goals, goal.display() + "\n" + description, !n.busy,
 				() -> n.selectNutritionGoal(goal));
 			button.setTag("nutrition_goal_" + goal.name().toLowerCase(Locale.ROOT));
 			// El nombre y la explicación deben leerse completos también con fuentes grandes.
@@ -97,10 +99,10 @@ public final class BodyFragment extends ScreenFragment {
 			button.setEllipsize(null);
 			button.setCheckable(true);
 			button.setChecked(selected);
-			button.setContentDescription(goal.label + ". " + description + (selected ? " Seleccionado." : ""));
+			button.setContentDescription(goal.display() + ". " + description + (selected ? " " + Txt.t(R.string.body_selected) : ""));
 			if (selected) primary(button);
 		}
-		LinearLayout preview = card("Tu estimación diaria", "Revisa las calorías y macronutrientes antes de guardar.");
+		LinearLayout preview = card(Txt.t(R.string.body_estimate), Txt.t(R.string.body_estimate_body));
 		TextView kcal = text(preview, "", R.style.EnerGym_CardTitle, 4);
 		kcal.setTag("nutrition_goal_preview_kcal");
 		TextView macros = text(preview, "", R.style.EnerGym_Body, 8);
@@ -108,19 +110,15 @@ public final class BodyFragment extends ScreenFragment {
 		kcal.setAccessibilityLiveRegion(android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE);
 		refresh[0] = () -> {
 			BodyProfile.Targets targets = n.previewTargets();
-			kcal.setText(targets == null ? "Estimación pendiente" : Math.round(targets.kcal) + " kcal/día");
+			kcal.setText(targets == null ? Txt.t(R.string.body_estimate_pending) : Txt.t(R.string.nut_kcal_day, Math.round(targets.kcal)));
 			macros.setText(targets == null ? n.bodyPreviewIssue() :
-				"Proteínas: " + Math.round(targets.protein) + " g\nHidratos: " + Math.round(targets.carbs) +
-					" g\nGrasas: " + Math.round(targets.fat) + " g");
+				Txt.t(R.string.body_macros, Math.round(targets.protein), Math.round(targets.carbs), Math.round(targets.fat)));
 		};
 		refresh[0].run();
-		card("Cómo se calcula",
-			"Metabolismo basal con Mifflin-St Jeor × factor de actividad, ajustado a tu objetivo. Proteína 1,6–2 g/kg, " +
-				"grasa mínima 0,8 g/kg y el resto en hidratos. Déficit orientativo del 15 % o superávit del 10 %. " +
-				"Estimación para adultos; no se aplica durante embarazo o lactancia y no sustituye una valoración profesional.");
-		primary(action(rows, "Guardar objetivo y datos", !n.busy,
+		card(Txt.t(R.string.body_how), Txt.t(R.string.body_how_body));
+		primary(action(rows, Txt.t(R.string.body_save), !n.busy,
 			() -> n.saveBody(() -> app.navigate(Screen.NUTRITION))));
-		action(rows, "Cancelar", !n.busy, () -> {
+		action(rows, Txt.t(R.string.common_cancel), !n.busy, () -> {
 			n.cancelBody();
 			app.navigate(Screen.NUTRITION);
 		});

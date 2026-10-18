@@ -1,5 +1,7 @@
 package com.energym.app.controller;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import com.energym.app.catalog.CatalogRepository;
 import com.energym.app.domain.*;
 
@@ -131,7 +133,7 @@ public final class AppController {
 		if (exercise == null)
 			return;
 		if (explanationRoute == null)
-			error("La explicación guiada aún está pendiente. Puedes consultar la técnica escrita de este ejercicio.");
+			error(Txt.t(R.string.app_guided_pending));
 		else
 			explanationRoute.open(exercise, profile);
 	}
@@ -148,12 +150,12 @@ public final class AppController {
 		manual = new ManualRoutineController(store, catalog.getExercises(), this::changed, saved -> {
 			routines.accepted = saved;
 			selectedRoutineId = saved.getProposalId();
-			notice = "Rutina manual guardada. Tu perfil global no ha cambiado.";
+			notice = Txt.t(R.string.app_manual_saved);
 			reload();
 			navigate(Screen.TRAINING);
 		});
 		sessions = new SessionController(store, this::changed, this::error, () -> {
-			notice = "Sesión finalizada y guardada localmente.";
+			notice = Txt.t(R.string.app_session_saved_local);
 			selectNextPlanDay();
 			retireFreeRoutine();
 			reload();
@@ -175,7 +177,7 @@ public final class AppController {
 	}
 
 	public void error(String message) {
-		error = message == null ? "No se pudo completar la acción." : message;
+		error = message == null ? Txt.t(R.string.app_action_failed) : message;
 		changed();
 	}
 
@@ -333,13 +335,13 @@ public final class AppController {
 			return;
 		}
 		if (profile == null) {
-			error("Guarda tu perfil (lugar y material) antes de entrenar.");
+			error(Txt.t(R.string.app_profile_before_training));
 			return;
 		}
 		Session open = sessions.session != null && sessions.session.getStatus() == Session.Status.DRAFT ?
 			sessions.session : null;
 		if (open != null && !FreeWorkout.is(open.getRoutine())) {
-			error("Ya tienes un entreno de rutina abierto. Termínalo o descártalo antes de empezar uno libre.");
+			error(Txt.t(R.string.app_routine_open_before_free));
 			return;
 		}
 		String today = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("d/M"));
@@ -400,7 +402,7 @@ public final class AppController {
 	/** Nombre del entreno en curso o del que toca ahora (para el widget); "" si aún no hay rutinas. */
 	public String nextWorkoutTitle() {
 		if (sessions.session != null && sessions.session.getStatus() == Session.Status.DRAFT)
-			return "En curso: " + sessions.session.getRoutine().getTitle();
+			return Txt.t(R.string.app_in_progress, sessions.session.getRoutine().getTitle());
 		if (versions.isEmpty())
 			return "";
 		Routine next = defaultRoutine();
@@ -437,7 +439,7 @@ public final class AppController {
 		if (next != null) {
 			selectedRoutineId = next.getProposalId();
 			routines.accepted = next;
-			notice = "Sesión guardada. Siguiente: " + next.getTitle() + ".";
+			notice = Txt.t(R.string.app_session_saved_next, next.getTitle());
 		}
 	}
 
@@ -453,13 +455,13 @@ public final class AppController {
 			return;
 		}
 		if (profile == null) {
-			error("Guarda tu perfil (días por semana, lugar y material) antes de crear un plan.");
+			error(Txt.t(R.string.app_profile_before_plan));
 			return;
 		}
 		planAsk = asked == null ? "" : asked;
 		planPreview = WeeklyPlan.create(profile, catalog.getExercises(), planAsk, System.nanoTime());
 		if (planPreview.isEmpty()) {
-			error("No hay ejercicios compatibles con tu perfil para armar un plan. Revisa lugar y material.");
+			error(Txt.t(R.string.app_no_exercises_for_plan));
 			return;
 		}
 		navigate(Screen.PLAN);
@@ -492,7 +494,7 @@ public final class AppController {
 		if (pending.isEmpty()) {
 			trainingMutation = false;
 			planPreview = Collections.emptyList();
-			notice = "📅 Plan guardado: " + saved.size() + " días. Hoy toca " + saved.get(0).getTitle() + ".";
+			notice = Txt.t(R.string.app_plan_saved, saved.size(), saved.get(0).getTitle());
 			routines.accepted = saved.get(0);
 			selectedRoutineId = saved.get(0).getProposalId();
 			reload();
@@ -520,7 +522,7 @@ public final class AppController {
 		if (trainingMutation || loading || !initialDataReady) return;
 		if (sessions.session != null && sessions.session.getStatus() == Session.Status.DRAFT &&
 			routines.accepted != null && !sessions.session.getRoutine().getProposalId().equals(routines.accepted.getProposalId())) {
-			error("Ya hay una sesión de otra rutina abierta. Continúala o finalízala antes de empezar la seleccionada.");
+			error(Txt.t(R.string.app_other_session_open));
 			return;
 		}
 		if (sessions.session == null || sessions.session.getStatus() == Session.Status.FINISHED)
@@ -536,7 +538,7 @@ public final class AppController {
 			return;
 		}
 		if (loading || !initialDataReady) {
-			error("Espera a que termine de restaurarse tu cuenta antes de crear una rutina.");
+			error(Txt.t(R.string.app_wait_restore_routine));
 			return;
 		}
 		manual.begin(profile);
@@ -594,10 +596,9 @@ public final class AppController {
 		Routine r = new RoutinePlanner().create(profile, catalog.getExercises(), asked,
 			today.toEpochDay() * 31 + suggestionSeed);
 		suggestion = r.isEmpty() ? null : r;
-		suggestionReason = shares.isEmpty() || least == null ? "Para empezar, un entreno de cuerpo completo." :
-			fewest == 0 ? "No has trabajado " + least.label + " en las últimas dos semanas." :
-				"Es lo que menos has trabajado en las últimas dos semanas (" + Math.round(fewest) +
-					(Math.round(fewest) == 1 ? " serie)." : " series).");
+		suggestionReason = shares.isEmpty() || least == null ? Txt.t(R.string.app_suggest_full_body) :
+			fewest == 0 ? Txt.t(R.string.app_suggest_not_trained, least.display()) :
+				Txt.n(R.plurals.app_suggest_least, (int) Math.round(fewest));
 		return suggestion;
 	}
 
@@ -613,7 +614,7 @@ public final class AppController {
 	public void acceptAndStart(Routine proposal, boolean start) {
 		if (trainingMutation || loading || !initialDataReady || proposal == null) return;
 		if (sessions.session != null && sessions.session.getStatus() == Session.Status.DRAFT && start) {
-			error("Ya tienes un entreno a medias. Termínalo o descártalo antes de empezar otro.");
+			error(Txt.t(R.string.app_draft_open));
 			return;
 		}
 		trainingMutation = true;
@@ -720,7 +721,7 @@ public final class AppController {
 				else if (!manual.error.isEmpty()) error(manual.error);
 				return;
 			}
-		error("Esta rutina ya no está disponible en tu cuenta.");
+		error(Txt.t(R.string.app_routine_gone));
 	}
 
 	public void deleteRoutine(Routine routine) {
@@ -736,7 +737,7 @@ public final class AppController {
 		boolean found = routine ? versions.stream().anyMatch(r -> r.getProposalId().equals(syncId)) :
 			history.stream().anyMatch(s -> s.getSyncId().equals(syncId)) || pending.stream().anyMatch(s -> s.getSyncId().equals(syncId)) ||
 			(sessions.session != null && sessions.session.getSyncId().equals(syncId));
-		if (!found) { error("Este entrenamiento ya no está disponible en tu cuenta."); return; }
+		if (!found) { error(Txt.t(R.string.app_workout_gone)); return; }
 		trainingMutation = true;
 		long token = generation;
 		changed();
@@ -749,7 +750,7 @@ public final class AppController {
 					routines.accepted = lastLoadedRoutine = null;
 				}
 				if (!routine && sessions.session != null && sessions.session.getSyncId().equals(syncId)) sessions.reset();
-				notice = routine ? "Rutina eliminada. Tus sesiones registradas se conservan." : "Sesión eliminada del progreso.";
+				notice = Txt.t(routine ? R.string.app_routine_deleted : R.string.app_session_deleted);
 				reload();
 				if (!routine && screen == Screen.SESSION) navigate(Screen.TRAINING);
 			}
@@ -771,7 +772,7 @@ public final class AppController {
 				changed();
 				return;
 			}
-		error("Esta rutina ya no está disponible en la cuenta actual.");
+		error(Txt.t(R.string.app_routine_gone_current));
 	}
 
 	/** Punto único de selección tras una aceptación nueva, antes de refrescar la lista. */
@@ -858,13 +859,13 @@ public final class AppController {
 				double load = number(last.get("loadKg"));
 				if (load > 0 && number(p.get("loadKg")) != load) {
 					p.put("loadKg", ProgressionEngine.fmt(load));
-					note = "Parte de tu última carga: " + ProgressionEngine.fmt(load).replace('.', ',') + " kg.";
+					note = Txt.t(R.string.app_note_last_load, ProgressionEngine.fmt(load).replace('.', ','));
 				}
 			} else if (last != null && type == MetricType.ISOMETRIC) {
 				double held = number(last.get("durationSeconds"));
 				if (held > number(p.get("durationSeconds")) && held <= 90) {
 					p.put("durationSeconds", ProgressionEngine.fmt(held));
-					note = "Parte de los " + ProgressionEngine.fmt(held) + " s que ya aguantas.";
+					note = Txt.t(R.string.app_note_last_hold, ProgressionEngine.fmt(held));
 				}
 			}
 			if (!note.isEmpty()) {
@@ -935,7 +936,7 @@ public final class AppController {
 					return;
 				autoProgressing = false;
 				lastProgression = plan.changes;
-				notice = "📈 Tu rutina ha subido de nivel:\n• " + String.join("\n• ", plan.changes);
+				notice = Txt.t(R.string.app_leveled_up) + "\n• " + String.join("\n• ", plan.changes);
 				routineAccepted(saved);
 			}
 
@@ -1018,7 +1019,7 @@ public final class AppController {
 	 */
 	public String disciplineName() {
 		Sport s = catalog.findSport(profileDraft.getOrDefault("sportId", ""));
-		return s == null ? "tu disciplina" : s.getName();
+		return s == null ? Txt.t(R.string.app_your_discipline) : s.getName();
 	}
 
 	/**
@@ -1032,7 +1033,7 @@ public final class AppController {
 		if (profileSaving)
 			return;
 		if (!initialDataReady) {
-			error("Espera a que termine la restauración inicial. Puedes reintentar desde Cuenta.");
+			error(Txt.t(R.string.app_wait_restore));
 			return;
 		}
 		try {
@@ -1059,7 +1060,7 @@ public final class AppController {
 				.preferences(profileDraft.get("preferences")).limitations(profileDraft.get("limitations"))
 				.historyConsent(Boolean.parseBoolean(profileDraft.get("historyConsent"))).details(details).build();
 			if (catalog.findSport(p.getSportId()) == null)
-				throw new IllegalArgumentException("Selecciona un deporte del catálogo.");
+				throw new IllegalArgumentException(Txt.t(R.string.app_pick_sport));
 			profileSaving = true;
 			long token = generation;
 			store.profile(p, new AppStore.Callback<Void>() {
@@ -1070,7 +1071,7 @@ public final class AppController {
 					profile = p;
 					profileDirty = false;
 					fillProfile(p);
-					notice = "Perfil guardado. La próxima propuesta usará estos filtros.";
+					notice = Txt.t(R.string.app_profile_saved);
 					navigate(Screen.TRAINING);
 				}
 
@@ -1082,7 +1083,7 @@ public final class AppController {
 				}
 			});
 		} catch (RuntimeException e) {
-			error("Revisa el perfil: días 1–7, tiempo por sesión entre 0:05 y 4:00 h y nivel obligatorio.");
+			error(Txt.t(R.string.app_check_profile));
 		}
 	}
 
@@ -1123,20 +1124,20 @@ public final class AppController {
 			ids.add(s.getId());
 			names.add(s.getName());
 		}
-		f.add(new InputField("sportId", "Disciplina", profileDraft.get("sportId"), ids, names, false, false));
+		f.add(new InputField("sportId", Txt.t(R.string.man_discipline), profileDraft.get("sportId"), ids, names, false, false));
 		// Las preguntas con una sola respuesta posible para esta disciplina no se muestran: ya están fijadas.
 		if (form.categories.size() > 1)
-			f.add(options("category", "Tipo de entrenamiento", form.categories));
+			f.add(options("category", Txt.t(R.string.app_field_category), form.categories));
 		TrainingProfile.Focus focus = TrainingProfile.Focus.valueOf(profileDraft.get("focus"));
 		if (form.focuses.size() > 1)
-			f.add(new InputField("focus", "Qué quieres trabajar", profileDraft.get("focus"),
+			f.add(new InputField("focus", Txt.t(R.string.app_field_focus), profileDraft.get("focus"),
 				Arrays.asList("SPECIFIC", "COMPLEMENTARY"), Arrays.asList(form.specificLabel, form.complementaryLabel),
 				false, false));
 		if (form.environments(category, focus).size() > 1)
-			f.add(options("environment", "Dónde entrenas", form.environments(category, focus)));
+			f.add(options("environment", Txt.t(R.string.app_field_environment), form.environments(category, focus)));
 		List<TrainingProfile.Goal> goals = form.goals(focus, catalog.getExercises());
 		if (goals.size() > 1)
-			f.add(options("goal", "Objetivo", goals));
+			f.add(options("goal", Txt.t(R.string.man_goal), goals));
 		for (DisciplineForm.Detail d : form.details) {
 			String key = "detail." + d.key;
 			if (d.options.isEmpty()) {
@@ -1145,7 +1146,7 @@ public final class AppController {
 			}
 			List<String> v = new ArrayList<>(), t = new ArrayList<>();
 			v.add("");
-			t.add("Sin indicar");
+			t.add(Txt.t(R.string.ses_rpe_none));
 			for (String option : d.options) {
 				String[] e = option.split("\\|", 2);
 				v.add(e[0]);
@@ -1153,28 +1154,35 @@ public final class AppController {
 			}
 			f.add(new InputField(key, d.label, profileDraft.getOrDefault(key, ""), v, t, false, false));
 		}
-		f.add(list("daysPerWeek", "Días por semana", DAYS, DAY_LABELS));
+		List<String> dayLabels = new ArrayList<>();
+		for (String day : DAYS)
+			dayLabels.add(Txt.n(R.plurals.app_days, Integer.parseInt(day)));
+		f.add(list("daysPerWeek", Txt.t(R.string.app_field_days), DAYS, dayLabels));
 		// El tiempo admite cualquier valor, así que se escribe, en formato horas:minutos (0:20 h).
 		f.add(new InputField("durationHours", form.durationLabel,
 			hours(profileDraft.getOrDefault("durationMinutes", "")), Collections.emptyList(), Collections.emptyList(),
 			false, false));
 		// Experiencia y espacio necesitan detalle propio: siguen siendo texto libre.
-		f.add(field("experience", "Experiencia previa", false, false));
-		f.add(list("level", "Nivel", LEVELS, LEVELS));
+		f.add(field("experience", Txt.t(R.string.app_field_experience), false, false));
+		f.add(list("level", Txt.t(R.string.man_level), LEVELS, levelLabels()));
 		if (form.asksSpace)
-			f.add(field("space", "Espacio disponible", false, false));
-		f.add(field("preferences", "Preferencias", false, false));
-		f.add(field("limitations", "Limitaciones que quieras declarar", false, false));
+			f.add(field("space", Txt.t(R.string.app_field_space), false, false));
+		f.add(field("preferences", Txt.t(R.string.app_field_preferences), false, false));
+		f.add(field("limitations", Txt.t(R.string.app_field_limitations), false, false));
 		for (TrainingProfile.Resource r : form.askedResources(category))
-			f.add(field("resource." + r.name(), "Disponible: " + label(r.name()), true, false));
+			f.add(field("resource." + r.name(), Txt.t(R.string.app_field_available, label(r.name())), true, false));
 		// El permiso de historial solo servía para un servidor de IA externo; el entrenador corre en el móvil.
 		return f;
 	}
 
 	public static final List<String> LEVELS = Collections.unmodifiableList(
 		Arrays.asList("Principiante", "Intermedio", "Avanzado"));
-	private static final List<String> DAYS = Arrays.asList("1", "2", "3", "4", "5", "6", "7"),
-		DAY_LABELS = Arrays.asList("1 día", "2 días", "3 días", "4 días", "5 días", "6 días", "7 días");
+	private static final List<String> DAYS = Arrays.asList("1", "2", "3", "4", "5", "6", "7");
+
+	/** Nombres de LEVELS en el idioma del móvil (el valor guardado sigue en español). */
+	public static List<String> levelLabels() {
+		return Arrays.asList(Txt.t(R.string.level_beginner), Txt.t(R.string.level_intermediate), Txt.t(R.string.level_advanced));
+	}
 
 	/** Minutos guardados → horas:minutos para mostrar («20» → «0:20»); un texto no numérico se deja igual. */
 	public static String hours(String minutes) {
@@ -1213,7 +1221,7 @@ public final class AppController {
 		String current = profileDraft.getOrDefault(key, "");
 		if (!values.contains(current)) {
 			v.add(current);
-			t.add(current.isEmpty() ? "Sin indicar" : current);
+			t.add(current.isEmpty() ? Txt.t(R.string.ses_rpe_none) : current);
 		}
 		v.addAll(values);
 		t.addAll(labels);
@@ -1262,12 +1270,13 @@ public final class AppController {
 	 */
 	public String profileSummary(TrainingProfile profile) {
 		if (profile == null)
-			return "Aún no has guardado tu perfil. Elige disciplina, objetivo, entorno y los recursos que realmente tienes.";
+			return Txt.t(R.string.app_no_profile);
 		Sport s = catalog.findSport(profile.getSportId());
 		return label(profile.getCategory().name()) + " · " + (s == null ? profile.getSportId() : s.getName()) + "\n" +
 			label(profile.getGoal().name()) + " · " + label(profile.getEnvironment().name()) + " · " +
-			profile.getDurationMinutes() + " min · " + profile.getDaysPerWeek() + " días/semana\nRecursos: " +
-			(profile.getResources().isEmpty() ? "ninguno" : labels(profile.getResources())) + "\n" +
+			Txt.t(R.string.app_profile_time, profile.getDurationMinutes(), profile.getDaysPerWeek()) + "\n" +
+			Txt.t(R.string.app_profile_resources, profile.getResources().isEmpty() ? Txt.t(R.string.app_none) :
+				labels(profile.getResources())) + "\n" +
 			details(profile) + (s == null ? "" : s.getCoverageMessage(profile.getFocus()));
 	}
 
@@ -1298,68 +1307,93 @@ public final class AppController {
 	public static String label(String name) {
 		switch (name) {
 			case "GYM":
-				return "Gimnasio";
+				return Txt.t(R.string.label_gym);
 			case "HOME_EQUIPMENT":
-				return "Casa con material";
+				return Txt.t(R.string.label_home_equipment);
 			case "NO_EQUIPMENT":
-				return "Sin equipamiento";
+				return Txt.t(R.string.label_no_equipment);
 			case "SPORT":
-				return "Deporte";
+				return Txt.t(R.string.label_sport);
 			case "HOME":
-				return "Casa";
+				return Txt.t(R.string.label_home);
 			case "OUTDOORS":
-				return "Exterior";
+				return Txt.t(R.string.label_outdoors);
 			case "POOL":
-				return "Piscina / acceso al agua";
+				return Txt.t(R.string.label_pool);
 			case "STRENGTH":
-				return "Fuerza";
+				return Txt.t(R.string.label_strength);
 			case "ISOMETRIC":
-				return "Isométrico";
+				return Txt.t(R.string.label_isometric);
 			case "ENDURANCE":
-				return "Resistencia";
+				return Txt.t(R.string.label_endurance);
 			case "MOBILITY":
-				return "Movilidad";
+				return Txt.t(R.string.label_mobility);
 			case "SPORT_PRACTICE":
-				return "Práctica deportiva";
+				return Txt.t(R.string.label_sport_practice);
 			case "GENERAL_FITNESS":
-				return "Condición general";
+				return Txt.t(R.string.label_general_fitness);
 			case "DUMBBELLS":
-				return "Mancuernas";
+				return Txt.t(R.string.label_dumbbells);
 			case "BARBELL":
-				return "Barra";
+				return Txt.t(R.string.label_barbell);
 			case "BANDS":
-				return "Bandas";
+				return Txt.t(R.string.label_bands);
 			case "MAT":
-				return "Esterilla";
+				return Txt.t(R.string.label_mat);
 			case "BENCH":
-				return "Banco";
+				return Txt.t(R.string.label_bench);
 			case "MACHINE":
-				return "Máquina";
+				return Txt.t(R.string.label_machine);
 			case "CHAIR":
-				return "Silla";
+				return Txt.t(R.string.label_chair);
 			case "WALL":
-				return "Pared";
+				return Txt.t(R.string.label_wall);
 			case "SUPPORT":
-				return "Apoyo";
+				return Txt.t(R.string.label_support);
 			case "BICYCLE":
-				return "Bicicleta";
+				return Txt.t(R.string.label_bicycle);
 			default:
 				return name;
 		}
 	}
 
 	public static String metrics(MetricType type, Map<String, String> values) {
+		return metrics(type, values, false);
+	}
+
+	private static String metrics(MetricType type, Map<String, String> values, boolean planned) {
 		List<String> lines = new ArrayList<>();
 		for (MetricValidator.Field field : new MetricValidator().fields(type))
 			if (values.containsKey(field.key)) {
 				String value = values.get(field.key);
 				// «Carga: 0» se lee como un error: sin carga externa es peso corporal.
 				if ("loadKg".equals(field.key) && isZero(value))
-					lines.add("Carga: peso corporal");
+					lines.add(Txt.t(R.string.app_load_bodyweight));
 				else
-					lines.add(field.label + ": " + value.replace('.', ','));
+					lines.add((planned ? plannedLabel(field) : field.label) + ": " +
+						("side".equals(field.key) ? MetricValidator.choiceLabel(value) : value.replace('.', ',')));
 			}
 		return String.join("\n", lines);
+	}
+
+	/** Etiqueta del campo para lo previsto en una rutina, no para lo ya realizado. */
+	public static String plannedLabel(MetricValidator.Field f) {
+		switch (f.key) {
+			case "sets":
+				return Txt.t(R.string.man_planned_sets);
+			case "timeMinutes":
+				return Txt.t(R.string.man_planned_time);
+			case "intervals":
+				return Txt.t(R.string.man_planned_intervals);
+			case "blocks":
+				return Txt.t(R.string.man_planned_blocks);
+			case "side":
+				return Txt.t(R.string.man_planned_side);
+			case "loadKg":
+				return Txt.t(R.string.app_planned_load);
+			default:
+				return f.label;
+		}
 	}
 
 	private static boolean isZero(String value) {
@@ -1374,11 +1408,7 @@ public final class AppController {
 	 * Etiquetas de propuesta separadas de las de resultado para no afirmar que un ejemplo ya se realizó.
 	 */
 	public static String prescription(MetricType type, Map<String, String> values) {
-		return metrics(type, values).replace("Series realizadas", "Series previstas")
-			.replace("Bloques realizados", "Bloques previstos")
-			.replace("Intervalos / bloques realizados", "Intervalos / bloques previstos")
-			.replace("Tiempo realizado", "Tiempo previsto")
-			.replace("Carga (kg; 0 = peso corporal)", "Carga de ejemplo (kg)");
+		return metrics(type, values, true);
 	}
 }
 

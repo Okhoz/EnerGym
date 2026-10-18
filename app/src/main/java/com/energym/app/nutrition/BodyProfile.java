@@ -1,5 +1,7 @@
 package com.energym.app.nutrition;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.util.Objects;
 
 /**
@@ -20,37 +22,59 @@ public final class BodyProfile {
 	}
 
 	public enum Goal {
-		LOSE(-0.15, "Déficit calórico"), MAINTAIN(0, "Mantenimiento"), GAIN(0.10, "Superávit calórico");
+		LOSE(-0.15, "Déficit calórico", R.string.body_goal_lose), MAINTAIN(0, "Mantenimiento", R.string.body_goal_maintain),
+		GAIN(0.10, "Superávit calórico", R.string.body_goal_gain);
 
 		public final double adjustment;
+		/** En español para la IA; en pantalla, display(). */
 		public final String label;
+		private final int text;
 
-		Goal(double adjustment, String label) {
+		Goal(double adjustment, String label, int text) {
 			this.adjustment = adjustment;
 			this.label = label;
+			this.text = text;
+		}
+
+		public String display() {
+			return Txt.t(text);
 		}
 	}
 
 	/** Estilo de alimentación para las dietas creadas con IA. */
 	public enum Diet {
-		OMNIVORE("Omnívora (de todo)"), VEGETARIAN("Vegetariana"), VEGAN("Vegana"), PESCATARIAN("Pescetariana"),
-		MEDITERRANEAN("Mediterránea");
+		OMNIVORE("Omnívora (de todo)", R.string.diet_omnivore), VEGETARIAN("Vegetariana", R.string.diet_vegetarian),
+		VEGAN("Vegana", R.string.diet_vegan), PESCATARIAN("Pescetariana", R.string.diet_pescatarian),
+		MEDITERRANEAN("Mediterránea", R.string.diet_mediterranean);
 
 		public final String label;
+		private final int text;
 
-		Diet(String label) {
+		Diet(String label, int text) {
 			this.label = label;
+			this.text = text;
+		}
+
+		public String display() {
+			return Txt.t(text);
 		}
 	}
 
 	/** Tiempo que la persona quiere dedicar a cocinar. */
 	public enum Cooking {
-		QUICK("Poco: platos de 15 min"), NORMAL("Normal: hasta 30 min"), ELABORATE("Me gusta cocinar");
+		QUICK("Poco: platos de 15 min", R.string.cooking_quick), NORMAL("Normal: hasta 30 min", R.string.cooking_normal),
+		ELABORATE("Me gusta cocinar", R.string.cooking_elaborate);
 
 		public final String label;
+		private final int text;
 
-		Cooking(String label) {
+		Cooking(String label, int text) {
 			this.label = label;
+			this.text = text;
+		}
+
+		public String display() {
+			return Txt.t(text);
 		}
 	}
 
@@ -82,31 +106,31 @@ public final class BodyProfile {
 	public BodyProfile(Sex sex, int age, double heightCm, double weightKg, Activity activity, Goal goal,
 		String allergies, Diet diet, Cooking cooking, int mealsPerDay, String dislikes, double monthlyBudget) {
 		if (!(monthlyBudget >= 0 && monthlyBudget <= 5000))
-			throw new IllegalArgumentException("Presupuesto entre 0 y 5000 € al mes.");
+			throw new IllegalArgumentException(Txt.t(R.string.body_err_budget));
 		this.monthlyBudget = monthlyBudget;
 		this.diet = diet == null ? Diet.OMNIVORE : diet;
 		this.cooking = cooking == null ? Cooking.NORMAL : cooking;
 		if (mealsPerDay < 2 || mealsPerDay > 6)
-			throw new IllegalArgumentException("Comidas al día entre 2 y 6.");
+			throw new IllegalArgumentException(Txt.t(R.string.body_err_meals));
 		this.mealsPerDay = mealsPerDay;
 		this.dislikes = dislikes == null ? "" : dislikes.trim();
 		if (this.dislikes.length() > 300)
-			throw new IllegalArgumentException("Alimentos que no tomas: máximo 300 caracteres.");
+			throw new IllegalArgumentException(Txt.t(R.string.body_err_dislikes));
 		this.sex = Objects.requireNonNull(sex, "sex");
 		this.activity = Objects.requireNonNull(activity, "activity");
 		this.goal = Objects.requireNonNull(goal, "goal");
 		if (age < 16 || age > 100)
-			throw new IllegalArgumentException("Edad entre 16 y 100 años.");
+			throw new IllegalArgumentException(Txt.t(R.string.body_err_age));
 		if (!(heightCm >= 120 && heightCm <= 230))
-			throw new IllegalArgumentException("Altura entre 120 y 230 cm.");
+			throw new IllegalArgumentException(Txt.t(R.string.body_err_height));
 		if (!(weightKg >= 30 && weightKg <= 300))
-			throw new IllegalArgumentException("Peso entre 30 y 300 kg.");
+			throw new IllegalArgumentException(Txt.t(R.string.body_err_weight));
 		this.age = age;
 		this.heightCm = heightCm;
 		this.weightKg = weightKg;
 		this.allergies = allergies == null ? "" : allergies.trim();
 		if (this.allergies.length() > 300)
-			throw new IllegalArgumentException("Alergias: máximo 300 caracteres.");
+			throw new IllegalArgumentException(Txt.t(R.string.body_err_allergies));
 	}
 
 	/** Parte del presupuesto mensual que toca a cada día; 0 si no hay límite. */
@@ -142,14 +166,14 @@ public final class BodyProfile {
 	 */
 	public String estimationIssue() {
 		if (age < 18)
-			return "El cálculo automático de objetivos está disponible a partir de los 18 años.";
+			return Txt.t(R.string.body_issue_age);
 		Targets value = calculateTargets();
 		if (!Double.isFinite(value.kcal) || value.kcal < 1000)
-			return "El cálculo resulta demasiado bajo. Revisa tus datos con un profesional antes de fijar un objetivo.";
+			return Txt.t(R.string.body_issue_low);
 		double energy = value.protein * 4 + value.carbs * 4 + value.fat * 9;
 		// El redondeo de hidratos puede desplazar hasta 2 kcal; una discrepancia mayor no es un plan válido.
 		if (!Double.isFinite(energy) || Math.abs(energy - value.kcal) > 3)
-			return "No se puede calcular un reparto coherente con estos datos. Revisa tu perfil con un profesional.";
+			return Txt.t(R.string.body_issue_split);
 		return "";
 	}
 

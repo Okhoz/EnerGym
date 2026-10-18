@@ -1,5 +1,7 @@
 package com.energym.app.assistant;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import com.energym.app.domain.Exercise;
 
 import java.util.List;
@@ -116,9 +118,8 @@ public final class OnDeviceChatClient implements ChatClient {
 		if (state != OnDeviceModel.DOWNLOADABLE || !(failed || model.downloadNeedsConsent()))
 			return "";
 		if (failed)
-			return "Reintentar la descarga del entrenador IA";
-		return String.format(java.util.Locale.forLanguageTag("es-ES"), "Descargar el entrenador IA (%.1f GB)",
-			model.downloadBytes() / 1e9);
+			return Txt.t(R.string.od_retry_download);
+		return Txt.t(R.string.od_download, model.downloadBytes() / 1e9);
 	}
 
 	public int downloadProgress() {

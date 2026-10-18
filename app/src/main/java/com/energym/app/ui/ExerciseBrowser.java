@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -54,46 +55,45 @@ final class ExerciseBrowser {
 		this.source = source;
 		results = vertical();
 		panel = vertical();
-		host.textField(target, prefix + "_search", "Buscar ejercicio", state.query, false, false, text -> {
+		host.textField(target, prefix + "_search", Txt.t(R.string.eb_search), state.query, false, false, text -> {
 			state.query = text;
 			state.visible = 12;
 			if (!changing) refresh();
 		});
 		input = target.findViewWithTag(prefix + "_search");
-		input.setHint("Ej.: sentadilla, flexión, mancuernas");
+		input.setHint(Txt.t(R.string.eb_search_hint));
 		input.setSingleLine(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
 		TextInputLayout field = (TextInputLayout) input.getParent().getParent();
 		field.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
-		field.setEndIconContentDescription("Borrar búsqueda");
+		field.setEndIconContentDescription(Txt.t(R.string.eb_clear_search));
 		active = new ChipGroup(host.requireContext());
 		active.setSingleLine(false);
 		active.setTag(prefix + "_active_filters");
 		host.add(target, active, 0);
-		toggle = host.action(target, "Filtrar ejercicios", true, () -> {
+		toggle = host.action(target, Txt.t(R.string.eb_filter), true, () -> {
 			state.expanded = !state.expanded;
 			updateToggle();
 		});
 		toggle.setTag(prefix + "_filters_toggle");
 		List<String> sports = new ArrayList<>(Collections.singletonList(""));
-		List<String> sportNames = new ArrayList<>(Collections.singletonList("Todas las disciplinas"));
+		List<String> sportNames = new ArrayList<>(Collections.singletonList(Txt.t(R.string.eb_all_disciplines)));
 		for (Sport sport : host.app.catalog.getSports()) {
 			sports.add(sport.getId());
 			sportNames.add(sport.getName());
 		}
 		choice("sport", "Disciplina", sports, sportNames, state.discipline, value -> state.discipline = value);
-		enums("environment", "Entorno", "Cualquier entorno", Environment.values(), state.environment, value -> state.environment = value);
+		enums("environment", Txt.t(R.string.man_environment), Txt.t(R.string.eb_any_environment), Environment.values(), state.environment, value -> state.environment = value);
 		List<String> materials = new ArrayList<>(Arrays.asList("", "NONE"));
-		List<String> materialNames = new ArrayList<>(Arrays.asList("Cualquier material", "Sin material"));
+		List<String> materialNames = new ArrayList<>(Arrays.asList(Txt.t(R.string.eb_any_material), Txt.t(R.string.eb_no_material)));
 		for (Resource resource : Resource.values()) {
 			materials.add(resource.name());
 			materialNames.add(AppController.label(resource.name()));
 		}
-		choice("material", "Material que requiere", materials, materialNames, state.material, value -> state.material = value);
-		enums("goal", "Objetivo", "Cualquier objetivo", Goal.values(), state.goal, value -> state.goal = value);
-		host.text(panel, manual ? "Estos filtros sólo cambian lo que ves. El contexto de tu rutina se conserva." :
-			"Filtra la biblioteca sin cambiar tu perfil ni tus rutinas.", R.style.EnerGym_FieldCaption, 8);
-		host.action(panel, "Quitar filtros", true, () -> {
+		choice("material", Txt.t(R.string.eb_material), materials, materialNames, state.material, value -> state.material = value);
+		enums("goal", Txt.t(R.string.man_goal), Txt.t(R.string.eb_any_goal), Goal.values(), state.goal, value -> state.goal = value);
+		host.text(panel, Txt.t(manual ? R.string.eb_filters_manual : R.string.eb_filters_library), R.style.EnerGym_FieldCaption, 8);
+		host.action(panel, Txt.t(R.string.eb_remove_filters), true, () -> {
 			state.clearFilters();
 			syncControls();
 			refresh();
@@ -102,7 +102,7 @@ final class ExerciseBrowser {
 		if (manual) {
 			MaterialCheckBox compatible = new MaterialCheckBox(host.requireContext());
 			compatible.setTag("manual_only_compatible");
-			compatible.setText("Sólo compatibles con esta rutina");
+			compatible.setText(Txt.t(R.string.eb_only_compatible));
 			compatible.setMinHeight(host.dp(48));
 			compatible.setChecked(state.onlyCompatible);
 			compatible.setOnCheckedChangeListener((button, checked) -> {
@@ -112,7 +112,7 @@ final class ExerciseBrowser {
 			});
 			host.add(target, compatible, 8);
 		}
-		clear = host.action(target, "Limpiar búsqueda y filtros", true, () -> {
+		clear = host.action(target, Txt.t(R.string.eb_clear_all), true, () -> {
 			state.clearFilters();
 			state.query = "";
 			changing = true;
@@ -225,9 +225,9 @@ final class ExerciseBrowser {
 
 	private void updateToggle() {
 		panel.setVisibility(state.expanded ? View.VISIBLE : View.GONE);
-		toggle.setText(state.expanded ? "Ocultar filtros" : "Filtrar ejercicios");
-		toggle.setContentDescription((state.expanded ? "Ocultar filtros" : "Filtrar ejercicios") +
-			(state.activeCount() == 0 ? "" : ", " + state.activeCount() + " activos"));
+		toggle.setText(Txt.t(state.expanded ? R.string.eb_hide_filters : R.string.eb_filter));
+		toggle.setContentDescription(Txt.t(state.expanded ? R.string.eb_hide_filters : R.string.eb_filter) +
+			(state.activeCount() == 0 ? "" : ", " + Txt.t(R.string.eb_active, state.activeCount())));
 	}
 
 	private void refresh() {
@@ -241,7 +241,7 @@ final class ExerciseBrowser {
 			chip.setCloseIconVisible(true);
 			chip.setCheckable(false);
 			chip.setEnsureMinTouchTargetSize(true);
-			chip.setCloseIconContentDescription("Quitar filtro " + labels.get(key).get(index));
+			chip.setCloseIconContentDescription(Txt.t(R.string.eb_remove_filter, labels.get(key).get(index)));
 			chip.setOnCloseIconClickListener(view -> remove(key));
 			active.addView(chip);
 		}
@@ -250,19 +250,19 @@ final class ExerciseBrowser {
 		results.removeAllViews();
 		List<Exercise> found = source.find(state.query, state.filters(), state.onlyCompatible);
 		int shown = Math.min(state.visible, found.size());
-		TextView count = host.text(results, found.size() + (found.size() == 1 ? " resultado" : " resultados") +
-			" · " + shown + " visibles" + (state.activeCount() == 0 ? "" : " · " + state.activeCount() + " filtros activos"),
+		TextView count = host.text(results, Txt.n(R.plurals.eb_results, found.size()) +
+			" · " + Txt.t(R.string.eb_visible, shown) + (state.activeCount() == 0 ? "" : " · " + Txt.t(R.string.eb_active_filters, state.activeCount())),
 			R.style.EnerGym_FieldCaption, 12);
 		count.setTag(prefix + "_result_count");
 		count.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
 		for (int index = 0; index < shown; index++) source.row(results, found.get(index));
-		if (shown < found.size()) host.action(results, "Mostrar más ejercicios", true, () -> {
+		if (shown < found.size()) host.action(results, Txt.t(R.string.eb_show_more), true, () -> {
 			state.visible += 12;
 			refresh();
 		});
 		if (found.isEmpty()) {
-			host.text(results, "No hay ejercicios con esta búsqueda y estos filtros. Prueba otro nombre o quita algún filtro.", R.style.EnerGym_Body, 12);
-			if (state.activeCount() > 0) host.action(results, "Quitar filtros", true, () -> {
+			host.text(results, Txt.t(R.string.eb_no_results), R.style.EnerGym_Body, 12);
+			if (state.activeCount() > 0) host.action(results, Txt.t(R.string.eb_remove_filters), true, () -> {
 				state.clearFilters();
 				syncControls();
 				refresh();
@@ -277,7 +277,7 @@ final class ExerciseBrowser {
 		String environment = String.join(" / ", parts);
 		parts.clear();
 		for (Resource resource : exercise.getRequiredResources()) parts.add(AppController.label(resource.name()));
-		return environment + " · " + (parts.isEmpty() ? "Sin material" : String.join(", ", parts));
+		return environment + " · " + (parts.isEmpty() ? Txt.t(R.string.eb_no_material) : String.join(", ", parts));
 	}
 
 	static void save(Bundle bundle, String key, ExerciseBrowserState state, String owner, long revision) {

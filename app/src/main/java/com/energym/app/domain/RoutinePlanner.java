@@ -1,5 +1,7 @@
 package com.energym.app.domain;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.util.*;
 
 public final class RoutinePlanner {
@@ -37,11 +39,8 @@ public final class RoutinePlanner {
 				break;
 		}
 		String explanation = items.isEmpty() ?
-			"No hay ejercicios compatibles con este objetivo, entorno, recursos y cobertura. Ajusta el perfil; " +
-				"el contenido especializado puede estar pendiente de validación." :
-			"Propuesta local por reglas. Ejemplos sin revisión profesional; adapta la intensidad a tu situación. " +
-				"No utiliza modelos de IA ni requiere conexión. La duración estimada incluye descansos y transiciones.";
-		return new Routine(UUID.randomUUID().toString(), 0, "Propuesta de entrenamiento", profile, items, explanation,
+			Txt.t(R.string.rp_no_exercises) : Txt.t(R.string.rp_local_rules);
+		return new Routine(UUID.randomUUID().toString(), 0, Txt.t(R.string.rp_title), profile, items, explanation,
 			new RoutineMetadata(RoutineMetadata.Origin.LOCAL_RULES, true));
 	}
 
@@ -87,12 +86,10 @@ public final class RoutinePlanner {
 		}
 		String title = request.title();
 		String explanation = items.isEmpty() ?
-			"No hay ejercicios de " + (request.areas.isEmpty() ? "ese tipo" : request.title().toLowerCase(Locale.ROOT)) +
-				" compatibles con tu perfil (objetivo, lugar y material). Pide otra zona o cambia tu objetivo o material en " +
-				"Perfil." :
-			"Propuesta local por reglas según lo que has pedido. Ejemplos sin revisión profesional; adapta la intensidad a " +
-				"tu situación. No utiliza modelos de IA ni requiere conexión. La duración estimada incluye descansos y transiciones.";
-		return new Routine(UUID.randomUUID().toString(), 0, title.isEmpty() ? "Cuerpo completo" : title, profile,
+			Txt.t(R.string.rp_no_exercises_for, request.areas.isEmpty() ? Txt.t(R.string.rp_that_type) :
+				request.title().toLowerCase(Txt.locale())) :
+			Txt.t(R.string.rp_local_rules_request);
+		return new Routine(UUID.randomUUID().toString(), 0, title.isEmpty() ? Txt.t(R.string.df_cuerpo_completo) : title, profile,
 			items, explanation, new RoutineMetadata(RoutineMetadata.Origin.LOCAL_RULES, true));
 	}
 

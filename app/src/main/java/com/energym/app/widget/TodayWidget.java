@@ -1,5 +1,6 @@
 package com.energym.app.widget;
 
+import com.energym.app.i18n.Txt;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -44,9 +45,9 @@ public final class TodayWidget extends AppWidgetProvider {
 		// Un resumen de otro día ya no vale: hasta abrir la app se muestra sin cifras.
 		boolean today = java.time.LocalDate.now().toString().equals(p.getString("day", ""));
 		RemoteViews views = new RemoteViews(c.getPackageName(), R.layout.widget_today);
-		views.setTextViewText(R.id.widget_training, p.getString("training", "Abre EnerGym para ver tu entreno"));
-		views.setTextViewText(R.id.widget_food, today ? p.getString("food", "") : "🍽 Sin comidas anotadas hoy");
-		views.setTextViewText(R.id.widget_water, today ? p.getString("water", "") : "💧 0 ml de agua");
+		views.setTextViewText(R.id.widget_training, p.getString("training", Txt.t(R.string.wg_open)));
+		views.setTextViewText(R.id.widget_food, today ? p.getString("food", "") : Txt.t(R.string.wg_no_food));
+		views.setTextViewText(R.id.widget_water, today ? p.getString("water", "") : Txt.t(R.string.wg_no_water));
 		views.setOnClickPendingIntent(R.id.widget_root, open(c, "TRAINING", 0));
 		views.setOnClickPendingIntent(R.id.widget_food, open(c, "NUTRITION", 1));
 		views.setOnClickPendingIntent(R.id.widget_water, open(c, "NUTRITION", 2));

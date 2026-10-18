@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import com.energym.app.R;
 import com.energym.app.controller.AppController;
 import com.energym.app.domain.*;
@@ -19,14 +20,14 @@ public final class RoutineFragment extends ScreenFragment {
 
 	protected void content() {
 		Routine r = app.routines.preview != null ? app.routines.preview : app.routines.accepted;
-		heading("", app.routines.preview == null ? "Tu rutina" : "Tu propuesta",
-			r == null ? "Crea una propuesta desde Entreno." : r.getTitle() + " · " + r.getItems().size() +
-				" ejercicios · " + r.getEstimatedMinutes() + " min");
+		heading("", Txt.t(app.routines.preview == null ? R.string.rt_routine : R.string.rt_proposal),
+			r == null ? Txt.t(R.string.rt_create_from_training) : r.getTitle() + " · " +
+				Txt.t(R.string.tr_summary, r.getItems().size(), r.getEstimatedMinutes()));
 		if (r == null)
 			return;
 		// Lista compacta: cada ejercicio en una fila; técnica y sustituir al tocarla.
-		LinearLayout list = card("Ejercicios", "Toca uno para ver su técnica" +
-			(app.routines.preview != null ? " o cambiarlo." : "."));
+		LinearLayout list = card(Txt.t(R.string.tr_tab_exercises),
+			Txt.t(app.routines.preview != null ? R.string.rt_tap_or_swap : R.string.rt_tap));
 		int index = 0;
 		for (RoutineItem item : r.getItems()) {
 			final int i = index++;
@@ -37,12 +38,12 @@ public final class RoutineFragment extends ScreenFragment {
 		if (app.routines.preview != null) {
 			Routine proposal = app.routines.preview;
 			// Una propuesta (de la IA o automática) se hace ya, se guarda para después, se edita o se descarta.
-			com.google.android.material.button.MaterialButton start = action(rows, "Empezar ya",
+			com.google.android.material.button.MaterialButton start = action(rows, Txt.t(R.string.rt_start_now),
 				app.routines.canAccept() && !app.trainingMutation, () -> app.acceptAndStart(proposal, true));
 			start.setTag("proposal_start");
 			primary(start);
-			action(rows, "Guardar rutina", app.routines.canAccept(), app.routines::accept).setTag("proposal_accept");
-			action(rows, "✏️ Editar antes de guardar", !app.routines.busy && !app.trainingMutation,
+			action(rows, Txt.t(R.string.rt_save), app.routines.canAccept(), app.routines::accept).setTag("proposal_accept");
+			action(rows, Txt.t(R.string.rt_edit_before_saving), !app.routines.busy && !app.trainingMutation,
 				() -> app.editProposal(proposal)).setTag("proposal_edit");
 			action(rows, "Descartar", !app.routines.busy, () -> {
 				app.routines.reject();
@@ -50,15 +51,15 @@ public final class RoutineFragment extends ScreenFragment {
 			}).setTag("proposal_reject");
 		} else {
 			Routine accepted = app.routines.accepted;
-			primary(action(rows, "Empezar entreno", !app.sessions.busy, app::startSession));
-			action(rows, "✏️ Editar rutina", !app.routines.busy && !app.trainingMutation,
+			primary(action(rows, Txt.t(R.string.tr_start_workout), !app.sessions.busy, app::startSession));
+			action(rows, Txt.t(R.string.rt_edit), !app.routines.busy && !app.trainingMutation,
 				() -> app.editRoutine(accepted)).setTag("routine_edit");
-			action(rows, "Eliminar rutina", !app.routines.busy && !app.trainingMutation, () -> {
+			action(rows, Txt.t(R.string.tr_delete_routine), !app.routines.busy && !app.trainingMutation, () -> {
 				long scope = app.accountRevision();
-				new MaterialAlertDialogBuilder(requireContext()).setTitle("¿Eliminar esta rutina?")
-					.setMessage("Las sesiones que ya has registrado se conservan.")
-					.setNegativeButton("Cancelar", null)
-					.setPositiveButton("Eliminar", (d, w) -> {
+				new MaterialAlertDialogBuilder(requireContext()).setTitle(Txt.t(R.string.tr_delete_routine_title))
+					.setMessage(Txt.t(R.string.rt_delete_message))
+					.setNegativeButton(Txt.t(R.string.common_cancel), null)
+					.setPositiveButton(Txt.t(R.string.common_remove), (d, w) -> {
 						if (scope == app.accountRevision()) {
 							app.deleteRoutine(accepted);
 							app.back();
@@ -72,7 +73,8 @@ public final class RoutineFragment extends ScreenFragment {
 
 	private void exerciseOptions(int i, Exercise e) {
 		boolean proposal = app.routines.preview != null;
-		String[] choices = proposal ? new String[]{"Ver técnica", "Cambiar por otro"} : new String[]{"Ver técnica"};
+		String[] choices = proposal ? new String[]{Txt.t(R.string.ses_see_technique), Txt.t(R.string.rt_swap)} :
+			new String[]{Txt.t(R.string.ses_see_technique)};
 		new MaterialAlertDialogBuilder(requireContext()).setTitle(e.getName()).setItems(choices, (d, which) -> {
 			if (which == 0) {
 				app.openExercise(e);
@@ -80,16 +82,16 @@ public final class RoutineFragment extends ScreenFragment {
 			}
 			List<Exercise> alternatives = app.routines.alternatives(i);
 			if (alternatives.isEmpty()) {
-				app.error("No hay alternativas compatibles sin repetir ejercicios.");
+				app.error(Txt.t(R.string.rt_no_alternatives));
 				return;
 			}
 			String[] names = new String[alternatives.size()];
 			for (int j = 0; j < names.length; j++)
 				names[j] = alternatives.get(j).getName();
-			new MaterialAlertDialogBuilder(requireContext()).setTitle("Cambiar por")
+			new MaterialAlertDialogBuilder(requireContext()).setTitle(Txt.t(R.string.rt_swap_for))
 				.setItems(names, (dialog, w) -> app.routines.substitute(i, alternatives.get(w).getId()))
-				.setNegativeButton("Cancelar", null).show();
-		}).setNegativeButton("Cancelar", null).show();
+				.setNegativeButton(Txt.t(R.string.common_cancel), null).show();
+		}).setNegativeButton(Txt.t(R.string.common_cancel), null).show();
 	}
 }
 

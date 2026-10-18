@@ -1,5 +1,7 @@
 package com.energym.app.nutrition;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import com.energym.app.assistant.OnDeviceModel;
 import com.energym.app.assistant.StrictJson;
 import com.energym.app.assistant.TrainerPrompt;
@@ -210,11 +212,9 @@ public final class DietPlanner {
 		List<String> parts = new ArrayList<>();
 		long diff = Math.round(t.kcal - base.kcal);
 		if (diff != 0)
-			parts.add((diff < 0 ? "−" : "+") + Math.abs(diff) + " kcal porque los últimos días " +
-				(diff < 0 ? "te pasaste" : "te quedaste corto"));
+			parts.add((diff < 0 ? "−" : "+") + Txt.t(diff < 0 ? R.string.dp_over : R.string.dp_under, Math.abs(diff)));
 		if (body.monthlyBudget > 0)
-			parts.add(String.format(Locale.forLanguageTag("es-ES"), "≈ %.2f € para este día con lo que queda del mes",
-				dailyBudget(body, day)));
+			parts.add(Txt.t(R.string.dp_daily_budget, dailyBudget(body, day)));
 		return String.join(" · ", parts);
 	}
 
@@ -277,20 +277,19 @@ public final class DietPlanner {
 		String note = "";
 		if (ai != null && ai.mentionsAny(DietRules.banned(body))) {
 			ai = null;
-			note = "La IA propuso un alimento que evitas; te dejo un menú base seguro.";
+			note = Txt.t(R.string.dp_banned_food);
 		} else if (ai != null && (ai = ai.scaledTo(targets.kcal)) == null)
-			note = "El menú de la IA no cuadraba con tus calorías; te dejo un menú base con tus datos.";
+			note = Txt.t(R.string.dp_kcal_mismatch);
 		else if (ai != null && budget > 0 && ai.cost() > budget * 1.25) {
 			ai = null;
-			note = "El menú de la IA superaba tu presupuesto; te dejo un menú económico con tus datos.";
+			note = Txt.t(R.string.dp_over_budget);
 		} else if (ai == null && output != null)
-			note = "La IA no devolvió un menú válido; te dejo un menú base con tus datos.";
+			note = Txt.t(R.string.dp_invalid);
 		else if (ai == null)
-			note = "La IA del móvil aún no está lista; te dejo un menú base con tus datos.";
+			note = Txt.t(R.string.dp_not_ready);
 		DietPlan result = ai != null ? ai : DietRules.local(body, targets, variant + day.getDayOfMonth(), now);
 		if (note.isEmpty() && budget > 0 && result.cost() > budget * 1.05)
-			note = "Con el presupuesto que queda no llega para todo: este es el menú más económico que cuadra con tus " +
-				"calorías.";
+			note = Txt.t(R.string.dp_budget_short);
 		String message = note;
 		delivery.execute(() -> {
 			if (token != generation)

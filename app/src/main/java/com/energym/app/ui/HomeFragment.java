@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import com.energym.app.R;
 import com.energym.app.controller.AppController.Screen;
 import com.energym.app.controller.AccountController;
@@ -28,7 +29,7 @@ public final class HomeFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		String date = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", NutritionFragment.SPANISH));
+		String date = LocalDate.now().format(DateTimeFormatter.ofPattern(Txt.t(R.string.pattern_weekday_day_month), Txt.locale()));
 		heading(getString(R.string.home_eyebrow), greeting(),
 			Character.toUpperCase(date.charAt(0)) + date.substring(1));
 		// Inicio solo dice qué toca hoy; todas las cifras y gráficas están en Progreso.
@@ -62,9 +63,9 @@ public final class HomeFragment extends ScreenFragment {
 		Session draft = app.sessions.session != null && app.sessions.session.getStatus() == Session.Status.DRAFT ?
 			app.sessions.session : app.pending.isEmpty() ? null : app.pending.get(0);
 		if (draft != null) {
-			LinearLayout resume = card("Entreno a medias", draft.getRoutine().getTitle() + " · " +
-				draft.getResults().size() + " de " + draft.getRoutine().getItems().size() + " ejercicios");
-			primary(action(resume, "Continuar entreno", !app.sessions.busy, () -> {
+			LinearLayout resume = card(Txt.t(R.string.home_half_done), draft.getRoutine().getTitle() + " · " +
+				Txt.t(R.string.hist_exercises_of_total, draft.getResults().size(), draft.getRoutine().getItems().size()));
+			primary(action(resume, Txt.t(R.string.home_continue), !app.sessions.busy, () -> {
 				if (draft == app.sessions.session)
 					app.navigate(Screen.SESSION);
 				else
@@ -74,20 +75,19 @@ public final class HomeFragment extends ScreenFragment {
 		}
 		com.energym.app.domain.ProgressionEngine.Plan level = app.progression();
 		if (level != null && app.routines.preview == null) {
-			LinearLayout up = card("Sube de nivel", summary(level));
-			primary(action(up, "Revisar progresión", !app.routines.busy, app::reviewProgression));
-			action(up, "Repetir rutina actual", !app.sessions.busy, app::startSession);
+			LinearLayout up = card(Txt.t(R.string.home_level_up), summary(level));
+			primary(action(up, Txt.t(R.string.home_review_progression), !app.routines.busy, app::reviewProgression));
+			action(up, Txt.t(R.string.home_repeat_current), !app.sessions.busy, app::startSession);
 			return;
 		}
 		if (app.routines.accepted != null) {
-			LinearLayout ready = card("Tu entreno de hoy", app.routines.accepted.getTitle() + " · " +
-				app.routines.accepted.getItems().size() + " ejercicios · " + app.routines.accepted.getEstimatedMinutes() +
-				" min");
-			primary(action(ready, "Empezar", !app.sessions.busy, app::startSession));
+			LinearLayout ready = card(Txt.t(R.string.home_today_workout), app.routines.accepted.getTitle() + " · " +
+				Txt.t(R.string.tr_summary, app.routines.accepted.getItems().size(), app.routines.accepted.getEstimatedMinutes()));
+			primary(action(ready, Txt.t(R.string.home_start), !app.sessions.busy, app::startSession));
 			return;
 		}
-		LinearLayout create = card("Tu entreno de hoy", "Aún no tienes rutina. Te preparamos una con tu perfil.");
-		primary(action(create, "Crear mi rutina", !app.routines.busy, () -> app.navigate(Screen.TRAINING)));
+		LinearLayout create = card(Txt.t(R.string.home_today_workout), Txt.t(R.string.home_no_routine));
+		primary(action(create, Txt.t(R.string.home_create_routine), !app.routines.busy, () -> app.navigate(Screen.TRAINING)));
 	}
 
 	/** Tu día de un vistazo: calorías y agua, con añadir comida o un vaso a un toque. */
@@ -99,31 +99,31 @@ public final class HomeFragment extends ScreenFragment {
 		String water = "";
 		if (state.water != null) {
 			int ml = state.water.ml(state.nutrition.today());
-			water = "\n💧 " + com.energym.app.nutrition.WaterLog.liters(ml) + " de " +
-				com.energym.app.nutrition.WaterLog.liters(com.energym.app.nutrition.WaterLog.goal(state.nutrition.effectiveBody())) +
-				" de agua";
+			water = "\n" + Txt.t(R.string.home_water, com.energym.app.nutrition.WaterLog.liters(ml),
+				com.energym.app.nutrition.WaterLog.liters(com.energym.app.nutrition.WaterLog.goal(state.nutrition.effectiveBody())));
 		}
-		LinearLayout food = card("Tu día", (targets == null ? "🍽 Escanea tus alimentos y controla calorías y macros." :
-			"🍽 " + Math.round(today[0]) + " de " + Math.round(targets.kcal) + " kcal") + water);
+		LinearLayout food = card(Txt.t(R.string.home_your_day), (targets == null ? Txt.t(R.string.home_food_empty) :
+			Txt.t(R.string.home_food_kcal, Math.round(today[0]), Math.round(targets.kcal))) + water);
 		LinearLayout buttons = columns(food, 16);
-		compact(buttons, targets == null ? "Nutrición" : "+ Comida", true, () -> app.navigate(Screen.NUTRITION))
+		compact(buttons, targets == null ? Txt.t(R.string.nutrition) : Txt.t(R.string.home_add_meal), true, () -> app.navigate(Screen.NUTRITION))
 			.setTag("home_add_food");
 		if (state.water != null)
-			compact(buttons, "+ Vaso", true, () -> state.water.add(state.nutrition.today(),
-				com.energym.app.nutrition.WaterLog.GLASS)).setContentDescription("Añadir un vaso de agua");
+			compact(buttons, Txt.t(R.string.nut_glass_more), true, () -> state.water.add(state.nutrition.today(),
+				com.energym.app.nutrition.WaterLog.GLASS)).setContentDescription(Txt.t(R.string.home_add_glass));
 	}
 
 	static String summary(com.energym.app.domain.ProgressionEngine.Plan plan) {
-		StringBuilder text = new StringBuilder("Tu última sesión permite avanzar:");
+		StringBuilder text = new StringBuilder(Txt.t(R.string.home_progress_intro));
 		for (int i = 0; i < Math.min(3, plan.changes.size()); i++)
 			text.append("\n• ").append(plan.changes.get(i));
 		if (plan.changes.size() > 3)
-			text.append("\n• y ").append(plan.changes.size() - 3).append(" cambios más");
+			text.append("\n• ").append(Txt.n(R.plurals.home_more_changes, plan.changes.size() - 3));
 		return text.toString();
 	}
 
 	private static String greeting() {
 		int hour = LocalTime.now().getHour();
-		return hour < 6 ? "Buenas noches" : hour < 14 ? "Buenos días" : hour < 21 ? "Buenas tardes" : "Buenas noches";
+		return Txt.t(hour < 6 ? R.string.home_good_night : hour < 14 ? R.string.home_good_morning :
+			hour < 21 ? R.string.home_good_afternoon : R.string.home_good_night);
 	}
 }

@@ -1,5 +1,7 @@
 package com.energym.app.assistant;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import android.app.ActivityManager;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -157,8 +159,8 @@ public final class GemmaModel implements OnDeviceModel {
 					target.delete();
 					verified().delete();
 					DownloadManager.Request request = new DownloadManager.Request(Uri.parse(URL))
-						.setTitle("Entrenador IA de EnerGym")
-						.setDescription("Modelo Gemma para usar la IA sin internet")
+						.setTitle(Txt.t(R.string.gm_download_title))
+						.setDescription(Txt.t(R.string.gm_download_body))
 						.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI |
 							DownloadManager.Request.NETWORK_MOBILE)
 						.setAllowedOverMetered(true)

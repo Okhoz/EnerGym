@@ -1,5 +1,7 @@
 package com.energym.app.catalog;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import com.energym.app.domain.*;
 import com.energym.app.domain.RoutineRequest.Area;
 
@@ -48,13 +50,13 @@ public final class CustomExercises {
 	/** Crea un ejercicio; devuelve el mensaje de error o vacío si se guardó. */
 	public String add(String name, MetricType type, Area area, Set<TrainingProfile.Resource> resources, String notes) {
 		if (owner == null)
-			return "Entra con tu cuenta para crear ejercicios.";
+			return Txt.t(R.string.ce_signed_out);
 		String clean = name == null ? "" : name.trim();
 		if (clean.length() < 2 || clean.length() > 60)
-			return "Escribe un nombre de 2 a 60 caracteres.";
+			return Txt.t(R.string.ce_name);
 		for (Exercise e : catalog.getExercises())
 			if (e.getName().equalsIgnoreCase(clean))
-				return "Ya existe un ejercicio llamado «" + e.getName() + "».";
+				return Txt.t(R.string.ce_exists, e.getName());
 		Set<String> sports = new LinkedHashSet<>();
 		for (Sport sport : catalog.getSports())
 			sports.add(sport.getId());

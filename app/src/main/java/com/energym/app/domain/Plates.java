@@ -1,5 +1,7 @@
 package com.energym.app.domain;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.util.*;
 
 /**
@@ -59,7 +61,7 @@ public final class Plates {
 
 	/** «60 kg», «135 lb» o «Peso corporal». */
 	public static String text(double kg, boolean lb) {
-		return kg > 0 ? SetLog.format(toUnit(kg, lb)) + " " + unit(lb) : "Peso corporal";
+		return kg > 0 ? SetLog.format(toUnit(kg, lb)) + " " + unit(lb) : Txt.t(R.string.hist_body_weight);
 	}
 
 	/** Repeticiones aproximadas a un porcentaje del 1RM (inversa de Epley, la misma fórmula del 1RM estimado). */

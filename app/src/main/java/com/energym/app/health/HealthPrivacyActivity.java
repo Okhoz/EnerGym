@@ -1,5 +1,7 @@
 package com.energym.app.health;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.ScrollView;
@@ -14,11 +16,7 @@ public final class HealthPrivacyActivity extends Activity {
 		TextView text = new TextView(this);
 		text.setPadding(pad, pad, pad, pad);
 		text.setTextSize(16);
-		text.setText("EnerGym y Health Connect\n\n" +
-			"Si lo activas en Cuenta, EnerGym escribe en Health Connect tus entrenos terminados (hora de inicio y fin y " +
-			"nombre de la rutina) y tu peso anotado, para que los veas en otras apps de salud.\n\n" +
-			"EnerGym no lee datos de Health Connect ni los envía a ningún servidor. Puedes quitar el permiso cuando " +
-			"quieras desde los ajustes de Health Connect.");
+		text.setText(Txt.t(R.string.hp_text));
 		ScrollView scroll = new ScrollView(this);
 		scroll.addView(text);
 		setContentView(scroll);

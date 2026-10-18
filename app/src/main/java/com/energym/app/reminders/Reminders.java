@@ -1,5 +1,6 @@
 package com.energym.app.reminders;
 
+import com.energym.app.i18n.Txt;
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
@@ -35,10 +36,7 @@ public final class Reminders {
 	private static final int ID_TRAINING = 1001, ID_WATER = 1002;
 	/** Ventana de entrega: Android puede retrasar el aviso hasta 10 min para ahorrar batería. */
 	private static final long WINDOW_MS = 10 * 60_000L;
-	private static final String[] WATER_TEXTS = {
-		"Un vaso ahora y vas sumando hacia tu objetivo de hoy.",
-		"Hidratarte ayuda a rendir y a recuperar. Toca para apuntar un vaso.",
-		"¿Has bebido agua en las últimas horas? Apúntalo en Nutrición."};
+	private static final int[] WATER_TEXTS = {R.string.rem_water_1, R.string.rem_water_2, R.string.rem_water_3};
 
 	private Reminders() {
 	}
@@ -120,24 +118,24 @@ public final class Reminders {
 		NotificationManager manager = c.getSystemService(NotificationManager.class);
 		if (manager == null)
 			return;
-		NotificationChannel training = new NotificationChannel(CHANNEL_TRAINING, "Recordatorios de entreno",
+		NotificationChannel training = new NotificationChannel(CHANNEL_TRAINING, Txt.t(R.string.rem_channel_training),
 			NotificationManager.IMPORTANCE_DEFAULT);
-		training.setDescription("Aviso los días que toca entrenar, a la hora que elijas.");
-		NotificationChannel water = new NotificationChannel(CHANNEL_WATER, "Recordatorios de agua",
+		training.setDescription(Txt.t(R.string.rem_channel_training_body));
+		NotificationChannel water = new NotificationChannel(CHANNEL_WATER, Txt.t(R.string.rem_channel_water),
 			NotificationManager.IMPORTANCE_DEFAULT);
-		water.setDescription("Avisos para beber agua cada pocas horas durante el día.");
+		water.setDescription(Txt.t(R.string.rem_channel_water_body));
 		manager.createNotificationChannel(training);
 		manager.createNotificationChannel(water);
 	}
 
 	static void showTraining(Context c) {
-		show(c, CHANNEL_TRAINING, ID_TRAINING, R.drawable.ic_training, "Hoy toca entrenar",
-			"Tu sesión te espera. Toca para abrir Entreno.", "TRAINING");
+		show(c, CHANNEL_TRAINING, ID_TRAINING, R.drawable.ic_training, Txt.t(R.string.rem_training_title),
+			Txt.t(R.string.rem_training_body), "TRAINING");
 	}
 
 	static void showWater(Context c, int hour) {
-		show(c, CHANNEL_WATER, ID_WATER, R.drawable.ic_nutrition, "Hora de beber agua",
-			WATER_TEXTS[Math.floorMod(hour, WATER_TEXTS.length)], "NUTRITION");
+		show(c, CHANNEL_WATER, ID_WATER, R.drawable.ic_nutrition, Txt.t(R.string.rem_water_title),
+			Txt.t(WATER_TEXTS[Math.floorMod(hour, WATER_TEXTS.length)]), "NUTRITION");
 	}
 
 	private static void show(Context c, String channel, int id, int icon, String title, String text, String open) {

@@ -1,5 +1,7 @@
 package com.energym.app.domain;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.util.*;
 import java.math.BigDecimal;
 
@@ -24,36 +26,50 @@ public final class MetricValidator {
 		}
 	}
 
+	/** Nombre para mostrar de un valor de elección (se guarda siempre en español). */
+	public static String choiceLabel(String value) {
+		switch (value) {
+			case "ambos":
+				return Txt.t(R.string.side_both);
+			case "izquierdo":
+				return Txt.t(R.string.side_left);
+			case "derecho":
+				return Txt.t(R.string.side_right);
+			default:
+				return value;
+		}
+	}
+
 	public List<Field> fields(MetricType type) {
 		List<Field> f = new ArrayList<>();
 		switch (Objects.requireNonNull(type)) {
 			case STRENGTH:
-				f.add(new Field("sets", "Series realizadas", true, false));
-				f.add(new Field("repetitions", "Repeticiones por serie", true, false));
-				f.add(new Field("loadKg", "Carga (kg; 0 = peso corporal)", false, false));
-				f.add(new Field("restSeconds", "Descanso entre series (s)", false, false));
+				f.add(new Field("sets", Txt.t(R.string.metric_sets), true, false));
+				f.add(new Field("repetitions", Txt.t(R.string.metric_reps_per_set), true, false));
+				f.add(new Field("loadKg", Txt.t(R.string.metric_load), false, false));
+				f.add(new Field("restSeconds", Txt.t(R.string.metric_rest), false, false));
 				break;
 			case ISOMETRIC:
-				f.add(new Field("sets", "Series realizadas", true, false));
-				f.add(new Field("durationSeconds", "Duración por serie (s)", false, false));
-				f.add(new Field("restSeconds", "Descanso entre series (s)", false, false));
+				f.add(new Field("sets", Txt.t(R.string.metric_sets), true, false));
+				f.add(new Field("durationSeconds", Txt.t(R.string.metric_duration_per_set), false, false));
+				f.add(new Field("restSeconds", Txt.t(R.string.metric_rest), false, false));
 				break;
 			case ENDURANCE:
-				f.add(new Field("timeMinutes", "Tiempo realizado (min)", false, false));
-				f.add(new Field("intervals", "Intervalos / bloques realizados", true, false));
-				f.add(new Field("distanceKm", "Distancia (km; opcional)", false, true));
+				f.add(new Field("timeMinutes", Txt.t(R.string.metric_time), false, false));
+				f.add(new Field("intervals", Txt.t(R.string.metric_intervals), true, false));
+				f.add(new Field("distanceKm", Txt.t(R.string.metric_distance), false, true));
 				break;
 			case MOBILITY:
-				f.add(new Field("durationSeconds", "Duración (s)", false, false));
-				f.add(new Field("repetitions", "Repeticiones", true, false));
-				f.add(new Field("side", "Lado trabajado", false, false, "ambos", "izquierdo", "derecho"));
+				f.add(new Field("durationSeconds", Txt.t(R.string.metric_duration), false, false));
+				f.add(new Field("repetitions", Txt.t(R.string.metric_reps), true, false));
+				f.add(new Field("side", Txt.t(R.string.metric_side), false, false, "ambos", "izquierdo", "derecho"));
 				break;
 			case SPORT_PRACTICE:
-				f.add(new Field("blocks", "Bloques realizados", true, false));
-				f.add(new Field("durationMinutes", "Tiempo de práctica (min)", false, false));
+				f.add(new Field("blocks", Txt.t(R.string.metric_blocks), true, false));
+				f.add(new Field("durationMinutes", Txt.t(R.string.metric_practice), false, false));
 				break;
 		}
-		f.add(new Field("effort", "Esfuerzo percibido (0–10; opcional)", false, true));
+		f.add(new Field("effort", Txt.t(R.string.metric_effort), false, true));
 		return Collections.unmodifiableList(f);
 	}
 
@@ -67,12 +83,12 @@ public final class MetricValidator {
 			String value = source.getOrDefault(f.key, "").trim();
 			if (value.isEmpty()) {
 				if (!f.optional)
-					errors.add(f.label + ": obligatorio.");
+					errors.add(Txt.t(R.string.metric_required, f.label));
 				continue;
 			}
 			if (!f.choices.isEmpty()) {
 				if (!f.choices.contains(value))
-					errors.add(f.label + ": selecciona un lado válido.");
+					errors.add(Txt.t(R.string.metric_bad_side, f.label));
 				continue;
 			}
 			try {
@@ -81,13 +97,13 @@ public final class MetricValidator {
 				BigDecimal n = new BigDecimal(value.replace(',', '.'));
 				boolean allowZero = f.key.equals("loadKg") || f.key.equals("restSeconds") || f.key.equals("distanceKm") || f.key.equals("effort");
 				if (n.signum() < 0 || (!allowZero && n.signum() == 0))
-					errors.add(f.label + ": debe ser " + (allowZero ? "cero o mayor." : "mayor que cero."));
+					errors.add(Txt.t(allowZero ? R.string.metric_zero_or_more : R.string.metric_positive, f.label));
 				if (f.integer && n.stripTrailingZeros().scale() > 0)
-					errors.add(f.label + ": introduce un número entero.");
+					errors.add(Txt.t(R.string.metric_integer, f.label));
 				if (f.key.equals("effort") && n.compareTo(BigDecimal.TEN) > 0)
-					errors.add(f.label + ": máximo 10.");
+					errors.add(Txt.t(R.string.metric_max_10, f.label));
 			} catch (NumberFormatException e) {
-				errors.add(f.label + ": introduce un número válido (se admite coma decimal).");
+				errors.add(Txt.t(R.string.metric_number, f.label));
 			}
 		}
 		return Collections.unmodifiableList(errors);

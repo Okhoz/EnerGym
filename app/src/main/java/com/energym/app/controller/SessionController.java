@@ -1,5 +1,7 @@
 package com.energym.app.controller;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import com.energym.app.domain.*;
 
 import java.util.*;
@@ -33,11 +35,11 @@ public final class SessionController {
 		if (busy)
 			return;
 		if (session != null && session.getStatus() == Session.Status.DRAFT) {
-			error.accept("Ya hay un borrador abierto. Continúa esa sesión.");
+			error.accept(Txt.t(R.string.sc_draft_open));
 			return;
 		}
 		if (routine == null || routine.getVersionId() <= 0) {
-			error.accept("Acepta una rutina antes de empezar.");
+			error.accept(Txt.t(R.string.sc_accept_first));
 			return;
 		}
 		reset();
@@ -54,7 +56,7 @@ public final class SessionController {
 		if (busy)
 			return;
 		if (draft == null) {
-			error.accept("No hay un borrador seleccionado.");
+			error.accept(Txt.t(R.string.sc_no_draft));
 			return;
 		}
 		Session previous = session != null && session.getStatus() == Session.Status.DRAFT &&
@@ -76,7 +78,7 @@ public final class SessionController {
 					id = 0;
 					selected = 0;
 					edits.clear();
-					error.accept("No hay un borrador vigente de esta cuenta. Puede haberse finalizado o eliminado.");
+					error.accept(Txt.t(R.string.sc_draft_gone));
 					changed.run();
 					return;
 				}
@@ -288,7 +290,7 @@ public final class SessionController {
 			item.getExercise().getMetricType() != MetricType.STRENGTH)
 			return;
 		if (kg < 0 || kg > 9999 || reps < 1 || reps > 999) {
-			error.accept("Revisa el peso (0 o más) y las repeticiones (1 o más).");
+			error.accept(Txt.t(R.string.sc_check_set));
 			return;
 		}
 		List<SetLog.Entry> list = new ArrayList<>(sets());
@@ -366,19 +368,19 @@ public final class SessionController {
 		for (RoutineItem item : session.getRoutine().getItems())
 			if (!validator.validate(item.getExercise().getMetricType(),
 				session.getResults().get(item.getExercise().getId())).isEmpty()) {
-				error.accept("Registra los valores realizados de cada ejercicio antes de finalizar.");
+				error.accept(Txt.t(R.string.sc_log_all));
 				return;
 			}
 		for (RoutineItem item : session.getRoutine().getItems()) {
 			Map<String, String> edited = edits.get(item.getExercise().getId());
 			if (edited != null && !validator.normalized(item.getExercise().getMetricType(), edited)
 				.equals(session.getResults().get(item.getExercise().getId()))) {
-				error.accept("Hay valores escritos sin guardar. Guarda ese ejercicio antes de finalizar.");
+				error.accept(Txt.t(R.string.sc_unsaved));
 				return;
 			}
 		}
 		if (session.getResults().isEmpty() || id <= 0) {
-			error.accept("La sesión vacía no puede finalizarse.");
+			error.accept(Txt.t(R.string.sc_empty));
 			return;
 		}
 		busy = true;

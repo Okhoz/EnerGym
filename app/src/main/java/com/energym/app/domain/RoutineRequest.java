@@ -1,5 +1,7 @@
 package com.energym.app.domain;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.regex.*;
@@ -11,13 +13,22 @@ import java.util.regex.*;
  */
 public final class RoutineRequest {
 	public enum Area {
-		LEGS("piernas"), GLUTES("glúteos"), CHEST("pecho"), BACK("espalda"), SHOULDERS("hombros"), ARMS("brazos"),
-		CORE("core"), CARDIO("cardio"), MOBILITY("movilidad");
+		LEGS("piernas", R.string.area_legs), GLUTES("glúteos", R.string.area_glutes), CHEST("pecho", R.string.area_chest),
+		BACK("espalda", R.string.area_back), SHOULDERS("hombros", R.string.area_shoulders), ARMS("brazos", R.string.area_arms),
+		CORE("core", R.string.area_core), CARDIO("cardio", R.string.area_cardio), MOBILITY("movilidad", R.string.area_mobility);
 
+		/** Nombre en español: se guarda en los ejercicios propios y va a la IA; no se traduce. */
 		public final String label;
+		private final int text;
 
-		Area(String label) {
+		Area(String label, int text) {
 			this.label = label;
+			this.text = text;
+		}
+
+		/** Nombre para mostrar en el idioma del móvil. */
+		public String display() {
+			return Txt.t(text);
 		}
 	}
 
@@ -252,19 +263,21 @@ public final class RoutineRequest {
 	public String title() {
 		String base;
 		if (areas.containsAll(UPPER) && Collections.disjoint(areas, LOWER))
-			base = "Tren superior";
+			base = Txt.t(R.string.rq_upper_body);
 		else if (areas.size() >= 4)
-			base = "Cuerpo completo";
+			base = Txt.t(R.string.df_cuerpo_completo);
 		else {
 			List<String> names = new ArrayList<>();
 			for (Area a : areas)
-				names.add(a.label);
-			base = names.isEmpty() ? "" : join(names);
+				names.add(a.display());
+			base = names.isEmpty() ? "" : names.size() == 1 ? names.get(0) :
+				Txt.t(R.string.rq_and, String.join(", ", names.subList(0, names.size() - 1)), names.get(names.size() - 1));
 		}
 		if (base.isEmpty())
 			return "";
 		base = Character.toUpperCase(base.charAt(0)) + base.substring(1);
-		return base + (intensity == Intensity.EASY ? " · suave" : intensity == Intensity.HARD ? " · intensa" : "");
+		return base + (intensity == Intensity.EASY ? " · " + Txt.t(R.string.rq_easy) :
+			intensity == Intensity.HARD ? " · " + Txt.t(R.string.rq_hard) : "");
 	}
 
 	/** Resumen para el prompt del entrenador; vacío si la petición no concreta nada. */

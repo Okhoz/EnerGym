@@ -1,5 +1,7 @@
 package com.energym.app.nutrition;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
@@ -37,15 +39,15 @@ public final class FoodEntry {
 		this.barcode = barcode == null ? "" : barcode.trim();
 		this.unit = Objects.requireNonNull(unit, "unit");
 		if (this.name.isEmpty() || this.name.length() > 120)
-			throw new IllegalArgumentException("Indica el nombre del alimento (máximo 120 caracteres).");
+			throw new IllegalArgumentException(Txt.t(R.string.fe_name));
 		if (!(amount > 0) || amount > 5000)
-			throw new IllegalArgumentException("La cantidad debe estar entre 0 y 5000 " + unit.symbol + ".");
-		check(kcal100, 0, 900, "Calorías por 100");
-		check(protein100, 0, 100, "Proteínas por 100");
-		check(carbs100, 0, 100, "Hidratos por 100");
-		check(fat100, 0, 100, "Grasas por 100");
+			throw new IllegalArgumentException(Txt.t(R.string.fe_amount, unit.symbol));
+		check(kcal100, 0, 900, Txt.t(R.string.fe_kcal100));
+		check(protein100, 0, 100, Txt.t(R.string.fe_protein100));
+		check(carbs100, 0, 100, Txt.t(R.string.fe_carbs100));
+		check(fat100, 0, 100, Txt.t(R.string.fe_fat100));
 		if (protein100 + carbs100 + fat100 > 100.5 && unit == Unit.G)
-			throw new IllegalArgumentException("Los macronutrientes superan 100 g por cada 100 g.");
+			throw new IllegalArgumentException(Txt.t(R.string.fe_macros_over));
 		this.amount = amount;
 		this.kcal100 = kcal100;
 		this.protein100 = protein100;
@@ -62,7 +64,7 @@ public final class FoodEntry {
 
 	private static void check(double value, double min, double max, String label) {
 		if (Double.isNaN(value) || value < min || value > max)
-			throw new IllegalArgumentException(label + " fuera de rango (" + (int) min + "–" + (int) max + ").");
+			throw new IllegalArgumentException(Txt.t(R.string.fe_out_of_range, label, (int) min, (int) max));
 	}
 
 	public double kcal() {
