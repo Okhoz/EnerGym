@@ -257,6 +257,9 @@ public final class SessionFragment extends ScreenFragment {
 		if (sets.isEmpty() && before.isEmpty())
 			text(log, "Ajusta con − y + (o escribe el número) y pulsa «Guardar serie» al acabar cada serie. " +
 				"Peso 0 = peso corporal. Tu objetivo sube solo cuando lo cumples.", R.style.EnerGym_FieldCaption, 12);
+		// Sobrecarga progresiva antes de la primera serie: peso y repeticiones objetivo según tus últimas sesiones.
+		if (!editing && sets.isEmpty())
+			overload(log, item, e);
 		// Consejo del entrenador para la siguiente serie según el RPE de la última (objetivo RPE 8).
 		if (!editing && !sets.isEmpty()) {
 			Autoregulation.Advice advice = Autoregulation.next(sets.get(sets.size() - 1), lb ? Plates.toKg(5, true) : 2.5);
@@ -368,6 +371,43 @@ public final class SessionFragment extends ScreenFragment {
 			});
 			list.addView(row);
 		}
+	}
+
+	/** Sugerencia de doble progresión con descarga si se estanca; un toque la pasa a − / +, o se ignora. */
+	private void overload(LinearLayout log, RoutineItem item, Exercise e) {
+		List<List<SetLog.Entry>> past = new ArrayList<>();
+		List<Session> finished = finishedWith(e.getId());
+		for (Session s : finished.subList(Math.max(0, finished.size() - 6), finished.size()))
+			past.add(SetLog.of(s.getResults().get(e.getId())));
+		int[] range = OverloadCoach.range((int) number(item.getPrescription().get("repetitions"), 8));
+		OverloadCoach.Suggestion s = OverloadCoach.suggest(past, range[0], range[1],
+			lb ? Plates.toKg(5, true) : OverloadCoach.increment(e.getRequiredResources()));
+		if (s == null)
+			return;
+		String text;
+		if (s.kg <= 0)
+			text = s.kind == OverloadCoach.Kind.ADD_REPS ? getString(R.string.overload_add_reps_bodyweight, s.lastReps,
+				s.reps) : getString(R.string.overload_hold_bodyweight, s.reps);
+		else {
+			int res = s.kind == OverloadCoach.Kind.INCREASE_LOAD ? R.string.overload_increase :
+				s.kind == OverloadCoach.Kind.ADD_REPS ? R.string.overload_add_reps :
+					s.kind == OverloadCoach.Kind.DELOAD ? R.string.overload_deload : R.string.overload_hold;
+			text = getString(res, s.kind == OverloadCoach.Kind.DELOAD ? s.stalled : s.lastReps, weight(s.lastKg),
+				weight(s.kg), s.reps);
+		}
+		text(log, text, R.style.EnerGym_Body, 12).setTag("track_overload");
+		String kg = SetLog.format(Plates.toUnit(s.kg, lb)), reps = Integer.toString(s.reps);
+		if (kg.equals(kgInput) && reps.equals(repsInput))
+			return;
+		action(log, s.kg > 0 ? getString(R.string.overload_use, weight(s.kg), s.reps) :
+			getString(R.string.overload_use_reps, s.reps), true, () -> {
+			kgInput = kg;
+			repsInput = reps;
+			app.sessions.input("trackKg", kg);
+			app.sessions.input("trackUnit", Plates.unit(lb));
+			app.sessions.input("trackReps", reps);
+			render();
+		}).setTag("track_use_overload");
 	}
 
 	/** Superseries de este entreno (índices enlazados con el siguiente), guardadas en este móvil. */

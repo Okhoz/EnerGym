@@ -40,5 +40,13 @@
 	<string name="chat_hint">Escribe un mensaje…</string>
 	<string name="chat_send">Enviar mensaje</string>
 	<string name="widget_today_description">Tu entreno de hoy, calorías y agua de un vistazo.</string>
+	<string name="overload_increase">📈 Sugerencia: completaste %1$d reps con %2$s. Sube a %3$s × %4$d.</string>
+	<string name="overload_add_reps">📈 Sugerencia: mismo peso, %2$s × %4$d (una repetición más que las %1$d de la última vez).</string>
+	<string name="overload_add_reps_bodyweight">📈 Sugerencia: la última vez hiciste %1$d; intenta %2$d repeticiones.</string>
+	<string name="overload_hold">📈 Sugerencia: mantén %2$s y busca %4$d repeticiones en todas las series.</string>
+	<string name="overload_hold_bodyweight">📈 Sugerencia: repite %1$d repeticiones en todas las series.</string>
+	<string name="overload_deload">📉 Sugerencia: %1$d sesiones sin mejorar con %2$s. Descarga a %3$s × %4$d y vuelve a subir.</string>
+	<string name="overload_use">Usar %1$s × %2$d</string>
+	<string name="overload_use_reps">Usar %1$d repeticiones</string>
 </resources>
 
