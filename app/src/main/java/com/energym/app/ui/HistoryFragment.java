@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import com.energym.app.R;
 import com.energym.app.domain.*;
 import com.energym.app.nutrition.NutritionController;
@@ -46,9 +47,10 @@ public final class HistoryFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		heading("", "Progreso", "");
+		heading("", Txt.t(R.string.history), "");
 		// Cuatro pestañas cortas en vez de una página interminable.
-		segmented("history", new String[]{"Resumen", "Calendario", "Cuerpo", "Metas"},
+		segmented("history", new String[]{Txt.t(R.string.hist_tab_summary), Txt.t(R.string.hist_tab_calendar),
+				Txt.t(R.string.hist_tab_body), Txt.t(R.string.hist_tab_goals)},
 			new String[]{"history_tab_summary", "history_tab_calendar", "history_tab_body", "history_tab_goals"}, tab,
 			index -> {
 				tab = index;
@@ -79,39 +81,39 @@ public final class HistoryFragment extends ScreenFragment {
 	private void summary(ProgressStats stats) {
 		NutritionController n = state.nutrition;
 		gap(0);
-		LinearLayout totals = card("Todo lo que has hecho", stats.total() == 0 ?
-			"Finaliza tu primera sesión y aquí se irá sumando todo." : "");
+		LinearLayout totals = card(Txt.t(R.string.hist_totals_title), stats.total() == 0 ?
+			Txt.t(R.string.hist_totals_empty) : "");
 		LinearLayout row1 = columns(totals, 4);
-		stat(row1, Integer.toString(stats.total()), "sesiones");
-		stat(row1, BarChartView.compact(stats.totalMinutes() / 60.0), "horas");
-		stat(row1, Integer.toString(stats.exercisesDone()), "ejercicios");
+		stat(row1, Integer.toString(stats.total()), Txt.t(R.string.hist_stat_sessions));
+		stat(row1, BarChartView.compact(stats.totalMinutes() / 60.0), Txt.t(R.string.hist_stat_hours));
+		stat(row1, Integer.toString(stats.exercisesDone()), Txt.t(R.string.hist_stat_exercises));
 		LinearLayout row2 = columns(totals, 16);
-		stat(row2, BarChartView.compact(stats.totalVolume()), "kg levantados");
+		stat(row2, BarChartView.compact(stats.totalVolume()), Txt.t(R.string.hist_stat_kg_lifted));
 		stat(row2, BarChartView.compact(stats.totalDistance()), "km");
-		stat(row2, Integer.toString(n == null ? 0 : n.loggedDays().size()), "días con dieta");
+		stat(row2, Integer.toString(n == null ? 0 : n.loggedDays().size()), Txt.t(R.string.hist_stat_diet_days));
 
 		inProgress();
 
 		if (stats.total() > 0) {
 			gap(32);
-			LinearLayout trend = card("Tu mejora", "Últimas 4 semanas frente a las 4 anteriores");
-			text(trend, "Sesiones: " + trend(stats.sessionsTrend(), ""), R.style.EnerGym_Body, 8);
-			text(trend, "Tiempo: " + trend(stats.minutesTrend(), " min"), R.style.EnerGym_Body, 4);
+			LinearLayout trend = card(Txt.t(R.string.hist_trend_title), Txt.t(R.string.hist_trend_subtitle));
+			text(trend, Txt.t(R.string.hist_trend_sessions, trend(stats.sessionsTrend(), "")), R.style.EnerGym_Body, 8);
+			text(trend, Txt.t(R.string.hist_trend_time, trend(stats.minutesTrend(), " min")), R.style.EnerGym_Body, 4);
 			LinearLayout figures = columns(trend, 12);
-			stat(figures, Integer.toString(stats.weekStreak()), stats.weekStreak() == 1 ? "semana seguida" : "semanas seguidas");
-			stat(figures, Integer.toString(stats.daysThisMonth()), "días este mes");
+			stat(figures, Integer.toString(stats.weekStreak()), Txt.n(R.plurals.hist_weeks_in_row, stats.weekStreak()));
+			stat(figures, Integer.toString(stats.daysThisMonth()), Txt.t(R.string.hist_days_this_month));
 
-			bars("Sesiones por semana", stats.sessionsPerWeek(), stats);
-			bars("Minutos por semana", stats.minutesPerWeek(), stats);
+			bars(Txt.t(R.string.hist_bars_sessions), stats.sessionsPerWeek(), stats);
+			bars(Txt.t(R.string.hist_bars_minutes), stats.minutesPerWeek(), stats);
 			if (stats.totalVolume() > 0)
-				bars("Kilos levantados por semana", stats.volumePerWeek(), stats);
+				bars(Txt.t(R.string.hist_bars_kg), stats.volumePerWeek(), stats);
 			if (stats.totalDistance() > 0)
-				bars("Kilómetros por semana", stats.distancePerWeek(), stats);
+				bars(Txt.t(R.string.hist_bars_km), stats.distancePerWeek(), stats);
 
 			List<ProgressStats.Improvement> improvements = stats.improvements();
 			if (!improvements.isEmpty()) {
 				ProgressStats.Improvement top = improvements.get(0);
-				LinearLayout records = card("Récords por ejercicio", "Primera carga → mejor carga");
+				LinearLayout records = card(Txt.t(R.string.hist_records_title), Txt.t(R.string.hist_records_subtitle));
 				for (int i = 0; i < Math.min(5, improvements.size()); i++) {
 					ProgressStats.Improvement m = improvements.get(i);
 					text(records, m.name + "\n" + NutritionController.format(m.first) + " → " +
@@ -122,7 +124,8 @@ public final class HistoryFragment extends ScreenFragment {
 				double[] loads = stats.loadHistory(top.exerciseId);
 				if (loads.length > 1)
 					add(records, new LineChartView(requireContext()), 12).set(loads,
-						new String[]{"1.ª vez", "última"}, "kg", "Evolución de carga en " + top.name);
+						new String[]{Txt.t(R.string.hist_first_time), Txt.t(R.string.hist_latest)}, "kg",
+						Txt.t(R.string.hist_load_evolution, top.name));
 			}
 		}
 		nutrition(n);
@@ -135,12 +138,12 @@ public final class HistoryFragment extends ScreenFragment {
 			return;
 		gap(0);
 		com.energym.app.nutrition.BodyProfile current = n.effectiveBody();
-		LinearLayout log = card("⚖️ Peso", current == null ? "Anota tu peso para seguir su evolución." :
-			"Actual: " + NutritionController.format(current.weightKg) + " kg");
+		LinearLayout log = card(Txt.t(R.string.hist_weight_title), current == null ? Txt.t(R.string.hist_weight_empty) :
+			Txt.t(R.string.hist_weight_current, NutritionController.format(current.weightKg)));
 		String[] typed = {""};
-		textField(log, "weight", "Peso de hoy (kg)", "", true, false, v -> typed[0] = v);
-		action(log, "Anotar peso", !n.busy, () -> n.logWeight(typed[0])).setTag("progress_log_weight");
-		action(log, n.body == null ? "Completar mis datos" : "Editar mis datos físicos", true, () -> {
+		textField(log, "weight", Txt.t(R.string.hist_weight_today), "", true, false, v -> typed[0] = v);
+		action(log, Txt.t(R.string.hist_log_weight), !n.busy, () -> n.logWeight(typed[0])).setTag("progress_log_weight");
+		action(log, n.body == null ? Txt.t(R.string.hist_complete_body) : Txt.t(R.string.hist_edit_body), true, () -> {
 			n.fillBody();
 			app.navigate(com.energym.app.controller.AppController.Screen.BODY);
 		});
@@ -150,12 +153,12 @@ public final class HistoryFragment extends ScreenFragment {
 			for (int i = 0; i < kg.length; i++)
 				kg[i] = n.weights.get(days.get(i));
 			double change = kg[kg.length - 1] - kg[0];
-			LinearLayout weight = card("Peso corporal", (Math.abs(change) < 0.05 ? "Estable" :
-				(change > 0 ? "▲ Subida de " : "▼ Bajada de ") +
-					NutritionController.format(Math.round(Math.abs(change) * 10) / 10.0) + " kg") + " desde " +
-				short_(days.get(0)));
+			String amount = NutritionController.format(Math.round(Math.abs(change) * 10) / 10.0);
+			LinearLayout weight = card(Txt.t(R.string.hist_body_weight), Txt.t(Math.abs(change) < 0.05 ?
+				R.string.hist_weight_stable : change > 0 ? R.string.hist_weight_up : R.string.hist_weight_down,
+				amount, short_(days.get(0))));
 			add(weight, new LineChartView(requireContext()), 8).set(kg,
-				new String[]{short_(days.get(0)), short_(days.get(days.size() - 1))}, "kg", "Evolución del peso");
+				new String[]{short_(days.get(0)), short_(days.get(days.size() - 1))}, "kg", Txt.t(R.string.hist_weight_evolution));
 		}
 	}
 
@@ -167,8 +170,8 @@ public final class HistoryFragment extends ScreenFragment {
 		for (Achievements.Badge b : badges)
 			if (b.earned()) earned++;
 		gap(32);
-		LinearLayout card = card("🏅 " + earned + (earned == 1 ? " logro conseguido" : " logros conseguidos"),
-			allBadges ? "Todos los logros." : "Los siguientes que puedes conseguir.");
+		LinearLayout card = card(Txt.n(R.plurals.hist_badges_earned, earned),
+			Txt.t(allBadges ? R.string.hist_badges_all : R.string.hist_badges_next));
 		List<Achievements.Badge> shown = new ArrayList<>();
 		for (Achievements.Badge b : badges)
 			if (allBadges || !b.earned())
@@ -185,7 +188,7 @@ public final class HistoryFragment extends ScreenFragment {
 			row.setContentDescription(b.title + ". " + b.detail);
 			card.addView(row);
 		}
-		action(card, allBadges ? "Ver menos" : "Ver todos los logros", true, () -> {
+		action(card, Txt.t(allBadges ? R.string.hist_see_less : R.string.hist_see_all_badges), true, () -> {
 			allBadges = !allBadges;
 			render();
 		}).setTag("progress_all_badges");
@@ -196,34 +199,32 @@ public final class HistoryFragment extends ScreenFragment {
 	private void body() {
 		if (app.owner() == null || state.measures == null)
 			return;
-		section("Cuerpo", 32);
+		section(Txt.t(R.string.hist_tab_body), 32);
 		com.energym.app.nutrition.BodyMeasures m = state.measures;
 		SortedMap<LocalDate, Map<com.energym.app.nutrition.BodyMeasures.Part, Double>> days = m.days();
 		StringBuilder s = new StringBuilder();
 		if (days.isEmpty())
-			s.append("Mide cintura, pecho, brazo… cada 2–4 semanas: a veces el cuerpo cambia aunque la báscula no se mueva.");
+			s.append(Txt.t(R.string.hist_measures_empty));
 		else {
 			LocalDate last = days.lastKey();
-			s.append("Última medición: ").append(short_(last));
+			s.append(Txt.t(R.string.hist_last_measure, short_(last)));
 			for (Map.Entry<com.energym.app.nutrition.BodyMeasures.Part, Double> e : days.get(last).entrySet()) {
-				s.append('\n').append(e.getKey().label).append(": ").append(NutritionController.format(e.getValue()))
+				s.append('\n').append(e.getKey().display()).append(": ").append(NutritionController.format(e.getValue()))
 					.append(' ').append(e.getKey().unit);
 				double[] change = m.change(e.getKey());
 				if (change != null && Math.abs(change[1] - change[0]) >= 0.05)
 					s.append("   (").append(change[1] > change[0] ? "▲ +" : "▼ ")
 						.append(NutritionController.format(Math.abs(Math.round((change[1] - change[0]) * 10) / 10.0)))
-						.append(" desde ").append(short_(days.firstKey())).append(')');
+						.append(Txt.t(R.string.hist_since, short_(days.firstKey()))).append(')');
 			}
 		}
-		LinearLayout card = card("📏 Medidas", s.toString());
-		action(card, days.isEmpty() ? "Anotar medidas" : "Anotar medidas de hoy", true, this::measureDialog)
+		LinearLayout card = card(Txt.t(R.string.hist_measures_title), s.toString());
+		action(card, Txt.t(days.isEmpty() ? R.string.hist_log_measures : R.string.hist_log_measures_today), true, this::measureDialog)
 			.setTag("progress_measures");
 
 		List<java.io.File> photos = ProgressPhotos.list(requireContext(), app.owner());
-		LinearLayout album = card("📸 Fotos de progreso", photos.isEmpty() ?
-			"Haz una foto cada pocas semanas con la misma luz y postura para comparar. Se guardan solo en este móvil." :
-			photos.size() + (photos.size() == 1 ? " foto" : " fotos") + " · solo en este móvil. Toca para verla, " +
-				"mantén pulsado para borrarla.");
+		LinearLayout album = card(Txt.t(R.string.hist_photos_title), photos.isEmpty() ?
+			Txt.t(R.string.hist_photos_empty) : Txt.n(R.plurals.hist_photos_count, photos.size()));
 		if (!photos.isEmpty()) {
 			android.widget.HorizontalScrollView scroll = new android.widget.HorizontalScrollView(requireContext());
 			LinearLayout strip = new LinearLayout(requireContext());
@@ -236,14 +237,14 @@ public final class HistoryFragment extends ScreenFragment {
 			add(album, scroll, 12);
 		}
 		LinearLayout buttons = columns(album, 12);
-		compact(buttons, "Hacer foto", true, () -> {
+		compact(buttons, Txt.t(R.string.hist_take_photo), true, () -> {
 			try {
 				takePhoto.launch(cameraUri());
 			} catch (RuntimeException e) {
-				android.widget.Toast.makeText(requireContext(), "No hay cámara disponible", android.widget.Toast.LENGTH_SHORT).show();
+				android.widget.Toast.makeText(requireContext(), Txt.t(R.string.hist_no_camera), android.widget.Toast.LENGTH_SHORT).show();
 			}
 		}).setTag("progress_camera");
-		compact(buttons, "De la galería", true, () -> pickPhoto.launch(new androidx.activity.result.PickVisualMediaRequest.Builder()
+		compact(buttons, Txt.t(R.string.hist_from_gallery), true, () -> pickPhoto.launch(new androidx.activity.result.PickVisualMediaRequest.Builder()
 			.setMediaType(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
 			.build())).setTag("progress_gallery");
 	}
@@ -255,7 +256,7 @@ public final class HistoryFragment extends ScreenFragment {
 		android.widget.ImageView image = new android.widget.ImageView(requireContext());
 		image.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
 		image.setImageBitmap(ProgressPhotos.thumbnail(f, dp(96)));
-		image.setContentDescription("Foto de progreso del " + ProgressPhotos.date(f));
+		image.setContentDescription(Txt.t(R.string.hist_photo_description, ProgressPhotos.date(f)));
 		box.addView(image, new LinearLayout.LayoutParams(dp(88), dp(104)));
 		TextView label = text(box, ProgressPhotos.date(f), R.style.EnerGym_FieldCaption, 2);
 		label.setGravity(Gravity.CENTER);
@@ -264,12 +265,12 @@ public final class HistoryFragment extends ScreenFragment {
 			full.setAdjustViewBounds(true);
 			full.setImageBitmap(ProgressPhotos.thumbnail(f, 1200));
 			new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-				.setTitle(ProgressPhotos.date(f)).setView(full).setPositiveButton("Cerrar", null).show();
+				.setTitle(ProgressPhotos.date(f)).setView(full).setPositiveButton(Txt.t(R.string.common_close), null).show();
 		});
 		box.setOnLongClickListener(v -> {
 			new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-				.setTitle("¿Borrar esta foto?").setMessage("Se borrará de este móvil.")
-				.setNegativeButton("Cancelar", null).setPositiveButton("Borrar", (d, w) -> {
+				.setTitle(Txt.t(R.string.hist_delete_photo_title)).setMessage(Txt.t(R.string.hist_delete_photo_message))
+				.setNegativeButton(Txt.t(R.string.common_cancel), null).setPositiveButton(Txt.t(R.string.common_delete), (d, w) -> {
 					//noinspection ResultOfMethodCallIgnored
 					f.delete();
 					render();
@@ -288,7 +289,7 @@ public final class HistoryFragment extends ScreenFragment {
 		if (app == null || app.owner() == null)
 			return;
 		boolean ok = ProgressPhotos.add(requireContext(), app.owner(), uri);
-		android.widget.Toast.makeText(requireContext(), ok ? "Foto guardada" : "No se pudo guardar la foto",
+		android.widget.Toast.makeText(requireContext(), Txt.t(ok ? R.string.hist_photo_saved : R.string.hist_photo_failed),
 			android.widget.Toast.LENGTH_SHORT).show();
 		//noinspection ResultOfMethodCallIgnored
 		ProgressPhotos.cameraFile(requireContext()).delete();
@@ -305,7 +306,7 @@ public final class HistoryFragment extends ScreenFragment {
 		for (com.energym.app.nutrition.BodyMeasures.Part p : com.energym.app.nutrition.BodyMeasures.Part.values()) {
 			com.google.android.material.textfield.TextInputLayout layout =
 				new com.google.android.material.textfield.TextInputLayout(requireContext());
-			layout.setHint(p.label + " (" + p.unit + ")");
+			layout.setHint(p.display() + " (" + p.unit + ")");
 			com.google.android.material.textfield.TextInputEditText edit =
 				new com.google.android.material.textfield.TextInputEditText(layout.getContext());
 			edit.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
@@ -319,8 +320,9 @@ public final class HistoryFragment extends ScreenFragment {
 		android.widget.ScrollView scroll = new android.widget.ScrollView(requireContext());
 		scroll.addView(form);
 		androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-			.setTitle("Medidas de hoy").setMessage("Rellena solo las que midas. Mide siempre en el mismo sitio y a la misma hora.")
-			.setView(scroll).setNegativeButton("Cancelar", null).setPositiveButton("Guardar medidas", null).show();
+			.setTitle(Txt.t(R.string.hist_measures_today)).setMessage(Txt.t(R.string.hist_measures_hint))
+			.setView(scroll).setNegativeButton(Txt.t(R.string.common_cancel), null)
+			.setPositiveButton(Txt.t(R.string.hist_save_measures), null).show();
 		dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
 			Map<com.energym.app.nutrition.BodyMeasures.Part, String> typed =
 				new EnumMap<>(com.energym.app.nutrition.BodyMeasures.Part.class);
@@ -342,7 +344,7 @@ public final class HistoryFragment extends ScreenFragment {
 			if (s.getStatus() != Session.Status.DRAFT)
 				continue;
 			int total = s.getRoutine().getItems().size(), saved = s.getResults().size();
-			StringBuilder done = new StringBuilder(saved + " de " + total + " ejercicios guardados");
+			StringBuilder done = new StringBuilder(Txt.t(R.string.hist_saved_of_total, saved, total));
 			for (RoutineItem item : s.getRoutine().getItems()) {
 				Map<String, String> values = s.getResults().get(item.getExercise().getId());
 				if (values != null)
@@ -350,10 +352,10 @@ public final class HistoryFragment extends ScreenFragment {
 						.append(com.energym.app.controller.AppController.metrics(item.getExercise().getMetricType(), values));
 			}
 			gap(32);
-			LinearLayout card = card("Entreno en curso: " + s.getRoutine().getTitle(), done.toString());
+			LinearLayout card = card(Txt.t(R.string.hist_in_progress, s.getRoutine().getTitle()), done.toString());
 			add(card, new ProgressBarView(requireContext()), 12).set(total == 0 ? 0 : saved / (double) total,
-				saved + " de " + total + " ejercicios");
-			primary(action(card, "▶ Continuar entreno", !app.trainingMutation, () -> app.resume(s)));
+				Txt.t(R.string.hist_exercises_of_total, saved, total));
+			primary(action(card, Txt.t(R.string.hist_continue_workout), !app.trainingMutation, () -> app.resume(s)));
 			return;
 		}
 	}
@@ -369,29 +371,28 @@ public final class HistoryFragment extends ScreenFragment {
 			if (v > 0) logged++;
 		com.energym.app.nutrition.BodyProfile.Targets targets = n.targets();
 		gap(32);
-		LinearLayout card = card("Alimentación", logged == 0 ?
-			"Anota comidas en Alimentación y aquí verás tu evolución." : "Últimos " + days + " días");
+		LinearLayout card = card(Txt.t(R.string.hist_food_title), logged == 0 ?
+			Txt.t(R.string.hist_food_empty) : Txt.t(R.string.hist_last_days, days));
 		if (logged == 0)
 			return;
 		LinearLayout figures = columns(card, 4);
-		stat(figures, Integer.toString(logged), logged == 1 ? "día anotado" : "días anotados");
-		stat(figures, Long.toString(Math.round(NutritionController.loggedAverage(kcal, kcal))), "kcal de media");
-		stat(figures, Long.toString(Math.round(NutritionController.loggedAverage(protein, kcal))), "g proteína/día");
+		stat(figures, Integer.toString(logged), Txt.n(R.plurals.hist_days_logged, logged));
+		stat(figures, Long.toString(Math.round(NutritionController.loggedAverage(kcal, kcal))), Txt.t(R.string.hist_kcal_avg));
+		stat(figures, Long.toString(Math.round(NutritionController.loggedAverage(protein, kcal))), Txt.t(R.string.hist_protein_day));
 		if (targets != null) {
 			int onTarget = 0;
 			for (double v : kcal)
 				if (v > 0 && Math.abs(v - targets.kcal) <= targets.kcal * 0.1) onTarget++;
-			text(card, "🎯 " + onTarget + " de " + logged + " días dentro de tu objetivo (±10 % de " +
-				Math.round(targets.kcal) + " kcal)", R.style.EnerGym_Body, 12);
+			text(card, Txt.t(R.string.hist_on_target, onTarget, logged, Math.round(targets.kcal)), R.style.EnerGym_Body, 12);
 		}
 		add(card, new BarChartView(requireContext()), 12).set(kcal, n.recentLabels(days),
-			targets == null ? 0 : targets.kcal, "Calorías de los últimos " + days + " días: " + Arrays.toString(kcal));
+			targets == null ? 0 : targets.kcal, Txt.t(R.string.hist_kcal_chart, days, Arrays.toString(kcal)));
 		add(card, new LineChartView(requireContext()), 12).set(protein,
-			new String[]{n.recentLabels(days)[0], "hoy"}, "g", "Proteínas por día");
+			new String[]{n.recentLabels(days)[0], Txt.t(R.string.common_today_lower)}, "g", Txt.t(R.string.hist_protein_chart));
 	}
 
 	private void bars(String title, double[] values, ProgressStats stats) {
-		LinearLayout card = card(title, "Últimas 8 semanas");
+		LinearLayout card = card(title, Txt.t(R.string.hist_last_8_weeks));
 		add(card, new BarChartView(requireContext()), 8).set(values, stats.weekLabels(), 0,
 			title + ": " + Arrays.toString(values));
 	}
@@ -403,7 +404,7 @@ public final class HistoryFragment extends ScreenFragment {
 		if (selected == null)
 			selected = today;
 		gap(0);
-		LinearLayout calendar = card("Calendario", "Dorado: entreno · puntos de color: grupos musculares · punto blanco: comida anotada");
+		LinearLayout calendar = card(Txt.t(R.string.hist_tab_calendar), Txt.t(R.string.hist_calendar_legend));
 		Map<LocalDate, Set<RoutineRequest.Area>> worked = MuscleBreakdown.byDay(app.history, ZoneId.systemDefault());
 		Map<LocalDate, int[]> dots = new HashMap<>();
 		Set<RoutineRequest.Area> seen = EnumSet.noneOf(RoutineRequest.Area.class);
@@ -420,9 +421,9 @@ public final class HistoryFragment extends ScreenFragment {
 		compact(nav, "‹", true, () -> {
 			month = month.minusMonths(1);
 			render();
-		}).setContentDescription("Mes anterior");
+		}).setContentDescription(Txt.t(R.string.hist_previous_month));
 		((TextView) nav.getChildAt(0)).setTextSize(22);
-		String title = month.format(DateTimeFormatter.ofPattern("MMMM yyyy", NutritionFragment.SPANISH));
+		String title = month.format(DateTimeFormatter.ofPattern(Txt.t(R.string.pattern_month_year), Txt.locale()));
 		TextView monthTitle = new TextView(requireContext());
 		monthTitle.setTextAppearance(R.style.EnerGym_CardTitle);
 		monthTitle.setText(Character.toUpperCase(title.charAt(0)) + title.substring(1));
@@ -435,7 +436,7 @@ public final class HistoryFragment extends ScreenFragment {
 		compact(nav, "›", month.isBefore(YearMonth.from(today)), () -> {
 			month = month.plusMonths(1);
 			render();
-		}).setContentDescription("Mes siguiente");
+		}).setContentDescription(Txt.t(R.string.hist_next_month));
 		((TextView) nav.getChildAt(2)).setTextSize(22);
 		add(calendar, new MonthCalendarView(requireContext()), 12).set(month, today, selected,
 			stats.sessionsByDay().keySet(), n == null ? Collections.emptySet() : n.loggedDays(), day -> {
@@ -446,7 +447,7 @@ public final class HistoryFragment extends ScreenFragment {
 			text(calendar, "", R.style.EnerGym_FieldCaption, 8).setText(legend(seen));
 		StringBuilder detail = new StringBuilder(NutritionFragment.label(selected, today));
 		List<Session> that = stats.sessionsOn(selected);
-		detail.append(that.isEmpty() ? " · sin entreno" : " · " + that.size() + (that.size() == 1 ? " sesión" : " sesiones"));
+		detail.append(" · ").append(that.isEmpty() ? Txt.t(R.string.hist_no_workout) : Txt.n(R.plurals.hist_sessions, that.size()));
 		// Resultados exactos del día elegido: lo realizado, nunca la prescripción.
 		for (Session s : that) {
 			detail.append("\n\n").append(s.getRoutine().getTitle());
@@ -457,16 +458,16 @@ public final class HistoryFragment extends ScreenFragment {
 			}
 		}
 		if (n != null && n.historyCalories(selected) > 0)
-			detail.append("\nComida: ").append(Math.round(n.historyCalories(selected))).append(" kcal");
+			detail.append('\n').append(Txt.t(R.string.hist_food_kcal, Math.round(n.historyCalories(selected))));
 		text(calendar, detail.toString(), R.style.EnerGym_Body, 12);
 		long scope = app.accountRevision();
 		for (Session session : that)
-			action(calendar, "Eliminar sesión: " + session.getRoutine().getTitle(), !app.trainingMutation, () ->
+			action(calendar, Txt.t(R.string.hist_delete_session, session.getRoutine().getTitle()), !app.trainingMutation, () ->
 				new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-					.setTitle("¿Eliminar esta sesión?")
-					.setMessage("Se quitará de tu historial y se recalculará el progreso. La rutina se conserva. No se puede deshacer.")
-					.setNegativeButton("Cancelar", null)
-					.setPositiveButton("Eliminar", (dialog, button) -> {
+					.setTitle(Txt.t(R.string.hist_delete_session_title))
+					.setMessage(Txt.t(R.string.hist_delete_session_message))
+					.setNegativeButton(Txt.t(R.string.common_cancel), null)
+					.setPositiveButton(Txt.t(R.string.common_remove), (dialog, button) -> {
 						if (scope == app.accountRevision()) app.deleteSession(session);
 					}).show());
 	}
@@ -476,14 +477,14 @@ public final class HistoryFragment extends ScreenFragment {
 		LocalDate today = LocalDate.now();
 		LocalDate from = recentPeriod ? today.minusDays(89) : today.withDayOfMonth(1);
 		List<MuscleBreakdown.Share> shares = MuscleBreakdown.of(app.history, ZoneId.systemDefault(), from, today);
-		section("Por grupo muscular", 32);
-		segmented("breakdown", new String[]{"Este mes", "Últimos 90 días"},
+		section(Txt.t(R.string.hist_by_muscle), 32);
+		segmented("breakdown", new String[]{Txt.t(R.string.hist_this_month), Txt.t(R.string.hist_last_90)},
 			new String[]{"breakdown_month", "breakdown_90"}, recentPeriod ? 1 : 0, index -> {
 				recentPeriod = index == 1;
 				render();
 			});
 		if (shares.isEmpty()) {
-			card("Sin datos en este periodo", "Termina entrenos y aquí verás qué grupos musculares trabajas más.");
+			card(Txt.t(R.string.hist_no_data_period), Txt.t(R.string.hist_no_data_period_body));
 			return;
 		}
 		double total = 0;
@@ -496,22 +497,22 @@ public final class HistoryFragment extends ScreenFragment {
 			colors[i] = areaColor(shares.get(i).area);
 		}
 		MuscleBreakdown.Share top = shares.get(0);
-		LinearLayout card = card("Series por grupo", "Un ejercicio que trabaja varias zonas reparte sus series entre ellas.");
-		StringBuilder spoken = new StringBuilder("Reparto de series: ");
+		LinearLayout card = card(Txt.t(R.string.hist_sets_by_group), Txt.t(R.string.hist_sets_by_group_body));
+		StringBuilder spoken = new StringBuilder(Txt.t(R.string.hist_sets_split));
 		for (MuscleBreakdown.Share sh : shares)
-			spoken.append(sh.area.label).append(" ").append(Math.round(sh.sets / total * 100)).append(" %, ");
+			spoken.append(sh.area.display()).append(" ").append(Math.round(sh.sets / total * 100)).append(" %, ");
 		add(card, new com.energym.app.ui.charts.DonutView(requireContext()), 8).set(values, colors,
-			capital(top.area.label), Math.round(top.sets / total * 100) + " %", spoken.toString());
+			capital(top.area.display()), Math.round(top.sets / total * 100) + " %", spoken.toString());
 		for (MuscleBreakdown.Share sh : shares) {
 			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, card, false);
 			TextView name = row.findViewById(R.id.food_name);
-			name.setText("●  " + capital(sh.area.label));
+			name.setText("●  " + capital(sh.area.display()));
 			android.text.SpannableString dot = new android.text.SpannableString(name.getText());
 			dot.setSpan(new android.text.style.ForegroundColorSpan(areaColor(sh.area)), 0, 1, 0);
 			name.setText(dot);
 			((TextView) row.findViewById(R.id.food_detail)).setText(
-				NutritionController.format(Math.round(sh.sets * 10) / 10.0) + " series" +
-					(sh.kg > 0 ? " · " + Math.round(sh.kg) + " kg movidos" : ""));
+				Txt.t(R.string.hist_sets_count, NutritionController.format(Math.round(sh.sets * 10) / 10.0)) +
+					(sh.kg > 0 ? " · " + Txt.t(R.string.hist_kg_moved, Math.round(sh.kg)) : ""));
 			((TextView) row.findViewById(R.id.food_kcal)).setText(Math.round(sh.sets / total * 100) + " %");
 			card.addView(row);
 		}
@@ -519,13 +520,13 @@ public final class HistoryFragment extends ScreenFragment {
 
 	/** Leyenda con el punto de color de cada grupo, igual que en el calendario. */
 	private static CharSequence legend(Set<RoutineRequest.Area> areas) {
-		android.text.SpannableStringBuilder b = new android.text.SpannableStringBuilder("Este mes:");
+		android.text.SpannableStringBuilder b = new android.text.SpannableStringBuilder(Txt.t(R.string.hist_this_month_colon));
 		for (RoutineRequest.Area a : areas) {
 			b.append("   ");
 			int start = b.length();
 			b.append("●");
 			b.setSpan(new android.text.style.ForegroundColorSpan(areaColor(a)), start, start + 1, 0);
-			b.append(" ").append(capital(a.label));
+			b.append(" ").append(capital(a.display()));
 		}
 		return b;
 	}
@@ -538,7 +539,7 @@ public final class HistoryFragment extends ScreenFragment {
 		StringBuilder b = new StringBuilder();
 		for (int i = 0; i < sets.size(); i++)
 			b.append(i == 0 ? "" : "\n").append(i + 1).append(".  ")
-				.append(sets.get(i).kg > 0 ? SetLog.format(sets.get(i).kg) + " kg" : "Peso corporal")
+				.append(sets.get(i).kg > 0 ? SetLog.format(sets.get(i).kg) + " kg" : Txt.t(R.string.hist_body_weight))
 				.append(" × ").append(sets.get(i).reps);
 		return b.toString();
 	}
@@ -576,7 +577,7 @@ public final class HistoryFragment extends ScreenFragment {
 	private void goals(ProgressStats stats) {
 		GoalsController g = state.goals;
 		if (g == null || app.owner() == null) {
-			card("Objetivos", "Entra con tu cuenta para marcar objetivos.");
+			card(Txt.t(R.string.hist_goals_title), Txt.t(R.string.hist_goals_signed_out));
 			return;
 		}
 		SortedMap<LocalDate, Double> weights = state.nutrition == null ? new TreeMap<>() : state.nutrition.weights;
@@ -584,39 +585,38 @@ public final class HistoryFragment extends ScreenFragment {
 			form(g, weights);
 		else
 		{
-			MaterialButton add = action(rows, "Nuevo objetivo", !g.busy, g::startNew);
+			MaterialButton add = action(rows, Txt.t(R.string.hist_new_goal), !g.busy, g::startNew);
 			primary(add);
 			((LinearLayout.LayoutParams) add.getLayoutParams()).bottomMargin = dp(16);
 		}
 		if (g.goals.isEmpty() && !g.editing)
-			card("Aún no tienes objetivos", "Por ejemplo: 3 sesiones por semana, 150 minutos por semana, " +
-				"llegar a 75 kg o levantar 60 kg en sentadilla.");
+			card(Txt.t(R.string.hist_no_goals), Txt.t(R.string.hist_no_goals_body));
 		for (Goal goal : g.goals) {
 			GoalProgress p = GoalProgress.of(goal, stats, weights);
-			LinearLayout card = card(goal.title(), p.status() + (p.reached ? "\n✓ ¡Objetivo cumplido!" : ""));
+			LinearLayout card = card(goal.title(), p.status() + (p.reached ? "\n" + Txt.t(R.string.hist_goal_reached) : ""));
 			add(card, new ProgressBarView(requireContext()), 12).set(p.ratio, goal.title());
 			if (p.series.length > 0) {
 				if (goal.type.weekly)
 					add(card, new BarChartView(requireContext()), 12).set(p.series, p.labels, goal.target,
-						goal.title() + " por semana");
+						Txt.t(R.string.hist_per_week, goal.title()));
 				else if (p.series.length > 1)
 					add(card, new LineChartView(requireContext()), 12).set(p.series,
-						new String[]{p.labels[0], p.labels[p.labels.length - 1]}, goal.type.unit, goal.title());
+						new String[]{p.labels[0], p.labels[p.labels.length - 1]}, goal.type.unit(), goal.title());
 			}
-			MaterialButton remove = action(card, "Quitar objetivo", !g.busy, () -> g.remove(goal));
-			remove.setContentDescription("Quitar objetivo " + goal.title());
+			MaterialButton remove = action(card, Txt.t(R.string.hist_remove_goal), !g.busy, () -> g.remove(goal));
+			remove.setContentDescription(Txt.t(R.string.hist_remove_goal_named, goal.title()));
 		}
 	}
 
 	private void form(GoalsController g, SortedMap<LocalDate, Double> weights) {
 		Map<String, String> d = g.draft;
-		LinearLayout form = card("Nuevo objetivo", "");
+		LinearLayout form = card(Txt.t(R.string.hist_new_goal), "");
 		List<String> types = new ArrayList<>(), labels = new ArrayList<>();
 		for (Goal.Type t : Goal.Type.values()) {
 			types.add(t.name());
-			labels.add(t.label);
+			labels.add(t.display());
 		}
-		choice(form, "goal_type", "Tipo de objetivo", types, labels, d.get("type"), v -> {
+		choice(form, "goal_type", Txt.t(R.string.hist_goal_type), types, labels, d.get("type"), v -> {
 			d.put("type", v);
 			app.changed();
 		});
@@ -631,18 +631,18 @@ public final class HistoryFragment extends ScreenFragment {
 					names.put(e.getId(), e.getName());
 				}
 			d.putIfAbsent("exerciseId", ids.get(0));
-			choice(form, "goal_exercise", "Ejercicio", ids, exerciseNames, d.get("exerciseId"),
+			choice(form, "goal_exercise", Txt.t(R.string.common_exercise), ids, exerciseNames, d.get("exerciseId"),
 				v -> d.put("exerciseId", v));
 		}
-		textField(form, "goal_target", "Meta (" + type.unit + (type.weekly ? " por semana)" : ")"),
+		textField(form, "goal_target", Txt.t(type.weekly ? R.string.hist_goal_target_weekly : R.string.hist_goal_target, type.unit()),
 			d.getOrDefault("target", ""), true, false, v -> d.put("target", v));
 		double latest = weights.isEmpty() ? 0 : weights.get(weights.lastKey());
 		if (type == Goal.Type.TARGET_WEIGHT)
-			text(form, latest > 0 ? "Partes de " + NutritionController.format(latest) + " kg (último peso anotado)." :
-				"Anota tu peso en Nutrición para medir el avance.", R.style.EnerGym_FieldCaption, 0);
+			text(form, latest > 0 ? Txt.t(R.string.hist_goal_start_weight, NutritionController.format(latest)) :
+				Txt.t(R.string.hist_goal_log_weight), R.style.EnerGym_FieldCaption, 0);
 		LinearLayout buttons = columns(form, 8);
-		compact(buttons, "Cancelar", true, g::cancel);
-		primary(compact(buttons, "Guardar", !g.busy, () -> g.save(latest, names.get(d.get("exerciseId")))));
+		compact(buttons, Txt.t(R.string.common_cancel), true, g::cancel);
+		primary(compact(buttons, Txt.t(R.string.common_save), !g.busy, () -> g.save(latest, names.get(d.get("exerciseId")))));
 	}
 
 	private static String short_(LocalDate d) {
@@ -652,8 +652,8 @@ public final class HistoryFragment extends ScreenFragment {
 	private static String trend(ProgressStats.Trend t, String unit) {
 		String now = Math.round(t.recent) + unit;
 		if (!t.comparable())
-			return now + (t.recent > 0 ? " · primer periodo" : "");
+			return now + (t.recent > 0 ? " · " + Txt.t(R.string.hist_first_period) : "");
 		long percent = Math.round(t.percent());
-		return now + "  " + (percent > 0 ? "▲ +" + percent + " %" : percent < 0 ? "▼ " + percent + " %" : "= igual");
+		return now + "  " + (percent > 0 ? "▲ +" + percent + " %" : percent < 0 ? "▼ " + percent + " %" : Txt.t(R.string.hist_same));
 	}
 }

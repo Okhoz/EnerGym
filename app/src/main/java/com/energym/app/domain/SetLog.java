@@ -1,5 +1,7 @@
 package com.energym.app.domain;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.util.*;
 
 /**
@@ -15,14 +17,22 @@ public final class SetLog {
 
 	/** Tipo de serie: normal, calentamiento (no cuenta para progresar ni récords), drop set o al fallo. */
 	public enum Kind {
-		NORMAL('N', ""), WARMUP('W', "Calentamiento"), DROP('D', "Drop set"), FAILURE('F', "Al fallo");
+		NORMAL('N', "", 0), WARMUP('W', "Calentamiento", R.string.set_kind_warmup), DROP('D', "Drop set", R.string.set_kind_drop),
+		FAILURE('F', "Al fallo", R.string.set_kind_failure);
 
 		public final char code;
+		/** En español: va a la copia CSV; en pantalla, display(). */
 		public final String label;
+		private final int text;
 
-		Kind(char code, String label) {
+		Kind(char code, String label, int text) {
 			this.code = code;
 			this.label = label;
+			this.text = text;
+		}
+
+		public String display() {
+			return text == 0 ? "" : Txt.t(text);
 		}
 
 		static Kind of(char code) {

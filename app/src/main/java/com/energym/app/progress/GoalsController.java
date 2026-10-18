@@ -1,5 +1,7 @@
 package com.energym.app.progress;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -64,7 +66,7 @@ public final class GoalsController {
 
 			public void failure(Exception e) {
 				if (token == generation)
-					error.accept("No se pudieron leer tus objetivos: " + e.getMessage());
+					error.accept(Txt.t(R.string.goal_read_failed, e.getMessage()));
 			}
 		});
 	}
@@ -94,11 +96,11 @@ public final class GoalsController {
 			Goal.Type type = Goal.Type.valueOf(draft.getOrDefault("type", ""));
 			String raw = draft.getOrDefault("target", "").trim().replace(',', '.');
 			if (!raw.matches("\\d+(?:\\.\\d+)?"))
-				throw new IllegalArgumentException("Indica una cifra para el objetivo.");
+				throw new IllegalArgumentException(Txt.t(R.string.goal_need_number));
 			goal = Goal.create(type, Double.parseDouble(raw), type == Goal.Type.TARGET_WEIGHT ? currentWeight : 0,
 				draft.get("exerciseId"), exerciseName);
 		} catch (RuntimeException e) {
-			error.accept(e.getMessage() == null ? "Revisa el objetivo." : e.getMessage());
+			error.accept(e.getMessage() == null ? Txt.t(R.string.goal_check) : e.getMessage());
 			return;
 		}
 		busy = true;
@@ -148,6 +150,6 @@ public final class GoalsController {
 		if (token != generation)
 			return;
 		busy = false;
-		error.accept("No se pudo guardar el objetivo: " + e.getMessage());
+		error.accept(Txt.t(R.string.goal_save_failed, e.getMessage()));
 	}
 }

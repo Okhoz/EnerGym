@@ -1,5 +1,7 @@
 package com.energym.app.domain;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 /**
  * MODELO: consejo para la siguiente serie según el esfuerzo de la última (RPE), como haría un entrenador en la
  * sala: el objetivo es un RPE de 8 (quedaban 2 repeticiones). Con carga ajusta los kilos; sin carga, las
@@ -29,27 +31,26 @@ public final class Autoregulation {
 		if (last.kg <= 0) {
 			int reps = rpe >= 9.5 ? Math.max(1, last.reps - 2) : rpe <= 6.5 ? last.reps + 2 : rpe <= 7.5 ? last.reps + 1 :
 				last.reps;
-			return new Advice(0, reps, rpe >= 9.5 ? "Al límite: haz " + reps + " repeticiones en la siguiente." :
-				reps > last.reps ? "Te sobra margen: intenta " + reps + " repeticiones." :
-					"Bien ajustado: repite " + reps + " repeticiones.");
+			return new Advice(0, reps, Txt.t(rpe >= 9.5 ? R.string.advice_reps_limit :
+				reps > last.reps ? R.string.advice_reps_more : R.string.advice_reps_same, reps));
 		}
 		double kg;
 		String text;
 		if (rpe >= 9.5 || last.kind == SetLog.Kind.FAILURE) {
 			kg = round(last.kg * 0.9, step);
-			text = "Al límite: baja a " + fmt(kg) + " kg para mantener la técnica.";
+			text = Txt.t(R.string.advice_kg_limit, fmt(kg));
 		} else if (rpe >= 8.75) {
 			kg = last.kg;
-			text = "Cerca del límite: mantén " + fmt(kg) + " kg; si fallas, baja un poco.";
+			text = Txt.t(R.string.advice_kg_near, fmt(kg));
 		} else if (rpe >= 7.75) {
 			kg = last.kg;
-			text = "Esfuerzo perfecto: repite " + fmt(kg) + " kg.";
+			text = Txt.t(R.string.advice_kg_perfect, fmt(kg));
 		} else if (rpe >= 6.75) {
 			kg = last.kg + step;
-			text = "Te quedan reservas: prueba con " + fmt(kg) + " kg.";
+			text = Txt.t(R.string.advice_kg_reserve, fmt(kg));
 		} else {
 			kg = Math.max(last.kg + 2 * step, round(last.kg * 1.05, step));
-			text = "Muy fácil: sube a " + fmt(kg) + " kg.";
+			text = Txt.t(R.string.advice_kg_easy, fmt(kg));
 		}
 		return new Advice(kg, last.reps, text);
 	}

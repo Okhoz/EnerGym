@@ -1,5 +1,7 @@
 package com.energym.app.progress;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -73,14 +75,14 @@ public final class GoalProgress {
 	}
 
 	public String status() {
-		String unit = goal.type.unit;
+		String unit = goal.type.unit();
 		if (goal.type == Goal.Type.TARGET_WEIGHT)
-			return series.length == 0 ? "Anota tu peso en Nutrición para medir el avance." :
-				"Ahora " + Goal.fmt(round(current)) + " kg · objetivo " + Goal.fmt(goal.target) + " kg";
+			return series.length == 0 ? Txt.t(R.string.hist_goal_log_weight) :
+				Txt.t(R.string.goal_status_weight, Goal.fmt(round(current)), Goal.fmt(goal.target));
 		if (goal.type == Goal.Type.EXERCISE_LOAD)
-			return series.length == 0 ? "Aún no hay sesiones con carga en este ejercicio." :
-				"Mejor marca " + Goal.fmt(round(current)) + " kg de " + Goal.fmt(goal.target) + " kg";
-		return "Esta semana " + Goal.fmt(round(current)) + " de " + Goal.fmt(goal.target) + " " + unit;
+			return series.length == 0 ? Txt.t(R.string.goal_status_load_empty) :
+				Txt.t(R.string.goal_status_load, Goal.fmt(round(current)), Goal.fmt(goal.target));
+		return Txt.t(R.string.goal_status_week, Goal.fmt(round(current)), Goal.fmt(goal.target), unit);
 	}
 
 	private static double round(double v) {

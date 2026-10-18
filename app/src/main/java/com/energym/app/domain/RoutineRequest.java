@@ -1,5 +1,7 @@
 package com.energym.app.domain;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.regex.*;
@@ -11,13 +13,22 @@ import java.util.regex.*;
  */
 public final class RoutineRequest {
 	public enum Area {
-		LEGS("piernas"), GLUTES("glúteos"), CHEST("pecho"), BACK("espalda"), SHOULDERS("hombros"), ARMS("brazos"),
-		CORE("core"), CARDIO("cardio"), MOBILITY("movilidad");
+		LEGS("piernas", R.string.area_legs), GLUTES("glúteos", R.string.area_glutes), CHEST("pecho", R.string.area_chest),
+		BACK("espalda", R.string.area_back), SHOULDERS("hombros", R.string.area_shoulders), ARMS("brazos", R.string.area_arms),
+		CORE("core", R.string.area_core), CARDIO("cardio", R.string.area_cardio), MOBILITY("movilidad", R.string.area_mobility);
 
+		/** Nombre en español: se guarda en los ejercicios propios y va a la IA; no se traduce. */
 		public final String label;
+		private final int text;
 
-		Area(String label) {
+		Area(String label, int text) {
 			this.label = label;
+			this.text = text;
+		}
+
+		/** Nombre para mostrar en el idioma del móvil. */
+		public String display() {
+			return Txt.t(text);
 		}
 	}
 

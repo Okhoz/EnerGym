@@ -1,5 +1,7 @@
 package com.energym.app.progress;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.util.*;
 
 /**
@@ -7,23 +9,31 @@ import java.util.*;
  */
 public final class Goal {
 	public enum Type {
-		SESSIONS_PER_WEEK("Sesiones por semana", "sesiones", 1, 14, true),
-		MINUTES_PER_WEEK("Minutos por semana", "min", 10, 2000, true),
-		VOLUME_PER_WEEK("Kilos levantados por semana", "kg", 50, 200000, true),
-		DISTANCE_PER_WEEK("Kilómetros por semana", "km", 1, 500, true),
-		TARGET_WEIGHT("Peso objetivo", "kg", 30, 300, false),
-		EXERCISE_LOAD("Carga en un ejercicio", "kg", 1, 500, false);
+		SESSIONS_PER_WEEK(R.string.goal_sessions_week, R.string.goal_unit_sessions, 1, 14, true),
+		MINUTES_PER_WEEK(R.string.hist_bars_minutes, R.string.unit_min, 10, 2000, true),
+		VOLUME_PER_WEEK(R.string.hist_bars_kg, R.string.unit_kg, 50, 200000, true),
+		DISTANCE_PER_WEEK(R.string.hist_bars_km, R.string.unit_km, 1, 500, true),
+		TARGET_WEIGHT(R.string.goal_target_weight, R.string.unit_kg, 30, 300, false),
+		EXERCISE_LOAD(R.string.goal_exercise_load, R.string.unit_kg, 1, 500, false);
 
-		public final String label, unit;
+		private final int label, unit;
 		public final double min, max;
 		public final boolean weekly;
 
-		Type(String label, String unit, double min, double max, boolean weekly) {
+		Type(int label, int unit, double min, double max, boolean weekly) {
 			this.label = label;
 			this.unit = unit;
 			this.min = min;
 			this.max = max;
 			this.weekly = weekly;
+		}
+
+		public String display() {
+			return Txt.t(label);
+		}
+
+		public String unit() {
+			return Txt.t(unit);
 		}
 	}
 
@@ -40,14 +50,14 @@ public final class Goal {
 		this.id = Objects.requireNonNull(id, "id");
 		this.type = Objects.requireNonNull(type, "type");
 		if (!id.matches("[A-Za-z0-9_-]{1,64}"))
-			throw new IllegalArgumentException("ID de objetivo inválido");
+			throw new IllegalArgumentException(Txt.t(R.string.goal_invalid_id));
 		if (Double.isNaN(target) || target < type.min || target > type.max)
-			throw new IllegalArgumentException(type.label + ": entre " + fmt(type.min) + " y " + fmt(type.max) + " " +
-				type.unit + ".");
+			throw new IllegalArgumentException(Txt.t(R.string.goal_range, type.display(), fmt(type.min), fmt(type.max),
+				type.unit()));
 		if (type == Type.EXERCISE_LOAD && (exerciseId == null || exerciseId.trim().isEmpty()))
-			throw new IllegalArgumentException("Elige el ejercicio del objetivo.");
+			throw new IllegalArgumentException(Txt.t(R.string.goal_pick_exercise));
 		if (Double.isNaN(start) || start < 0 || createdAt <= 0)
-			throw new IllegalArgumentException("Objetivo inválido");
+			throw new IllegalArgumentException(Txt.t(R.string.goal_invalid));
 		this.target = target;
 		this.start = start;
 		this.exerciseId = type == Type.EXERCISE_LOAD ? exerciseId.trim() : "";
@@ -62,7 +72,7 @@ public final class Goal {
 
 	public String title() {
 		return type == Type.EXERCISE_LOAD ? exerciseName + ": " + fmt(target) + " kg" :
-			type.label + ": " + fmt(target) + " " + type.unit;
+			type.display() + ": " + fmt(target) + " " + type.unit();
 	}
 
 	static String fmt(double v) {

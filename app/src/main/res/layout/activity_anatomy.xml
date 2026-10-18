@@ -76,7 +76,7 @@
 				style="@style/EnerGym.Eyebrow"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text="MOVIMIENTO · 3D" />
+				android:text="@string/anatomy_eyebrow" />
 
 			<TextView
 				android:id="@+id/viewer_title"
@@ -84,21 +84,21 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/space_inline"
-				android:text="Referencia de movimiento" />
+				android:text="@string/anatomy_title" />
 
 			<TextView
 				style="@style/EnerGym.Body"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/space_inline"
-				android:text="Vista previa técnica · Validación profesional pendiente" />
+				android:text="@string/anatomy_preview" />
 
 			<TextView
 				style="@style/EnerGym.FieldCaption"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="0dp"
-				android:text="Referencia, no evaluación personal. No utiliza cámara ni analiza tu cuerpo." />
+				android:text="@string/anatomy_disclaimer" />
 
 			<FrameLayout
 				android:layout_width="match_parent"
@@ -111,7 +111,7 @@
 					android:layout_width="match_parent"
 					android:layout_height="match_parent"
 					tools:visibility="gone"
-					android:contentDescription="Referencia animada 3D; usa los controles accesibles para girar o ampliar" />
+					android:contentDescription="@string/anatomy_viewer_description" />
 
 				<LinearLayout
 					android:id="@+id/viewer_loading"
@@ -140,7 +140,7 @@
 						android:layout_marginTop="@dimen/control_gap_vertical"
 						android:gravity="center"
 						android:accessibilityLiveRegion="polite"
-						android:text="Comprobando recurso local…" />
+						android:text="@string/anatomy_checking" />
 				</LinearLayout>
 
 				<!-- Marcador exclusivo del editor: el visor real conserva su fondo negro. -->
@@ -189,7 +189,7 @@
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/space_inline"
 				android:accessibilityLiveRegion="polite"
-				android:text="Disponible sin conexión · Animación de referencia" />
+				android:text="@string/anatomy_offline" />
 
 			<LinearLayout
 				android:id="@+id/viewer_controls"
@@ -206,14 +206,14 @@
 					android:layout_height="wrap_content"
 					android:minHeight="@dimen/touch_target"
 					android:layout_marginTop="@dimen/control_gap_vertical"
-					android:text="Pausar" />
+					android:text="@string/anatomy_pause" />
 
 				<TextView
 					style="@style/EnerGym.FieldCaption"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:layout_marginTop="@dimen/group_gap"
-					android:text="Velocidad de reproducción" />
+					android:text="@string/anatomy_speed" />
 
 				<androidx.constraintlayout.widget.ConstraintLayout
 					android:layout_width="match_parent"
@@ -266,7 +266,7 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:layout_marginTop="@dimen/group_gap"
-					android:text="Fotogramas del clip · No son fases técnicas validadas" />
+					android:text="@string/anatomy_frames" />
 
 				<androidx.constraintlayout.widget.ConstraintLayout
 					android:layout_width="match_parent"
@@ -279,7 +279,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:minHeight="@dimen/touch_target"
-						android:text="Inicial" />
+						android:text="@string/anatomy_frame_start" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_middle"
@@ -287,7 +287,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:minHeight="@dimen/touch_target"
-						android:text="Medio" />
+						android:text="@string/anatomy_frame_middle" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_final"
@@ -295,7 +295,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:minHeight="@dimen/touch_target"
-						android:text="Final" />
+						android:text="@string/anatomy_frame_end" />
 
 					<androidx.constraintlayout.helper.widget.Flow
 						android:layout_width="0dp"
@@ -316,7 +316,7 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:layout_marginTop="@dimen/group_gap"
-					android:text="Cámara · Gira y amplía con botones o gestos" />
+					android:text="@string/anatomy_camera" />
 
 				<androidx.constraintlayout.widget.ConstraintLayout
 					android:layout_width="match_parent"
@@ -329,7 +329,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:minHeight="@dimen/touch_target"
-						android:text="Girar ←" />
+						android:text="@string/anatomy_rotate_left" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_rotate_right"
@@ -337,7 +337,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:minHeight="@dimen/touch_target"
-						android:text="Girar →" />
+						android:text="@string/anatomy_rotate_right" />
 
 					<androidx.constraintlayout.helper.widget.Flow
 						android:layout_width="0dp"
@@ -364,7 +364,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:minHeight="@dimen/touch_target"
-						android:text="Acercar +" />
+						android:text="@string/anatomy_zoom_in" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_zoom_out"
@@ -372,7 +372,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:minHeight="@dimen/touch_target"
-						android:text="Alejar −" />
+						android:text="@string/anatomy_zoom_out" />
 
 					<androidx.constraintlayout.helper.widget.Flow
 						android:layout_width="0dp"
@@ -399,7 +399,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:minHeight="@dimen/touch_target"
-						android:text="Frente" />
+						android:text="@string/anatomy_front" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:id="@+id/viewer_side"
@@ -407,7 +407,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:minHeight="@dimen/touch_target"
-						android:text="Lateral" />
+						android:text="@string/anatomy_side" />
 
 					<androidx.constraintlayout.helper.widget.Flow
 						android:layout_width="0dp"
@@ -430,7 +430,7 @@
 					android:layout_height="wrap_content"
 					android:layout_marginTop="@dimen/control_gap_vertical"
 					android:minHeight="@dimen/touch_target"
-					android:text="Restablecer cámara" />
+					android:text="@string/anatomy_reset_camera" />
 			</LinearLayout>
 
 			<TextView
@@ -439,7 +439,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/section_gap"
-				android:text="Disponibilidad" />
+				android:text="@string/anatomy_availability" />
 
 			<com.energym.app.ui.effects.GlassButton
 				style="@style/EnerGym.Button"
@@ -447,14 +447,14 @@
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/space_inline"
 				android:enabled="false"
-				android:text="Capas de músculos · No disponibles" />
+				android:text="@string/anatomy_layers" />
 
 			<TextView
 				style="@style/EnerGym.Body"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/space_inline"
-				android:text="Sin capas anatómicas separadas, activación muscular ni medidas de articulaciones. Los colores del modelo no indican esfuerzo muscular. La demostración profesional verificada aún no está disponible." />
+				android:text="@string/anatomy_layers_body" />
 
 			<TextView
 				android:id="@+id/viewer_written_reference"
@@ -470,7 +470,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/group_gap"
-				android:text="Recurso: OpenGym3D · Mesh2Motion · MakeHuman/MPFB\nArte y movimiento CC0 1.0 · Filament Apache 2.0\nArchivo local, sin cuenta ni descargas durante el uso" />
+				android:text="@string/anatomy_credits" />
 		</LinearLayout>
 	</ScrollView>
 </LinearLayout>

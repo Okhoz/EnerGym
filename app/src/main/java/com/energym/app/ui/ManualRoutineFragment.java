@@ -128,7 +128,7 @@ public final class ManualRoutineFragment extends ScreenFragment {
 			if (f.key.equals("loadKg") && !c.externalLoad(entry.exercise)) {
 				text(box, "Carga: 0 kg · peso corporal", R.style.EnerGym_FieldCaption, 12);
 			} else if (!f.choices.isEmpty()) {
-				choice(box, "manual_" + f.key, label, f.choices, f.choices, value, v -> c.input(index, f.key, v));
+				choice(box, "manual_" + f.key, label, f.choices, choiceLabels(f.choices), value, v -> c.input(index, f.key, v));
 				box.findViewWithTag("manual_" + f.key).setEnabled(!c.busy);
 			} else field(box, "manual_" + f.key, label, value, true, f.integer, v -> c.input(index, f.key, v));
 		}
@@ -197,5 +197,12 @@ public final class ManualRoutineFragment extends ScreenFragment {
 	private void choose(LinearLayout box, String key, String label, List<String> values, List<String> labels) {
 		choice(box, "manual_" + key, label, values, labels, app.manual.contextValue(key), v -> app.manual.contextInput(key, v));
 		box.findViewWithTag("manual_" + key).setEnabled(!app.manual.busy);
+	}
+
+	private static List<String> choiceLabels(List<String> values) {
+		List<String> labels = new ArrayList<>();
+		for (String v : values)
+			labels.add(MetricValidator.choiceLabel(v));
+		return labels;
 	}
 }
