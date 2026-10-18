@@ -40,5 +40,25 @@
 	<string name="chat_hint">Escribe un mensaje…</string>
 	<string name="chat_send">Enviar mensaje</string>
 	<string name="widget_today_description">Tu entreno de hoy, calorías y agua de un vistazo.</string>
+	<string name="programs_option">📚 Programa clásico</string>
+	<string name="programs_option_help">5/3/1, Empuje/Tirón/Pierna, Cuerpo completo o GZCLP.</string>
+	<string name="programs_title">Elige un programa</string>
+	<string name="programs_days">%1$d días</string>
+	<string name="programs_day">Día %1$d · %2$s</string>
+	<string name="programs_cancel">Cancelar</string>
+	<string name="warmup_plan">🔥 Calentamiento: %1$s</string>
+	<string name="warmup_log">Apuntar calentamiento</string>
+	<string name="volume_title">Volumen de esta semana</string>
+	<string name="volume_all_ok">Todos los grupos están en las %1$d–%2$d series semanales recomendadas. 💪</string>
+	<string name="volume_low">Por debajo de %2$d series esta semana: %1$s. Añade algún ejercicio de esos grupos.</string>
+	<string name="volume_sets">%1$s series · objetivo %2$d–%3$d</string>
+	<string name="switch_apps_title">¿Vienes de Strong o Hevy?</string>
+	<string name="switch_apps_body">Importa el CSV que exportan Strong o Hevy y tus entrenos de fuerza aparecerán en tu historial, gráficas y récords. También puedes exportar los tuyos en formato Strong.</string>
+	<string name="switch_apps_import">Importar de Strong o Hevy</string>
+	<string name="switch_apps_export">Exportar en formato Strong</string>
+	<string name="switch_apps_exported">Exportado en formato Strong</string>
+	<string name="switch_apps_unknown">Este archivo no parece una exportación de Strong ni de Hevy, o no tiene entrenos de fuerza que reconozcamos.</string>
+	<string name="switch_apps_done">%1$d entrenos importados desde %2$s. %3$d ya estaban y se han saltado.</string>
+	<string name="switch_apps_unmatched">Ejercicios sin equivalente que no se han importado: %1$s.</string>
 </resources>
 

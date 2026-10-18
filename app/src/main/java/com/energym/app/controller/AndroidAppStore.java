@@ -2,6 +2,7 @@ package com.energym.app.controller;
 
 import com.energym.app.data.*;
 import com.energym.app.domain.*;
+import java.util.List;
 
 /**
  * Adaptador del puerto MVC: todos los repositorios se crean dentro del scope UID protegido.
@@ -94,5 +95,9 @@ public final class AndroidAppStore implements AppStore {
 			new SessionRepository(db).finish(id);
 			return null;
 		}, callback(c, true));
+	}
+
+	public void importSessions(List<Session> sessions, Callback<Integer> c) {
+		sync.withDatabase(db -> new SessionRepository(db).importFinished(sessions), callback(c, true));
 	}
 }

@@ -257,6 +257,9 @@ public final class SessionFragment extends ScreenFragment {
 		if (sets.isEmpty() && before.isEmpty())
 			text(log, "Ajusta con − y + (o escribe el número) y pulsa «Guardar serie» al acabar cada serie. " +
 				"Peso 0 = peso corporal. Tu objetivo sube solo cuando lo cumples.", R.style.EnerGym_FieldCaption, 12);
+		// Antes de la primera serie: aproximaciones calculadas a partir del peso de trabajo escrito.
+		if (!editing && sets.isEmpty())
+			warmup(log, e);
 		// Consejo del entrenador para la siguiente serie según el RPE de la última (objetivo RPE 8).
 		if (!editing && !sets.isEmpty()) {
 			Autoregulation.Advice advice = Autoregulation.next(sets.get(sets.size() - 1), lb ? Plates.toKg(5, true) : 2.5);
@@ -368,6 +371,25 @@ public final class SessionFragment extends ScreenFragment {
 			});
 			list.addView(row);
 		}
+	}
+
+	/** Series de aproximación (barra vacía, 40, 60 y 80 %) y un toque para apuntarlas como calentamiento. */
+	private void warmup(LinearLayout log, Exercise e) {
+		Set<TrainingProfile.Resource> r = e.getRequiredResources();
+		boolean barbell = r.contains(TrainingProfile.Resource.BARBELL);
+		double step = lb ? Plates.toKg(5, true) : barbell || r.contains(TrainingProfile.Resource.MACHINE) ? 2.5 :
+			r.contains(TrainingProfile.Resource.DUMBBELLS) ? 2 : 1;
+		double bar = barbell ? (lb ? Plates.toKg(45, true) : 20) : 0;
+		List<SetLog.Entry> ramp = WarmupSets.of(Plates.toKg(number(kgInput, 0), lb), bar, step);
+		if (ramp.isEmpty())
+			return;
+		List<String> parts = new ArrayList<>();
+		for (SetLog.Entry s : ramp)
+			parts.add(weight(s.kg).toLowerCase(Locale.ROOT) + " × " + s.reps);
+		text(log, getString(R.string.warmup_plan, String.join(" · ", parts)), R.style.EnerGym_FieldCaption, 12)
+			.setTag("track_warmup");
+		action(log, getString(R.string.warmup_log), !app.sessions.busy, () -> app.sessions.addSets(ramp))
+			.setTag("track_warmup_log");
 	}
 
 	/** Superseries de este entreno (índices enlazados con el siguiente), guardadas en este móvil. */

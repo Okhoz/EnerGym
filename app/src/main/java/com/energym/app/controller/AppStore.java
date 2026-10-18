@@ -88,4 +88,9 @@ public interface AppStore {
 	void openDraft(String syncId, Callback<OpenDraft> callback);
 
 	void finish(long id, Callback<Void> callback);
+
+	/** Sesiones ya terminadas traídas de otra app; devuelve cuántas eran nuevas (las repetidas se saltan). */
+	default void importSessions(List<Session> sessions, Callback<Integer> callback) {
+		callback.failure(new UnsupportedOperationException("Importar entrenos no está disponible"));
+	}
 }

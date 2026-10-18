@@ -476,6 +476,7 @@ public final class HistoryFragment extends ScreenFragment {
 		LocalDate today = LocalDate.now();
 		LocalDate from = recentPeriod ? today.minusDays(89) : today.withDayOfMonth(1);
 		List<MuscleBreakdown.Share> shares = MuscleBreakdown.of(app.history, ZoneId.systemDefault(), from, today);
+		weeklyVolume(today);
 		section("Por grupo muscular", 32);
 		segmented("breakdown", new String[]{"Este mes", "Últimos 90 días"},
 			new String[]{"breakdown_month", "breakdown_90"}, recentPeriod ? 1 : 0, index -> {
@@ -513,6 +514,33 @@ public final class HistoryFragment extends ScreenFragment {
 				NutritionController.format(Math.round(sh.sets * 10) / 10.0) + " series" +
 					(sh.kg > 0 ? " · " + Math.round(sh.kg) + " kg movidos" : ""));
 			((TextView) row.findViewById(R.id.food_kcal)).setText(Math.round(sh.sets / total * 100) + " %");
+			card.addView(row);
+		}
+	}
+
+	/** Series de esta semana por grupo frente a las 10–20 recomendadas, con aviso de los que se quedan cortos. */
+	private void weeklyVolume(LocalDate today) {
+		List<WeeklyVolume.Line> lines = WeeklyVolume.of(app.history, ZoneId.systemDefault(), today);
+		List<WeeklyVolume.Line> low = WeeklyVolume.low(lines);
+		List<String> names = new ArrayList<>();
+		for (WeeklyVolume.Line l : low)
+			names.add(l.area.label);
+		LinearLayout card = card(getString(R.string.volume_title), low.isEmpty() ?
+			getString(R.string.volume_all_ok, WeeklyVolume.MIN_SETS, WeeklyVolume.MAX_SETS) :
+			getString(R.string.volume_low, String.join(", ", names), WeeklyVolume.MIN_SETS));
+		card.setTag("weekly_volume");
+		for (WeeklyVolume.Line l : lines) {
+			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, card, false);
+			TextView name = row.findViewById(R.id.food_name);
+			name.setText("●  " + capital(l.area.label));
+			android.text.SpannableString dot = new android.text.SpannableString(name.getText());
+			dot.setSpan(new android.text.style.ForegroundColorSpan(areaColor(l.area)), 0, 1, 0);
+			name.setText(dot);
+			((TextView) row.findViewById(R.id.food_detail)).setText(getString(R.string.volume_sets,
+				NutritionController.format(Math.round(l.sets * 10) / 10.0), WeeklyVolume.MIN_SETS, WeeklyVolume.MAX_SETS));
+			((TextView) row.findViewById(R.id.food_kcal)).setText(l.status == WeeklyVolume.Status.LOW ? "⚠️" :
+				l.status == WeeklyVolume.Status.HIGH ? "⬆️" : "✅");
+			row.setContentDescription(capital(l.area.label) + ": " + ((TextView) row.findViewById(R.id.food_detail)).getText());
 			card.addView(row);
 		}
 	}

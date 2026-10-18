@@ -31,6 +31,12 @@ public final class AccountFragment extends ScreenFragment {
 	private final androidx.activity.result.ActivityResultLauncher<String[]> importCsv = registerForActivityResult(
 		new androidx.activity.result.contract.ActivityResultContracts.OpenDocument(), this::readCsv);
 
+	/** Cambiarse desde Strong o Hevy: se lee su CSV; y se exporta en su formato para llevarse los datos. */
+	private final androidx.activity.result.ActivityResultLauncher<String[]> importWorkouts = registerForActivityResult(
+		new androidx.activity.result.contract.ActivityResultContracts.OpenDocument(), this::readWorkouts);
+	private final androidx.activity.result.ActivityResultLauncher<String> exportStrong = registerForActivityResult(
+		new androidx.activity.result.contract.ActivityResultContracts.CreateDocument("text/csv"), this::writeStrong);
+
 	private final androidx.activity.result.ActivityResultLauncher<String[]> healthPermissions = registerForActivityResult(
 		new androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(), result -> {
 			boolean ok = com.energym.app.health.HealthSync.granted(requireContext());
@@ -264,6 +270,68 @@ public final class AccountFragment extends ScreenFragment {
 		action(data, "Importar CSV", state.nutrition != null && !state.nutrition.busy,
 			() -> importCsv.launch(new String[]{"text/csv", "text/comma-separated-values", "text/plain"}))
 			.setTag("import_csv");
+		LinearLayout apps = card(getString(R.string.switch_apps_title), getString(R.string.switch_apps_body));
+		com.google.android.material.button.MaterialButton importButton = action(apps,
+			getString(R.string.switch_apps_import), !app.trainingMutation && app.profile != null,
+			() -> importWorkouts.launch(new String[]{"text/csv", "text/comma-separated-values", "text/plain"}));
+		importButton.setTag("import_workouts");
+		primary(importButton);
+		action(apps, getString(R.string.switch_apps_export), !app.history.isEmpty(),
+			() -> exportStrong.launch("energym-strong-" + java.time.LocalDate.now() + ".csv")).setTag("export_strong");
+	}
+
+	private void writeStrong(android.net.Uri uri) {
+		if (uri == null || app.owner() == null)
+			return;
+		String csv = com.energym.app.progress.WorkoutImport.exportStrong(app.history, java.time.ZoneId.systemDefault());
+		try (java.io.OutputStream out = requireContext().getContentResolver().openOutputStream(uri, "wt")) {
+			if (out == null)
+				throw new java.io.IOException();
+			out.write(csv.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+			toast(getString(R.string.switch_apps_exported));
+		} catch (java.io.IOException | RuntimeException e) {
+			toast("No se pudo guardar el archivo");
+		}
+	}
+
+	private void readWorkouts(android.net.Uri uri) {
+		String text = uri == null || app.owner() == null ? null : readText(uri);
+		if (text == null)
+			return;
+		app.importWorkouts(text, (result, added) -> {
+			if (!isAdded())
+				return;
+			String message;
+			if (result == null)
+				message = getString(R.string.switch_apps_unknown);
+			else {
+				message = getString(R.string.switch_apps_done, added, result.source == com.energym.app.progress.WorkoutImport.Source.HEVY ?
+					"Hevy" : "Strong", result.sessions.size() - added);
+				if (!result.unmatched.isEmpty())
+					message += "\n\n" + getString(R.string.switch_apps_unmatched, String.join(", ", result.unmatched));
+			}
+			new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+				.setTitle(R.string.switch_apps_title).setMessage(message).setPositiveButton("Vale", null).show();
+		});
+	}
+
+	/** Texto de un archivo elegido (máx. 10 MB, sin BOM); null y aviso si no se puede leer. */
+	private String readText(android.net.Uri uri) {
+		try (java.io.InputStream in = requireContext().getContentResolver().openInputStream(uri)) {
+			if (in == null)
+				throw new java.io.IOException();
+			java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
+			byte[] buffer = new byte[8192];
+			for (int r; (r = in.read(buffer)) > 0; ) {
+				bytes.write(buffer, 0, r);
+				if (bytes.size() > 10_000_000)
+					throw new java.io.IOException("Archivo demasiado grande");
+			}
+			return bytes.toString("UTF-8").replace("\uFEFF", "");
+		} catch (java.io.IOException | RuntimeException e) {
+			toast("No se pudo leer el archivo");
+			return null;
+		}
 	}
 
 	private void writeCsv(android.net.Uri uri) {
