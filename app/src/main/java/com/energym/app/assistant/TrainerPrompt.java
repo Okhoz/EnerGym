@@ -99,7 +99,8 @@ public final class TrainerPrompt {
 			.append("Responde en español, cercano y motivador, con frases cortas y concretas. ")
 			.append("Redacta bien: buena ortografía y puntuación (¿?, ¡!, comas y puntos), párrafos cortos separados ")
 			.append("por una línea en blanco (\\n\\n dentro del JSON), listas con «• » y cada punto en su línea (\\n), ")
-			.append("y de 1 a 3 emoticonos que encajen (💪 🔥 ✅ 🧘 👏). Sin Markdown ni asteriscos. ")
+			.append("y de 1 a 3 emoticonos que encajen (💪 🔥 ✅ 🧘 👏). Resalta con **negrita** solo 1 o 2 ideas clave; " +
+				"ningún otro Markdown. ")
 			.append("Ayudas con rutinas, técnica, progresión, motivación, descanso y hábitos. ")
 			.append("No diagnosticas ni tratas lesiones: ante dolor, mareo o una lesión recomienda parar y consultar ")
 			.append("a un profesional sanitario. No inventes datos del cliente ni material que no tenga.\n")
@@ -431,10 +432,12 @@ public final class TrainerPrompt {
 	}
 
 	/**
-	 * El chat muestra texto plano: se quitan negritas y viñetas Markdown que los modelos pequeños suelen añadir.
+	 * El chat solo entiende **negritas** y viñetas «• »: los títulos pasan a negrita y el resto del Markdown que
+	 * suelen añadir los modelos pequeños se normaliza (ChatFormat lo pinta).
 	 */
 	static String plain(String text) {
-		return text.replaceAll("\\*\\*|__", "").replaceAll("(?m)^\\s*[*-]\\s+", "• ").replaceAll("(?m)^#+\\s*", "")
+		return text.replace("__", "**").replaceAll("(?m)^\\s*[*-]\\s+", "• ")
+			.replaceAll("(?m)^#++\\s*+(?!\\*\\*)(\\S.*)$", "**$1**").replaceAll("(?m)^#+\\s*", "")
 			// Listas en línea («… 1. Sentadilla … 2. Puente …» o «… • Técnica …»): cada punto en su propia línea.
 			.replaceAll("([^\\n])\\s+(\\d{1,2}\\.\\s+\\p{Lu})", "$1\n$2").replaceAll("([^\\n])\\s*•\\s*", "$1\n• ")
 			.replaceAll("[ \\t]+\\n", "\n").replaceAll("\\n{3,}", "\n\n").trim();

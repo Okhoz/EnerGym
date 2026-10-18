@@ -233,9 +233,10 @@ public class OnDeviceTrainerTest {
 	}
 
 	@Test
-	public void markdownFromTheModelIsShownAsPlainText() {
-		assertEquals("Rutina de piernas:\n• Sentadilla: baja controlado\n• Puente",
+	public void markdownFromTheModelKeepsOnlyBoldAndBullets() {
+		assertEquals("**Rutina de piernas:**\n• **Sentadilla:** baja controlado\n• Puente",
 			TrainerPrompt.plain("## **Rutina de piernas:**\n*   **Sentadilla:** baja controlado\n- Puente"));
+		assertEquals("**Técnica**\n• Espalda **recta**", TrainerPrompt.plain("### Técnica\n- Espalda __recta__"));
 	}
 
 	@Test
