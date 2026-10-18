@@ -236,6 +236,8 @@ public final class SessionFragment extends ScreenFragment {
 		}
 		List<SetLog.Entry> sets = app.sessions.sets();
 		boolean editing = selectedSet >= 0 && selectedSet < sets.size();
+		wearExercise = e.getName();
+		publishWear();
 		Session last = lastTime(e.getId());
 		List<SetLog.Entry> before = last == null ? Collections.<SetLog.Entry>emptyList() :
 			SetLog.of(last.getResults().get(e.getId()));
@@ -640,8 +642,21 @@ public final class SessionFragment extends ScreenFragment {
 	}
 
 	/** Cambia el descanso en pantalla y su aviso fuera de la app (0 = parado). */
+	/** Ejercicio que se está registrando, para el reloj. */
+	private String wearExercise = "";
+
+	/** Envía al reloj el ejercicio, la serie y el descanso actuales. */
+	private void publishWear() {
+		if (app.sessions.session == null || wearExercise.isEmpty())
+			return;
+		com.energym.app.wear.WearBridge.publish(requireContext(), com.energym.app.wear.WearState.of(wearExercise,
+			app.sessions.sets(), Plates.toUnit(1, lb), Plates.unit(lb), restEndsAt, SystemClock.elapsedRealtime(),
+			System.currentTimeMillis()));
+	}
+
 	private void restEndsAt(long at, String exercise) {
 		restEndsAt = at;
+		publishWear();
 		if (at == 0)
 			com.energym.app.reminders.RestTimer.cancel(requireContext());
 		else

@@ -71,9 +71,25 @@ public final class MainActivity extends AppCompatActivity {
 			});
 	}
 
+	/** «Otra serie igual» desde el reloj: repite la última serie del ejercicio abierto en el entreno. */
+	private com.google.android.gms.wearable.MessageClient.OnMessageReceivedListener wear;
+
+	private void repeatFromWatch() {
+		runOnUiThread(() -> {
+			if (state == null || state.app == null || state.app.sessions.session == null || state.app.sessions.busy)
+				return;
+			java.util.List<com.energym.app.domain.SetLog.Entry> sets = state.app.sessions.sets();
+			if (sets.isEmpty())
+				return;
+			com.energym.app.domain.SetLog.Entry last = sets.get(sets.size() - 1);
+			state.app.sessions.addSet(last.kg, last.reps, last.kind, 0);
+		});
+	}
+
 	@Override
 	protected void onCreate(Bundle saved) {
 		super.onCreate(saved);
+		wear = com.energym.app.wear.WearBridge.listen(this, this::repeatFromWatch);
 		EdgeToEdge.enable(this);
 		setContentView(R.layout.activity_main);
 		// Primera vez en este móvil: tutorial obligatorio antes de usar la app.
@@ -160,6 +176,9 @@ public final class MainActivity extends AppCompatActivity {
 		if (state == null || isFinishing()) return;
 		// El avatar se invalida aunque los fragmentos deban esperar a onResume.
 		if (state.app != null) updateAvatar();
+		// Sin entreno abierto, el reloj vuelve a su pantalla de espera.
+		if (state.app != null && state.app.sessions.session == null)
+			com.energym.app.wear.WearBridge.publish(this, com.energym.app.wear.WearState.idle());
 		if (getSupportFragmentManager().isStateSaved()) return;
 		((TextView) findViewById(R.id.status)).setText(
 			state.app == null ? (state.fatal.isEmpty() ? "Preparando tu espacio…" : state.fatal) :
@@ -524,6 +543,7 @@ public final class MainActivity extends AppCompatActivity {
 
 	@Override
 	protected void onDestroy() {
+		com.energym.app.wear.WearBridge.stop(this, wear);
 		if (menuSheet != null && menuSheet.isShowing()) menuSheet.dismiss();
 		menuSheet = null;
 		if (remoteAvatar != null) remoteAvatar.close();

@@ -1,0 +1,12 @@
+<resources>
+	<string name="app_name">EnerGym</string>
+	<string name="idle">Empieza un entreno en el móvil y lo verás aquí.</string>
+	<string name="set_number">Serie %1$d</string>
+	<string name="last_set">Última: %1$s</string>
+	<string name="rest">Descanso %1$s</string>
+	<string name="rest_done">¡A por la siguiente! 💪</string>
+	<string name="repeat">✓ Otra igual</string>
+	<string name="repeat_description">Apuntar otra serie igual que la última</string>
+	<string name="sent">Enviado al móvil</string>
+	<string name="no_phone">Abre EnerGym en el móvil</string>
+</resources>
