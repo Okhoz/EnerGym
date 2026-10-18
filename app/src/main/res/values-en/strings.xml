@@ -1643,7 +1643,7 @@
 	<string name="chat_copy">Copy</string>
 	<string name="chat_copied">Reply copied</string>
 	<string name="chat_regenerate">Regenerate</string>
-	<string name="chat_copy_description">Copy the trainer's reply</string>
+	<string name="chat_copy_description">Copy the trainer\'s reply</string>
 	<string name="chat_regenerate_description">Ask for another reply to your last message</string>
 	<string name="chat_thinking">Thinking…</string>
 	<string name="followup_routine_today">What should I train today?</string>
@@ -1667,7 +1667,7 @@
 	<string name="chat_cancel">Cancel</string>
 	<string name="chat_connect">Connect AI</string>
 	<string name="overload_increase">📈 Suggestion: you did %1$d reps with %2$s. Go up to %3$s × %4$d.</string>
-	<string name="overload_add_reps">📈 Suggestion: same weight, %2$s × %4$d (one more rep than last time's %1$d).</string>
+	<string name="overload_add_reps">📈 Suggestion: same weight, %2$s × %4$d (one more rep than last time\'s %1$d).</string>
 	<string name="overload_add_reps_bodyweight">📈 Suggestion: last time you did %1$d; try %2$d reps.</string>
 	<string name="overload_hold">📈 Suggestion: keep %2$s and aim for %4$d reps on every set.</string>
 	<string name="overload_hold_bodyweight">📈 Suggestion: repeat %1$d reps on every set.</string>
@@ -1677,7 +1677,7 @@
 	<string name="share_button">📤 Share workout</string>
 	<string name="share_record_button">🏆 Share record</string>
 	<string name="share_chooser">Share workout</string>
-	<string name="share_error">Couldn't prepare the image to share</string>
+	<string name="share_error">Couldn\'t prepare the image to share</string>
 	<string name="share_brand">ENERGYM</string>
 	<string name="share_minutes">%d min</string>
 	<string name="share_label_duration">Duration</string>
@@ -1692,7 +1692,7 @@
 	<string name="share_text">I finished “%1$s” on EnerGym: %2$d min and %3$s of volume.</string>
 	<string name="share_text_records">New record on %s! 🏆</string>
 	<string name="share_finished_title">Workout finished</string>
-	<string name="share_finished_detail">You'll find it in Progress. Share your workout card.</string>
+	<string name="share_finished_detail">You\'ll find it in Progress. Share your workout card.</string>
 	<string name="share_finished_record">🏆 Personal record on %s!</string>
 	<string name="share_history_button">📤 Share: %s</string>
 	<string name="programs_option">📚 Classic program</string>
@@ -1703,7 +1703,7 @@
 	<string name="programs_cancel">Cancel</string>
 	<string name="warmup_plan">🔥 Warm-up: %1$s</string>
 	<string name="warmup_log">Log warm-up</string>
-	<string name="volume_title">This week's volume</string>
+	<string name="volume_title">This week\'s volume</string>
 	<string name="volume_all_ok">Every group is within the recommended %1$d–%2$d weekly sets. 💪</string>
 	<string name="volume_low">Below %2$d sets this week: %1$s. Add an exercise for those groups.</string>
 	<string name="volume_sets">%1$s sets · target %2$d–%3$d</string>
@@ -1712,7 +1712,7 @@
 	<string name="switch_apps_import">Import from Strong or Hevy</string>
 	<string name="switch_apps_export">Export in Strong format</string>
 	<string name="switch_apps_exported">Exported in Strong format</string>
-	<string name="switch_apps_unknown">This file doesn't look like a Strong or Hevy export, or it has no strength workouts we recognise.</string>
+	<string name="switch_apps_unknown">This file doesn\'t look like a Strong or Hevy export, or it has no strength workouts we recognise.</string>
 	<string name="switch_apps_done">%1$d workouts imported from %2$s. %3$d were already there and were skipped.</string>
-	<string name="switch_apps_unmatched">Exercises with no match that weren't imported: %1$s.</string>
+	<string name="switch_apps_unmatched">Exercises with no match that weren\'t imported: %1$s.</string>
 </resources>
