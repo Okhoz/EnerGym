@@ -21,6 +21,7 @@
 		android:icon="@mipmap/ic_launcher"
 		android:label="@string/app_name"
 		android:roundIcon="@mipmap/ic_launcher_round"
+		android:localeConfig="@xml/locales_config"
 		android:supportsRtl="true"
 		android:theme="@style/Theme.EnerGym"
 		android:usesCleartextTraffic="false"
@@ -95,6 +96,15 @@
 		<!-- GPU opcional para Gemma (LiteRT-LM); sin estas bibliotecas el modelo corre en CPU. -->
 		<uses-native-library android:name="libOpenCL.so" android:required="false" />
 		<uses-native-library android:name="libvndksupport.so" android:required="false" />
+		<!-- Guarda el idioma elegido en el menú en Android 12 o anterior. -->
+		<service
+			android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+			android:enabled="false"
+			android:exported="false">
+			<meta-data
+				android:name="autoStoreLocales"
+				android:value="true" />
+		</service>
 	</application>
 
 </manifest>

@@ -90,6 +90,8 @@ public final class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle saved) {
 		super.onCreate(saved);
+		// Los textos fuera de las vistas siguen el idioma elegido en el menú (o el del móvil).
+		Txt.init(getResources());
 		wear = com.energym.app.wear.WearBridge.listen(this, this::repeatFromWatch);
 		EdgeToEdge.enable(this);
 		setContentView(R.layout.activity_main);
@@ -310,7 +312,8 @@ public final class MainActivity extends AppCompatActivity {
 		};
 		sheet.item(R.drawable.ic_training, getString(R.string.menu_profile), false, () -> go.accept(R.id.menu_profile))
 			.item(R.drawable.ic_scale, getString(R.string.menu_body), false, () -> go.accept(R.id.menu_body))
-			.item(R.drawable.ic_settings, getString(R.string.menu_account), false, () -> go.accept(R.id.menu_account));
+			.item(R.drawable.ic_settings, getString(R.string.menu_account), false, () -> go.accept(R.id.menu_account))
+			.item(R.drawable.ic_assistant, getString(R.string.menu_language), false, this::chooseLanguage);
 		// La foto es el propio botón del menú: con cuenta, aquí se elige, cambia o quita.
 		if (owner != null) {
 			boolean has = avatars().has(owner);
@@ -334,6 +337,21 @@ public final class MainActivity extends AppCompatActivity {
 		}
 		menuSheet = sheet;
 		sheet.show();
+	}
+
+	/** Idioma de la app: el del móvil, español o inglés. Android lo guarda y recrea la pantalla. */
+	private void chooseLanguage() {
+		String[] tags = {"", "es", "en"};
+		String current = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales().toLanguageTags();
+		int checked = current.startsWith("es") ? 1 : current.startsWith("en") ? 2 : 0;
+		new com.google.android.material.dialog.MaterialAlertDialogBuilder(this).setTitle(R.string.menu_language)
+			.setSingleChoiceItems(new String[]{getString(R.string.language_system), "Español", "English"}, checked,
+				(dialog, which) -> {
+					dialog.dismiss();
+					androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+						androidx.core.os.LocaleListCompat.forLanguageTags(tags[which]));
+				})
+			.setNegativeButton(R.string.common_cancel, null).show();
 	}
 
 	private ProfileSheet menuSheet;

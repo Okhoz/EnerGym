@@ -1719,4 +1719,6 @@
 	<string name="guide_pf_subtitle">Tell us how you want to train so your routines fit you. Then, your body details.</string>
 	<string name="guide_body_eyebrow">FIRST STEPS · 2 OF 2</string>
 	<string name="guide_body_subtitle">Last step: with these details we calculate your daily calories and macros. Once saved, you are ready to go.</string>
+	<string name="menu_language">Language</string>
+	<string name="language_system">Phone language</string>
 </resources>
