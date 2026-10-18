@@ -114,7 +114,6 @@
 				android:hint="@string/chat_hint"
 				android:textColorHint="@color/text_secondary"
 				android:inputType="textCapSentences|textMultiLine"
-				android:maxLength="2000"
 				android:textColor="@color/white"
 				android:textSize="16sp"
 				android:saveEnabled="false" />

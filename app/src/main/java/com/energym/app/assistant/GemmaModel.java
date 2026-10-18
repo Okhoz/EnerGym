@@ -43,6 +43,7 @@ public final class GemmaModel implements OnDeviceModel {
 	 * Margen sobre el modelo: memoria del motor (≈1,7 GB en CPU) y espacio para el archivo y su verificación.
 	 */
 	private static final long MIN_RAM = 5_500_000_000L, MIN_FREE = BYTES + 400_000_000L;
+	private static final int MAX_TOKENS = 6144;
 	private final Context context;
 	private final Executor worker;
 	private Engine engine;
@@ -199,6 +200,7 @@ public final class GemmaModel implements OnDeviceModel {
 				result.success(null);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
+				progress = -1;
 				result.failure("MODEL_DOWNLOAD_FAILED");
 			} catch (Exception e) {
 				progress = -1;
@@ -268,7 +270,8 @@ public final class GemmaModel implements OnDeviceModel {
 		}
 		String path = model().getPath();
 		for (Backend backend : new Backend[]{new Backend.GPU(), new Backend.CPU()}) {
-			Engine candidate = new Engine(new EngineConfig(path, backend));
+			// Ventana de tokens explícita: el prompt (≈3500 tokens como mucho) más la respuesta caben siempre.
+			Engine candidate = new Engine(new EngineConfig(path, backend, null, null, MAX_TOKENS));
 			try {
 				candidate.initialize();
 				engine = candidate;

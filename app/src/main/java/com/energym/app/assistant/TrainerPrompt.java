@@ -1,5 +1,7 @@
 package com.energym.app.assistant;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import com.energym.app.domain.*;
 
 import java.util.*;
@@ -11,12 +13,25 @@ import java.util.*;
  * y dejan margen para que la sobrecarga progresiva suba la carga sesión a sesión.
  */
 public final class TrainerPrompt {
+	/**
+	 * El mensaje del cliente no tiene límite al escribirlo; al modelo le llega entero si cabe en el prompt y, si no,
+	 * su principio y su final (MIN_MESSAGE es lo mínimo que se le reserva aunque haya mucho contexto).
+	 */
 	static final int MAX_EXERCISES = 30, MAX_RECENT = 6, MAX_RECENT_CHARS = 300, MAX_DESCRIPTION = 800,
-		MAX_MESSAGE = 1200, MAX_PROMPT = 12500;
+		MAX_TRAINING = 3800, MIN_TRAINING = 600, MIN_MESSAGE = 1500, MAX_PROMPT = 11500;
 	private static final List<String> REQUIRED = Arrays.asList("sportId", "goal", "environment", "focus", "category",
 		"resources", "daysPerWeek", "durationMinutes", "level");
-	static final String NOTICE = "Rutina creada por la IA de tu móvil (Gemini Nano), sin enviar datos a ningún " +
-		"servidor. Es un ejemplo sin revisión profesional: adapta la intensidad y para si notas dolor.";
+
+	static String notice() {
+		return com.energym.app.i18n.Txt.t(com.energym.app.R.string.tp_notice);
+	}
+
+	/** Idioma de la respuesta: el de la app (el prompt sigue en español, el modelo lo entiende igual). */
+	private static String language() {
+		return "en".equals(com.energym.app.i18n.Txt.locale().getLanguage()) ?
+			"Responde SIEMPRE en inglés (English), aunque estas instrucciones estén en español. " :
+			"Responde en español. ";
+	}
 
 	private TrainerPrompt() {
 	}
@@ -96,7 +111,7 @@ public final class TrainerPrompt {
 	public static String build(ChatClient.Request r, List<Exercise> catalog) {
 		StringBuilder p = new StringBuilder();
 		p.append("Eres el entrenador personal de la app EnerGym y hablas con tu cliente dentro de la app. ")
-			.append("Responde en español, cercano y motivador, con frases cortas y concretas. ")
+			.append(language()).append("Tono cercano y motivador, con frases cortas y concretas. ")
 			.append("Redacta bien: buena ortografía y puntuación (¿?, ¡!, comas y puntos), párrafos cortos separados ")
 			.append("por una línea en blanco (\\n\\n dentro del JSON), listas con «• » y cada punto en su línea (\\n), ")
 			.append("y de 1 a 3 emoticonos que encajen (💪 🔥 ✅ 🧘 👏). Resalta con **negrita** solo 1 o 2 ideas clave; " +
@@ -140,31 +155,48 @@ public final class TrainerPrompt {
 				.append("eso: elige ejercicios de esas zonas (la lista está ordenada de más a menos afín) y respeta lo que ")
 				.append("quiere evitar. Ponle un título que lo refleje.\n");
 		p.append("\nPERFIL DEL CLIENTE\n").append(profile(r.profileData)).append('\n');
-		if (!r.training.isEmpty())
-			p.append("\nSU ENTRENAMIENTO Y TODO LO QUE HA HECHO EN LA APP (datos reales)\n")
-				.append(cut(r.training, 3800)).append('\n')
-				.append("Conoces todo esto: úsalo en cada respuesta y cita sus datos concretos (sesiones, cargas, peso, ")
-				.append("comidas, objetivos). No inventes datos que no aparezcan. Relaciona entreno y dieta con su objetivo, ")
-				.append("no repitas lo que ya le cuesta y sube poco a poco lo que domina. Si hay una subida de nivel reciente, ")
-				.append("felicítale y explica qué subió; si hay un entreno a medias, díselo (botones del chat).\n");
-		if (r.profile == null) {
-			List<String> missing = missing(r.profileData);
-			p.append("Perfil incompleto (falta: ").append(String.join(", ", missing)).append("). Responde a su ")
+		StringBuilder tail = new StringBuilder();
+		List<String> missing = missing(r.profileData);
+		// Sin perfil guardado (o con datos a medias) no se pueden preparar rutinas; con el perfil completo, sí.
+		if (r.profile == null && !missing.isEmpty())
+			tail.append("Perfil incompleto (falta: ").append(String.join(", ", missing)).append("). Responde a su ")
 				.append("pregunta igualmente. Solo si pide una rutina, explica que primero complete su perfil en Perfil.\n");
-		}
+		else if (r.profile == null)
+			tail.append("Si pide una rutina, dile que la pida con el botón «🆕 Rutina nueva» del chat.\n");
 		if (!eligible.isEmpty()) {
-			p.append("\nEJERCICIOS DISPONIBLES (id | nombre | tipo)\n");
+			tail.append("\nEJERCICIOS DISPONIBLES (id | nombre | tipo)\n");
 			for (Exercise e : eligible)
-				p.append(e.getId()).append(" | ").append(e.getName()).append(" | ").append(metric(e.getMetricType()))
+				tail.append(e.getId()).append(" | ").append(e.getName()).append(" | ").append(metric(e.getMetricType()))
 					.append('\n');
 		}
 		Exercise asked = r.exerciseId == null ? null : ChatProtocol.find(catalog, r.exerciseId);
 		if (asked != null)
-			p.append("\nEJERCICIO QUE CONSULTA: ").append(asked.getName()).append(". Técnica: ")
+			tail.append("\nEJERCICIO QUE CONSULTA: ").append(asked.getName()).append(". Técnica: ")
 				.append(cut(asked.getDescription(), MAX_DESCRIPTION)).append('\n');
-		String message = "\nMENSAJE DEL CLIENTE: " + cut(r.message, MAX_MESSAGE) + '\n';
+		String trainingIntro = "\nSU ENTRENAMIENTO Y TODO LO QUE HA HECHO EN LA APP (datos reales)\n";
+		String trainingRules = "Conoces todo esto: úsalo en cada respuesta y cita sus datos concretos (sesiones, cargas, " +
+			"peso, comidas, objetivos). No inventes datos que no aparezcan. Relaciona entreno y dieta con su objetivo, " +
+			"no repitas lo que ya le cuesta y sube poco a poco lo que domina. Si hay una subida de nivel reciente, " +
+			"felicítale y explica qué subió; si hay un entreno a medias, díselo (botones del chat).\n";
+		// Reparto del espacio que queda: primero el mensaje (el cliente puede escribir sin límite), luego sus datos
+		// y, con lo que sobre, la conversación reciente. Así el prompt nunca supera lo que admite el modelo.
+		String user = r.message == null ? "" : r.message.trim();
+		boolean hasTraining = r.training != null && !r.training.isEmpty();
+		int room = MAX_PROMPT - p.length() - tail.length() - 60 -
+			(hasTraining ? trainingIntro.length() + trainingRules.length() : 0);
+		int forMessage = Math.min(user.length(), Math.max(MIN_MESSAGE, room - (hasTraining ? MIN_TRAINING : 0)));
+		String message = "\nMENSAJE DEL CLIENTE: " + middleCut(user, forMessage) + '\n';
+		room -= message.length();
+		if (hasTraining) {
+			int forTraining = Math.min(MAX_TRAINING, room);
+			if (forTraining >= 200) {
+				String training = cut(r.training, forTraining);
+				p.append(trainingIntro).append(training).append('\n').append(trainingRules);
+				room -= training.length();
+			}
+		}
+		p.append(tail);
 		// La conversación reciente usa solo el espacio que queda: se conservan los mensajes más nuevos.
-		int room = MAX_PROMPT - p.length() - message.length() - 40;
 		List<String> lines = new ArrayList<>();
 		for (int i = r.recent.size() - 1; i >= 0 && lines.size() < MAX_RECENT; i--) {
 			ConversationStore.Message m = r.recent.get(i);
@@ -199,7 +231,15 @@ public final class TrainerPrompt {
 			// JSON roto (p. ej. una llave de más): nunca se enseña crudo; se rescata solo el texto si se puede.
 			java.util.regex.Matcher t = java.util.regex.Pattern.compile("\"texto\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\"")
 				.matcher(text);
-			text = t.find() ? t.group(1).replace("\\n", "\n").replace("\\\"", "\"") : "";
+			String found = t.find() ? t.group(1) : null;
+			// Respuesta cortada por el límite de salida: el texto no llega a cerrarse, pero lo escrito se aprovecha.
+			if (found == null) {
+				java.util.regex.Matcher open = java.util.regex.Pattern.compile("\"texto\"\\s*:\\s*\"").matcher(text);
+				found = open.find() ? text.substring(open.end()).replaceAll("\\\\$", "") : "";
+				if (!found.isEmpty())
+					found = found.trim() + "…";
+			}
+			text = found.replace("\\n", "\n").replace("\\\"", "\"");
 		} else
 			text = text.replaceAll("```[a-zA-Z]*", "").trim();
 		// A veces el modelo mete la rutina en JSON dentro del propio texto (incluso cortada): se quita del texto y,
@@ -213,22 +253,23 @@ public final class TrainerPrompt {
 					embedded.get("ejercicios") instanceof List ? embedded : null;
 			text = text.substring(0, brace).replaceAll("(?i)(^|\\n)[^\\n]{0,20}rutina[^\\n]{0,10}:\\s*$", "").trim();
 		}
-		if (routine == null && r.profile != null)
+		boolean asked = asksForRoutine(r.message);
+		if (routine == null && r.profile != null && (!r.conversation || asked))
 			routine = fromNames(source, eligible(r, catalog));
 		// Si pidió una rutina y el modelo no la dio, se arma con los primeros ejercicios compatibles del catálogo.
-		if (routine == null && r.profile != null && asksForRoutine(r.message))
+		if (routine == null && r.profile != null && asked)
 			routine = new LinkedHashMap<>();
 		Map<String, Object> proposal = r.profile == null || routine == null ? null : proposal(routine, r, catalog);
 		if (text.isEmpty())
-			text = proposal != null ? "Aquí tienes tu entrenamiento de hoy. Revísalo antes de aceptarlo." :
-				"No he podido preparar una respuesta. ¿Puedes repetírmelo con otras palabras?";
+			text = com.energym.app.i18n.Txt.t(proposal != null ? com.energym.app.R.string.tp_here_is_routine :
+				com.energym.app.R.string.tp_no_answer);
 		Map<String, Object> m = new LinkedHashMap<>();
 		m.put("text", cut(plain(text), 4000));
 		m.put("missingFields", r.profile == null ? new ArrayList<Object>(missing(r.profileData)) : new ArrayList<>());
 		m.put("proposal", proposal);
 		m.put("commands", new ArrayList<>());
 		m.put("catalogVersion", catalogVersion);
-		m.put("proposalNotice", NOTICE);
+		m.put("proposalNotice", notice());
 		m.put("conversationId", r.conversationId);
 		m.put("requestId", r.requestId);
 		m.put("exerciseId", r.exerciseId);
@@ -238,7 +279,8 @@ public final class TrainerPrompt {
 	static boolean asksForRoutine(String message) {
 		String m = java.text.Normalizer.normalize(message == null ? "" : message.toLowerCase(Locale.ROOT),
 			java.text.Normalizer.Form.NFD).replaceAll("\\p{M}", "");
-		return m.matches(".*\\b(rutina|entrenamiento|entreno|sesion|que (hago|entreno) hoy|plan de)\\b.*");
+		return m.matches("(?s).*\\b(rutina|entrenamiento|entreno|sesion|que (hago|entreno) hoy|plan de|routine|workout|" +
+			"what (should|do) i (do|train) today)\\b.*");
 	}
 
 	/**
@@ -325,7 +367,7 @@ public final class TrainerPrompt {
 				pairs.add(StrictJson.map("key", v.getKey(), "value", v.getValue()));
 			Object why = hint.get("motivo");
 			String justification = why instanceof String && !((String) why).trim().isEmpty() ?
-				cut(((String) why).trim(), 900) : "Encaja con tu disciplina, objetivo, lugar y material.";
+				cut(((String) why).trim(), 900) : com.energym.app.i18n.Txt.t(com.energym.app.R.string.tp_fits);
 			items.add(StrictJson.map("exerciseId", e.getId(), "estimatedMinutes", p.minutes, "prescription", pairs,
 				"justification", justification));
 			if (e.getMetricType() == MetricType.ENDURANCE || e.getMetricType() == MetricType.SPORT_PRACTICE)
@@ -334,7 +376,7 @@ public final class TrainerPrompt {
 		if (items.isEmpty())
 			return null;
 		Object title = routine.get("titulo");
-		String fallback = wants.title().isEmpty() ? "Entrenamiento de tu entrenador" : wants.title();
+		String fallback = wants.title().isEmpty() ? com.energym.app.i18n.Txt.t(com.energym.app.R.string.tp_title) : wants.title();
 		return StrictJson.map("title", title instanceof String && !((String) title).trim().isEmpty() ?
 			cut(((String) title).trim(), 200) : fallback, "items", items);
 	}
@@ -513,5 +555,14 @@ public final class TrainerPrompt {
 
 	private static String cut(String value, int max) {
 		return value.length() <= max ? value : value.substring(0, max - 1) + "…";
+	}
+
+	/** Un texto demasiado largo conserva su principio y su final, que es donde suele estar la pregunta. */
+	static String middleCut(String value, int max) {
+		if (value.length() <= max)
+			return value;
+		String gap = " […] ";
+		int head = Math.max(0, (max - gap.length()) * 2 / 3), end = Math.max(0, max - gap.length() - head);
+		return value.substring(0, head) + gap + value.substring(value.length() - end);
 	}
 }

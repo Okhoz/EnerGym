@@ -197,7 +197,7 @@ public final class AssistantFragment extends ScreenFragment {
 			primary(compact(row, Txt.t(R.string.as_start_workout), !c.busy, app::startSession));
 		if (app.progression() != null)
 			compact(row, Txt.t(R.string.as_level_up), !c.busy, app::reviewProgression);
-		compact(row, Txt.t(R.string.as_new_routine), !c.busy, () -> c.send("Hazme una rutina para hoy"));
+		compact(row, Txt.t(R.string.as_new_routine), !c.busy, () -> c.send(Txt.t(R.string.as_new_routine_message)));
 	}
 
 	private TextView bubble(String message, boolean mine) {
@@ -237,6 +237,11 @@ public final class AssistantFragment extends ScreenFragment {
 			public void run() {
 				at[0] = ChatFormat.reveal(f.text, at[0] + step);
 				view.setText(styled(f, at[0]));
+				// La burbuja crece mientras se escribe: se sigue bajando para que no se quede oculta.
+				View root = getView();
+				ScrollView scroll = root == null ? null : root.findViewById(R.id.chat_scroll);
+				if (scroll != null)
+					scroll.post(() -> scroll.fullScroll(View.FOCUS_DOWN));
 				if (at[0] < f.text.length())
 					typing.postDelayed(this, 16);
 			}
