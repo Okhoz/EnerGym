@@ -81,6 +81,6 @@ public final class SourceStrings implements Txt.Resolver {
 	private static String unescape(String raw) {
 		String s = raw.trim();
 		if (s.length() >= 2 && s.startsWith("\"") && s.endsWith("\"")) s = s.substring(1, s.length() - 1);
-		return s.replace("\n", "\n").replace("\'", "'").replace("\\\"", "\"").replace("\@", "@").replace("\?", "?");
+		return s.replace("\\n", "\n").replace("\\'", "'").replace("\\\"", "\"").replace("\\@", "@").replace("\\?", "?");
 	}
 }

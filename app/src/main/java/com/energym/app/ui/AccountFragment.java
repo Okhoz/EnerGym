@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import com.energym.app.R;
 import com.energym.app.auth.AccountUser;
 import com.energym.app.controller.AccountController;
@@ -38,7 +39,7 @@ public final class AccountFragment extends ScreenFragment {
 			if (ok)
 				syncHealth();
 			else
-				toast("Sin permiso no se puede enviar a Health Connect");
+				toast(Txt.t(R.string.acc_health_no_permission));
 			render();
 		});
 
@@ -60,7 +61,7 @@ public final class AccountFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		heading("", "Cuenta", "");
+		heading("", Txt.t(R.string.account), "");
 		AccountUser user = state.user;
 		LinearLayout account = card(state.accountText(), user == null ? getString(R.string.account_signed_out) : user.getEmail());
 		boolean signing = state.accountStatus == AccountController.Status.SIGNING_IN || state.deletingLocalData;
@@ -71,32 +72,32 @@ public final class AccountFragment extends ScreenFragment {
 		primary(action(account, getString(googleLabel), !signing,
 			() -> state.accounts.signInWithGoogle(requireActivity(), false)));
 		if (app.owner() == null && state.accounts.isDemoEnabled())
-			action(account, "Entrar en demo local", !signing, () -> {
+			action(account, Txt.t(R.string.acc_demo), !signing, () -> {
 				state.accounts.enterDemo();
 				app.back();
 			});
 		else if (app.owner() != null)
 			action(account, getString(R.string.account_sign_out), !signing, state.accounts::signOut);
 		// Ajustes como lista plegable: solo uno abierto a la vez para no saturar la pantalla.
-		section("Ajustes", 32);
-		if (fold("backup", "☁️  Respaldo")) {
+		section(Txt.t(R.string.acc_settings), 32);
+		if (fold("backup", Txt.t(R.string.acc_backup_fold))) {
 			LinearLayout backup =
-				card("Respaldo", state.syncText() + (state.syncError.isEmpty() ? "" : "\n" + state.syncError));
+				card(Txt.t(R.string.acc_backup), state.syncText() + (state.syncError.isEmpty() ? "" : "\n" + state.syncError));
 			if (user != null)
-				action(backup, "Reintentar sincronización", !signing, state.sync::requestSync);
+				action(backup, Txt.t(R.string.acc_retry_sync), !signing, state.sync::requestSync);
 			text(backup, getString(R.string.account_separation), R.style.EnerGym_FieldCaption, 12);
 		}
-		if (app.owner() != null && state.assistant != null && fold("assistant", "✦  Entrenador con IA"))
+		if (app.owner() != null && state.assistant != null && fold("assistant", Txt.t(R.string.acc_trainer_fold)))
 			assistantServer();
-		if (state.reminders != null && fold("reminders", "⏰  Recordatorios"))
+		if (state.reminders != null && fold("reminders", Txt.t(R.string.acc_reminders_fold)))
 			reminders();
-		if (fold("preferences", "⚙️  Preferencias, Health Connect y CSV"))
+		if (fold("preferences", Txt.t(R.string.acc_preferences_fold)))
 			preferences();
-		if (!fold("device", "🗑  Datos de este dispositivo"))
+		if (!fold("device", Txt.t(R.string.acc_device_fold)))
 			return;
-		LinearLayout local = card("Datos de este dispositivo",
+		LinearLayout local = card(Txt.t(R.string.acc_device),
 			getString(R.string.account_local_data));
-		action(local, "Borrar datos locales", app.owner() != null && !signing, () -> {
+		action(local, Txt.t(R.string.acc_delete_local), app.owner() != null && !signing, () -> {
 			if (getParentFragmentManager().findFragmentByTag("delete-local-confirmation") != null)
 				return;
 			DeleteLocalConfirmation dialog = new DeleteLocalConfirmation();
@@ -145,39 +146,35 @@ public final class AccountFragment extends ScreenFragment {
 		if (c == null || app.owner() == null)
 			return;
 		if (c.onDevice()) {
-			LinearLayout local = card("Entrenador con IA", c.connectionNotice());
+			LinearLayout local = card(Txt.t(R.string.acc_trainer), c.connectionNotice());
 			if (!c.downloadOffer().isEmpty())
 				primary(action(local, c.downloadOffer(), !c.busy, c::downloadModel));
-			text(local, "Usa Gemini Nano si tu móvil lo trae o, si no, Gemma (Google, licencia Apache 2.0), que " +
-				"se descarga sola la primera vez que abres la app (2,6 GB). Todo se ejecuta en el móvil: no usa servidores ni envía tus mensajes fuera del dispositivo. " +
-				"Si tu móvil no puede, el chat usa el guiado local.", R.style.EnerGym_FieldCaption, 8);
+			text(local, Txt.t(R.string.acc_trainer_on_device), R.style.EnerGym_FieldCaption, 8);
 			if (!c.status.isEmpty()) text(local, c.status, R.style.EnerGym_Body, 12);
 			return;
 		}
 		if (c.automaticConnection()) {
-			LinearLayout online = card("Asistente con IA", c.connectionNotice());
-			text(online, "Los mensajes se envían al servicio online sólo al usar el chat en modo IA. " +
-				"Puedes elegir el guiado local dentro del chat.", R.style.EnerGym_FieldCaption, 8);
+			LinearLayout online = card(Txt.t(R.string.acc_ai_assistant), c.connectionNotice());
+			text(online, Txt.t(R.string.acc_online_notice), R.style.EnerGym_FieldCaption, 8);
 			if (!c.status.isEmpty()) text(online, c.status, R.style.EnerGym_Body, 12);
 			return;
 		}
-		LinearLayout server = card("Asistente con IA", c.remoteActive() ?
-			"Conectado a tu servidor. Puedes conversar con la IA y activar «Recordar esta conversación» dentro del chat para mantener el hilo." :
-			"Sin servidor, el chat usa el guiado local gratuito por reglas, sin enviar datos. Empareja tu servidor para que responda la IA.");
+		LinearLayout server = card(Txt.t(R.string.acc_ai_assistant), Txt.t(c.remoteActive() ?
+			R.string.acc_server_connected : R.string.acc_server_none));
 		if (c.connected()) {
-			action(server, "Desconectar y revocar", !c.busy, c::disconnect);
+			action(server, Txt.t(R.string.acc_disconnect), !c.busy, c::disconnect);
 			return;
 		}
-		action(server, c.showConnection ? "Ocultar conexión" : "Conectar servidor de IA", c::toggleConnection);
+		action(server, Txt.t(c.showConnection ? R.string.acc_hide_connection : R.string.acc_connect_server), c::toggleConnection);
 		if (!c.showConnection)
 			return;
-		textField(server, "assistant_endpoint", "URL del servidor (HTTPS)", c.endpoint, false, false, c::endpointInput);
-		textField(server, "assistant_pairing", "Código privado de emparejamiento", c.pairingCode, false, false,
+		textField(server, "assistant_endpoint", Txt.t(R.string.acc_server_url), c.endpoint, false, false, c::endpointInput);
+		textField(server, "assistant_pairing", Txt.t(R.string.acc_pairing_code), c.pairingCode, false, false,
 			c::pairingInput);
 		android.widget.EditText pairing = server.findViewWithTag("assistant_pairing");
 		pairing.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
 		pairing.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(128)});
-		action(server, "Conectar", !c.busy, () -> c.connect(c.endpoint, c.pairingCode));
+		action(server, Txt.t(R.string.acc_connect), !c.busy, () -> c.connect(c.endpoint, c.pairingCode));
 		if (!c.status.isEmpty())
 			text(server, c.status, R.style.EnerGym_Body, 12);
 	}
@@ -193,31 +190,31 @@ public final class AccountFragment extends ScreenFragment {
 		androidx.fragment.app.Fragment open = getParentFragmentManager().findFragmentByTag("reminder-time");
 		if (open instanceof com.google.android.material.timepicker.MaterialTimePicker)
 			listen((com.google.android.material.timepicker.MaterialTimePicker) open);
-		LinearLayout card = card("Recordatorios",
-			"Avisos en este móvil, sin servidor. Puedes apagarlos cuando quieras.");
+		LinearLayout card = card(Txt.t(R.string.acc_reminders),
+			Txt.t(R.string.acc_reminders_body));
 		String days = plan.daysText();
-		toggle(card, "Aviso los días de entreno", plan.training, on -> {
+		toggle(card, Txt.t(R.string.acc_training_reminder), plan.training, on -> {
 			if (on) requestReminder("training");
 			else r.setTraining(false);
 		});
-		caption(card, days.isEmpty() ? "Crea tu plan de entreno para saber qué días avisarte." :
-			"Días: " + days + " (según los " + plan.daysPerWeek + " días por semana de tu plan). Abre Entreno.");
+		caption(card, days.isEmpty() ? Txt.t(R.string.acc_training_reminder_empty) :
+			Txt.t(R.string.acc_training_reminder_days, days, plan.daysPerWeek));
 		if (plan.training)
-			action(card, "Hora del aviso: " + plan.trainingTimeText(), this::pickTrainingTime);
-		toggle(card, "Recordatorios para beber agua", plan.water, on -> {
+			action(card, Txt.t(R.string.acc_reminder_time, plan.trainingTimeText()), this::pickTrainingTime);
+		toggle(card, Txt.t(R.string.acc_water_reminder), plan.water, on -> {
 			if (on) requestReminder("water");
 			else r.setWater(false);
 		});
-		caption(card, "Entre las " + com.energym.app.reminders.ReminderPlan.WATER_START_HOUR + ":00 y las " +
-			com.energym.app.reminders.ReminderPlan.WATER_END_HOUR + ":00. Abre Nutrición para apuntar el vaso.");
+		caption(card, Txt.t(R.string.acc_water_reminder_hours, com.energym.app.reminders.ReminderPlan.WATER_START_HOUR,
+			com.energym.app.reminders.ReminderPlan.WATER_END_HOUR));
 		if (plan.water)
-			choice(card, "reminder_water_hours", "Frecuencia", java.util.Arrays.asList("1", "2", "3", "4"),
-				java.util.Arrays.asList("Cada hora", "Cada 2 horas", "Cada 3 horas", "Cada 4 horas"),
+			choice(card, "reminder_water_hours", Txt.t(R.string.acc_frequency), java.util.Arrays.asList("1", "2", "3", "4"),
+				java.util.Arrays.asList(Txt.n(R.plurals.acc_every_hours, 1), Txt.n(R.plurals.acc_every_hours, 2),
+					Txt.n(R.plurals.acc_every_hours, 3), Txt.n(R.plurals.acc_every_hours, 4)),
 				Integer.toString(plan.waterHours), value -> r.setWaterHours(Integer.parseInt(value)));
 		if ((plan.training || plan.water || notificationsDenied) && !r.canNotify()) {
-			text(card, "Las notificaciones de EnerGym están desactivadas, así que no verás los avisos. " +
-				"Actívalas en los ajustes de Android.", R.style.EnerGym_Body, 12);
-			action(card, "Abrir ajustes de notificaciones", () -> startActivity(
+			text(card, Txt.t(R.string.acc_notifications_off), R.style.EnerGym_Body, 12);
+			action(card, Txt.t(R.string.acc_open_notification_settings), () -> startActivity(
 				new android.content.Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
 					.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, requireContext().getPackageName())));
 		}
@@ -225,20 +222,19 @@ public final class AccountFragment extends ScreenFragment {
 
 	/** Preferencias de este móvil: unidad de peso del registro de entreno. */
 	private void preferences() {
-		LinearLayout card = card("Preferencias", "Se guardan en este móvil.");
-		choice(card, "weight_unit", "Unidad de peso en el entreno", java.util.Arrays.asList("kg", "lb"),
-			java.util.Arrays.asList("Kilos (kg)", "Libras (lb)"), Units.lb(requireContext()) ? "lb" : "kg",
-			"Tus registros se guardan igual; solo cambia cómo se muestran y escriben.",
+		LinearLayout card = card(Txt.t(R.string.acc_preferences), Txt.t(R.string.acc_preferences_body));
+		choice(card, "weight_unit", Txt.t(R.string.acc_weight_unit), java.util.Arrays.asList("kg", "lb"),
+			java.util.Arrays.asList(Txt.t(R.string.acc_kilos), Txt.t(R.string.acc_pounds)), Units.lb(requireContext()) ? "lb" : "kg",
+			Txt.t(R.string.acc_weight_unit_help),
 			v -> Units.setLb(requireContext(), "lb".equals(v)));
-		action(card, "Ver el tutorial otra vez", true,
+		action(card, Txt.t(R.string.acc_replay_tutorial), true,
 			() -> startActivity(new android.content.Intent(requireContext(), TutorialActivity.class)))
 			.setTag("replay_tutorial");
 		if (app.owner() == null)
 			return;
 		if (com.energym.app.health.HealthSync.available()) {
-			LinearLayout health = card("Health Connect", "Envía tus entrenos terminados y tu peso a Health Connect para " +
-				"verlos en Samsung Health u otras apps. EnerGym no lee nada de allí.");
-			toggle(health, "Enviar a Health Connect", com.energym.app.health.HealthSync.enabled(requireContext()), on -> {
+			LinearLayout health = card("Health Connect", Txt.t(R.string.acc_health_body));
+			toggle(health, Txt.t(R.string.acc_health_send), com.energym.app.health.HealthSync.enabled(requireContext()), on -> {
 				if (!on) {
 					com.energym.app.health.HealthSync.setEnabled(requireContext(), false);
 					render();
@@ -250,18 +246,17 @@ public final class AccountFragment extends ScreenFragment {
 					try {
 						healthPermissions.launch(com.energym.app.health.HealthSync.PERMISSIONS);
 					} catch (RuntimeException e) {
-						toast("Health Connect no está disponible en este móvil");
+						toast(Txt.t(R.string.acc_health_unavailable));
 					}
 			});
 			if (com.energym.app.health.HealthSync.enabled(requireContext()))
-				action(health, "Enviar ahora", true, this::syncHealth).setTag("health_sync");
+				action(health, Txt.t(R.string.acc_send_now), true, this::syncHealth).setTag("health_sync");
 		}
-		LinearLayout data = card("Tus datos en CSV", "Exporta tus entrenos serie a serie, comidas (últimas " +
-			com.energym.app.nutrition.NutritionController.HISTORY_DAYS / 7 + " semanas), peso y medidas para abrirlos en " +
-			"Excel o Google Sheets. Al importar se recuperan comidas, peso y medidas sin duplicarlas.");
-		action(data, "Exportar a CSV", true, () -> exportCsv.launch("energym-" + java.time.LocalDate.now() + ".csv"))
+		LinearLayout data = card(Txt.t(R.string.acc_csv), Txt.t(R.string.acc_csv_body,
+			com.energym.app.nutrition.NutritionController.HISTORY_DAYS / 7));
+		action(data, Txt.t(R.string.acc_export_csv), true, () -> exportCsv.launch("energym-" + java.time.LocalDate.now() + ".csv"))
 			.setTag("export_csv");
-		action(data, "Importar CSV", state.nutrition != null && !state.nutrition.busy,
+		action(data, Txt.t(R.string.acc_import_csv), state.nutrition != null && !state.nutrition.busy,
 			() -> importCsv.launch(new String[]{"text/csv", "text/comma-separated-values", "text/plain"}))
 			.setTag("import_csv");
 	}
@@ -279,9 +274,9 @@ public final class AccountFragment extends ScreenFragment {
 			// BOM para que Excel lea bien las tildes.
 			out.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
 			out.write(csv.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-			toast("Exportado");
+			toast(Txt.t(R.string.acc_exported));
 		} catch (java.io.IOException | RuntimeException e) {
-			toast("No se pudo guardar el archivo");
+			toast(Txt.t(R.string.acc_save_file_failed));
 		}
 	}
 
@@ -301,7 +296,7 @@ public final class AccountFragment extends ScreenFragment {
 			}
 			text = bytes.toString("UTF-8").replace("\uFEFF", "");
 		} catch (java.io.IOException | RuntimeException e) {
-			toast("No se pudo leer el archivo");
+			toast(Txt.t(R.string.acc_read_file_failed));
 			return;
 		}
 		com.energym.app.progress.CsvBackup.Imported data = com.energym.app.progress.CsvBackup.parse(text);
@@ -315,11 +310,11 @@ public final class AccountFragment extends ScreenFragment {
 		state.nutrition.importBackup(data.foods, data.weights, (foods, weights) -> {
 			if (isAdded())
 				new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-					.setTitle("Importación terminada")
-					.setMessage(foods + " comidas, " + weights + " pesos y " + savedMeasures + " días de medidas añadidos." +
-						(skipped > 0 ? "\n" + skipped + " filas no se entendieron y se han saltado." : "") +
-						"\nLos entrenos ya están en tu cuenta, así que no se importan de nuevo.")
-					.setPositiveButton("Vale", null).show();
+					.setTitle(Txt.t(R.string.acc_import_done))
+					.setMessage(Txt.t(R.string.acc_import_summary, foods, weights, savedMeasures) +
+						(skipped > 0 ? "\n" + Txt.t(R.string.acc_import_skipped, skipped) : "") +
+						"\n" + Txt.t(R.string.acc_import_workouts))
+					.setPositiveButton(Txt.t(R.string.common_ok), null).show();
 		});
 	}
 
@@ -381,7 +376,7 @@ public final class AccountFragment extends ScreenFragment {
 		com.google.android.material.timepicker.MaterialTimePicker picker =
 			new com.google.android.material.timepicker.MaterialTimePicker.Builder()
 				.setTimeFormat(com.google.android.material.timepicker.TimeFormat.CLOCK_24H).setHour(minute / 60)
-				.setMinute(minute % 60).setTitleText("Hora del aviso de entreno").build();
+				.setMinute(minute % 60).setTitleText(Txt.t(R.string.acc_reminder_time_title)).build();
 		listen(picker);
 		picker.show(getParentFragmentManager(), "reminder-time");
 	}
@@ -400,11 +395,10 @@ public final class AccountFragment extends ScreenFragment {
 		@Override
 		public android.app.Dialog onCreateDialog(android.os.Bundle saved) {
 			return new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-				.setTitle("¿Borrar los datos locales?")
-				.setMessage(
-					"Se borrarán los datos y la conversación de esta cuenta en este dispositivo y se cerrará la sesión. Los datos de otras cuentas y de Firebase se conservan. Al volver a conectar Google se restaurará el respaldo confirmado; los cambios solo locales se perderán.")
-				.setNegativeButton("Cancelar", null)
-				.setPositiveButton("Borrar y salir", (dialog, which) ->
+				.setTitle(Txt.t(R.string.acc_delete_local_title))
+				.setMessage(Txt.t(R.string.acc_delete_local_message))
+				.setNegativeButton(Txt.t(R.string.common_cancel), null)
+				.setPositiveButton(Txt.t(R.string.acc_delete_and_exit), (dialog, which) ->
 					((com.energym.app.MainActivity) requireActivity()).state()
 						.clearLocalData(requireArguments().getString("owner")))
 				.create();

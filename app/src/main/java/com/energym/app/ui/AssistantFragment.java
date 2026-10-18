@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import com.energym.app.R;
 import com.energym.app.assistant.*;
 import com.energym.app.domain.*;
@@ -69,40 +70,40 @@ public final class AssistantFragment extends ScreenFragment {
 		View composer = getView().findViewById(R.id.chat_composer);
 		if (app.owner() == null || c == null) {
 			composer.setVisibility(View.GONE);
-			bubble("¡Hola! Soy tu asistente de EnerGym. Entra con tu cuenta para guardar nuestra conversación.", false);
-			MaterialButton open = action(rows, "Entrar", true, () -> app.navigate(AppController.Screen.ACCOUNT));
+			bubble(Txt.t(R.string.as_hello), false);
+			MaterialButton open = action(rows, Txt.t(R.string.as_sign_in), true, () -> app.navigate(AppController.Screen.ACCOUNT));
 			primary(open);
 			return;
 		}
 		composer.setVisibility(View.VISIBLE);
 		String modeLabel = c.onDevice() ?
-			(c.localGuidance() ? "Guiado local · sin IA" : c.remoteActive() ? "Entrenador IA · " + c.modelLabel() + " en tu móvil" :
-				"IA del móvil no disponible · guiado local") : c.automaticConnection() ?
-			(c.localGuidance() ? "Guiado local · sin IA" : c.remoteActive() ? "IA online · cuenta de Google" : "IA online no disponible") :
-			(c.remoteActive() ? "Servidor de IA emparejado · conversación" : "Guiado local · sin IA");
+			(c.localGuidance() ? Txt.t(R.string.as_mode_local) : c.remoteActive() ? Txt.t(R.string.as_mode_device, c.modelLabel()) :
+				Txt.t(R.string.as_mode_device_unavailable)) : c.automaticConnection() ?
+			(c.localGuidance() ? Txt.t(R.string.as_mode_local) : c.remoteActive() ? Txt.t(R.string.as_mode_online) :
+				Txt.t(R.string.as_mode_online_unavailable)) :
+			(c.remoteActive() ? Txt.t(R.string.as_mode_server) : Txt.t(R.string.as_mode_local));
 		TextView mode = text(rows, modeLabel, R.style.EnerGym_FieldCaption, 4);
 		mode.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
 		if (c.automaticConnection()) {
-			String ai = c.onDevice() ? "IA del móvil" : "IA online";
+			String ai = Txt.t(c.onDevice() ? R.string.as_device_ai : R.string.as_online_ai);
 			if (c.localGuidance())
-				action(rows, "Usar " + ai, !c.busy, () -> c.selectLocalGuidance(false));
+				action(rows, Txt.t(R.string.as_use, ai), !c.busy, () -> c.selectLocalGuidance(false));
 			else {
 				if (!c.remoteActive()) {
 					text(rows, c.connectionNotice(), R.style.EnerGym_Body, 8);
 					if (!c.downloadOffer().isEmpty())
 						primary(action(rows, c.downloadOffer(), !c.busy, c::downloadModel));
 					if (c.connected())
-						action(rows, "Reintentar " + ai, !c.busy, () -> c.selectLocalGuidance(false));
+						action(rows, Txt.t(R.string.as_retry, ai), !c.busy, () -> c.selectLocalGuidance(false));
 				}
-				action(rows, "Usar guiado local", !c.busy, () -> c.selectLocalGuidance(true));
+				action(rows, Txt.t(R.string.as_use_local), !c.busy, () -> c.selectLocalGuidance(true));
 			}
 			if (c.busy)
-				action(rows, "Cancelar solicitud", true, c::cancelPending);
+				action(rows, Txt.t(R.string.as_cancel_request), true, c::cancelPending);
 		} else if (!c.remoteActive())
-			action(rows, "Conectar IA en Cuenta", !c.busy, () -> app.navigate(AppController.Screen.ACCOUNT));
+			action(rows, Txt.t(R.string.as_connect_in_account), !c.busy, () -> app.navigate(AppController.Screen.ACCOUNT));
 		if (c.onDevice())
-			text(rows, "Todo se procesa en tu móvil: ningún mensaje sale del dispositivo, no necesita internet " +
-				"y no tiene coste. Tu entrenador recuerda los últimos mensajes de esta conversación.",
+			text(rows, Txt.t(R.string.as_on_device_notice),
 				R.style.EnerGym_FieldCaption, 4);
 		else
 			historyConsent(c);
@@ -116,15 +117,12 @@ public final class AssistantFragment extends ScreenFragment {
 		com.google.android.material.checkbox.MaterialCheckBox context =
 			new com.google.android.material.checkbox.MaterialCheckBox(requireContext());
 		context.setTag("assistant_history_context");
-		context.setText("Recordar esta conversación (hasta 12 mensajes)");
+		context.setText(Txt.t(R.string.as_remember));
 		context.setChecked(c.historyContextEnabled());
 		context.setMinHeight(dp(48));
 		context.setOnCheckedChangeListener((button, enabled) -> c.historyContext(enabled));
 		add(rows, context, 4);
-		text(rows, "Al activar contexto se comparten con la IA hasta 12 mensajes anteriores de este chat. " +
-			"El permiso del chat dura esta conversación y no cambia tu perfil. No se adjuntan tu historial de entrenamientos " +
-			"ni tus datos de nutrición o perfil físico. Al pedir una rutina se comparten los filtros y limitaciones que indicaste " +
-			"para adaptarla. El mensaje actual se envía siempre al usar IA.",
+		text(rows, Txt.t(R.string.as_remember_notice),
 			R.style.EnerGym_FieldCaption, 4);
 	}
 
@@ -132,7 +130,7 @@ public final class AssistantFragment extends ScreenFragment {
 		send.setEnabled(!c.busy);
 		send.setAlpha(c.busy ? 0.5f : 1f);
 		if (c.exercise != null) {
-			MaterialButton chip = action(rows, "Hablando de: " + c.exercise.getName() + "  ›", true, () ->
+			MaterialButton chip = action(rows, Txt.t(R.string.as_talking_about, c.exercise.getName()) + "  ›", true, () ->
 				app.openExercise(c.exercise));
 		}
 		// La tarjeta de rutina va justo tras la respuesta que la propuso; lo hablado después queda debajo.
@@ -146,7 +144,7 @@ public final class AssistantFragment extends ScreenFragment {
 		if (c.preview != null && anchor >= c.messages.size())
 			proposal(c, c.preview);
 		if (c.busy)
-			bubble("Escribiendo…", false).setAlpha(0.7f);
+			bubble(Txt.t(R.string.as_typing), false).setAlpha(0.7f);
 		if (!c.status.isEmpty()) {
 			TextView note = text(rows, c.status, R.style.EnerGym_FieldCaption, 12);
 			note.setGravity(Gravity.CENTER);
@@ -173,12 +171,12 @@ public final class AssistantFragment extends ScreenFragment {
 		LinearLayout row = columns(rows, 14);
 		if (draft != null) {
 			Session open = draft;
-			primary(compact(row, "▶ Continuar entreno", !c.busy, () -> app.resume(open)));
+			primary(compact(row, Txt.t(R.string.hist_continue_workout), !c.busy, () -> app.resume(open)));
 		} else if (app.routines.accepted != null && !app.routines.accepted.isEmpty())
-			primary(compact(row, "▶ Empezar entreno", !c.busy, app::startSession));
+			primary(compact(row, Txt.t(R.string.as_start_workout), !c.busy, app::startSession));
 		if (app.progression() != null)
-			compact(row, "📈 Subir de nivel", !c.busy, app::reviewProgression);
-		compact(row, "🆕 Rutina nueva", !c.busy, () -> c.send("Hazme una rutina para hoy"));
+			compact(row, Txt.t(R.string.as_level_up), !c.busy, app::reviewProgression);
+		compact(row, Txt.t(R.string.as_new_routine), !c.busy, () -> c.send("Hazme una rutina para hoy"));
 	}
 
 	private TextView bubble(String message, boolean mine) {
@@ -190,7 +188,7 @@ public final class AssistantFragment extends ScreenFragment {
 		view.setLineSpacing(dp(2), 1f);
 		view.setTextIsSelectable(true);
 		view.setText(message);
-		view.setContentDescription((mine ? "Tú: " : "Asistente: ") + message);
+		view.setContentDescription(Txt.t(mine ? R.string.as_you : R.string.as_assistant, message));
 		view.setMaxWidth((int) (getResources().getDisplayMetrics().widthPixels * 0.8f));
 		LinearLayout.LayoutParams params =
 			new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -206,12 +204,12 @@ public final class AssistantFragment extends ScreenFragment {
 	private void proposal(ProposalController c, Routine routine) {
 		bubble(com.energym.app.assistant.RoutineCard.text(routine), false);
 		LinearLayout choices = columns(rows, 10);
-		primary(compact(choices, "Aceptar", !c.busy && !routine.isEmpty(), c::accept));
-		compact(choices, "Rechazar", !c.busy, c::reject);
+		primary(compact(choices, Txt.t(R.string.as_accept), !c.busy && !routine.isEmpty(), c::accept));
+		compact(choices, Txt.t(R.string.as_reject), !c.busy, c::reject);
 		LinearLayout tweaks = columns(rows, 8);
 		compact(tweaks, "−5 min", !c.busy, c::reduceTime);
 		compact(tweaks, "+5 min", !c.busy, c::extendTime);
-		TextView hint = text(rows, "Toca un ejercicio para ver su técnica o 🔄 para cambiarlo:",
+		TextView hint = text(rows, Txt.t(R.string.as_proposal_hint),
 			R.style.EnerGym_FieldCaption, 14);
 		hint.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
 		for (int i = 0; i < routine.getItems().size(); i++) {
@@ -220,10 +218,10 @@ public final class AssistantFragment extends ScreenFragment {
 			LinearLayout line = columns(rows, 8);
 			MaterialButton open = compact(line, item.getExercise().getName(), true,
 				() -> app.openExercise(item.getExercise()));
-			open.setContentDescription("Consultar técnica de " + item.getExercise().getName());
+			open.setContentDescription(Txt.t(R.string.as_check_technique, item.getExercise().getName()));
 			((LinearLayout.LayoutParams) open.getLayoutParams()).weight = 4;
 			MaterialButton swap = compact(line, "🔄", !c.busy, () -> c.substitute(index));
-			swap.setContentDescription("Cambiar " + item.getExercise().getName() + " por otro ejercicio");
+			swap.setContentDescription(Txt.t(R.string.as_swap, item.getExercise().getName()));
 		}
 	}
 }
