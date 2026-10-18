@@ -16,7 +16,10 @@ public final class ProfileFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		heading(Txt.t(R.string.pf_eyebrow), Txt.t(R.string.pf_title), Txt.t(R.string.pf_subtitle));
+		if (app.guidedStep == com.energym.app.controller.AppController.Screen.PROFILE)
+			heading(Txt.t(R.string.guide_pf_eyebrow), Txt.t(R.string.pf_title), Txt.t(R.string.guide_pf_subtitle));
+		else
+			heading(Txt.t(R.string.pf_eyebrow), Txt.t(R.string.pf_title), Txt.t(R.string.pf_subtitle));
 		LinearLayout fields = card(Txt.t(R.string.pf_training), "");
 		boolean resources = false, details = false;
 		// Secciones de presentación: conservan el orden y los eventos de todos los campos del controlador.

@@ -20,6 +20,8 @@ public final class NutritionController {
 	public LocalDate selected;
 	public FoodProduct product;
 	public boolean busy, looking;
+	/** Ya se leyó el diario de la cuenta activa (sin esto, «sin datos físicos» podría ser solo «aún cargando»). */
+	public boolean loaded;
 	public String status = "";
 	private final NutritionStore store;
 	private final NutritionStore.Lookup lookup;
@@ -53,6 +55,7 @@ public final class NutritionController {
 		generation++;
 		foodRevision++;
 		body = null;
+		loaded = false;
 		entries = Collections.emptyList();
 		weights = new TreeMap<>();
 		dailyCalories = new TreeMap<>();
@@ -87,6 +90,7 @@ public final class NutritionController {
 					if (token != generation || request != loadRequest)
 						return;
 					body = s.body;
+					loaded = true;
 					entries = s.entries;
 					weights = new TreeMap<>(s.weights);
 					dailyCalories = new TreeMap<>(s.dailyCalories);

@@ -62,6 +62,7 @@ public class TutorialFlowTest {
 				find(a.getWindow().getDecorView(), "Empezar").performClick();
 			});
 			assertTrue(TutorialActivity.done(context));
+			assertTrue("Al terminar, la app guía a rellenar perfil y datos físicos", TutorialActivity.setupPending(context));
 		}
 	}
 }

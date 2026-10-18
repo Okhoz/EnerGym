@@ -195,6 +195,8 @@ public final class MainActivity extends AppCompatActivity {
 					AppController.Screen.TRAINING);
 			return;
 		}
+		if (guideSetup(state.app))
+			return;
 		queuePendingAvatar();
 		rendering = true;
 		try {
@@ -239,6 +241,40 @@ public final class MainActivity extends AppCompatActivity {
 		} finally {
 			rendering = false;
 		}
+	}
+
+	/**
+	 * Guía tras el tutorial: Cuenta (si no hay) → Perfil → Datos físicos, hasta que ambos estén guardados. Cada paso
+	 * se abre una sola vez por ejecución: si el usuario sale del formulario, no se le vuelve a forzar hasta otro
+	 * arranque. Devuelve true si ha navegado (navigate() vuelve a pintar a través del observador).
+	 */
+	private boolean guideSetup(AppController app) {
+		if (!TutorialActivity.setupPending(this) || !TutorialActivity.done(this) || !state.accountResolved ||
+			app.screen != app.tab)
+			return false;
+		AppController.Screen target;
+		if (app.owner() == null)
+			target = AppController.Screen.ACCOUNT;
+		else if (app.loading || !app.initialDataReady || state.nutrition == null || !state.nutrition.loaded)
+			return false;
+		else if (app.profile == null)
+			target = AppController.Screen.PROFILE;
+		else if (state.nutrition.body == null)
+			target = AppController.Screen.BODY;
+		else {
+			TutorialActivity.setupFinished(this);
+			if (app.guidedStep == null)
+				return false;
+			app.guidedStep = null;
+			app.notice = "¡Todo listo! Tu perfil y tus objetivos ya están configurados. Empieza por el entreno de hoy.";
+			app.navigate(AppController.Screen.HOME);
+			return true;
+		}
+		if (target == app.guidedStep)
+			return false;
+		app.guidedStep = target;
+		app.navigate(target);
+		return true;
 	}
 
 	/**

@@ -60,6 +60,8 @@ public final class AppController {
 	public Screen screen = Screen.HOME, tab = Screen.HOME;
 	public Exercise exercise;
 	public String error = "", notice = "";
+	/** Último formulario al que la guía inicial llevó al usuario (null = sin guía en esta ejecución). */
+	public Screen guidedStep;
 	public boolean loading, trainingMutation;
 	/** Becomes true only when a current account snapshot includes cached or validated restored data. */
 	public boolean initialDataReady = true;

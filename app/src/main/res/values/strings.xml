@@ -1299,7 +1299,7 @@
 	<string name="tut_trainer">Tu entrenador con IA</string>
 	<string name="tut_trainer_body">En Asistente pregúntale lo que quieras: técnica, rutinas, si subir peso…\n\nUsa tus datos reales y funciona en tu móvil, sin enviar tus mensajes fuera.</string>
 	<string name="tut_account">Cuenta y ajustes</string>
-	<string name="tut_account_body">Arriba a la derecha: copia en la nube, recordatorios, kg/lb, Health Connect y CSV.\n\nDesde ahí puedes volver a ver este tutorial cuando quieras. ¡A entrenar! 💪</string>
+	<string name="tut_account_body">Arriba a la derecha: copia en la nube, recordatorios, kg/lb, Health Connect y CSV.\n\nDesde ahí puedes volver a ver este tutorial cuando quieras. Ahora rellena tu perfil y tus datos físicos: así tus rutinas y tu dieta se ajustan a ti. 💪</string>
 	<string name="tut_back">Atrás</string>
 	<string name="tut_next">Siguiente</string>
 	<string name="tut_complete">Completa el tutorial para empezar a usar EnerGym</string>
@@ -1743,5 +1743,9 @@
 	<string name="dp_budget_short">Con el presupuesto que queda no llega para todo: este es el menú más económico que cuadra con tus calorías.</string>
 	<string name="label_health_privacy">EnerGym y Health Connect</string>
 	<string name="label_widget">EnerGym · Tu día</string>
+	<string name="guide_pf_eyebrow">PRIMEROS PASOS · 1 DE 2</string>
+	<string name="guide_pf_subtitle">Cuéntanos cómo quieres entrenar para que tus rutinas se ajusten a ti. Después, tus datos físicos.</string>
+	<string name="guide_body_eyebrow">PRIMEROS PASOS · 2 DE 2</string>
+	<string name="guide_body_subtitle">Último paso: con estos datos calculamos tus calorías y macros diarios. Al guardar, ya puedes empezar.</string>
 </resources>
 

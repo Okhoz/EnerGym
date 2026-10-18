@@ -28,7 +28,7 @@ import com.google.android.material.button.MaterialButton;
  * ver desde Cuenta.
  */
 public final class TutorialActivity extends AppCompatActivity {
-	private static final String PREFS = "tutorial", DONE = "done_v1";
+	private static final String PREFS = "tutorial", DONE = "done_v1", SETUP = "setup_pending";
 
 	/** Pasos: título, texto, imagen (0 = logo, -1 = animación 3D). */
 	private static final int[][] STEPS = {
@@ -51,6 +51,15 @@ public final class TutorialActivity extends AppCompatActivity {
 
 	public static boolean done(Context c) {
 		return c.getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(DONE, false);
+	}
+
+	/** Tras el tutorial, la app guía a rellenar el perfil y los datos físicos hasta que ambos estén guardados. */
+	public static boolean setupPending(Context c) {
+		return c.getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(SETUP, false);
+	}
+
+	public static void setupFinished(Context c) {
+		c.getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(SETUP, false).apply();
 	}
 
 	/** Los tests instrumentados abren la app directamente: allí el tutorial no se interpone. */
@@ -295,7 +304,7 @@ public final class TutorialActivity extends AppCompatActivity {
 	}
 
 	private void finishTutorial() {
-		getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(DONE, true).apply();
+		getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(DONE, true).putBoolean(SETUP, true).apply();
 		finish();
 	}
 

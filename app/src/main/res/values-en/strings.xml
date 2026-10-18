@@ -1201,7 +1201,7 @@
 	<string name="tut_trainer">Your AI trainer</string>
 	<string name="tut_trainer_body">In Assistant ask it anything: technique, routines, whether to add weight…\n\nIt uses your real data and runs on your phone, without sending your messages anywhere.</string>
 	<string name="tut_account">Account and settings</string>
-	<string name="tut_account_body">Top right: cloud backup, reminders, kg/lb, Health Connect and CSV.\n\nFrom there you can watch this tutorial again whenever you like. Let\'s train! 💪</string>
+	<string name="tut_account_body">Top right: cloud backup, reminders, kg/lb, Health Connect and CSV.\n\nFrom there you can watch this tutorial again whenever you like. Now fill in your profile and body details so your routines and diet fit you. 💪</string>
 	<string name="tut_back">Back</string>
 	<string name="tut_next">Next</string>
 	<string name="tut_complete">Complete the tutorial to start using EnerGym</string>
@@ -1715,4 +1715,8 @@
 	<string name="switch_apps_unknown">This file doesn\'t look like a Strong or Hevy export, or it has no strength workouts we recognise.</string>
 	<string name="switch_apps_done">%1$d workouts imported from %2$s. %3$d were already there and were skipped.</string>
 	<string name="switch_apps_unmatched">Exercises with no match that weren\'t imported: %1$s.</string>
+	<string name="guide_pf_eyebrow">FIRST STEPS · 1 OF 2</string>
+	<string name="guide_pf_subtitle">Tell us how you want to train so your routines fit you. Then, your body details.</string>
+	<string name="guide_body_eyebrow">FIRST STEPS · 2 OF 2</string>
+	<string name="guide_body_subtitle">Last step: with these details we calculate your daily calories and macros. Once saved, you are ready to go.</string>
 </resources>

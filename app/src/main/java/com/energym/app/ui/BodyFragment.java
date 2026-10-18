@@ -21,7 +21,10 @@ public final class BodyFragment extends ScreenFragment {
 
 	protected void content() {
 		NutritionController n = state.nutrition;
-		heading(Txt.t(R.string.nut_eyebrow), Txt.t(R.string.body_title), Txt.t(R.string.body_subtitle));
+		if (app.guidedStep == Screen.BODY)
+			heading(Txt.t(R.string.guide_body_eyebrow), Txt.t(R.string.body_title), Txt.t(R.string.guide_body_subtitle));
+		else
+			heading(Txt.t(R.string.nut_eyebrow), Txt.t(R.string.body_title), Txt.t(R.string.body_subtitle));
 		if (n == null || app.owner() == null) {
 			card(Txt.t(R.string.nut_sign_in), "");
 			return;
