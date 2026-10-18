@@ -75,6 +75,9 @@ public class FollowUpsTest {
 	@Test
 	public void warmupQuestionIsNotSuggestedBackUnlessARoutineCame() {
 		assertFalse(FollowUps.suggest("¿Cómo caliento?", "5 min de movilidad.", false).contains(WARMUP));
+		// Caso visto en el emulador: la sugerencia «¿Cómo caliento antes?» no debe volver a salir tras tocarla.
+		assertFalse(FollowUps.suggest("¿Cómo caliento antes?", "Puedo explicarte la técnica.", false).contains(WARMUP));
+		assertFalse(FollowUps.suggest("¿Cómo calentar?", "", false).contains(WARMUP));
 		assertTrue(FollowUps.suggest("Rutina y calentamiento", "Aquí la tienes.", true).contains(WARMUP));
 	}
 

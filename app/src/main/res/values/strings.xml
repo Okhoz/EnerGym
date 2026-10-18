@@ -57,5 +57,16 @@
 	<string name="followup_nutrition">¿Qué como para mi objetivo?</string>
 	<string name="followup_rest">¿Cuánto debo descansar?</string>
 	<string name="followup_motivation">Motívame para entrenar 💪</string>
+	<string name="chat_mode_guided">💬 Guiado local · sin IA</string>
+	<string name="chat_mode_device">🔒 %1$s · privado, en tu móvil</string>
+	<string name="chat_mode_device_off">💬 Guiado local · la IA del móvil no está disponible</string>
+	<string name="chat_mode_online">✨ IA online · cuenta de Google</string>
+	<string name="chat_mode_online_off">💬 IA online no disponible</string>
+	<string name="chat_mode_paired">✨ Servidor de IA emparejado</string>
+	<string name="chat_use_device">Usar IA</string>
+	<string name="chat_use_online">Usar IA</string>
+	<string name="chat_retry">Reintentar</string>
+	<string name="chat_cancel">Cancelar</string>
+	<string name="chat_connect">Conectar IA</string>
 </resources>
 

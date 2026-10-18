@@ -28,7 +28,7 @@ public final class FollowUps {
 		LinkedHashSet<Topic> result = new LinkedHashSet<>();
 		if (has(all, "dolor", "molest", "lesion", "duele"))
 			add(result, Topic.ALTERNATIVE, Topic.REST);
-		if (routine || has(all, "rutina", "entreno de hoy", "sesion"))
+		if (routine || has(all, "rutina", "entreno de hoy", "sesion", "calient", "calent"))
 			add(result, Topic.WARMUP, Topic.ALTERNATIVE);
 		if (has(all, "estanc", "descarga", "no avanzo", "no mejoro"))
 			add(result, Topic.DELOAD, Topic.TECHNIQUE);
@@ -56,7 +56,7 @@ public final class FollowUps {
 			return Topic.ROUTINE_TODAY;
 		if (has(user, "subo", "subir peso", "progres"))
 			return Topic.PROGRESSION;
-		if (has(user, "calent"))
+		if (has(user, "calent", "calient"))
 			return Topic.WARMUP;
 		if (has(user, "descarga"))
 			return Topic.DELOAD;
