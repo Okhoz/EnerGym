@@ -268,7 +268,7 @@ public final class MainActivity extends AppCompatActivity {
 			if (app.guidedStep == null)
 				return false;
 			app.guidedStep = null;
-			app.notice = "¡Todo listo! Tu perfil y tus objetivos ya están configurados. Empieza por el entreno de hoy.";
+			app.notice = Txt.t(R.string.main_onboarding_done);
 			app.navigate(AppController.Screen.HOME);
 			return true;
 		}
@@ -565,7 +565,7 @@ public final class MainActivity extends AppCompatActivity {
 	public boolean dispatchTouchEvent(android.view.MotionEvent event) {
 		if (android.os.Build.VERSION.SDK_INT < 31 && (event.getFlags() & android.view.MotionEvent.FLAG_WINDOW_IS_OBSCURED) != 0) {
 			if (event.getActionMasked() == android.view.MotionEvent.ACTION_DOWN)
-				android.widget.Toast.makeText(this, "Otra app está tapando EnerGym; ciérrala para poder tocar.",
+				android.widget.Toast.makeText(this, Txt.t(R.string.main_overlay_blocked),
 					android.widget.Toast.LENGTH_SHORT).show();
 			return true;
 		}

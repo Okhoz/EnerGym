@@ -174,7 +174,7 @@ public final class WorkoutImport {
 	public static Result parse(String csv, List<Exercise> catalog, TrainingProfile profile, ZoneId zone) {
 		if (csv == null || catalog == null || profile == null)
 			return null;
-		String text = csv.startsWith("﻿") ? csv.substring(1) : csv;
+		String text = csv.startsWith("\uFEFF") ? csv.substring(1) : csv;
 		int firstLine = text.indexOf('\n');
 		String header = firstLine < 0 ? text : text.substring(0, firstLine);
 		char delimiter = count(header, ';') > count(header, ',') ? ';' : ',';

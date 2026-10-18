@@ -308,7 +308,7 @@ public final class AppState extends AndroidViewModel {
 			else if (status != AccountController.Status.ERROR)
 				app.activate(null);
 			if (error != null)
-				app.error(Txt.t(R.string.st_account_error, error.getMessage()));
+				app.error(accountError(error));
 			changed();
 		});
 		accounts.start();
@@ -350,6 +350,18 @@ public final class AppState extends AndroidViewModel {
 		if (visualization != null && app != null)
 			visualization.context(app.owner(), app.navigationRevision(), app.screen, app.exercise);
 		observer.run();
+	}
+
+	/** Mensaje claro para los fallos habituales al entrar con Google, en vez del texto técnico de la librería. */
+	private static String accountError(Throwable error) {
+		if (error instanceof androidx.credentials.exceptions.NoCredentialException)
+			return Txt.t(R.string.st_no_google_account);
+		if (error instanceof androidx.credentials.exceptions.GetCredentialInterruptedException ||
+			error instanceof java.io.IOException ||
+			error instanceof com.google.firebase.FirebaseNetworkException)
+			return Txt.t(R.string.st_account_network);
+		return Txt.t(R.string.st_account_error, error.getMessage() == null ? error.getClass().getSimpleName() :
+			error.getMessage());
 	}
 
 	private void updateWidget() {

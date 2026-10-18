@@ -744,7 +744,7 @@
 	<string name="body_estimate_pending">Estimate pending</string>
 	<string name="body_macros">Protein: %1$d g\nCarbs: %2$d g\nFat: %3$d g</string>
 	<string name="body_how">How it\'s calculated</string>
-	<string name="body_how_body">Basal metabolism with Mifflin-St Jeor × activity factor, adjusted to your goal. Protein 1.6–2 g/kg, minimum fat 0.8 g/kg and the rest from carbs. Approximate 15 % deficit or 10 % surplus. An estimate for adults; it doesn\'t apply during pregnancy or breastfeeding and doesn\'t replace a professional assessment.</string>
+	<string name="body_how_body" formatted="false">Basal metabolism with Mifflin-St Jeor × activity factor, adjusted to your goal. Protein 1.6–2 g/kg, minimum fat 0.8 g/kg and the rest from carbs. Approximate 15 % deficit or 10 % surplus. An estimate for adults; it doesn\'t apply during pregnancy or breastfeeding and doesn\'t replace a professional assessment.</string>
 	<string name="body_save">Save target and details</string>
 	<string name="common_ok">OK</string>
 	<!-- Cuenta -->
@@ -1729,4 +1729,27 @@
 	<string name="tp_title">Your trainer\'s workout</string>
 	<string name="pc_device_too_long">Your message and data don\'t fit in the phone\'s AI at once. Try splitting it into shorter messages.</string>
 	<string name="as_new_routine_message">Make me a routine for today</string>
+	<string name="st_no_google_account">There\'s no Google account on this phone. Add one in Android settings and try again, or use the local demo.</string>
+	<string name="st_account_network">Couldn\'t connect to Google. Check your internet connection and try again.</string>
+	<!-- Programas clásicos -->
+	<string name="cp_531_week1" formatted="false">Week 1: 65 % × 5, 75 % × 5 and 85 % × 5+ (as many as you can on the last one)</string>
+	<string name="cp_ppl">Push / Pull / Legs</string>
+	<string name="cp_overhead_press">Overhead press</string>
+	<string name="cp_deadlift">Deadlift</string>
+	<string name="cp_bench_press">Bench press</string>
+	<string name="cp_squat">Squat</string>
+	<string name="cp_push">Push</string>
+	<string name="cp_pull">Pull</string>
+	<string name="cp_legs">Legs</string>
+	<string name="cp_bbb" formatted="false">Boring But Big: 5 × 10 at 50 %</string>
+	<string name="cp_t1">T1: 5 × 3 (as many as you can on the last one); if you fail, move to 6 × 2</string>
+	<string name="cp_t2">T2: 3 × 10; if you fail, move to 3 × 8</string>
+	<string name="cp_t3">T3: 3 × 15; when you get 25 on the last one, add weight</string>
+	<string name="cp_program">%1$s program.</string>
+	<string name="cp_explanation">Classic %1$s program. Loads start at 90 %% of your best estimated 1RM; review and adjust them if you haven\'t done the exercise before.</string>
+	<string name="app_profile_before_import">Set up your profile before importing workouts.</string>
+	<string name="app_wait_action">Wait for the current action to finish.</string>
+	<string name="app_program_empty">This program has no exercises available in the catalogue.</string>
+	<string name="main_onboarding_done">All set! Your profile and targets are configured. Start with today\'s workout.</string>
+	<string name="main_overlay_blocked">Another app is covering EnerGym; close it to be able to tap.</string>
 </resources>

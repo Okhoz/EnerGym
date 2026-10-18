@@ -1,5 +1,7 @@
 package com.energym.app.domain;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import java.util.*;
 
 /**
@@ -38,7 +40,9 @@ public final class ClassicPrograms {
 	}
 
 	public static final double TRAINING_MAX = 0.9;
-	private static final String W531 = "Semana 1: 65 % × 5, 75 % × 5 y 85 % × 5+ (la última, todas las que puedas)";
+	private static String w531() {
+		return Txt.t(R.string.cp_531_week1);
+	}
 
 	private ClassicPrograms() {
 	}
@@ -48,9 +52,9 @@ public final class ClassicPrograms {
 			case FIVE_THREE_ONE:
 				return "5/3/1";
 			case PUSH_PULL_LEGS:
-				return "Empuje / Tirón / Pierna";
+				return Txt.t(R.string.cp_ppl);
 			case FULL_BODY:
-				return "Cuerpo completo";
+				return Txt.t(R.string.df_cuerpo_completo);
 			default:
 				return "GZCLP";
 		}
@@ -60,26 +64,26 @@ public final class ClassicPrograms {
 		switch (p) {
 			case FIVE_THREE_ONE:
 				return Arrays.asList(
-					new Day("Press militar", main("barbell-overhead-press"), bbb("barbell-overhead-press"),
+					new Day(Txt.t(R.string.cp_overhead_press), main("barbell-overhead-press"), bbb("barbell-overhead-press"),
 						acc("lat-pulldown", 5, 10)),
-					new Day("Peso muerto", main("barbell-deadlift"), bbb("barbell-deadlift"), acc("crunch", 5, 15)),
-					new Day("Press de banca", main("barbell-bench-press"), bbb("barbell-bench-press"),
+					new Day(Txt.t(R.string.cp_deadlift), main("barbell-deadlift"), bbb("barbell-deadlift"), acc("crunch", 5, 15)),
+					new Day(Txt.t(R.string.cp_bench_press), main("barbell-bench-press"), bbb("barbell-bench-press"),
 						acc("barbell-row", 5, 10)),
-					new Day("Sentadilla", main("barbell-back-squat"), bbb("barbell-back-squat"), acc("leg-curl", 5, 10)));
+					new Day(Txt.t(R.string.cp_squat), main("barbell-back-squat"), bbb("barbell-back-squat"), acc("leg-curl", 5, 10)));
 			case PUSH_PULL_LEGS:
 				return Arrays.asList(
-					new Day("Empuje", lift("barbell-bench-press", 4, 6, 0.75, 150), lift("barbell-overhead-press", 3, 8, 0.7, 120),
+					new Day(Txt.t(R.string.cp_push), lift("barbell-bench-press", 4, 6, 0.75, 150), lift("barbell-overhead-press", 3, 8, 0.7, 120),
 						acc("dumbbell-incline-press", 3, 10), acc("dumbbell-lateral-raise", 3, 15),
 						acc("cable-triceps-pushdown", 3, 12)),
-					new Day("Tirón", lift("barbell-deadlift", 3, 5, 0.75, 180), acc("lat-pulldown", 4, 10),
+					new Day(Txt.t(R.string.cp_pull), lift("barbell-deadlift", 3, 5, 0.75, 180), acc("lat-pulldown", 4, 10),
 						acc("seated-cable-row", 3, 10), acc("cable-face-pull", 3, 15), acc("dumbbell-biceps-curl", 3, 12)),
-					new Day("Pierna", lift("barbell-back-squat", 4, 6, 0.75, 180), lift("barbell-romanian-deadlift", 3, 10, 0.6, 120),
+					new Day(Txt.t(R.string.cp_legs), lift("barbell-back-squat", 4, 6, 0.75, 180), lift("barbell-romanian-deadlift", 3, 10, 0.6, 120),
 						acc("leg-press", 3, 12), acc("leg-curl", 3, 12), acc("machine-calf-raise", 4, 15)));
 			case FULL_BODY:
 				return Arrays.asList(
-					new Day("Cuerpo completo A", lift("barbell-back-squat", 3, 5, 0.8, 180),
+					new Day(Txt.t(R.string.df_cuerpo_completo) + " A", lift("barbell-back-squat", 3, 5, 0.8, 180),
 						lift("barbell-bench-press", 3, 5, 0.8, 180), lift("barbell-row", 3, 8, 0.7, 120), acc("forearm-plank", 3, 0)),
-					new Day("Cuerpo completo B", lift("barbell-deadlift", 3, 5, 0.8, 180),
+					new Day(Txt.t(R.string.df_cuerpo_completo) + " B", lift("barbell-deadlift", 3, 5, 0.8, 180),
 						lift("barbell-overhead-press", 3, 5, 0.8, 180), acc("lat-pulldown", 3, 10),
 						acc("dumbbell-walking-lunge", 3, 10)));
 			default:
@@ -92,23 +96,23 @@ public final class ClassicPrograms {
 	}
 
 	private static Slot main(String id) {
-		return new Slot(id, 3, 5, 0.85, 180, W531);
+		return new Slot(id, 3, 5, 0.85, 180, w531());
 	}
 
 	private static Slot bbb(String id) {
-		return new Slot(id, 5, 10, 0.5, 90, "Boring But Big: 5 × 10 al 50 %");
+		return new Slot(id, 5, 10, 0.5, 90, Txt.t(R.string.cp_bbb));
 	}
 
 	private static Slot t1(String id) {
-		return new Slot(id, 5, 3, 0.85, 180, "T1: 5 × 3 (la última, todas las que puedas); si fallas, pasa a 6 × 2");
+		return new Slot(id, 5, 3, 0.85, 180, Txt.t(R.string.cp_t1));
 	}
 
 	private static Slot t2(String id) {
-		return new Slot(id, 3, 10, 0.65, 120, "T2: 3 × 10; si fallas, pasa a 3 × 8");
+		return new Slot(id, 3, 10, 0.65, 120, Txt.t(R.string.cp_t2));
 	}
 
 	private static Slot t3(String id) {
-		return new Slot(id, 3, 15, 0, 60, "T3: 3 × 15; cuando hagas 25 en la última, sube peso");
+		return new Slot(id, 3, 15, 0, 60, Txt.t(R.string.cp_t3));
 	}
 
 	private static Slot lift(String id, int sets, int reps, double percent, int rest) {
@@ -156,13 +160,12 @@ public final class ClassicPrograms {
 			}
 			prescription.put("restSeconds", Integer.toString(s.restSeconds));
 			items.add(new RoutineItem(e, prescription, minutes(s), (s.note.isEmpty() ? "" : s.note + ". ") +
-				"Programa " + title(p) + "."));
+				Txt.t(R.string.cp_program, title(p))));
 		}
 		if (items.isEmpty())
 			return null;
 		return new Routine(UUID.randomUUID().toString(), 0, title(p) + " · " + d.name, profile, items,
-			"Programa clásico " + title(p) + ". Las cargas parten del 90 % de tu mejor 1RM estimado; revísalas " +
-				"y ajústalas si no has hecho antes el ejercicio.", new RoutineMetadata(RoutineMetadata.Origin.MANUAL, true));
+			Txt.t(R.string.cp_explanation, title(p)), new RoutineMetadata(RoutineMetadata.Origin.MANUAL, true));
 	}
 
 	/** Minutos estimados: descansos entre series más unos 40 s por serie. */
