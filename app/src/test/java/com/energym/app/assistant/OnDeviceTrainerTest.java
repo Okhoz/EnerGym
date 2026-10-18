@@ -33,6 +33,22 @@ public class OnDeviceTrainerTest {
 	}
 
 	@Test
+	public void promptAsksForAFewBoldKeyIdeasOnly() {
+		String prompt = TrainerPrompt.build(request(profile, "¿Subo peso?", Collections.emptyList()), catalog);
+		assertTrue(prompt.contains("**negrita**"));
+		assertFalse(prompt.contains("Sin Markdown ni asteriscos"));
+	}
+
+	@Test
+	public void modelMarkdownEndsAsBoldSpansInTheChat() {
+		ChatFormat.Formatted f = ChatFormat.format(TrainerPrompt.plain("## Plan\n- Sube a **82,5 kg**\n* Descansa __2 min__"));
+		assertEquals("Plan\n• Sube a 82,5 kg\n• Descansa 2 min", f.text);
+		assertEquals(3, f.bold.size());
+		assertEquals("82,5 kg", f.text.substring(f.bold.get(1)[0], f.bold.get(1)[1]));
+		assertEquals("2 min", f.text.substring(f.bold.get(2)[0], f.bold.get(2)[1]));
+	}
+
+	@Test
 	public void trainerSeesTheTrainingButItNeverLeavesThePhone() {
 		ChatClient.Request r = request(profile, "¿Cómo voy?", Collections.emptyList());
 		r.training = "Rutina activa: Piernas (20 min): Sentadilla 3 × 10\nSesiones terminadas: 4\n" +
@@ -233,9 +249,10 @@ public class OnDeviceTrainerTest {
 	}
 
 	@Test
-	public void markdownFromTheModelIsShownAsPlainText() {
-		assertEquals("Rutina de piernas:\n• Sentadilla: baja controlado\n• Puente",
+	public void markdownFromTheModelKeepsOnlyBoldAndBullets() {
+		assertEquals("**Rutina de piernas:**\n• **Sentadilla:** baja controlado\n• Puente",
 			TrainerPrompt.plain("## **Rutina de piernas:**\n*   **Sentadilla:** baja controlado\n- Puente"));
+		assertEquals("**Técnica**\n• Espalda **recta**", TrainerPrompt.plain("### Técnica\n- Espalda __recta__"));
 	}
 
 	@Test

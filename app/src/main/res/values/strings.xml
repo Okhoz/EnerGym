@@ -40,5 +40,22 @@
 	<string name="chat_hint">Escribe un mensaje…</string>
 	<string name="chat_send">Enviar mensaje</string>
 	<string name="widget_today_description">Tu entreno de hoy, calorías y agua de un vistazo.</string>
+	<string name="chat_greeting">¡Hola! 👋 ¿En qué te ayudo hoy?</string>
+	<string name="chat_greeting_body">Pregúntame por tu rutina, tu técnica, cuánto subir de peso o qué comer. Conozco tus entrenos y tus registros.</string>
+	<string name="chat_copy">Copiar</string>
+	<string name="chat_copied">Respuesta copiada</string>
+	<string name="chat_regenerate">Regenerar</string>
+	<string name="chat_copy_description">Copiar la respuesta del entrenador</string>
+	<string name="chat_regenerate_description">Pedir otra respuesta a tu último mensaje</string>
+	<string name="chat_thinking">Pensando…</string>
+	<string name="followup_routine_today">¿Qué entreno hoy?</string>
+	<string name="followup_progression">¿Cuándo subo de peso?</string>
+	<string name="followup_technique">¿Errores típicos de técnica?</string>
+	<string name="followup_alternative">Dame una alternativa</string>
+	<string name="followup_warmup">¿Cómo caliento antes?</string>
+	<string name="followup_deload">¿Necesito una semana de descarga?</string>
+	<string name="followup_nutrition">¿Qué como para mi objetivo?</string>
+	<string name="followup_rest">¿Cuánto debo descansar?</string>
+	<string name="followup_motivation">Motívame para entrenar 💪</string>
 </resources>
 

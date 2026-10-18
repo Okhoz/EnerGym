@@ -17,6 +17,10 @@ import android.widget.*;
  * y las escrituras pertenecen al controlador. La conexión del servidor se configura en Cuenta.
  */
 public final class AssistantFragment extends ScreenFragment {
+	/** Respuestas ya mostradas enteras: solo la nueva se «escribe» poco a poco; -1 hasta el primer pintado. */
+	private int shown = -1;
+	private final android.os.Handler typing = new android.os.Handler(android.os.Looper.getMainLooper());
+
 	public AssistantFragment() {
 		super(R.layout.fragment_assistant);
 	}
@@ -135,18 +139,30 @@ public final class AssistantFragment extends ScreenFragment {
 			MaterialButton chip = action(rows, "Hablando de: " + c.exercise.getName() + "  ›", true, () ->
 				app.openExercise(c.exercise));
 		}
+		typing.removeCallbacksAndMessages(null);
+		if (shown < 0)
+			shown = c.messages.size();
+		if (c.messages.isEmpty() && c.preview == null && !c.busy)
+			greeting(c);
+		int last = c.messages.size() - 1;
+		boolean replied = last >= 0 && !c.busy && !c.messages.get(last).role.equals("user");
 		// La tarjeta de rutina va justo tras la respuesta que la propuso; lo hablado después queda debajo.
 		int anchor = Math.min(c.previewAnchor, c.messages.size());
 		for (int i = 0; i < c.messages.size(); i++) {
 			if (i == anchor && c.preview != null)
 				proposal(c, c.preview);
 			ConversationStore.Message m = c.messages.get(i);
-			bubble(m.text, m.role.equals("user"));
+			TextView view = bubble(m.text, m.role.equals("user"));
+			if (i == last && replied && i >= shown)
+				type(view, ChatFormat.format(m.text));
+			if (i == last && replied)
+				replyActions(c, m.text);
 		}
+		shown = c.messages.size();
 		if (c.preview != null && anchor >= c.messages.size())
 			proposal(c, c.preview);
 		if (c.busy)
-			bubble("Escribiendo…", false).setAlpha(0.7f);
+			bubble(getString(R.string.chat_thinking), false).setAlpha(0.7f);
 		if (!c.status.isEmpty()) {
 			TextView note = text(rows, c.status, R.style.EnerGym_FieldCaption, 12);
 			note.setGravity(Gravity.CENTER);
@@ -189,8 +205,8 @@ public final class AssistantFragment extends ScreenFragment {
 		view.setPadding(h, v, h, v);
 		view.setLineSpacing(dp(2), 1f);
 		view.setTextIsSelectable(true);
-		view.setText(message);
-		view.setContentDescription((mine ? "Tú: " : "Asistente: ") + message);
+		view.setText(mine ? message : styled(ChatFormat.format(message), Integer.MAX_VALUE));
+		view.setContentDescription((mine ? "Tú: " : "Asistente: ") + ChatFormat.plain(message));
 		view.setMaxWidth((int) (getResources().getDisplayMetrics().widthPixels * 0.8f));
 		LinearLayout.LayoutParams params =
 			new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -198,6 +214,107 @@ public final class AssistantFragment extends ScreenFragment {
 		params.topMargin = dp(16);
 		rows.addView(view, params);
 		return view;
+	}
+
+	private static CharSequence styled(ChatFormat.Formatted f, int chars) {
+		int end = ChatFormat.reveal(f.text, chars);
+		android.text.SpannableString s = new android.text.SpannableString(f.text.substring(0, end));
+		for (int[] b : f.bold)
+			if (b[0] < end)
+				s.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), b[0], Math.min(b[1], end),
+					android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+		return s;
+	}
+
+	/** Efecto de escritura de la respuesta nueva (~1 s); si la pantalla se repinta antes, sale entera. */
+	private void type(TextView view, ChatFormat.Formatted f) {
+		int step = Math.max(2, f.text.length() / 60);
+		int[] at = {0};
+		Runnable next = new Runnable() {
+			public void run() {
+				at[0] = ChatFormat.reveal(f.text, at[0] + step);
+				view.setText(styled(f, at[0]));
+				if (at[0] < f.text.length())
+					typing.postDelayed(this, 16);
+			}
+		};
+		next.run();
+	}
+
+	/** Pantalla vacía al estilo Gemini: saludo y sugerencias para empezar con un toque. */
+	private void greeting(ProposalController c) {
+		TextView hello = text(rows, getString(R.string.chat_greeting), R.style.EnerGym_Body, 24);
+		hello.setTextSize(24);
+		text(rows, getString(R.string.chat_greeting_body), R.style.EnerGym_FieldCaption, 8);
+		chips(c, FollowUps.STARTERS);
+	}
+
+	/** Bajo la última respuesta: copiar, regenerar y preguntas de seguimiento. */
+	private void replyActions(ProposalController c, String reply) {
+		String asked = null;
+		for (int i = c.messages.size() - 1; i >= 0 && asked == null; i--)
+			if (c.messages.get(i).role.equals("user"))
+				asked = c.messages.get(i).text;
+		LinearLayout row = columns(rows, 6);
+		MaterialButton copy = compact(row, "📋 " + getString(R.string.chat_copy), true, () -> {
+			android.content.ClipboardManager clip = (android.content.ClipboardManager)
+				requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+			clip.setPrimaryClip(android.content.ClipData.newPlainText("EnerGym", ChatFormat.plain(reply)));
+			Toast.makeText(requireContext(), R.string.chat_copied, Toast.LENGTH_SHORT).show();
+		});
+		copy.setContentDescription(getString(R.string.chat_copy_description));
+		copy.setTag("chat_copy");
+		if (asked != null) {
+			String again = asked;
+			MaterialButton regenerate = compact(row, "🔄 " + getString(R.string.chat_regenerate), !c.busy,
+				() -> c.send(again));
+			regenerate.setContentDescription(getString(R.string.chat_regenerate_description));
+			regenerate.setTag("chat_regenerate");
+		}
+		chips(c, FollowUps.suggest(asked, ChatFormat.plain(reply), c.preview != null));
+	}
+
+	private void chips(ProposalController c, java.util.List<FollowUps.Topic> topics) {
+		com.google.android.material.chip.ChipGroup group = new com.google.android.material.chip.ChipGroup(requireContext());
+		group.setTag("chat_followups");
+		for (FollowUps.Topic t : topics) {
+			String label = getString(label(t));
+			com.google.android.material.chip.Chip chip = new com.google.android.material.chip.Chip(requireContext());
+			chip.setText(label);
+			chip.setEnabled(!c.busy);
+			chip.setOnClickListener(v -> c.send(label.replace(" 💪", "")));
+			group.addView(chip);
+		}
+		add(rows, group, 8);
+	}
+
+	private static int label(FollowUps.Topic t) {
+		switch (t) {
+			case ROUTINE_TODAY:
+				return R.string.followup_routine_today;
+			case PROGRESSION:
+				return R.string.followup_progression;
+			case TECHNIQUE:
+				return R.string.followup_technique;
+			case ALTERNATIVE:
+				return R.string.followup_alternative;
+			case WARMUP:
+				return R.string.followup_warmup;
+			case DELOAD:
+				return R.string.followup_deload;
+			case NUTRITION:
+				return R.string.followup_nutrition;
+			case REST:
+				return R.string.followup_rest;
+			default:
+				return R.string.followup_motivation;
+		}
+	}
+
+	@Override
+	public void onDestroyView() {
+		typing.removeCallbacksAndMessages(null);
+		super.onDestroyView();
 	}
 
 	/**
