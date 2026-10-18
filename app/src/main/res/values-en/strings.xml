@@ -564,8 +564,8 @@
 	<string name="nut_water_title">💧 Water · %1$s of %2$s</string>
 	<string name="nut_water_done">Goal reached! 🎉</string>
 	<plurals name="nut_glasses">
-		<item quantity="one">%2$d of %3$d glass</item>
-		<item quantity="other">%2$d of %3$d glasses</item>
+		<item quantity="one">%1$d of %2$d glass</item>
+		<item quantity="other">%1$d of %2$d glasses</item>
 	</plurals>
 	<string name="nut_water_progress">Water: %1$d of %2$d ml</string>
 	<string name="nut_glass_less">− Glass</string>
