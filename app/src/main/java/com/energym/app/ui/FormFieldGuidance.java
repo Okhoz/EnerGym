@@ -1,5 +1,7 @@
 package com.energym.app.ui;
 
+import com.energym.app.R;
+import com.energym.app.i18n.Txt;
 import java.util.Locale;
 
 /** Texto de ayuda de la vista: los ejemplos nunca forman parte del valor ni de la validación. */
@@ -13,128 +15,133 @@ public final class FormFieldGuidance {
 		if (name.startsWith("detail."))
 			name = name.substring("detail.".length());
 		if (name.endsWith("_search") || name.equals("search"))
-			return "Ej.: sentadilla o remo";
+			return example(Txt.t(R.string.ff_ex_sentadilla_o_remo));
 		switch (name) {
-			case "age": return "Ej.: 30";
-			case "heightCm": return "Ej.: 175";
+			case "age": return example("30");
+			case "heightCm": return example("175");
 			case "weightKg":
-			case "weight": return "Ej.: 75.5";
-			case "daysPerWeek": return "Ej.: 3";
+			case "weight": return example("75.5");
+			case "daysPerWeek": return example("3");
 			case "duration":
-			case "durationMinutes": return "Ej.: 45";
+			case "durationMinutes": return example("45");
 			case "durationHours":
-			case "manual_duration": return "Ej.: 0:45";
-			case "estimatedMinutes": return "Ej.: 10";
-			case "level": return "Ej.: principiante";
-			case "experience": return "Ej.: 6 meses de entrenamiento de fuerza";
-			case "space": return "Ej.: una habitación despejada";
-			case "preferences": return "Ej.: prefiero ejercicios con mancuernas";
-			case "limitations": return "Ej.: evitar saltos";
-			case "priority": return "Ej.: espalda o sentadilla";
-			case "maxPushups": return "Ej.: 12";
-			case "maxPullups": return "Ej.: 3";
-			case "weeklyKm": return "Ej.: 20";
-			case "bestTime": return "Ej.: 5 km en 28 min";
-			case "ftp": return "Ej.: 200";
-			case "sessionMeters": return "Ej.: 1000";
-			case "matchesPerWeek": return "Ej.: 2";
-			case "elevation": return "Ej.: 500";
-			case "grade": return "Ej.: 6a";
-			case "sportName": return "Ej.: bádminton";
-			case "title": return "Ej.: Mi rutina de fuerza";
+			case "manual_duration": return example("0:45");
+			case "estimatedMinutes": return example("10");
+			case "level": return example(Txt.t(R.string.ff_ex_principiante));
+			case "experience": return example(Txt.t(R.string.ff_ex_6_meses_de_entrenamiento_de_fuerza));
+			case "space": return example(Txt.t(R.string.ff_ex_una_habitacion_despejada));
+			case "preferences": return example(Txt.t(R.string.ff_ex_prefiero_ejercicios_con_mancuernas));
+			case "limitations": return example(Txt.t(R.string.ff_ex_evitar_saltos));
+			case "priority": return example(Txt.t(R.string.ff_ex_espalda_o_sentadilla));
+			case "maxPushups": return example("12");
+			case "maxPullups": return example("3");
+			case "weeklyKm": return example("20");
+			case "bestTime": return example(Txt.t(R.string.ff_ex_5_km_en_28_min));
+			case "ftp": return example("200");
+			case "sessionMeters": return example("1000");
+			case "matchesPerWeek": return example("2");
+			case "elevation": return example("500");
+			case "grade": return example("6a");
+			case "sportName": return example(Txt.t(R.string.ff_ex_badminton));
+			case "title": return example(Txt.t(R.string.ff_ex_mi_rutina_de_fuerza));
 			case "sets":
-			case "blocks": return "Ej.: 3";
-			case "repetitions": return "Ej.: 10";
-			case "loadKg": return "Ej.: 20";
-			case "restSeconds": return "Ej.: 60";
-			case "durationSeconds": return "Ej.: 30";
-			case "timeMinutes": return "Ej.: 20";
-			case "intervals": return "Ej.: 4";
-			case "distanceKm": return "Ej.: 5";
-			case "effort": return "Ej.: 7";
-			case "amount": return "Ej.: 150";
-			case "name": return "Ej.: yogur natural";
-			case "kcal100": return "Ej.: 65";
-			case "protein100": return "Ej.: 4.5";
-			case "carbs100": return "Ej.: 5";
-			case "fat100": return "Ej.: 3";
-			case "allergies": return "Ej.: cacahuetes, lactosa";
-			case "dislikes": return "Ej.: champiñones, coliflor";
-			case "budget": return "Ej.: 250";
-			case "barcode": return "Ej.: 8412345678905";
-			case "assistant_endpoint": return "Ej.: https://ia.tudominio.es";
-			case "assistant_pairing": return "Pega tu código privado de emparejamiento";
+			case "blocks": return example("3");
+			case "repetitions": return example("10");
+			case "loadKg": return example("20");
+			case "restSeconds": return example("60");
+			case "durationSeconds": return example("30");
+			case "timeMinutes": return example("20");
+			case "intervals": return example("4");
+			case "distanceKm": return example("5");
+			case "effort": return example("7");
+			case "amount": return example("150");
+			case "name": return example(Txt.t(R.string.ff_ex_yogur_natural));
+			case "kcal100": return example("65");
+			case "protein100": return example("4.5");
+			case "carbs100": return example("5");
+			case "fat100": return example("3");
+			case "allergies": return example(Txt.t(R.string.ff_ex_cacahuetes_lactosa));
+			case "dislikes": return example(Txt.t(R.string.ff_ex_champinones_coliflor));
+			case "budget": return example("250");
+			case "barcode": return example("8412345678905");
+			case "assistant_endpoint": return example(Txt.t(R.string.ff_ex_https_ia_tudominio_es));
+			case "assistant_pairing": return Txt.t(R.string.ff_paste_pairing);
 			case "goal_target": return goalExample(label);
-			default: return number ? (integer ? "Ej.: 3" : "Ej.: 10.5") : "Escribe tu respuesta";
+			default: return number ? (integer ? example("3") : example("10.5")) : Txt.t(R.string.ff_type_answer);
 		}
+	}
+
+	private static String example(String value) {
+		return Txt.t(R.string.ff_example, value);
 	}
 
 	private static String goalExample(String label) {
 		String text = label.toLowerCase(Locale.ROOT);
-		if (text.contains("sesiones")) return "Ej.: 3";
-		if (text.contains("min")) return "Ej.: 150";
-		if (text.contains("km")) return "Ej.: 20";
-		if (text.contains("kg") && text.contains("semana")) return "Ej.: 5000";
-		return "Ej.: 70";
+		if (text.contains("sesiones")) return example("3");
+		if (text.contains("min")) return example("150");
+		if (text.contains("km")) return example("20");
+		if (text.contains("kg") && (text.contains("semana") || text.contains("week"))) return example("5000");
+		return example("70");
 	}
 
 	/** La condición opcional permanece visible aunque desaparezca el ejemplo al escribir. */
 	public static String profileLabel(String key, String label) {
-		if (key.equals("detail.grade")) label = "Grado que encadenas";
-		if (key.equals("detail.ftp")) label = "FTP (W)";
+		if (key.equals("detail.grade")) label = Txt.t(R.string.ff_grade);
+		if (key.equals("detail.ftp")) label = Txt.t(R.string.ff_ftp);
 		boolean optional = key.startsWith("detail.") || key.equals("experience") ||
 			key.equals("space") || key.equals("preferences") || key.equals("limitations");
-		return optional && !label.toLowerCase(Locale.ROOT).contains("opcional") ? label + " (opcional)" : label;
+		String word = Txt.t(R.string.ff_optional);
+		return optional && !label.toLowerCase(Locale.ROOT).contains(word) ? label + " (" + word + ")" : label;
 	}
 
 	/** Ayudas solo para el perfil; las métricas de sesión comparten claves, pero no sus límites. */
 	public static String profileHelper(String key) {
 		switch (key) {
-			case "sportId": return "La disciplina determina qué ejercicios y preguntas verás.";
-			case "category": return "Elige el tipo de entrenamiento que podrás realizar.";
-			case "focus": return "Distingue la práctica del deporte de su preparación complementaria.";
-			case "environment": return "Indica dónde harás las sesiones para orientar la selección de ejercicios.";
-			case "goal": return "Da prioridad al resultado que buscas con tu rutina.";
-			case "daysPerWeek": return "Indica cuántos días podrás entrenar cada semana.";
-			case "durationMinutes": return "Es el tiempo disponible para cada sesión, en minutos.";
-			case "durationHours": return "Formato horas:minutos. 0:20 h = 20 minutos, 1:30 h = hora y media.";
-			case "level": return "Describe tu nivel actual para orientar la dificultad.";
-			case "experience": return "Cuenta qué has practicado y durante cuánto tiempo.";
-			case "space": return "Describe el espacio libre en el que podrás moverte.";
-			case "preferences": return "Indica ejercicios o formas de entrenar que disfrutas.";
-			case "limitations": return "Señala movimientos o actividades que prefieres evitar.";
-			case "historyConsent": return "Opcional. Actívalo si quieres adjuntar mensajes anteriores al chat conectado.";
-			case "detail.split": return "Indica cómo prefieres repartir el trabajo muscular.";
-			case "detail.priority": return "Añade una zona o un ejercicio al que quieras dar prioridad.";
-			case "detail.skill": return "Señala una habilidad que quieras practicar.";
+			case "sportId": return Txt.t(R.string.ff_help_sportid);
+			case "category": return Txt.t(R.string.ff_help_category);
+			case "focus": return Txt.t(R.string.ff_help_focus);
+			case "environment": return Txt.t(R.string.ff_help_environment);
+			case "goal": return Txt.t(R.string.ff_help_goal);
+			case "daysPerWeek": return Txt.t(R.string.ff_help_daysperweek);
+			case "durationMinutes": return Txt.t(R.string.ff_help_durationminutes);
+			case "durationHours": return Txt.t(R.string.ff_help_durationhours);
+			case "level": return Txt.t(R.string.ff_help_level);
+			case "experience": return Txt.t(R.string.ff_help_experience);
+			case "space": return Txt.t(R.string.ff_help_space);
+			case "preferences": return Txt.t(R.string.ff_help_preferences);
+			case "limitations": return Txt.t(R.string.ff_help_limitations);
+			case "historyConsent": return Txt.t(R.string.ff_help_historyconsent);
+			case "detail.split": return Txt.t(R.string.ff_help_d_split);
+			case "detail.priority": return Txt.t(R.string.ff_help_d_priority);
+			case "detail.skill": return Txt.t(R.string.ff_help_d_skill);
 			case "detail.maxPushups":
-			case "detail.maxPullups": return "Indica las repeticiones seguidas que haces con buena técnica.";
-			case "detail.format": return "Describe la modalidad o el formato que practicas.";
-			case "detail.olympic": return "Sitúa tu experiencia con los movimientos de halterofilia.";
-			case "detail.raceGoal": return "Añade la distancia o el reto de carrera que tienes en mente.";
-			case "detail.weeklyKm": return "Aporta tu distancia semanal actual, en kilómetros.";
-			case "detail.bestTime": return "Incluye la distancia y el tiempo de una marca reciente.";
-			case "detail.bike": return "Describe la bicicleta con la que entrenas.";
-			case "detail.ftp": return "Añade tu potencia funcional en vatios, solo si ya la conoces.";
-			case "detail.stroke": return "Indica el estilo que nadas con más frecuencia.";
-			case "detail.pool": return "Da contexto sobre el espacio en el que nadas.";
-			case "detail.sessionMeters": return "Aporta la distancia que nadas en una sesión habitual, en metros.";
-			case "detail.position": return "Aporta contexto sobre tu función en el equipo.";
-			case "detail.matchesPerWeek": return "Indica cuántos partidos juegas además de tus entrenamientos.";
-			case "detail.terrain": return "Describe el terreno de tus salidas habituales.";
-			case "detail.elevation": return "Indica los metros de subida acumulados en una salida habitual.";
-			case "detail.pack": return "Describe la carga que sueles llevar en la mochila.";
-			case "detail.style": return "Describe la modalidad que practicas habitualmente.";
-			case "detail.grade": return "Indica un grado que completes con regularidad.";
-			case "detail.competes": return "Añade tu experiencia en competición.";
-			case "detail.area": return "Señala la zona o capacidad que te interesa trabajar.";
-			case "detail.modality": return "Indica cómo practicas esta disciplina.";
-			case "detail.side": return "Describe tu lado habitual de juego.";
-			case "detail.hand": return "Indica con qué mano juegas habitualmente.";
-			case "detail.backhand": return "Indica cómo ejecutas el revés.";
-			case "detail.surface": return "Describe la pista o superficie donde juegas.";
-			case "detail.sportName": return "Da nombre a la disciplina que no aparece en la lista.";
-			default: return key.startsWith("detail.") ? "Añade contexto sobre tu práctica; puedes dejarlo sin indicar." : "";
+			case "detail.maxPullups": return Txt.t(R.string.ff_help_d_maxpullups);
+			case "detail.format": return Txt.t(R.string.ff_help_d_format);
+			case "detail.olympic": return Txt.t(R.string.ff_help_d_olympic);
+			case "detail.raceGoal": return Txt.t(R.string.ff_help_d_racegoal);
+			case "detail.weeklyKm": return Txt.t(R.string.ff_help_d_weeklykm);
+			case "detail.bestTime": return Txt.t(R.string.ff_help_d_besttime);
+			case "detail.bike": return Txt.t(R.string.ff_help_d_bike);
+			case "detail.ftp": return Txt.t(R.string.ff_help_d_ftp);
+			case "detail.stroke": return Txt.t(R.string.ff_help_d_stroke);
+			case "detail.pool": return Txt.t(R.string.ff_help_d_pool);
+			case "detail.sessionMeters": return Txt.t(R.string.ff_help_d_sessionmeters);
+			case "detail.position": return Txt.t(R.string.ff_help_d_position);
+			case "detail.matchesPerWeek": return Txt.t(R.string.ff_help_d_matchesperweek);
+			case "detail.terrain": return Txt.t(R.string.ff_help_d_terrain);
+			case "detail.elevation": return Txt.t(R.string.ff_help_d_elevation);
+			case "detail.pack": return Txt.t(R.string.ff_help_d_pack);
+			case "detail.style": return Txt.t(R.string.ff_help_d_style);
+			case "detail.grade": return Txt.t(R.string.ff_help_d_grade);
+			case "detail.competes": return Txt.t(R.string.ff_help_d_competes);
+			case "detail.area": return Txt.t(R.string.ff_help_d_area);
+			case "detail.modality": return Txt.t(R.string.ff_help_d_modality);
+			case "detail.side": return Txt.t(R.string.ff_help_d_side);
+			case "detail.hand": return Txt.t(R.string.ff_help_d_hand);
+			case "detail.backhand": return Txt.t(R.string.ff_help_d_backhand);
+			case "detail.surface": return Txt.t(R.string.ff_help_d_surface);
+			case "detail.sportName": return Txt.t(R.string.ff_help_d_sportname);
+			default: return key.startsWith("detail.") ? Txt.t(R.string.ff_help_detail) : "";
 		}
 	}
 }

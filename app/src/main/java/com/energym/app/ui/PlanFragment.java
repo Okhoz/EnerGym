@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -20,32 +21,30 @@ public final class PlanFragment extends ScreenFragment {
 	protected void content() {
 		List<Routine> plan = app.planPreview;
 		if (plan.isEmpty()) {
-			heading("", "Tu plan semanal", "");
-			card("No hay plan pendiente", "Pídeselo al entrenador o créalo desde Entreno.");
+			heading("", Txt.t(R.string.plan_title), "");
+			card(Txt.t(R.string.plan_none), Txt.t(R.string.plan_none_body));
 			return;
 		}
 		int minutes = 0;
 		for (Routine r : plan)
 			minutes += r.getEstimatedMinutes();
-		heading("PLAN SEMANAL", "Tu plan de " + plan.size() + (plan.size() == 1 ? " día" : " días"),
-			"Una rutina por día de entreno. Al terminar un día, Entreno te deja preparado el siguiente. " +
-				"Las cargas suben solas cuando cumples el objetivo.");
+		heading(Txt.t(R.string.plan_eyebrow), Txt.n(R.plurals.plan_days, plan.size()), Txt.t(R.string.plan_body));
 		for (Routine r : plan) {
-			LinearLayout day = card(r.getTitle(), r.getItems().size() + " ejercicios · " + r.getEstimatedMinutes() + " min");
+			LinearLayout day = card(r.getTitle(), Txt.t(R.string.tr_summary, r.getItems().size(), r.getEstimatedMinutes()));
 			for (RoutineItem item : r.getItems()) {
 				android.view.View row = getLayoutInflater().inflate(R.layout.row_food, day, false);
 				((TextView) row.findViewById(R.id.food_name)).setText(item.getExercise().getName());
 				((TextView) row.findViewById(R.id.food_detail)).setText(target(item));
 				((TextView) row.findViewById(R.id.food_kcal)).setText("›");
-				row.setContentDescription("Ver técnica de " + item.getExercise().getName());
+				row.setContentDescription(Txt.t(R.string.tr_see_technique_of, item.getExercise().getName()));
 				row.setOnClickListener(v -> app.openExercise(item.getExercise()));
 				day.addView(row);
 			}
 		}
-		text(rows, "Total semanal: unos " + minutes + " min. Ejemplos sin revisión profesional; adapta la carga a cómo te encuentres.",
+		text(rows, Txt.t(R.string.plan_total, minutes),
 			R.style.EnerGym_FieldCaption, 8);
-		action(rows, "🔀 Otra combinación de ejercicios", !app.trainingMutation, app::shufflePlan);
-		primary(action(rows, "Guardar plan", !app.trainingMutation, app::acceptPlan));
+		action(rows, Txt.t(R.string.plan_shuffle), !app.trainingMutation, app::shufflePlan);
+		primary(action(rows, Txt.t(R.string.plan_save), !app.trainingMutation, app::acceptPlan));
 		action(rows, "Cancelar", !app.trainingMutation, app::cancelPlan);
 	}
 
@@ -61,7 +60,7 @@ public final class PlanFragment extends ScreenFragment {
 					kg = 0;
 				}
 				return p.getOrDefault("sets", "?") + " × " + p.getOrDefault("repetitions", "?") + " · " +
-					(kg > 0 ? SetLog.format(kg) + " kg" : "peso corporal");
+					(kg > 0 ? SetLog.format(kg) + " kg" : Txt.t(R.string.ses_bodyweight_lower));
 			}
 			case ISOMETRIC:
 				return p.getOrDefault("sets", "?") + " × " + p.getOrDefault("durationSeconds", "?") + " s";

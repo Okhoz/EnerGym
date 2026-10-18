@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import android.content.Context;
 import android.view.View;
 import android.widget.EditText;
@@ -32,7 +33,7 @@ final class ExercisePicker {
 		int pad = (int) (20 * density);
 		root.setPadding(pad, (int) (8 * density), pad, 0);
 		EditText search = new EditText(context);
-		search.setHint("Buscar (p. ej. press, sentadilla, remo)");
+		search.setHint(Txt.t(R.string.ep_search_hint));
 		search.setSingleLine(true);
 		search.setTag("picker_search");
 		root.addView(search);
@@ -49,7 +50,7 @@ final class ExercisePicker {
 			String q = search.getText().toString().trim();
 			List<Exercise> found = q.isEmpty() ? options : searcher.find(q, ExerciseSearch.Filters.all());
 			if (found.isEmpty()) {
-				list.addView(label(context, "Ningún ejercicio compatible con ese nombre.", false));
+				list.addView(label(context, Txt.t(R.string.ep_none), false));
 				return;
 			}
 			// Sin búsqueda, por grupo muscular; al buscar, lista única por relevancia (lo más parecido primero).
@@ -73,7 +74,7 @@ final class ExercisePicker {
 					TextView row = label(context, e.getName(), false);
 					row.setMinHeight((int) (48 * density));
 					row.setGravity(android.view.Gravity.CENTER_VERTICAL);
-					row.setContentDescription("Añadir " + e.getName());
+					row.setContentDescription(Txt.t(R.string.man_add_named, e.getName()));
 					row.setTag("picker_" + e.getId());
 					row.setOnClickListener(v -> {
 						dialog.dismiss();

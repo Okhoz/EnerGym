@@ -1,5 +1,6 @@
 package com.energym.app;
 
+import com.energym.app.i18n.Txt;
 import android.os.Bundle;
 import android.content.Intent;
 
@@ -162,7 +163,7 @@ public final class MainActivity extends AppCompatActivity {
 		if (state.app != null) updateAvatar();
 		if (getSupportFragmentManager().isStateSaved()) return;
 		((TextView) findViewById(R.id.status)).setText(
-			state.app == null ? (state.fatal.isEmpty() ? "Preparando tu espacio…" : state.fatal) :
+			state.app == null ? (state.fatal.isEmpty() ? Txt.t(R.string.main_preparing) : state.fatal) :
 				state.accountText() + " · " + state.syncText());
 		if (state.app == null)
 			return;
@@ -213,7 +214,7 @@ public final class MainActivity extends AppCompatActivity {
 			if (!app.error.isEmpty()) {
 				String error = app.error;
 				app.dismissError();
-				new MaterialAlertDialogBuilder(this).setTitle("Revisa esta acción").setMessage(error)
+				new MaterialAlertDialogBuilder(this).setTitle(Txt.t(R.string.main_check_action)).setMessage(error)
 					.setPositiveButton("Entendido", null).show();
 			}
 		} finally {
@@ -236,15 +237,15 @@ public final class MainActivity extends AppCompatActivity {
 			photo = remoteAvatar.imageFor(owner, menuRevision, googlePhotoUrl(owner));
 		String name, subtitle;
 		if (owner == null) {
-			name = "Sin cuenta";
-			subtitle = "Entra para guardar tu progreso";
+			name = Txt.t(R.string.main_no_account);
+			subtitle = Txt.t(R.string.main_no_account_body);
 		} else if (state.user != null && owner.equals(state.user.getUid())) {
-			name = state.user.getDisplayName() == null || state.user.getDisplayName().isEmpty() ? "Tu cuenta" :
+			name = state.user.getDisplayName() == null || state.user.getDisplayName().isEmpty() ? Txt.t(R.string.man_account) :
 				state.user.getDisplayName();
-			subtitle = state.user.getEmail() == null ? "Cuenta de Google" : state.user.getEmail();
+			subtitle = state.user.getEmail() == null ? Txt.t(R.string.main_google_account) : state.user.getEmail();
 		} else {
-			name = "Demo local";
-			subtitle = "Datos solo en este móvil";
+			name = Txt.t(R.string.main_demo);
+			subtitle = Txt.t(R.string.main_demo_body);
 		}
 		ProfileSheet sheet = new ProfileSheet(this, photo, name, subtitle);
 		// Un panel abierto antes de cambiar de cuenta no actúa sobre ninguna de las dos cuentas.
@@ -258,7 +259,7 @@ public final class MainActivity extends AppCompatActivity {
 		// La foto es el propio botón del menú: con cuenta, aquí se elige, cambia o quita.
 		if (owner != null) {
 			boolean has = avatars().has(owner);
-			sheet.divider().item(R.drawable.ic_photo, has ? "Cambiar foto de perfil" : "Elegir foto de perfil", false, () -> {
+			sheet.divider().item(R.drawable.ic_photo, Txt.t(has ? R.string.main_change_photo : R.string.main_pick_photo), false, () -> {
 				if (!java.util.Objects.equals(owner, state.app.owner()) || menuRevision != state.app.accountRevision())
 					return;
 				releaseAvatarUri(pendingAvatar.uri());
@@ -267,7 +268,7 @@ public final class MainActivity extends AppCompatActivity {
 					.setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build());
 			});
 			if (has)
-				sheet.item(R.drawable.ic_account, googlePhotoUrl(owner).isEmpty() ? "Quitar foto" : "Usar foto de Google",
+				sheet.item(R.drawable.ic_account, Txt.t(googlePhotoUrl(owner).isEmpty() ? R.string.main_remove_photo : R.string.main_google_photo),
 					true, () -> {
 						if (!java.util.Objects.equals(owner, state.app.owner()) || menuRevision != state.app.accountRevision())
 							return;
@@ -349,8 +350,8 @@ public final class MainActivity extends AppCompatActivity {
 			try {
 				avatars().save(owner, android.net.Uri.parse(uri));
 			} catch (Exception e) {
-				new MaterialAlertDialogBuilder(this).setTitle("Foto de perfil")
-					.setMessage("No se pudo usar esa imagen. Prueba con otra.").setPositiveButton("Entendido", null).show();
+				new MaterialAlertDialogBuilder(this).setTitle(Txt.t(R.string.main_profile_photo))
+					.setMessage(Txt.t(R.string.main_photo_failed)).setPositiveButton(Txt.t(R.string.main_understood), null).show();
 			} finally {
 				releaseAvatarUri(uri);
 			}

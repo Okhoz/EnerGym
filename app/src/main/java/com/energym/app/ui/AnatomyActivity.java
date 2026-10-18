@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import android.content.Intent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -85,11 +86,11 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 			exerciseId = getIntent().getStringExtra(EXTRA_EXERCISE_ID);
 			lease = getIntent().getStringExtra(EXTRA_LEASE);
 		} catch (RuntimeException e) {
-			failure("Contexto de ejercicio inválido.");
+			failure(Txt.t(R.string.an_bad_context));
 			return;
 		}
 		if (exerciseId == null || !exerciseId.matches("[a-z][a-z0-9-]{0,79}")) {
-			failure("Selecciona un ejercicio del catálogo para abrir su referencia.");
+			failure(Txt.t(R.string.an_pick_exercise));
 			return;
 		}
 		if (!authorized())
@@ -113,7 +114,7 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 				CatalogRepository catalog = CatalogRepository.load(getApplicationContext());
 				Exercise exercise = catalog.findExercise(exerciseId);
 				if (exercise == null)
-					throw new IOException("Ejercicio fuera del catálogo local.");
+					throw new IOException(Txt.t(R.string.an_not_in_catalog));
 				// La referencia escrita no depende de que el archivo animado pase su hash o llegue a JNI.
 				main.post(() -> {
 					if (current(token))
@@ -124,7 +125,7 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 				if (resource == null) {
 					main.post(() -> {
 						if (current(token))
-							failure("Este ejercicio aún no tiene una referencia animada disponible.");
+							failure(Txt.t(R.string.an_no_animation));
 					});
 					return;
 				}
@@ -144,7 +145,7 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 										return;
 									progress.setIndeterminate(false);
 									progress.setProgress(Math.round(value * 100));
-									loadMessage.setText("Cargando referencia local… " + Math.round(value * 100) + " %");
+									loadMessage.setText(Txt.t(R.string.an_loading, Math.round(value * 100)));
 								}
 
 								public void ready(String evidence) {
@@ -166,15 +167,14 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 					} catch (RuntimeException | LinkageError e) {
 						Log.e("EnerGymViewer", "Inicio nativo fallido", e);
 						failure(e instanceof UnsupportedOperationException ?
-							"Este dispositivo no ofrece Vulkan 1.1 para el visor. Puedes consultar la referencia escrita." :
-							"No se pudo abrir el visor nativo. Puedes consultar la referencia escrita.");
+							Txt.t(R.string.an_no_vulkan) : Txt.t(R.string.an_viewer_failed));
 					}
 				});
 			} catch (IOException | RuntimeException e) {
 				main.post(() -> {
 					if (current(token)) {
 						Log.w("EnerGymViewer", "Recurso no disponible", e);
-						failure(e.getMessage() == null ? "Recurso local no disponible." : e.getMessage());
+						failure(e.getMessage() == null ? Txt.t(R.string.an_resource_unavailable) : e.getMessage());
 					}
 				});
 			}
@@ -183,11 +183,8 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 
 	private static String credits(ResourceManifest resource) {
 		if (resource.kind == ResourceManifest.Kind.SCHEMATIC)
-			return "Animación esquemática generada por EnerGym a partir del patrón de movimiento\n" +
-				"Modelo MakeHuman/MPFB vía OpenGym3D · CC0 1.0 · Filament Apache 2.0\n" +
-				"Archivo local, sin cuenta ni descargas durante el uso";
-		return "Recurso: OpenGym3D · Mesh2Motion · MakeHuman/MPFB\nArte y movimiento CC0 1.0 · Filament Apache 2.0\n" +
-			"Archivo local, sin cuenta ni descargas durante el uso";
+			return Txt.t(R.string.an_credits_generated);
+		return Txt.t(R.string.anatomy_credits);
 	}
 
 	private boolean current(long token) {
@@ -206,7 +203,7 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 		writtenReferenceAvailable = true;
 		((TextView) findViewById(R.id.viewer_title)).setText(exercise.getName());
 		((TextView) findViewById(R.id.viewer_written_reference)).setText(
-			"Referencia escrita · Sin revisión profesional\n" + exercise.getDescription());
+			Txt.t(R.string.an_written_reference) + "\n" + exercise.getDescription());
 	}
 
 	private void bindControls() {
@@ -295,9 +292,9 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 		loading.setVisibility(state.ready ? android.view.View.GONE : android.view.View.VISIBLE);
 		((TextView) findViewById(R.id.viewer_play)).setText(state.playing ? "Pausar" : "Reproducir");
 		if (state.ready)
-			status.setText("Sin conexión · " + (manifest == null ? "" : manifest.label() + " · ") +
-				(state.playing ? "Reproduciendo" : "En pausa") + " · " +
-				String.format(java.util.Locale.forLanguageTag("es"), "%.2f×", state.speed));
+			status.setText(Txt.t(R.string.an_offline) + " · " + (manifest == null ? "" : manifest.label() + " · ") +
+				Txt.t(state.playing ? R.string.an_playing : R.string.an_paused) + " · " +
+				String.format(Txt.locale(), "%.2f×", state.speed));
 		findViewById(R.id.viewer_speed_quarter).setSelected(state.speed == .25f);
 		findViewById(R.id.viewer_speed_half).setSelected(state.speed == .5f);
 		findViewById(R.id.viewer_speed_normal).setSelected(state.speed == 1);
@@ -311,8 +308,7 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 		loading.setVisibility(android.view.View.VISIBLE);
 		controls.setVisibility(android.view.View.GONE);
 		loadMessage.setText(message);
-		status.setText(writtenReferenceAvailable ? "Animación no disponible · La referencia escrita sigue accesible" :
-			"Animación no disponible · Vuelve y selecciona un ejercicio del catálogo");
+		status.setText(Txt.t(writtenReferenceAvailable ? R.string.an_unavailable_written : R.string.an_unavailable_back));
 	}
 
 	private void closeRenderer() {

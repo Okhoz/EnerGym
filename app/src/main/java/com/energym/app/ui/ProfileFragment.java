@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import com.energym.app.R;
 import com.energym.app.controller.AppController.InputField;
 
@@ -15,22 +16,20 @@ public final class ProfileFragment extends ScreenFragment {
 	}
 
 	protected void content() {
-		heading("PERSONALIZA", "Tu perfil",
-			"Define cómo quieres entrenar. Guardar conserva tu perfil; después podrás crear una rutina desde Entrenamiento.");
-		LinearLayout fields = card("Tu entrenamiento", "");
+		heading(Txt.t(R.string.pf_eyebrow), Txt.t(R.string.pf_title), Txt.t(R.string.pf_subtitle));
+		LinearLayout fields = card(Txt.t(R.string.pf_training), "");
 		boolean resources = false, details = false;
 		// Secciones de presentación: conservan el orden y los eventos de todos los campos del controlador.
 		for (InputField f : app.profileFields()) {
 			if (f.key.startsWith("detail.") && !details) {
-				fields = card(app.disciplineName(), "Datos opcionales para describir tu práctica deportiva.");
+				fields = card(app.disciplineName(), Txt.t(R.string.pf_details));
 				details = true;
 			} else if (f.key.equals("daysPerWeek"))
-				fields = card("Tu disponibilidad", "Usa una disponibilidad que puedas mantener.");
+				fields = card(Txt.t(R.string.pf_availability), Txt.t(R.string.pf_availability_body));
 			else if (f.key.equals("experience"))
-				fields = card("Sobre ti", "Si indicas cuánto tiempo llevas (p. ej. «2 años»), el nivel se ajusta solo; puedes cambiarlo.");
+				fields = card(Txt.t(R.string.body_about_you), Txt.t(R.string.pf_about_body));
 			else if (f.key.startsWith("resource.") && !resources) {
-				fields = card("Material disponible",
-					"Marca solo el material que podrás usar en las sesiones.");
+				fields = card(Txt.t(R.string.pf_equipment), Txt.t(R.string.pf_equipment_body));
 				resources = true;
 			}
 			String label = FormFieldGuidance.profileLabel(f.key, f.label);
@@ -49,7 +48,7 @@ public final class ProfileFragment extends ScreenFragment {
 					timeInput(fields, f.key);
 			}
 		}
-		primary(action(rows, "Guardar perfil", !app.profileSaving(), app::saveProfile));
+		primary(action(rows, Txt.t(R.string.pf_save), !app.profileSaving(), app::saveProfile));
 	}
 
 	/** Refleja en el selector el nivel deducido de la experiencia escrita. */

@@ -1,5 +1,7 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
+import com.energym.app.R;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -53,7 +55,7 @@ public final class AvatarStore {
 	 */
 	public void save(String owner, Uri source) throws Exception {
 		if (owner == null || source == null)
-			throw new IllegalArgumentException("Falta el propietario o la imagen");
+			throw new IllegalArgumentException(Txt.t(R.string.av_missing));
 		Bitmap decoded = null, square = null, scaled = null, oriented = null;
 		File temp = null;
 		try {
@@ -68,17 +70,17 @@ public final class AvatarStore {
 			File target = file(owner);
 			File directory = target.getParentFile();
 			if (!directory.isDirectory() && !directory.mkdirs())
-				throw new IOException("No se pudo preparar la foto");
+				throw new IOException(Txt.t(R.string.av_prepare_failed));
 			temp = File.createTempFile(target.getName(), ".tmp", directory);
 			try (FileOutputStream out = new FileOutputStream(temp)) {
 				if (!oriented.compress(Bitmap.CompressFormat.JPEG, 88, out))
-					throw new IOException("No se pudo codificar la foto");
+					throw new IOException(Txt.t(R.string.av_encode_failed));
 				out.getFD().sync();
 			}
 			// rename sustituye el archivo de forma atómica; un fallo conserva la foto anterior.
 			Os.rename(temp.getPath(), target.getPath());
 		} catch (OutOfMemoryError e) {
-			throw new IOException("No hay memoria suficiente para leer esta foto", e);
+			throw new IOException(Txt.t(R.string.av_no_memory), e);
 		} finally {
 			if (temp != null) temp.delete();
 			recycle(oriented);
@@ -95,7 +97,7 @@ public final class AvatarStore {
 			BitmapFactory.decodeStream(in, null, options);
 		}
 		if (options.outWidth <= 0 || options.outHeight <= 0)
-			throw new IOException("La imagen no es válida");
+			throw new IOException(Txt.t(R.string.av_invalid));
 		int sample = 1;
 		int shortest = Math.min(options.outWidth, options.outHeight);
 		while (shortest / (sample * 2L) >= SIZE) sample *= 2;
@@ -114,7 +116,7 @@ public final class AvatarStore {
 		Bitmap bitmap = null;
 		try (InputStream in = open(source)) {
 			bitmap = BitmapFactory.decodeStream(in, null, options);
-			if (bitmap == null) throw new IOException("La imagen no es válida");
+			if (bitmap == null) throw new IOException(Txt.t(R.string.av_invalid));
 		} catch (IOException | RuntimeException | Error e) {
 			recycle(bitmap);
 			throw e;
@@ -128,7 +130,7 @@ public final class AvatarStore {
 
 	private InputStream open(Uri source) throws IOException {
 		InputStream stream = context.getContentResolver().openInputStream(source);
-		if (stream == null) throw new IOException("No se pudo abrir la foto");
+		if (stream == null) throw new IOException(Txt.t(R.string.av_open_failed));
 		return stream;
 	}
 

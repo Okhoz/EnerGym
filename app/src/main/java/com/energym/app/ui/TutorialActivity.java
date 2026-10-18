@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
@@ -30,26 +31,16 @@ public final class TutorialActivity extends AppCompatActivity {
 	private static final String PREFS = "tutorial", DONE = "done_v1";
 
 	/** Pasos: título, texto, imagen (0 = logo, -1 = animación 3D). */
-	private static final Object[][] STEPS = {
-		{"Bienvenido a EnerGym", "Tu entrenador, tu dieta y tu progreso en un solo sitio.\n\nEn un minuto te enseñamos " +
-			"dónde está cada cosa. Desliza o pulsa «Siguiente».", 0},
-		{"Inicio: lo que toca hoy", "Ves el entreno del día y tu resumen de comida y agua.\n\nCon «+ Comida» y «+ Vaso» lo " +
-			"anotas al momento.", R.drawable.tutorial_inicio},
-		{"Entreno: tus rutinas", "Pulsa «Empezar entreno» para hacer la rutina de hoy.\n\nCon «+ Nuevo» creas un entreno " +
-			"libre, pides una sugerencia o una rutina a la IA, un plan semanal o la haces tú.", R.drawable.tutorial_entreno},
-		{"Apunta cada serie", "Ajusta peso y repeticiones con − y + y pulsa «Guardar serie»: empieza el descanso solo.\n\n" +
-			"En «Más opciones» tienes RPE, notas, superseries y discos. Tu rutina sube de nivel sola cuando la cumples.",
-			R.drawable.tutorial_registro},
-		{"Técnica en 3D", "Los ejercicios con modelo 3D muestran el movimiento completo, como este.\n\nÁbrelo en Entreno › " +
-			"Ejercicios › elige un ejercicio › «Vista previa 3D».", -1},
-		{"Nutrición", "Escanea el código de barras o busca el alimento: solo indicas cuánto has tomado y se calculan " +
-			"calorías y macros.\n\nTambién: agua, comidas guardadas y una dieta del mes con IA.", R.drawable.tutorial_nutricion},
-		{"Progreso", "Por pestañas: Resumen (totales y logros), Calendario, Cuerpo (peso, medidas y fotos) y Metas.",
-			R.drawable.tutorial_progreso},
-		{"Tu entrenador con IA", "En Asistente pregúntale lo que quieras: técnica, rutinas, si subir peso…\n\nUsa tus datos " +
-			"reales y funciona en tu móvil, sin enviar tus mensajes fuera.", R.drawable.tutorial_asistente},
-		{"Cuenta y ajustes", "Arriba a la derecha: copia en la nube, recordatorios, kg/lb, Health Connect y CSV.\n\nDesde " +
-			"ahí puedes volver a ver este tutorial cuando quieras. ¡A entrenar! 💪", R.drawable.tutorial_cuenta},
+	private static final int[][] STEPS = {
+		{R.string.tut_welcome, R.string.tut_welcome_body, 0},
+		{R.string.tut_home, R.string.tut_home_body, R.drawable.tutorial_inicio},
+		{R.string.tut_training, R.string.tut_training_body, R.drawable.tutorial_entreno},
+		{R.string.tut_log, R.string.tut_log_body, R.drawable.tutorial_registro},
+		{R.string.tut_3d, R.string.tut_3d_body, -1},
+		{R.string.nutrition, R.string.tut_nutrition_body, R.drawable.tutorial_nutricion},
+		{R.string.history, R.string.tut_progress_body, R.drawable.tutorial_progreso},
+		{R.string.tut_trainer, R.string.tut_trainer_body, R.drawable.tutorial_asistente},
+		{R.string.tut_account, R.string.tut_account_body, R.drawable.tutorial_cuenta},
 	};
 
 	private int step;
@@ -121,8 +112,8 @@ public final class TutorialActivity extends AppCompatActivity {
 
 		LinearLayout buttons = new LinearLayout(this);
 		buttons.setOrientation(LinearLayout.HORIZONTAL);
-		back = button("Atrás", false);
-		next = button("Siguiente", true);
+		back = button(Txt.t(R.string.tut_back), false);
+		next = button(Txt.t(R.string.tut_next), true);
 		LinearLayout.LayoutParams left = new LinearLayout.LayoutParams(0, dp(56), 1);
 		LinearLayout.LayoutParams right = new LinearLayout.LayoutParams(0, dp(56), 1);
 		right.setMarginStart(dp(16));
@@ -166,7 +157,7 @@ public final class TutorialActivity extends AppCompatActivity {
 				if (step > 0)
 					go(step - 1);
 				else
-					android.widget.Toast.makeText(TutorialActivity.this, "Completa el tutorial para empezar a usar EnerGym",
+					android.widget.Toast.makeText(TutorialActivity.this, Txt.t(R.string.tut_complete),
 						android.widget.Toast.LENGTH_SHORT).show();
 			}
 		});
@@ -187,8 +178,8 @@ public final class TutorialActivity extends AppCompatActivity {
 	}
 
 	private void show() {
-		Object[] s = STEPS[step];
-		counter.setText("TUTORIAL · PASO " + (step + 1) + " DE " + STEPS.length);
+		int[] s = STEPS[step];
+		counter.setText(Txt.t(R.string.tut_counter, step + 1, STEPS.length));
 		progress.post(() -> {
 			View track = (View) progress.getParent();
 			progress.getLayoutParams().width = track.getWidth() * (step + 1) / STEPS.length;
@@ -198,24 +189,24 @@ public final class TutorialActivity extends AppCompatActivity {
 		TextView title = new TextView(this);
 		title.setTextAppearance(R.style.EnerGym_CardTitle);
 		title.setTextSize(26);
-		title.setText((String) s[0]);
+		title.setText(Txt.t(s[0]));
 		title.setTextColor(color(R.color.white));
 		androidx.core.view.ViewCompat.setAccessibilityHeading(title, true);
 		body.addView(title);
-		int image = (Integer) s[2];
+		int image = s[2];
 		body.addView(image == 0 ? logo() : image == -1 ? squat() : screenshot(image), imageParams(image));
 		TextView text = new TextView(this);
 		text.setTextAppearance(R.style.EnerGym_Body);
 		text.setTextSize(16);
-		text.setText((String) s[1]);
+		text.setText(Txt.t(s[1]));
 		LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
 			LinearLayout.LayoutParams.WRAP_CONTENT);
 		textParams.topMargin = dp(20);
 		body.addView(text, textParams);
 		back.setVisibility(step == 0 ? View.INVISIBLE : View.VISIBLE);
-		next.setText(step == STEPS.length - 1 ? "Empezar" : "Siguiente");
-		next.setContentDescription(step == STEPS.length - 1 ? "Terminar el tutorial y empezar" : "Paso siguiente");
-		body.announceForAccessibility((String) s[0]);
+		next.setText(Txt.t(step == STEPS.length - 1 ? R.string.home_start : R.string.tut_next));
+		next.setContentDescription(Txt.t(step == STEPS.length - 1 ? R.string.tut_finish : R.string.tut_next_step));
+		body.announceForAccessibility(Txt.t(s[0]));
 	}
 
 	private LinearLayout.LayoutParams imageParams(int image) {
@@ -246,7 +237,7 @@ public final class TutorialActivity extends AppCompatActivity {
 		v.setForeground(frame(true));
 		v.setPadding(dp(4), dp(4), dp(4), dp(4));
 		v.setClipToOutline(true);
-		v.setContentDescription("Captura de la pantalla: " + STEPS[step][0]);
+		v.setContentDescription(Txt.t(R.string.tut_screenshot, Txt.t(STEPS[step][0])));
 		return v;
 	}
 
@@ -267,7 +258,7 @@ public final class TutorialActivity extends AppCompatActivity {
 		v.setForeground(frame(true));
 		v.setPadding(dp(4), dp(4), dp(4), dp(4));
 		v.setClipToOutline(true);
-		v.setContentDescription("Animación 3D de una sentadilla con mancuernas");
+		v.setContentDescription(Txt.t(R.string.tut_squat_animation));
 		v.post(anim::start);
 		return v;
 	}

@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import android.content.Context;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,12 +26,12 @@ final class PlateDialog {
 		double target = Plates.toUnit(kg, lb);
 		StringBuilder s = new StringBuilder();
 		if (target <= 0)
-			s.append("Escribe un peso para ver qué discos poner.");
+			s.append(Txt.t(R.string.pl_type_weight));
 		else {
 			Plates.Load load = Plates.load(target, bar, lb ? Plates.LB_PLATES : Plates.KG_PLATES);
-			s.append("Barra de ").append(SetLog.format(bar)).append(' ').append(unit).append(" + en cada lado:\n");
+			s.append(Txt.t(R.string.pl_bar, SetLog.format(bar) + " " + unit)).append('\n');
 			if (load.perSide.isEmpty())
-				s.append("  sin discos");
+				s.append("  ").append(Txt.t(R.string.pl_no_plates));
 			else {
 				// «2 × 20» en vez de repetir el mismo disco.
 				Map<Double, Integer> count = new LinkedHashMap<>();
@@ -42,13 +43,12 @@ final class PlateDialog {
 				s.append("  ").append(String.join("  +  ", parts)).append(' ').append(unit);
 			}
 			if (Math.abs(load.total - target) > 0.001)
-				s.append("\n\nCon estos discos lo más cercano es ").append(SetLog.format(load.total)).append(' ').append(unit)
-					.append('.');
+				s.append("\n\n").append(Txt.t(R.string.pl_closest, SetLog.format(load.total) + " " + unit));
 		}
-		add(box, c, "🏋️ Discos para " + (target > 0 ? SetLog.format(target) + " " + unit : "tu serie"), R.style.EnerGym_CardTitle);
+		add(box, c, Txt.t(R.string.pl_title, target > 0 ? SetLog.format(target) + " " + unit : Txt.t(R.string.pl_your_set)), R.style.EnerGym_CardTitle);
 		add(box, c, s.toString(), R.style.EnerGym_Body);
 		if (oneRepMaxKg > 0) {
-			add(box, c, "\n📈 Tu 1RM estimado: " + Plates.text(oneRepMaxKg, lb), R.style.EnerGym_CardTitle);
+			add(box, c, "\n" + Txt.t(R.string.pl_1rm, Plates.text(oneRepMaxKg, lb)), R.style.EnerGym_CardTitle);
 			StringBuilder table = new StringBuilder();
 			for (int p : Plates.PERCENTS)
 				table.append(String.format(Locale.ROOT, "%3d %%   %s %s   ~%d rep%s\n", p,
