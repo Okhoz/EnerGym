@@ -79,36 +79,41 @@ public final class AssistantFragment extends ScreenFragment {
 			return;
 		}
 		composer.setVisibility(View.VISIBLE);
+		// Una sola línea de estado con acciones pequeñas: el chat ocupa la pantalla, no los avisos.
 		String modeLabel = c.onDevice() ?
-			(c.localGuidance() ? "Guiado local · sin IA" : c.remoteActive() ? "Entrenador IA · " + c.modelLabel() + " en tu móvil" :
-				"IA del móvil no disponible · guiado local") : c.automaticConnection() ?
-			(c.localGuidance() ? "Guiado local · sin IA" : c.remoteActive() ? "IA online · cuenta de Google" : "IA online no disponible") :
-			(c.remoteActive() ? "Servidor de IA emparejado · conversación" : "Guiado local · sin IA");
-		TextView mode = text(rows, modeLabel, R.style.EnerGym_FieldCaption, 4);
+			(c.localGuidance() ? getString(R.string.chat_mode_guided) : c.remoteActive() ?
+				getString(R.string.chat_mode_device, c.modelLabel()) : getString(R.string.chat_mode_device_off)) :
+			c.automaticConnection() ? (c.localGuidance() ? getString(R.string.chat_mode_guided) : c.remoteActive() ?
+				getString(R.string.chat_mode_online) : getString(R.string.chat_mode_online_off)) :
+				(c.remoteActive() ? getString(R.string.chat_mode_paired) : getString(R.string.chat_mode_guided));
+		LinearLayout status = new LinearLayout(requireContext());
+		status.setOrientation(LinearLayout.HORIZONTAL);
+		status.setGravity(Gravity.CENTER_VERTICAL);
+		TextView mode = new TextView(requireContext());
+		mode.setTextAppearance(R.style.EnerGym_FieldCaption);
+		mode.setText(modeLabel);
 		mode.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+		status.addView(mode, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+		String ai = c.onDevice() ? getString(R.string.chat_use_device) : getString(R.string.chat_use_online);
 		if (c.automaticConnection()) {
-			String ai = c.onDevice() ? "IA del móvil" : "IA online";
-			if (c.localGuidance())
-				action(rows, "Usar " + ai, !c.busy, () -> c.selectLocalGuidance(false));
-			else {
-				if (!c.remoteActive()) {
-					text(rows, c.connectionNotice(), R.style.EnerGym_Body, 8);
-					if (!c.downloadOffer().isEmpty())
-						primary(action(rows, c.downloadOffer(), !c.busy, c::downloadModel));
-					if (c.connected())
-						action(rows, "Reintentar " + ai, !c.busy, () -> c.selectLocalGuidance(false));
-				}
-				action(rows, "Usar guiado local", !c.busy, () -> c.selectLocalGuidance(true));
-			}
 			if (c.busy)
-				action(rows, "Cancelar solicitud", true, c::cancelPending);
+				small(status, getString(R.string.chat_cancel), getString(R.string.chat_cancel), "chat_cancel", true,
+					c::cancelPending);
+			else if (c.localGuidance())
+				small(status, ai, ai, "chat_use_ai", true, () -> c.selectLocalGuidance(false));
+			else if (!c.remoteActive() && c.connected())
+				small(status, getString(R.string.chat_retry), getString(R.string.chat_retry), "chat_retry", true,
+					() -> c.selectLocalGuidance(false));
 		} else if (!c.remoteActive())
-			action(rows, "Conectar IA en Cuenta", !c.busy, () -> app.navigate(AppController.Screen.ACCOUNT));
-		if (c.onDevice())
-			text(rows, "Todo se procesa en tu móvil: ningún mensaje sale del dispositivo, no necesita internet " +
-				"y no tiene coste. Tu entrenador recuerda los últimos mensajes de esta conversación.",
-				R.style.EnerGym_FieldCaption, 4);
-		else
+			small(status, getString(R.string.chat_connect), getString(R.string.chat_connect), "chat_connect", !c.busy,
+				() -> app.navigate(AppController.Screen.ACCOUNT));
+		add(rows, status, 0);
+		// Lo único que merece un botón grande: descargar el modelo para tener IA de verdad.
+		if (c.automaticConnection() && !c.localGuidance() && !c.remoteActive() && !c.downloadOffer().isEmpty()) {
+			text(rows, c.connectionNotice(), R.style.EnerGym_FieldCaption, 4);
+			primary(action(rows, c.downloadOffer(), !c.busy, c::downloadModel));
+		}
+		if (!c.onDevice())
 			historyConsent(c);
 		conversation(c, getView().findViewById(R.id.chat_send));
 	}
@@ -255,23 +260,40 @@ public final class AssistantFragment extends ScreenFragment {
 		for (int i = c.messages.size() - 1; i >= 0 && asked == null; i--)
 			if (c.messages.get(i).role.equals("user"))
 				asked = c.messages.get(i).text;
-		LinearLayout row = columns(rows, 6);
-		MaterialButton copy = compact(row, "📋 " + getString(R.string.chat_copy), true, () -> {
-			android.content.ClipboardManager clip = (android.content.ClipboardManager)
-				requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-			clip.setPrimaryClip(android.content.ClipData.newPlainText("EnerGym", ChatFormat.plain(reply)));
-			Toast.makeText(requireContext(), R.string.chat_copied, Toast.LENGTH_SHORT).show();
-		});
-		copy.setContentDescription(getString(R.string.chat_copy_description));
-		copy.setTag("chat_copy");
-		if (asked != null) {
-			String again = asked;
-			MaterialButton regenerate = compact(row, "🔄 " + getString(R.string.chat_regenerate), !c.busy,
-				() -> c.send(again));
-			regenerate.setContentDescription(getString(R.string.chat_regenerate_description));
-			regenerate.setTag("chat_regenerate");
+		// Solo la bienvenida, sin nada preguntado aún: sugerencias para empezar, sin copiar ni regenerar.
+		if (asked == null) {
+			chips(c, FollowUps.STARTERS);
+			return;
 		}
+		LinearLayout row = new LinearLayout(requireContext());
+		row.setOrientation(LinearLayout.HORIZONTAL);
+		small(row, "📋 " + getString(R.string.chat_copy), getString(R.string.chat_copy_description), "chat_copy",
+			true, () -> {
+				android.content.ClipboardManager clip = (android.content.ClipboardManager)
+					requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+				clip.setPrimaryClip(android.content.ClipData.newPlainText("EnerGym", ChatFormat.plain(reply)));
+				Toast.makeText(requireContext(), R.string.chat_copied, Toast.LENGTH_SHORT).show();
+			});
+		String again = asked;
+		small(row, "🔄 " + getString(R.string.chat_regenerate), getString(R.string.chat_regenerate_description),
+			"chat_regenerate", !c.busy, () -> c.send(again));
+		add(rows, row, 2);
 		chips(c, FollowUps.suggest(asked, ChatFormat.plain(reply), c.preview != null));
+	}
+
+	/** Botón de texto pequeño bajo la burbuja, como los iconos de acción de Gemini. */
+	private void small(LinearLayout row, String label, String description, String tag, boolean enabled,
+		Runnable click) {
+		MaterialButton b = new MaterialButton(requireContext(), null,
+			com.google.android.material.R.attr.borderlessButtonStyle);
+		b.setText(label);
+		b.setTextSize(13);
+		b.setAllCaps(false);
+		b.setEnabled(enabled);
+		b.setContentDescription(description);
+		b.setTag(tag);
+		b.setOnClickListener(v -> click.run());
+		row.addView(b, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(48)));
 	}
 
 	private void chips(ProposalController c, java.util.List<FollowUps.Topic> topics) {
