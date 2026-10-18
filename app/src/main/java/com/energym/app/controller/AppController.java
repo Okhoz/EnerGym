@@ -654,7 +654,7 @@ public final class AppController {
 	 */
 	public void importWorkouts(String csv, java.util.function.BiConsumer<com.energym.app.progress.WorkoutImport.Result, Integer> done) {
 		if (owner == null || profile == null || trainingMutation) {
-			error(profile == null ? "Configura tu perfil antes de importar entrenos." : "Espera a que termine la acción en curso.");
+			error(Txt.t(profile == null ? R.string.app_profile_before_import : R.string.app_wait_action));
 			return;
 		}
 		com.energym.app.progress.WorkoutImport.Result result = com.energym.app.progress.WorkoutImport.parse(csv,
@@ -694,7 +694,7 @@ public final class AppController {
 				best.merge(e.getKey(), SetLog.best(SetLog.of(e.getValue())), Math::max);
 		Routine routine = ClassicPrograms.routine(program, day, catalog.getExercises(), best, profile);
 		if (routine == null) {
-			error("Este programa no tiene ejercicios disponibles en el catálogo.");
+			error(Txt.t(R.string.app_program_empty));
 			return;
 		}
 		editProposal(routine);

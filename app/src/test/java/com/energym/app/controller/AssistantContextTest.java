@@ -66,4 +66,12 @@ public class AssistantContextTest {
 		assertTrue(text, text.contains("≈ 2.10 €"));
 		assertEquals("", AssistantContext.build(null, null, null, planner, LocalDate.now()));
 	}
+
+	@Test
+	public void nextLoadsGivesTheCoachTheExactNextWeight() {
+		long now = System.currentTimeMillis();
+		String text = AssistantContext.nextLoads(Arrays.asList(session("80", now - 86400000L), session("80", now)));
+		assertTrue(text, text.startsWith("Sentadilla: última vez 80 kg × 8"));
+		assertTrue(text, text.contains("sube a 82.5 kg"));
+	}
 }

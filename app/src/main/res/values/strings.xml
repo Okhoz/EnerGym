@@ -1,5 +1,5 @@
 <resources>
-	<string name="app_name">EnerGym</string>
+	<string name="app_name" translatable="false">EnerGym</string>
 	<string name="account">Cuenta</string>
 	<string name="menu">Menú</string>
 	<string name="menu_profile">Mi perfil de entrenamiento</string>
@@ -839,7 +839,7 @@
 	<string name="body_estimate_pending">Estimación pendiente</string>
 	<string name="body_macros">Proteínas: %1$d g\nHidratos: %2$d g\nGrasas: %3$d g</string>
 	<string name="body_how">Cómo se calcula</string>
-	<string name="body_how_body">Metabolismo basal con Mifflin-St Jeor × factor de actividad, ajustado a tu objetivo. Proteína 1,6–2 g/kg, grasa mínima 0,8 g/kg y el resto en hidratos. Déficit orientativo del 15 % o superávit del 10 %. Estimación para adultos; no se aplica durante embarazo o lactancia y no sustituye una valoración profesional.</string>
+	<string name="body_how_body" formatted="false">Metabolismo basal con Mifflin-St Jeor × factor de actividad, ajustado a tu objetivo. Proteína 1,6–2 g/kg, grasa mínima 0,8 g/kg y el resto en hidratos. Déficit orientativo del 15 % o superávit del 10 %. Estimación para adultos; no se aplica durante embarazo o lactancia y no sustituye una valoración profesional.</string>
 	<string name="body_save">Guardar objetivo y datos</string>
 	<string name="common_ok">Vale</string>
 	<!-- Cuenta -->
@@ -1757,5 +1757,28 @@
 	<string name="tp_title">Entrenamiento de tu entrenador</string>
 	<string name="pc_device_too_long">Tu mensaje y tus datos no caben de una vez en la IA del móvil. Prueba a dividirlo en mensajes más cortos.</string>
 	<string name="as_new_routine_message">Hazme una rutina para hoy</string>
+	<string name="st_no_google_account">No hay ninguna cuenta de Google en este móvil. Añádela en los ajustes de Android y vuelve a intentarlo, o entra en la demo local.</string>
+	<string name="st_account_network">No se pudo conectar con Google. Revisa la conexión a internet y vuelve a intentarlo.</string>
+	<!-- Programas clásicos -->
+	<string name="cp_531_week1" formatted="false">Semana 1: 65 % × 5, 75 % × 5 y 85 % × 5+ (la última, todas las que puedas)</string>
+	<string name="cp_ppl">Empuje / Tirón / Pierna</string>
+	<string name="cp_overhead_press">Press militar</string>
+	<string name="cp_deadlift">Peso muerto</string>
+	<string name="cp_bench_press">Press de banca</string>
+	<string name="cp_squat">Sentadilla</string>
+	<string name="cp_push">Empuje</string>
+	<string name="cp_pull">Tirón</string>
+	<string name="cp_legs">Pierna</string>
+	<string name="cp_bbb" formatted="false">Boring But Big: 5 × 10 al 50 %</string>
+	<string name="cp_t1">T1: 5 × 3 (la última, todas las que puedas); si fallas, pasa a 6 × 2</string>
+	<string name="cp_t2">T2: 3 × 10; si fallas, pasa a 3 × 8</string>
+	<string name="cp_t3">T3: 3 × 15; cuando hagas 25 en la última, sube peso</string>
+	<string name="cp_program">Programa %1$s.</string>
+	<string name="cp_explanation">Programa clásico %1$s. Las cargas parten del 90 %% de tu mejor 1RM estimado; revísalas y ajústalas si no has hecho antes el ejercicio.</string>
+	<string name="app_profile_before_import">Configura tu perfil antes de importar entrenos.</string>
+	<string name="app_wait_action">Espera a que termine la acción en curso.</string>
+	<string name="app_program_empty">Este programa no tiene ejercicios disponibles en el catálogo.</string>
+	<string name="main_onboarding_done">¡Todo listo! Tu perfil y tus objetivos ya están configurados. Empieza por el entreno de hoy.</string>
+	<string name="main_overlay_blocked">Otra app está tapando EnerGym; ciérrala para poder tocar.</string>
 </resources>
 

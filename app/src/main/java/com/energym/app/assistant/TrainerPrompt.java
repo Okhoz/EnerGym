@@ -130,10 +130,11 @@ public final class TrainerPrompt {
 			.append("• Si el esfuerzo va muy alto o lleva días sin entrenar, baja la intensidad; si va sobrado, súbela.\n")
 			.append("• Si no pide nada concreto, prioriza los grupos que lleva tiempo sin trabajar.\n")
 			.append("• Usa sus números reales (kilos, repeticiones, RPE, fechas) y explica el porqué en una frase.\n")
-			.append("Ejemplo de buena respuesta a «¿subo peso en sentadilla?» con datos 80 kg × 8 a RPE 7:\n")
-			.append("{\"texto\":\"¡Sí! 💪 El martes hiciste 80 kg × 8 con RPE 7: te sobraban unas 3 repeticiones.\\n\\n")
-			.append("• Sube a 82,5 kg y busca 8 repeticiones a RPE 8.\\n• Si la técnica se rompe, vuelve a 80 kg.\",")
-			.append("\"rutina\":null}\n")
+			.append("• La primera frase responde directamente a lo que pregunta (sí/no, el número o la acción); después, ")
+			.append("el porqué y los pasos. Nada de rodeos ni de repetir la pregunta.\n")
+			.append("• Si hay CONOCIMIENTO DEL ENTRENADOR, básate en esas pautas y cifras; si hay PRÓXIMA CARGA ")
+			.append("CALCULADA, usa exactamente esos kilos y repeticiones (los calcula la app con su historial).\n")
+			.append(example(r.message))
 			.append("Responde SOLO con un objeto JSON, sin texto fuera de él, con esta forma:\n")
 			.append("{\"texto\":\"tu respuesta\",\"rutina\":null}\n");
 		List<Exercise> eligible = eligible(r, catalog);
@@ -154,6 +155,9 @@ public final class TrainerPrompt {
 			p.append("LO QUE PIDE PARA HOY: ").append(wants.describe()).append(". La rutina debe trabajar exactamente ")
 				.append("eso: elige ejercicios de esas zonas (la lista está ordenada de más a menos afín) y respeta lo que ")
 				.append("quiere evitar. Ponle un título que lo refleje.\n");
+		String knowledge = CoachKnowledge.forMessage(r.message);
+		if (!knowledge.isEmpty())
+			p.append("\nCONOCIMIENTO DEL ENTRENADOR (pautas contrastadas para esta pregunta)\n").append(knowledge);
 		p.append("\nPERFIL DEL CLIENTE\n").append(profile(r.profileData)).append('\n');
 		StringBuilder tail = new StringBuilder();
 		List<String> missing = missing(r.profileData);
@@ -274,6 +278,43 @@ public final class TrainerPrompt {
 		m.put("requestId", r.requestId);
 		m.put("exerciseId", r.exerciseId);
 		return StrictJson.write(m);
+	}
+
+	/**
+	 * Un ejemplo de respuesta modélica del mismo tipo que la pregunta: a un modelo pequeño le enseña más un buen
+	 * ejemplo parecido que cualquier instrucción.
+	 */
+	static String example(String message) {
+		List<CoachKnowledge.Topic> topics = CoachKnowledge.topics(message);
+		String ask, answer;
+		if (topics.contains(CoachKnowledge.Topic.PAIN)) {
+			ask = "me molesta la rodilla en la sentadilla";
+			answer = "Para hoy la sentadilla pesada y cuidemos esa rodilla. 🧘\\n\\n• Si el dolor es agudo o hay " +
+				"hinchazón, no entrenes la pierna y consulta a un profesional.\\n• Si es una molestia leve, prueba " +
+				"sentadilla a un banco con menos peso o prensa con poco rango, sin dolor.\\n• Si sigue más de una o dos " +
+				"semanas, que te lo valore un fisio. **Sin dolor, sin prisa.**";
+		} else if (topics.contains(CoachKnowledge.Topic.NUTRITION) || topics.contains(CoachKnowledge.Topic.FAT_LOSS)) {
+			ask = "¿cuánta proteína necesito?";
+			answer = "Con tus 75 kg, apunta a unos **120–165 g de proteína al día** (1,6–2,2 g/kg). 💪\\n\\n• Repártela " +
+				"en 3–4 comidas de 30–40 g.\\n• Ayer llevabas 95 g: añade un yogur griego y una lata de atún y llegas.";
+		} else if (topics.contains(CoachKnowledge.Topic.SQUAT) || topics.contains(CoachKnowledge.Topic.BENCH) ||
+			topics.contains(CoachKnowledge.Topic.DEADLIFT) || topics.contains(CoachKnowledge.Topic.PULL) ||
+			topics.contains(CoachKnowledge.Topic.OVERHEAD)) {
+			ask = "¿cómo hago bien el peso muerto?";
+			answer = "La clave es **empujar el suelo con la espalda neutra**. ✅\\n\\n• Barra sobre el medio del pie y " +
+				"pegada a las piernas.\\n• Cadera atrás, pecho orgulloso y dorsales activos antes de tirar.\\n• Termina " +
+				"apretando glúteos, sin echarte hacia atrás.\\n• Si la espalda se redondea, baja el peso.";
+		} else if (topics.contains(CoachKnowledge.Topic.MOTIVATION)) {
+			ask = "no tengo ganas de entrenar";
+			answer = "Pasa, y no hace falta un entreno perfecto: hoy basta con **20 minutos**. 🔥\\n\\n• Haz solo los " +
+				"2 primeros ejercicios de tu rutina.\\n• Llevas 3 semanas seguidas: no rompas la racha por un día flojo.";
+		} else {
+			ask = "¿subo peso en sentadilla?";
+			answer = "¡Sí! 💪 El martes hiciste 80 kg × 8 con RPE 7: te sobraban unas 3 repeticiones.\\n\\n• Sube a 82,5 kg " +
+				"y busca 8 repeticiones a RPE 8.\\n• Si la técnica se rompe, vuelve a 80 kg.";
+		}
+		return "Ejemplo de buena respuesta (con datos inventados solo para el ejemplo) a «" + ask + "»:\n" +
+			"{\"texto\":\"" + answer + "\",\"rutina\":null}\n";
 	}
 
 	static boolean asksForRoutine(String message) {
