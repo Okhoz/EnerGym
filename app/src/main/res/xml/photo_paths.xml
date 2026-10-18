@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Solo la carpeta temporal donde la cámara deja la foto de progreso antes de reducirla. -->
+<!-- Carpetas temporales: la foto de progreso de la cámara y la tarjeta de entreno que se comparte. -->
 <paths>
 	<cache-path name="camera" path="camera/" />
+	<cache-path name="share" path="share/" />
 </paths>
