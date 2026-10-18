@@ -395,8 +395,18 @@ public final class ProposalController {
 		}
 		if (!planning) {
 			String response;
+			// Sin IA, el guiado responde con las fichas del entrenador: primero los consejos (dolor, progresión,
+			// nutrición…); si solo pregunta por un ejercicio, su técnica del catálogo.
+			List<CoachKnowledge.Topic> topics = CoachKnowledge.topics(raw);
+			boolean advice = !topics.isEmpty() && !CoachKnowledge.TECHNIQUE.contains(topics.get(0));
 			if (greeting(text))
 				response = Txt.t(R.string.pc_hello);
+			else if (advice)
+				response = CoachKnowledge.answer(raw);
+			else if (techniqueReply(raw) != null)
+				response = techniqueReply(raw);
+			else if (!topics.isEmpty())
+				response = CoachKnowledge.answer(raw);
 			else if (text.contains("constan") || text.contains("habito") || text.contains("motiv"))
 				response = Txt.t(R.string.pc_habit);
 			else if (text.contains("cans") || text.contains("descans"))

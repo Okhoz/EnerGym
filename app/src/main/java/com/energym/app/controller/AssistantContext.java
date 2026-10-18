@@ -41,6 +41,7 @@ public final class AssistantContext {
 			add(parts, "ANÁLISIS DEL ENTRENADOR", "• " + String.join("\n• ", insights), 650);
 		// Cifras exactas para «¿subo peso?»: las calcula la sobrecarga progresiva de la app, no el modelo.
 		add(parts, "PRÓXIMA CARGA CALCULADA", nextLoads(app.history), 600);
+		add(parts, "TUS CIFRAS (calculadas por la app)", personal(app.history, nutrition), 400);
 		ProgressStats stats = new ProgressStats(app.history, ZoneId.systemDefault(), today);
 		add(parts, "PROGRESO", progress(stats), 450);
 		add(parts, "OBJETIVOS", goals(goals, stats, nutrition), 350);
@@ -121,6 +122,41 @@ public final class AssistantContext {
 			lines.add(item.getExercise().getName() + ": última vez " + last + " (rango " + range[0] + "–" + range[1] +
 				") → " + next + ".");
 		}
+		return String.join("\n", lines);
+	}
+
+	/**
+	 * Números personales que un entrenador tendría a mano: proteína y agua según su peso y el 1RM estimado de sus
+	 * ejercicios de fuerza (Epley con su mejor serie). Así el modelo no tiene que calcular nada.
+	 */
+	static String personal(List<Session> history, NutritionController nutrition) {
+		List<String> lines = new ArrayList<>();
+		BodyProfile b = nutrition == null ? null : nutrition.effectiveBody();
+		if (b != null && b.weightKg > 0)
+			lines.add("Proteína recomendada: " + Math.round(b.weightKg * 1.6) + "–" + Math.round(b.weightKg * 2.2) +
+				" g al día (1,6–2,2 g/kg con " + NutritionController.format(b.weightKg) + " kg). Agua: unos " +
+				NutritionController.format(Math.round(b.weightKg * 0.035 * 10) / 10.0) + " L al día.");
+		Map<String, Double> best = new LinkedHashMap<>();
+		for (Session s : history) {
+			if (s.getStatus() != Session.Status.FINISHED)
+				continue;
+			for (RoutineItem item : s.getRoutine().getItems()) {
+				Exercise e = item.getExercise();
+				Map<String, String> values = s.getResults().get(e.getId());
+				if (e.getMetricType() != MetricType.STRENGTH || values == null)
+					continue;
+				double oneRm = SetLog.best(SetLog.of(values));
+				if (oneRm > 0)
+					best.merge(e.getName(), oneRm, Math::max);
+			}
+		}
+		List<Map.Entry<String, Double>> top = new ArrayList<>(best.entrySet());
+		top.sort((x, y) -> Double.compare(y.getValue(), x.getValue()));
+		List<String> rms = new ArrayList<>();
+		for (Map.Entry<String, Double> e : top.subList(0, Math.min(4, top.size())))
+			rms.add(e.getKey() + " " + NutritionController.format(Math.round(e.getValue() * 2) / 2.0) + " kg");
+		if (!rms.isEmpty())
+			lines.add("1RM estimado (mejor serie): " + String.join(", ", rms) + ".");
 		return String.join("\n", lines);
 	}
 
