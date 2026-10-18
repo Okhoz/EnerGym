@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 import com.energym.app.R;
 import com.energym.app.catalog.ExerciseSearch;
 import com.energym.app.controller.AppController.Screen;
+import com.energym.app.domain.ClassicPrograms;
 import com.energym.app.domain.Exercise;
 import com.energym.app.domain.ProgressionEngine;
 import com.energym.app.domain.Routine;
@@ -216,6 +217,8 @@ public final class TrainingFragment extends ScreenFragment {
 		ai.setContentDescription("Crear rutina con IA");
 		option(create, "📅 Plan semanal", "Una rutina por día (Empuje / Tirón / Pierna…).",
 			ready && !app.trainingMutation, () -> app.createPlan("")).setTag("training_create_plan");
+		option(create, getString(R.string.programs_option), getString(R.string.programs_option_help),
+			ready && !app.trainingMutation && !app.manual.busy, this::chooseProgram).setTag("training_programs");
 		View manual = option(create, "✍ Hacerla yo", "Eliges ejercicios, series y carga.",
 			ready && !app.manual.busy, app::createManualRoutine);
 		manual.setTag("training_create_manual");
@@ -224,6 +227,31 @@ public final class TrainingFragment extends ScreenFragment {
 			ready && !app.profileSaving() && !app.routines.busy, app::createRoutine).setTag("training_more_options");
 		if (suggesting)
 			suggestion();
+	}
+
+	/** Programas clásicos: se elige el programa y el día, y se abre en el editor para revisarlo y guardarlo. */
+	private void chooseProgram() {
+		ClassicPrograms.Program[] programs = ClassicPrograms.Program.values();
+		String[] names = new String[programs.length];
+		for (int i = 0; i < programs.length; i++)
+			names[i] = ClassicPrograms.title(programs[i]) + " · " +
+				getString(R.string.programs_days, ClassicPrograms.days(programs[i]).size());
+		new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+			.setTitle(R.string.programs_title)
+			.setItems(names, (d, which) -> {
+				ClassicPrograms.Program program = programs[which];
+				List<ClassicPrograms.Day> days = ClassicPrograms.days(program);
+				String[] dayNames = new String[days.size()];
+				for (int i = 0; i < days.size(); i++)
+					dayNames[i] = getString(R.string.programs_day, i + 1, days.get(i).name);
+				new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+					.setTitle(ClassicPrograms.title(program))
+					.setItems(dayNames, (d2, day) -> app.openProgramDay(program, day))
+					.setNegativeButton(R.string.programs_cancel, null)
+					.show();
+			})
+			.setNegativeButton(R.string.programs_cancel, null)
+			.show();
 	}
 
 	/** Opción del menú «Nuevo»: fila compacta con su explicación de una línea. */

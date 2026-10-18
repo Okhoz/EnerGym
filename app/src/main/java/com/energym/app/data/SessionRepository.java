@@ -77,6 +77,25 @@ public final class SessionRepository {
 		});
 	}
 
+	/**
+	 * Guarda sesiones terminadas importadas de otra app sin exigir que su rutina esté aceptada: son historial, no
+	 * borradores. Las que ya existen o se eliminaron se saltan, así que importar dos veces no duplica.
+	 */
+	public int importFinished(List<Session> sessions) {
+		return database.transaction(() -> {
+			int added = 0;
+			TrainingArchiveRepository archive = new TrainingArchiveRepository(database);
+			for (Session s : sessions) {
+				if (s.getStatus() != Session.Status.FINISHED || database.find(SyncRecord.Kind.SESSION, s.getSyncId()) != null ||
+					archive.contains(SyncRecord.Kind.SESSION, s.getSyncId()))
+					continue;
+				database.writeLocal(SyncRecord.Kind.SESSION, s.getSyncId(), SnapshotCodec.encodeSession(s));
+				added++;
+			}
+			return added;
+		});
+	}
+
 	public List<Session> pending() {
 		return list(Session.Status.DRAFT);
 	}

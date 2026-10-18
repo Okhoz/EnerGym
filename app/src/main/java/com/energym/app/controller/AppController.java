@@ -645,6 +645,58 @@ public final class AppController {
 		});
 	}
 
+	/**
+	 * Importa un CSV de Strong o Hevy al historial. {@code done} recibe el resultado leído y cuántas sesiones
+	 * eran nuevas; null si el archivo no es de ninguna de esas apps.
+	 */
+	public void importWorkouts(String csv, java.util.function.BiConsumer<com.energym.app.progress.WorkoutImport.Result, Integer> done) {
+		if (owner == null || profile == null || trainingMutation) {
+			error(profile == null ? "Configura tu perfil antes de importar entrenos." : "Espera a que termine la acción en curso.");
+			return;
+		}
+		com.energym.app.progress.WorkoutImport.Result result = com.energym.app.progress.WorkoutImport.parse(csv,
+			catalog.getExercises(), profile, java.time.ZoneId.systemDefault());
+		if (result == null || result.sessions.isEmpty()) {
+			done.accept(result, 0);
+			return;
+		}
+		trainingMutation = true;
+		long token = generation;
+		changed();
+		store.importSessions(result.sessions, new AppStore.Callback<Integer>() {
+			public void success(Integer added) {
+				if (token != generation) return;
+				trainingMutation = false;
+				reload();
+				done.accept(result, added == null ? 0 : added);
+			}
+
+			public void failure(Exception e) {
+				if (token != generation) return;
+				trainingMutation = false;
+				error(e.getMessage());
+			}
+		});
+	}
+
+	/** Un día de un programa clásico, con cargas desde tus mejores 1RM, abierto en el editor para revisarlo. */
+	public void openProgramDay(ClassicPrograms.Program program, int day) {
+		if (profile == null) {
+			navigate(Screen.PROFILE);
+			return;
+		}
+		Map<String, Double> best = new HashMap<>();
+		for (Session s : history)
+			for (Map.Entry<String, Map<String, String>> e : s.getResults().entrySet())
+				best.merge(e.getKey(), SetLog.best(SetLog.of(e.getValue())), Math::max);
+		Routine routine = ClassicPrograms.routine(program, day, catalog.getExercises(), best, profile);
+		if (routine == null) {
+			error("Este programa no tiene ejercicios disponibles en el catálogo.");
+			return;
+		}
+		editProposal(routine);
+	}
+
 	/** Abre una rutina propuesta en el editor para cambiar ejercicios, series o carga antes de guardarla. */
 	public void editProposal(Routine proposal) {
 		if (trainingMutation || loading || !initialDataReady || owner == null || proposal == null) return;

@@ -217,6 +217,15 @@ public final class SessionController {
 		changeSets(list -> list.add(new SetLog.Entry(kg, reps, kind, rpe)), kg, reps, then);
 	}
 
+	/** Varias series de golpe (p. ej. las de calentamiento) en un solo guardado. */
+	public void addSets(List<SetLog.Entry> entries) {
+		if (entries == null || entries.isEmpty())
+			return;
+		SetLog.Entry last = entries.get(entries.size() - 1);
+		changeSets(list -> list.addAll(entries), last.kg, last.reps, () -> {
+		});
+	}
+
 	public void updateSet(int index, double kg, int reps) {
 		changeSets(list -> {
 			if (index >= 0 && index < list.size())

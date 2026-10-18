@@ -238,6 +238,8 @@ dependencies {
 	implementation("androidx.dynamicanimation:dynamicanimation:1.1.0")
 	// Escáner de Google Play services: la cámara la gestiona el sistema, la app no pide permiso de cámara.
 	implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
+	// Reloj Wear OS: el móvil publica el entreno en curso y recibe «otra serie igual» desde el reloj.
+	implementation("com.google.android.gms:play-services-wearable:18.2.0")
 	// Gemini Nano en el propio móvil (AICore): el chat funciona sin servidor cuando el dispositivo lo admite.
 	implementation("com.google.mlkit:genai-prompt:1.0.0-beta4")
 	// Sin Gemini Nano: Gemma 4 E2B (Apache 2.0) descargado una vez y ejecutado con LiteRT-LM en el móvil.

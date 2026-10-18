@@ -246,6 +246,8 @@ public final class SessionFragment extends ScreenFragment {
 		}
 		List<SetLog.Entry> sets = app.sessions.sets();
 		boolean editing = selectedSet >= 0 && selectedSet < sets.size();
+		wearExercise = e.getName();
+		publishWear();
 		Session last = lastTime(e.getId());
 		List<SetLog.Entry> before = last == null ? Collections.<SetLog.Entry>emptyList() :
 			SetLog.of(last.getResults().get(e.getId()));
@@ -270,6 +272,9 @@ public final class SessionFragment extends ScreenFragment {
 		// Sobrecarga progresiva antes de la primera serie: peso y repeticiones objetivo según tus últimas sesiones.
 		if (!editing && sets.isEmpty())
 			overload(log, item, e);
+		// Antes de la primera serie: aproximaciones calculadas a partir del peso de trabajo escrito.
+		if (!editing && sets.isEmpty())
+			warmup(log, e);
 		// Consejo del entrenador para la siguiente serie según el RPE de la última (objetivo RPE 8).
 		if (!editing && !sets.isEmpty()) {
 			Autoregulation.Advice advice = Autoregulation.next(sets.get(sets.size() - 1), lb ? Plates.toKg(5, true) : 2.5);
@@ -418,6 +423,25 @@ public final class SessionFragment extends ScreenFragment {
 			app.sessions.input("trackReps", reps);
 			render();
 		}).setTag("track_use_overload");
+	}
+
+	/** Series de aproximación (barra vacía, 40, 60 y 80 %) y un toque para apuntarlas como calentamiento. */
+	private void warmup(LinearLayout log, Exercise e) {
+		Set<TrainingProfile.Resource> r = e.getRequiredResources();
+		boolean barbell = r.contains(TrainingProfile.Resource.BARBELL);
+		double step = lb ? Plates.toKg(5, true) : barbell || r.contains(TrainingProfile.Resource.MACHINE) ? 2.5 :
+			r.contains(TrainingProfile.Resource.DUMBBELLS) ? 2 : 1;
+		double bar = barbell ? (lb ? Plates.toKg(45, true) : 20) : 0;
+		List<SetLog.Entry> ramp = WarmupSets.of(Plates.toKg(number(kgInput, 0), lb), bar, step);
+		if (ramp.isEmpty())
+			return;
+		List<String> parts = new ArrayList<>();
+		for (SetLog.Entry s : ramp)
+			parts.add(weight(s.kg).toLowerCase(Locale.ROOT) + " × " + s.reps);
+		text(log, getString(R.string.warmup_plan, String.join(" · ", parts)), R.style.EnerGym_FieldCaption, 12)
+			.setTag("track_warmup");
+		action(log, getString(R.string.warmup_log), !app.sessions.busy, () -> app.sessions.addSets(ramp))
+			.setTag("track_warmup_log");
 	}
 
 	/** Superseries de este entreno (índices enlazados con el siguiente), guardadas en este móvil. */
@@ -668,8 +692,21 @@ public final class SessionFragment extends ScreenFragment {
 	}
 
 	/** Cambia el descanso en pantalla y su aviso fuera de la app (0 = parado). */
+	/** Ejercicio que se está registrando, para el reloj. */
+	private String wearExercise = "";
+
+	/** Envía al reloj el ejercicio, la serie y el descanso actuales. */
+	private void publishWear() {
+		if (app.sessions.session == null || wearExercise.isEmpty())
+			return;
+		com.energym.app.wear.WearBridge.publish(requireContext(), com.energym.app.wear.WearState.of(wearExercise,
+			app.sessions.sets(), Plates.toUnit(1, lb), Plates.unit(lb), restEndsAt, SystemClock.elapsedRealtime(),
+			System.currentTimeMillis()));
+	}
+
 	private void restEndsAt(long at, String exercise) {
 		restEndsAt = at;
+		publishWear();
 		if (at == 0)
 			com.energym.app.reminders.RestTimer.cancel(requireContext());
 		else
