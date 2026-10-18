@@ -1,5 +1,7 @@
 # EnerGym
 
+[![Android CI](https://github.com/Okhoz/EnerGym/actions/workflows/android.yml/badge.svg?branch=codex/energym)](https://github.com/Okhoz/EnerGym/actions/workflows/android.yml)
+
 Aplicación Android Java/XML para planificar entrenamientos, registrar sesiones, alimentación y peso, y consultar el progreso de cada cuenta. Paquete `com.energym.app`. Diseño negro, blanco y dorado, con el logo verde y componentes compartidos.
 
 ## Estado actual — 15-10-2026
