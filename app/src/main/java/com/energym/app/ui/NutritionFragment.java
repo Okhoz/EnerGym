@@ -1,5 +1,6 @@
 package com.energym.app.ui;
 
+import com.energym.app.i18n.Txt;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -22,8 +23,12 @@ import java.util.*;
  * Play services devuelve el código sin permiso de cámara en la app; el controlador busca la ficha.
  */
 public final class NutritionFragment extends ScreenFragment {
-	static final Locale SPANISH = new Locale("es", "ES");
-	private static final String[] MEALS = {"Desayuno", "Comida", "Merienda", "Cena", "Otros"};
+	private static final int[] MEALS = {R.string.meal_breakfast, R.string.meal_lunch, R.string.meal_snack,
+		R.string.meal_dinner, R.string.meal_other};
+
+	static String meal(int ordinal) {
+		return Txt.t(MEALS[ordinal]);
+	}
 
 	public NutritionFragment() {
 		super(R.layout.fragment_screen);
@@ -31,24 +36,25 @@ public final class NutritionFragment extends ScreenFragment {
 
 	protected void content() {
 		NutritionController n = state.nutrition;
-		heading("NUTRICIÓN", "Nutrición", "");
+		heading(Txt.t(R.string.nut_eyebrow), Txt.t(R.string.nutrition), "");
 		if (app.owner() == null || n == null) {
-			LinearLayout signIn = card("Entra para empezar", "Tu diario se guarda por cuenta en este dispositivo.");
-			action(signIn, "Elegir cuenta", () -> app.navigate(Screen.ACCOUNT));
+			LinearLayout signIn = card(Txt.t(R.string.nut_sign_in), Txt.t(R.string.nut_sign_in_body));
+			action(signIn, Txt.t(R.string.tr_choose_account), () -> app.navigate(Screen.ACCOUNT));
 			return;
 		}
 		LocalDate day = n.selected;
 		LinearLayout dates = columns(rows, 0);
 		MaterialButton previous = compact(dates, "‹", true, () -> n.select(day.minusDays(1)));
-		previous.setContentDescription("Día anterior");
+		previous.setContentDescription(Txt.t(R.string.nut_previous_day));
 		// El botón central muestra el día; si no es hoy, pulsarlo vuelve a hoy.
 		MaterialButton today = compact(dates, label(day, n.today()), !day.equals(n.today()), () -> n.select(n.today()));
-		today.setContentDescription("Día mostrado: " + label(day, n.today()) + (day.equals(n.today()) ? "" : ". Ir a hoy"));
+		today.setContentDescription(Txt.t(R.string.nut_shown_day, label(day, n.today())) +
+			(day.equals(n.today()) ? "" : ". " + Txt.t(R.string.nut_go_today)));
 		today.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.white));
 		today.setSingleLine(true);
 		today.setEllipsize(android.text.TextUtils.TruncateAt.END);
 		MaterialButton next = compact(dates, "›", day.isBefore(n.today()), () -> n.select(day.plusDays(1)));
-		next.setContentDescription("Día siguiente");
+		next.setContentDescription(Txt.t(R.string.nut_next_day));
 		((LinearLayout.LayoutParams) today.getLayoutParams()).weight = 3;
 		add(rows, new android.widget.Space(requireContext()), 24);
 
@@ -61,7 +67,7 @@ public final class NutritionFragment extends ScreenFragment {
 			remaining(n, day, totals, targets);
 		water(n, day);
 
-		section("Tus comidas", 32);
+		section(Txt.t(R.string.nut_your_meals), 32);
 		// Solo las comidas con algo anotado; si el día está vacío, una tarjeta y copiar lo de ayer a un toque.
 		List<FoodEntry> entries = n.entriesOn(day);
 		for (FoodEntry.Meal meal : FoodEntry.Meal.values()) {
@@ -74,20 +80,19 @@ public final class NutritionFragment extends ScreenFragment {
 				}
 			if (items.isEmpty())
 				continue;
-			LinearLayout section = card(MEALS[meal.ordinal()] + "   " + Math.round(mealKcal) + " kcal", "");
+			LinearLayout section = card(meal(meal.ordinal()) + "   " + Math.round(mealKcal) + " kcal", "");
 			for (FoodEntry e : items)
 				foodRow(section, e, n);
-			action(section, "★ Guardar como comida", !n.busy, () -> saveMeal(items, MEALS[meal.ordinal()]))
+			action(section, Txt.t(R.string.nut_save_as_meal), !n.busy, () -> saveMeal(items, meal(meal.ordinal())))
 				.setTag("save_meal_" + meal.name());
 		}
 		if (entries.isEmpty()) {
 			List<FoodEntry> yesterday = n.entriesOn(day.minusDays(1));
-			LinearLayout empty = card("Nada anotado " + (day.equals(n.today()) ? "hoy" : "este día"),
-				"Pulsa «+ Añadir» o escanea un código de barras.");
+			LinearLayout empty = card(Txt.t(day.equals(n.today()) ? R.string.nut_nothing_today : R.string.nut_nothing_day),
+				Txt.t(R.string.nut_nothing_body));
 			if (!yesterday.isEmpty())
-				action(empty, "↺ Copiar lo del día anterior (" + yesterday.size() +
-					(yesterday.size() == 1 ? " alimento)" : " alimentos)"), !n.busy,
-					() -> n.logAll(yesterday, null, "Copiado del día anterior", () -> {
+				action(empty, Txt.n(R.plurals.nut_copy_yesterday, yesterday.size()), !n.busy,
+					() -> n.logAll(yesterday, null, Txt.t(R.string.nut_copied_yesterday), () -> {
 					})).setTag("copy_yesterday");
 		}
 		savedMeals(n);
@@ -95,8 +100,8 @@ public final class NutritionFragment extends ScreenFragment {
 			text(rows, n.status, R.style.EnerGym_FieldCaption, 0);
 
 		// Lo que no se usa a diario, plegado: objetivo, consulta con la IA y la dieta del mes.
-		section("Más", 32);
-		MaterialButton more = action(rows, moreOpen ? "Ocultar ▴" : "Objetivo, dieta del mes e IA ▾", true, () -> {
+		section(Txt.t(R.string.nut_more), 32);
+		MaterialButton more = action(rows, Txt.t(moreOpen ? R.string.nut_hide : R.string.nut_more_toggle), true, () -> {
 			moreOpen = !moreOpen;
 			render();
 		});
@@ -105,20 +110,19 @@ public final class NutritionFragment extends ScreenFragment {
 			if (targets != null)
 				dailyGoal(n, targets);
 			diet(n, targets);
-			text(rows, "Datos de Open Food Facts (ODbL): revisa la etiqueta. Objetivos estimados; no sustituyen a un " +
-				"dietista o médico.", R.style.EnerGym_FieldCaption, 4);
+			text(rows, Txt.t(R.string.nut_disclaimer), R.style.EnerGym_FieldCaption, 4);
 		}
 
 		// Añadir, siempre al final: alimento a mano o escaneando.
 		LinearLayout add = columns(rows, 32);
-		MaterialButton addFood = compact(add, "+ Añadir", !n.busy, () -> {
+		MaterialButton addFood = compact(add, Txt.t(R.string.nut_add), !n.busy, () -> {
 			n.startManual(n.defaultMeal());
 			app.navigate(Screen.FOOD);
 		});
 		primary(addFood);
 		addFood.setTag("nutrition_add_food");
-		addFood.setContentDescription("Añadir alimento");
-		compact(add, "Escanear", !n.busy, () -> {
+		addFood.setContentDescription(Txt.t(R.string.nut_add_food));
+		compact(add, Txt.t(R.string.nut_scan), !n.busy, () -> {
 			n.startManual(n.defaultMeal());
 			scan(this);
 		}).setTag("nutrition_scan");
@@ -134,11 +138,11 @@ public final class NutritionFragment extends ScreenFragment {
 		box.setPadding(dp(24), dp(8), dp(24), 0);
 		box.addView(name);
 		new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-			.setTitle("Guardar comida").setMessage("Ponle un nombre, p. ej. «Mi desayuno» o «Pasta con atún».")
-			.setView(box).setNegativeButton("Cancelar", null)
-			.setPositiveButton("Guardar", (d, w) -> {
+			.setTitle(Txt.t(R.string.nut_save_meal)).setMessage(Txt.t(R.string.nut_save_meal_hint))
+			.setView(box).setNegativeButton(Txt.t(R.string.common_cancel), null)
+			.setPositiveButton(Txt.t(R.string.common_save), (d, w) -> {
 				String error = state.savedMeals.save(name.getText().toString(), foods);
-				android.widget.Toast.makeText(requireContext(), error.isEmpty() ? "Comida guardada" : error,
+				android.widget.Toast.makeText(requireContext(), error.isEmpty() ? Txt.t(R.string.nut_meal_saved) : error,
 					android.widget.Toast.LENGTH_LONG).show();
 				render();
 			}).show();
@@ -149,8 +153,8 @@ public final class NutritionFragment extends ScreenFragment {
 		com.energym.app.nutrition.SavedMeals saved = state.savedMeals;
 		if (saved == null || saved.list().isEmpty())
 			return;
-		LinearLayout card = card("★ Comidas guardadas", "Toca una para anotarla entera en " +
-			MEALS[n.defaultMeal().ordinal()].toLowerCase(SPANISH) + ". Mantén pulsado para borrarla.");
+		LinearLayout card = card(Txt.t(R.string.nut_saved_meals),
+			Txt.t(R.string.nut_saved_meals_body, meal(n.defaultMeal().ordinal()).toLowerCase(Txt.locale())));
 		for (com.energym.app.nutrition.SavedMeals.Meal m : saved.list()) {
 			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, card, false);
 			((TextView) row.findViewById(R.id.food_name)).setText(m.name);
@@ -159,7 +163,7 @@ public final class NutritionFragment extends ScreenFragment {
 				names.add(f.name);
 			((TextView) row.findViewById(R.id.food_detail)).setText(String.join(", ", names));
 			((TextView) row.findViewById(R.id.food_kcal)).setText(Math.round(m.kcal()) + " kcal");
-			row.setContentDescription(m.name + ", " + Math.round(m.kcal()) + " kcal. Toca para anotarla");
+			row.setContentDescription(m.name + ", " + Math.round(m.kcal()) + " kcal. " + Txt.t(R.string.nut_tap_to_log));
 			row.setOnClickListener(v -> {
 				if (!n.busy)
 					n.logAll(m.foods, n.defaultMeal(), m.name, () -> {
@@ -167,8 +171,8 @@ public final class NutritionFragment extends ScreenFragment {
 			});
 			row.setOnLongClickListener(v -> {
 				new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-					.setTitle("¿Borrar «" + m.name + "»?").setNegativeButton("Cancelar", null)
-					.setPositiveButton("Borrar", (d, w) -> {
+					.setTitle(Txt.t(R.string.tr_delete_exercise_title, m.name)).setNegativeButton(Txt.t(R.string.common_cancel), null)
+					.setPositiveButton(Txt.t(R.string.common_delete), (d, w) -> {
 						saved.remove(m.name);
 						render();
 					}).show();
@@ -182,7 +186,7 @@ public final class NutritionFragment extends ScreenFragment {
 	private static boolean moreOpen;
 
 	private static String euros(double value) {
-		return String.format(SPANISH, "%.2f €", value);
+		return String.format(Txt.locale(), "%.2f €", value);
 	}
 
 	/**
@@ -198,36 +202,36 @@ public final class NutritionFragment extends ScreenFragment {
 		com.energym.app.nutrition.DietPlan plan = planner.plan;
 		LocalDate day = planner.selected == null ? n.today() : planner.selected;
 		java.time.YearMonth month = planner.month();
-		String monthName = month.getMonth().getDisplayName(java.time.format.TextStyle.FULL, SPANISH);
-		section("Dieta del mes", 32);
+		String monthName = month.getMonth().getDisplayName(java.time.format.TextStyle.FULL, Txt.locale());
+		section(Txt.t(R.string.nut_month_diet), 32);
 		double cost = planner.monthCost();
-		LinearLayout card = card("✦ Tu dieta de " + monthName, planner.busy ? "Preparando el menú con la IA del móvil…" :
-			planner.days().size() + " días con menú · " + current.mealsPerDay + " comidas al día" +
-				(cost >= 0 ? " · ≈ " + Math.round(cost) + " € previstos" +
-					(current.monthlyBudget > 0 ? " de " + Math.round(current.monthlyBudget) + " €" : "") : "") +
-				"\nSe ajusta sola con lo que comes, tu peso y tus preferencias.");
+		LinearLayout card = card(Txt.t(R.string.nut_your_diet, monthName), planner.busy ? Txt.t(R.string.nut_diet_busy) :
+			Txt.t(R.string.nut_diet_summary, planner.days().size(), current.mealsPerDay) +
+				(cost >= 0 ? " · " + Txt.t(R.string.nut_diet_cost, Math.round(cost)) +
+					(current.monthlyBudget > 0 ? " " + Txt.t(R.string.nut_diet_budget, Math.round(current.monthlyBudget)) : "") : "") +
+				"\n" + Txt.t(R.string.nut_diet_adjusts));
 		card.setTag("nutrition_diet");
 		if (planner.busy || plan == null)
 			return;
-		MaterialButton toggle = action(card, planner.expanded ? "Ocultar menú ▴" : "Ver menú del día ▾", true, () -> {
+		MaterialButton toggle = action(card, Txt.t(planner.expanded ? R.string.nut_hide_menu : R.string.nut_show_menu), true, () -> {
 			planner.expanded = !planner.expanded;
 			render();
 		});
 		toggle.setTag("diet_toggle");
-		toggle.setContentDescription(toggle.getText() + (planner.expanded ? ", desplegado" : ", plegado"));
+		toggle.setContentDescription(toggle.getText() + ", " + Txt.t(planner.expanded ? R.string.nut_expanded : R.string.nut_collapsed));
 		if (!planner.expanded)
 			return;
 		// Día del mes: anterior / día / siguiente.
 		LinearLayout nav = columns(card, 16);
 		LocalDate first = planner.days().isEmpty() ? day : planner.days().firstKey();
 		MaterialButton back = compact(nav, "‹", day.isAfter(first), () -> planner.select(day.minusDays(1)));
-		back.setContentDescription("Día anterior");
+		back.setContentDescription(Txt.t(R.string.nut_previous_day));
 		back.setTextSize(22);
 		MaterialButton label = compact(nav, label(day, n.today()), !day.equals(n.today()), () -> planner.select(n.today()));
 		label.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.white));
 		((LinearLayout.LayoutParams) label.getLayoutParams()).weight = 3;
 		MaterialButton forward = compact(nav, "›", day.isBefore(month.atEndOfMonth()), () -> planner.select(day.plusDays(1)));
-		forward.setContentDescription("Día siguiente");
+		forward.setContentDescription(Txt.t(R.string.nut_next_day));
 		forward.setTextSize(22);
 		text(card, plan.source + " · " + Math.round(plan.totals()[0]) + " kcal" +
 			(plan.cost() >= 0 ? " · ≈ " + euros(plan.cost()) : ""), R.style.EnerGym_FieldCaption, 12);
@@ -244,16 +248,16 @@ public final class NutritionFragment extends ScreenFragment {
 			text(card, meal.dish, R.style.EnerGym_Body, 4);
 			if (!meal.ingredients.isEmpty())
 				text(card, meal.ingredients, R.style.EnerGym_FieldCaption, 4);
-			text(card, "P " + Math.round(meal.protein) + " g · H " + Math.round(meal.carbs) + " g · G " +
-				Math.round(meal.fat) + " g", R.style.EnerGym_FieldCaption, 4);
+			text(card, Txt.t(R.string.nut_macros_line, Math.round(meal.protein), Math.round(meal.carbs), Math.round(meal.fat)),
+				R.style.EnerGym_FieldCaption, 4);
 			if (today)
-				action(card, "Anotar en mi diario", !n.busy, () -> n.logPlanned(meal, () -> { })).setTag("diet_log_" + i);
+				action(card, Txt.t(R.string.nut_log_in_diary), !n.busy, () -> n.logPlanned(meal, () -> { })).setTag("diet_log_" + i);
 		}
 		if (!plan.advice.isEmpty())
 			text(card, "💡 " + plan.advice, R.style.EnerGym_Body, 20);
-		action(card, plan.source.startsWith("Creado con IA") ? "🔄 Otra propuesta con IA" : "✦ Mejorar este día con IA",
+		action(card, Txt.t(plan.source.startsWith("Creado con IA") ? R.string.nut_diet_again : R.string.nut_diet_improve),
 			!n.busy, () -> planner.create(current)).setTag("diet_again");
-		text(card, "Menú orientativo; no sustituye a un dietista. Cambia tus preferencias en Datos físicos.",
+		text(card, Txt.t(R.string.nut_diet_disclaimer),
 			R.style.EnerGym_FieldCaption, 8);
 	}
 
@@ -264,17 +268,17 @@ public final class NutritionFragment extends ScreenFragment {
 			return;
 		int ml = w.ml(day), goal = com.energym.app.nutrition.WaterLog.goal(n.effectiveBody());
 		int glasses = ml / com.energym.app.nutrition.WaterLog.GLASS, target = goal / com.energym.app.nutrition.WaterLog.GLASS;
-		LinearLayout card = card("💧 Agua · " + com.energym.app.nutrition.WaterLog.liters(ml) + " de " +
-			com.energym.app.nutrition.WaterLog.liters(goal), ml >= goal ? "¡Objetivo cumplido! 🎉" :
-			glasses + " de " + target + (target == 1 ? " vaso" : " vasos"));
+		LinearLayout card = card(Txt.t(R.string.nut_water_title, com.energym.app.nutrition.WaterLog.liters(ml),
+			com.energym.app.nutrition.WaterLog.liters(goal)), ml >= goal ? Txt.t(R.string.nut_water_done) :
+			Txt.n(R.plurals.nut_glasses, target, glasses, target));
 		card.setTag("nutrition_water");
 		add(card, new com.energym.app.ui.charts.ProgressBarView(requireContext()), 12)
-			.set(goal == 0 ? 0 : Math.min(1, ml / (double) goal), "Agua: " + ml + " de " + goal + " ml");
+			.set(goal == 0 ? 0 : Math.min(1, ml / (double) goal), Txt.t(R.string.nut_water_progress, ml, goal));
 		LinearLayout buttons = columns(card, 16);
-		MaterialButton less = compact(buttons, "− Vaso", ml > 0, () -> w.add(day, -com.energym.app.nutrition.WaterLog.GLASS));
-		less.setContentDescription("Quitar un vaso de agua");
-		MaterialButton more = compact(buttons, "+ Vaso", true, () -> w.add(day, com.energym.app.nutrition.WaterLog.GLASS));
-		more.setContentDescription("Añadir un vaso de agua de 250 mililitros");
+		MaterialButton less = compact(buttons, Txt.t(R.string.nut_glass_less), ml > 0, () -> w.add(day, -com.energym.app.nutrition.WaterLog.GLASS));
+		less.setContentDescription(Txt.t(R.string.nut_glass_less_description));
+		MaterialButton more = compact(buttons, Txt.t(R.string.nut_glass_more), true, () -> w.add(day, com.energym.app.nutrition.WaterLog.GLASS));
+		more.setContentDescription(Txt.t(R.string.nut_glass_more_description));
 		primary(more);
 	}
 
@@ -282,24 +286,24 @@ public final class NutritionFragment extends ScreenFragment {
 	private void dailyGoal(NutritionController n, BodyProfile.Targets targets) {
 		BodyProfile current = n.effectiveBody();
 		LocalDate weightDay = n.targetWeightDay();
-		LinearLayout goal = card("Tu objetivo diario", n.body == null ?
-			"Completa tus datos para calcular tus calorías y macronutrientes." :
-			targets == null ? current.estimationIssue() : current.goal.label + "\nCalculado con " +
-				NutritionController.format(current.weightKg) + " kg · " + (weightDay == null ? "fecha no registrada" :
-					weightDay.format(DateTimeFormatter.ofPattern("d/M/yyyy", SPANISH))));
+		LinearLayout goal = card(Txt.t(R.string.nut_daily_goal), n.body == null ?
+			Txt.t(R.string.nut_daily_goal_empty) :
+			targets == null ? current.estimationIssue() : current.goal.display() + "\n" + Txt.t(R.string.nut_calculated_with,
+				NutritionController.format(current.weightKg), weightDay == null ? Txt.t(R.string.nut_no_date) :
+					weightDay.format(DateTimeFormatter.ofPattern(Txt.t(R.string.pattern_short_date), Txt.locale()))));
 		if (targets != null) {
-			TextView kcal = text(goal, Math.round(targets.kcal) + " kcal/día", R.style.EnerGym_StatValue, 4);
+			TextView kcal = text(goal, Txt.t(R.string.nut_kcal_day, Math.round(targets.kcal)), R.style.EnerGym_StatValue, 4);
 			kcal.setTag("nutrition_daily_target_kcal");
 			LinearLayout macros = columns(goal, 16);
-			stat(macros, Math.round(targets.protein) + " g", "Proteínas");
-			stat(macros, Math.round(targets.carbs) + " g", "Hidratos");
-			stat(macros, Math.round(targets.fat) + " g", "Grasas");
+			stat(macros, Math.round(targets.protein) + " g", Txt.t(R.string.nut_protein));
+			stat(macros, Math.round(targets.carbs) + " g", Txt.t(R.string.nut_carbs));
+			stat(macros, Math.round(targets.fat) + " g", Txt.t(R.string.nut_fat));
 		}
-		MaterialButton edit = action(goal, n.body == null ? "Configurar mi objetivo" : "Cambiar objetivo", !n.busy, () -> open(Screen.BODY));
+		MaterialButton edit = action(goal, Txt.t(n.body == null ? R.string.nut_set_goal : R.string.nut_change_goal), !n.busy, () -> open(Screen.BODY));
 		edit.setTag("nutrition_change_goal");
 		if (targets == null) primary(edit);
 		if (targets != null)
-			action(goal, "Consultar mi alimentación con IA", state.assistant != null && !state.assistant.busy, () -> {
+			action(goal, Txt.t(R.string.nut_consult_ai), state.assistant != null && !state.assistant.busy, () -> {
 			if (state.assistant == null || state.assistant.busy) return;
 			state.assistant.selectLocalGuidance(false);
 			state.assistant.messageInput(n.coachBrief());
@@ -312,23 +316,22 @@ public final class NutritionFragment extends ScreenFragment {
 	 */
 	private void remaining(NutritionController n, LocalDate day, double[] totals, BodyProfile.Targets targets) {
 		if (targets == null) return;
-		LinearLayout card = card("Hoy te quedan", "");
+		LinearLayout card = card(Txt.t(R.string.nut_left_today), "");
 		// Se redondea cada término antes de operar para que la cuenta visible cuadre (2451 − 195 + 0 = 2256).
 		long goal = Math.round(targets.kcal), food = Math.round(totals[0]), exercise = Math.round(exerciseKcal(n, day));
 		long left = goal - food + exercise;
 		LinearLayout equation = columns(card, 4);
-		term(equation, goal, "Objetivo", false);
+		term(equation, goal, Txt.t(R.string.nut_term_goal), false);
 		operator(equation, "−");
-		term(equation, food, "Comida", false);
+		term(equation, food, Txt.t(R.string.nut_term_food), false);
 		operator(equation, "+");
-		term(equation, exercise, "Ejercicio", false);
+		term(equation, exercise, Txt.t(R.string.common_exercise), false);
 		operator(equation, "=");
-		term(equation, left, "Restantes", true);
-		equation.setContentDescription("Objetivo " + goal + " menos comida " + food + " más ejercicio " + exercise +
-			" igual a " + left + " calorías restantes");
-		macro(card, "Hidratos", totals[2], targets.carbs, 0);
-		macro(card, "Proteínas", totals[1], targets.protein, 1);
-		macro(card, "Grasas", totals[3], targets.fat, 2);
+		term(equation, left, Txt.t(R.string.nut_term_left), true);
+		equation.setContentDescription(Txt.t(R.string.nut_equation_description, goal, food, exercise, left));
+		macro(card, Txt.t(R.string.nut_carbs), totals[2], targets.carbs, 0);
+		macro(card, Txt.t(R.string.nut_protein), totals[1], targets.protein, 1);
+		macro(card, Txt.t(R.string.nut_fat), totals[3], targets.fat, 2);
 	}
 
 	private void term(LinearLayout row, long value, String label, boolean highlight) {
@@ -398,15 +401,15 @@ public final class NutritionFragment extends ScreenFragment {
 		View row = getLayoutInflater().inflate(R.layout.row_food, section, false);
 		((TextView) row.findViewById(R.id.food_name)).setText(e.name);
 		((TextView) row.findViewById(R.id.food_detail)).setText(NutritionController.format(e.amount) + " " +
-			e.unit.symbol + " · P " + one(e.protein()) + " · H " + one(e.carbs()) + " · G " + one(e.fat()));
+			e.unit.symbol + " · " + Txt.t(R.string.nut_macros_short, one(e.protein()), one(e.carbs()), one(e.fat())));
 		((TextView) row.findViewById(R.id.food_kcal)).setText(Long.toString(Math.round(e.kcal())));
 		row.setContentDescription(e.name + ", " + NutritionController.format(e.amount) + " " + e.unit.symbol + ", " +
-			Math.round(e.kcal()) + " kilocalorías. Toca para ver opciones.");
+			Txt.t(R.string.nut_food_row_description, Math.round(e.kcal())));
 		long scope = n.scopeRevision();
 		row.setTag("food_options_" + e.id);
 		row.setOnClickListener(v -> new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
 			.setTitle(e.name)
-			.setItems(new String[]{"Editar alimento", "Añadir otra vez", "Eliminar del diario"}, (dialog, which) -> {
+			.setItems(new String[]{Txt.t(R.string.nut_edit_food), Txt.t(R.string.nut_add_again), Txt.t(R.string.nut_remove_from_diary)}, (dialog, which) -> {
 				if (n.busy || scope != n.scopeRevision()) return;
 				if (which == 0) {
 					n.edit(e);
@@ -415,13 +418,13 @@ public final class NutritionFragment extends ScreenFragment {
 					n.startFrom(e);
 					app.navigate(Screen.FOOD);
 				} else new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-					.setTitle("¿Eliminar este alimento?")
-					.setMessage(e.name + " se quitará del diario y se recalcularán tus calorías y macronutrientes.")
-					.setNegativeButton("Cancelar", null)
-					.setPositiveButton("Eliminar", (confirm, button) -> {
+					.setTitle(Txt.t(R.string.nut_remove_food_title))
+					.setMessage(Txt.t(R.string.nut_remove_food_message, e.name))
+					.setNegativeButton(Txt.t(R.string.common_cancel), null)
+					.setPositiveButton(Txt.t(R.string.common_remove), (confirm, button) -> {
 						if (scope == n.scopeRevision()) n.remove(e);
 					}).show();
-			}).setNegativeButton("Cancelar", null).show());
+			}).setNegativeButton(Txt.t(R.string.common_cancel), null).show());
 		section.addView(row);
 		View divider = new View(requireContext());
 		divider.setBackgroundColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.divider));
@@ -457,17 +460,16 @@ public final class NutritionFragment extends ScreenFragment {
 		}).addOnFailureListener(e -> {
 			if (!f.isAdded() || f.state.nutrition != nutrition || token != nutrition.scanToken())
 				return;
-			f.app.error("No se pudo abrir el escáner (necesita Google Play services actualizado). " +
-				"Puedes introducir el alimento manualmente.");
+			f.app.error(Txt.t(R.string.nut_scanner_failed));
 		});
 	}
 
 	static String label(LocalDate day, LocalDate today) {
 		if (day.equals(today))
-			return "Hoy";
+			return Txt.t(R.string.common_today);
 		if (day.equals(today.minusDays(1)))
-			return "Ayer";
-		String text = day.format(DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", SPANISH));
+			return Txt.t(R.string.common_yesterday);
+		String text = day.format(DateTimeFormatter.ofPattern(Txt.t(R.string.pattern_weekday_day_month), Txt.locale()));
 		return Character.toUpperCase(text.charAt(0)) + text.substring(1);
 	}
 
