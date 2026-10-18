@@ -226,6 +226,9 @@ dependencies {
 	implementation(platform("com.google.firebase:firebase-bom:35.0.0"))
 	implementation("com.google.firebase:firebase-auth")
 	implementation("com.google.firebase:firebase-firestore")
+	// App Check: Play Integrity en publicación y token de prueba en depuración.
+	implementation("com.google.firebase:firebase-appcheck-playintegrity")
+	debugImplementation("com.google.firebase:firebase-appcheck-debug")
 	implementation("androidx.credentials:credentials:1.3.0")
 	implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
 	implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")

@@ -193,7 +193,7 @@ public final class NativeAnimationRenderer implements UiHelper.RendererCallback,
 				}
 				if (progress >= 1) {
 					loaded = true;
-					Log.i("EnerGymViewer", "Native ready " + clipEvidence + " loadMs=" +
+					if (com.energym.app.BuildConfig.DEBUG) Log.i("EnerGymViewer", "Native ready " + clipEvidence + " loadMs=" +
 						(System.nanoTime() - loadStartedNanos) / 1_000_000);
 					listener.ready(clipEvidence);
 				}
@@ -335,7 +335,7 @@ public final class NativeAnimationRenderer implements UiHelper.RendererCallback,
 		}
 		engine.destroy();
 		engine = null;
-		Log.i("EnerGymViewer",
+		if (com.energym.app.BuildConfig.DEBUG) Log.i("EnerGymViewer",
 			"Native owner closed; frame callback removed; rendered=" + renderedFrames + " skipped=" + skippedFrames +
 				" meanFrameGapMs=" + (gapSamples == 0 ? 0 : gapTotalMs / gapSamples) + " maxFrameGapMs=" + maxGapMs);
 	}
