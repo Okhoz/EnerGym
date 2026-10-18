@@ -60,4 +60,31 @@ public class FollowUpsTest {
 		assertTrue(FollowUps.STARTERS.contains(ROUTINE_TODAY));
 		assertTrue(FollowUps.STARTERS.size() >= 3);
 	}
+
+	@Test
+	public void stalledLiftsSuggestADeloadFirst() {
+		assertEquals(DELOAD, FollowUps.suggest("Llevo semanas estancado", "Cambia el rango de repeticiones.", false).get(0));
+	}
+
+	@Test
+	public void fatigueSuggestsRestAndMotivation() {
+		List<FollowUps.Topic> t = FollowUps.suggest("Estoy muy cansado y con agujetas", "Hoy algo suave.", false);
+		assertEquals(Arrays.asList(REST, MOTIVATION, ROUTINE_TODAY), t);
+	}
+
+	@Test
+	public void warmupQuestionIsNotSuggestedBackUnlessARoutineCame() {
+		assertFalse(FollowUps.suggest("¿Cómo caliento?", "5 min de movilidad.", false).contains(WARMUP));
+		assertTrue(FollowUps.suggest("Rutina y calentamiento", "Aquí la tienes.", true).contains(WARMUP));
+	}
+
+	@Test
+	public void everyTopicHasAWayToAppear() {
+		Set<FollowUps.Topic> seen = new HashSet<>(FollowUps.STARTERS);
+		String[] chats = {"me duele", "rutina", "estancado", "kg", "técnica", "dieta", "dormir", "hola"};
+		for (String c : chats)
+			seen.addAll(FollowUps.suggest(c, "", false));
+		seen.addAll(FollowUps.suggest("", "", true));
+		assertEquals(EnumSet.allOf(FollowUps.Topic.class), seen);
+	}
 }

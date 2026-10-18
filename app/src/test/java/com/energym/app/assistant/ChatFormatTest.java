@@ -51,4 +51,46 @@ public class ChatFormatTest {
 		assertEquals(4, ChatFormat.reveal(text, 10));
 		assertEquals(0, ChatFormat.reveal(null, 3));
 	}
+
+	@Test
+	public void boldSpansSurviveAcrossLinesAndBullets() {
+		ChatFormat.Formatted f = ChatFormat.format("• **Sentadilla:** baja\n• **Puente:** sube");
+		assertEquals("• Sentadilla: baja\n• Puente: sube", f.text);
+		assertEquals("Sentadilla:", f.text.substring(f.bold.get(0)[0], f.bold.get(0)[1]));
+		assertEquals("Puente:", f.text.substring(f.bold.get(1)[0], f.bold.get(1)[1]));
+	}
+
+	@Test
+	public void spansAreInsideTheTextAndOrdered() {
+		ChatFormat.Formatted f = ChatFormat.format("**a** b **c** d **e");
+		assertEquals("a b c d e", f.text);
+		int previous = 0;
+		for (int[] b : f.bold) {
+			assertTrue(b[0] >= previous && b[0] < b[1] && b[1] <= f.text.length());
+			previous = b[1];
+		}
+		assertEquals(2, f.bold.size());
+	}
+
+	@Test
+	public void onlyRealHeadingsBecomeBold() {
+		assertEquals("#hashtag", ChatFormat.plain("#hashtag"));
+		assertEquals("3 # series", ChatFormat.plain("3 # series"));
+		assertEquals(1, ChatFormat.format("### Calentamiento").bold.size());
+	}
+
+	@Test
+	public void revealGrowsUntilTheWholeText() {
+		String text = "¡Vamos! 💪🔥 Sube a 82,5 kg.";
+		int at = 0, steps = 0;
+		while (at < text.length()) {
+			int next = ChatFormat.reveal(text, at + 2);
+			assertTrue(next > at);
+			assertFalse("Nunca medio emoticono", Character.isHighSurrogate(text.charAt(next - 1)));
+			at = next;
+			steps++;
+		}
+		assertEquals(text.length(), at);
+		assertTrue(steps < text.length());
+	}
 }
