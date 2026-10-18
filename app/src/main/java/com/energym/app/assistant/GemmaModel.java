@@ -18,6 +18,7 @@ import com.google.ai.edge.litertlm.ConversationConfig;
 import com.google.ai.edge.litertlm.Engine;
 import com.google.ai.edge.litertlm.EngineConfig;
 import com.google.ai.edge.litertlm.Message;
+import com.google.ai.edge.litertlm.SamplerConfig;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,7 +44,8 @@ public final class GemmaModel implements OnDeviceModel {
 	 * Margen sobre el modelo: memoria del motor (≈1,7 GB en CPU) y espacio para el archivo y su verificación.
 	 */
 	private static final long MIN_RAM = 5_500_000_000L, MIN_FREE = BYTES + 400_000_000L;
-	private static final int MAX_TOKENS = 6144;
+	private static final int MAX_TOKENS = 6144, TOP_K = 40;
+	private static final double TOP_P = 0.9, TEMPERATURE = 0.4;
 	private final Context context;
 	private final Executor worker;
 	private Engine engine;
@@ -226,7 +228,10 @@ public final class GemmaModel implements OnDeviceModel {
 	public void generate(String prompt, Result<String> result) {
 		worker.execute(() -> {
 			String text;
-			try (Conversation conversation = engine().createConversation(new ConversationConfig())) {
+			// Temperatura baja y top-k acotado: respuestas más precisas y fieles a los datos, menos inventadas.
+			ConversationConfig config = new ConversationConfig(null, java.util.Collections.emptyList(),
+				java.util.Collections.emptyList(), new SamplerConfig(TOP_K, TOP_P, TEMPERATURE, 0));
+			try (Conversation conversation = engine().createConversation(config)) {
 				Message reply = conversation.sendMessage(prompt);
 				StringBuilder out = new StringBuilder();
 				for (Content c : reply.getContents().getContents())

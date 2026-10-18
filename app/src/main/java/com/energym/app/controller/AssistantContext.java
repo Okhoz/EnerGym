@@ -1,5 +1,6 @@
 package com.energym.app.controller;
 
+import com.energym.app.domain.*;
 import com.energym.app.nutrition.*;
 import com.energym.app.progress.*;
 
@@ -38,6 +39,8 @@ public final class AssistantContext {
 		List<String> insights = CoachInsights.analyze(app.history, ZoneId.systemDefault(), today);
 		if (!insights.isEmpty())
 			add(parts, "ANÁLISIS DEL ENTRENADOR", "• " + String.join("\n• ", insights), 650);
+		// Cifras exactas para «¿subo peso?»: las calcula la sobrecarga progresiva de la app, no el modelo.
+		add(parts, "PRÓXIMA CARGA CALCULADA", nextLoads(app.history), 600);
 		ProgressStats stats = new ProgressStats(app.history, ZoneId.systemDefault(), today);
 		add(parts, "PROGRESO", progress(stats), 450);
 		add(parts, "OBJETIVOS", goals(goals, stats, nutrition), 350);
@@ -48,6 +51,77 @@ public final class AssistantContext {
 		add(parts, "MEDIDAS", measures(measures), 200);
 		String text = String.join("\n", parts);
 		return text.length() > MAX ? text.substring(0, MAX - 1) + "…" : text;
+	}
+
+	/**
+	 * Para los últimos ejercicios de fuerza entrenados: qué toca la próxima vez según la sobrecarga progresiva
+	 * (más carga, una repetición más, repetir o descargar). Una línea por ejercicio, el más reciente primero.
+	 */
+	static String nextLoads(List<Session> history) {
+		List<Session> done = new ArrayList<>();
+		for (Session s : history)
+			if (s.getStatus() == Session.Status.FINISHED)
+				done.add(s);
+		done.sort(Comparator.comparingLong(Session::getCompletedAt));
+		Map<String, List<List<SetLog.Entry>>> sets = new LinkedHashMap<>();
+		Map<String, RoutineItem> items = new HashMap<>();
+		for (Session s : done)
+			for (RoutineItem item : s.getRoutine().getItems()) {
+				Exercise e = item.getExercise();
+				Map<String, String> values = s.getResults().get(e.getId());
+				if (e.getMetricType() != MetricType.STRENGTH || values == null)
+					continue;
+				List<SetLog.Entry> logged = SetLog.of(values);
+				if (logged.isEmpty())
+					continue;
+				// Se vuelve a insertar para que el último ejercicio entrenado quede al final.
+				List<List<SetLog.Entry>> list = sets.remove(e.getId());
+				if (list == null)
+					list = new ArrayList<>();
+				list.add(logged);
+				sets.put(e.getId(), list);
+				items.put(e.getId(), item);
+			}
+		List<String> ids = new ArrayList<>(sets.keySet());
+		Collections.reverse(ids);
+		List<String> lines = new ArrayList<>();
+		for (String id : ids) {
+			if (lines.size() >= 5)
+				break;
+			RoutineItem item = items.get(id);
+			int target;
+			try {
+				target = Integer.parseInt(item.getPrescription().getOrDefault("repetitions", "10").trim());
+			} catch (NumberFormatException e) {
+				target = 10;
+			}
+			int[] range = OverloadCoach.range(target);
+			OverloadCoach.Suggestion s = OverloadCoach.suggest(sets.get(id), range[0], range[1],
+				OverloadCoach.increment(item.getExercise().getRequiredResources()));
+			if (s == null)
+				continue;
+			String last = (s.lastKg > 0 ? SetLog.format(s.lastKg) + " kg" : "peso corporal") + " × " + s.lastReps;
+			String next;
+			switch (s.kind) {
+				case INCREASE_LOAD:
+					next = "sube a " + SetLog.format(s.kg) + " kg y busca " + s.reps + " repeticiones";
+					break;
+				case ADD_REPS:
+					next = (s.kg > 0 ? "mismo peso (" + SetLog.format(s.kg) + " kg), " : "") + "busca " + s.reps +
+						" repeticiones";
+					break;
+				case DELOAD:
+					next = "lleva " + s.stalled + " sesiones sin mejorar: descarga a " + SetLog.format(s.kg) + " kg × " +
+						s.reps;
+					break;
+				default:
+					next = "repite " + (s.kg > 0 ? SetLog.format(s.kg) + " kg " : "") + "hasta hacer " + s.reps +
+						" repeticiones en todas las series";
+			}
+			lines.add(item.getExercise().getName() + ": última vez " + last + " (rango " + range[0] + "–" + range[1] +
+				") → " + next + ".");
+		}
+		return String.join("\n", lines);
 	}
 
 	private static void add(List<String> parts, String title, String body, int max) {
