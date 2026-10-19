@@ -741,8 +741,8 @@
 	<string name="food_carbs_field">Hidratos de carbono (g)</string>
 	<string name="food_fat_field">Grasas (g)</string>
 	<string name="food_save_changes">Guardar cambios</string>
-	<string name="food_add_to_diary">Añadir al diario</string>
-	<string name="food_add_another">Añadir y anotar otro</string>
+	<string name="food_add_to_diary">Guardar alimento</string>
+	<string name="food_add_another">Guardar y añadir otro</string>
 	<string name="food_add_another_description">Guardar este alimento y añadir otro a la misma comida</string>
 	<string name="food_calories">Calorías</string>
 	<string name="food_values">Valores</string>

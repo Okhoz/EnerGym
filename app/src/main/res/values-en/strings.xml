@@ -637,8 +637,8 @@
 	<string name="food_carbs_field">Carbohydrates (g)</string>
 	<string name="food_fat_field">Fat (g)</string>
 	<string name="food_save_changes">Save changes</string>
-	<string name="food_add_to_diary">Add to diary</string>
-	<string name="food_add_another">Add and log another</string>
+	<string name="food_add_to_diary">Save food</string>
+	<string name="food_add_another">Save and add another</string>
 	<string name="food_add_another_description">Save this food and add another to the same meal</string>
 	<string name="food_calories">Calories</string>
 	<string name="food_values">Values</string>
