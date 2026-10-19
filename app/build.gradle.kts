@@ -35,7 +35,10 @@ if (file("google-services.json").isFile || releaseFirebaseFile?.isFile == true) 
 		else if (!file("google-services.json").isFile)
 			googleServicesJsonFiles.set(listOfNotNull(releaseFirebaseFile))
 	}
-}
+} else
+	// Un clon nuevo no trae el JSON (está en .gitignore): sin él la app compila, pero sin Google ni nube.
+	logger.warn("EnerGym: falta app/google-services.json y ENERGYM_FIREBASE_CONFIG no apunta a uno; " +
+		"«Continuar con Google» y la copia en la nube no funcionarán en esta compilación.")
 
 @DisableCachingByDefault(because = "Verifica las entradas privadas en cada preparación de release")
 abstract class ValidateReleaseConfiguration : DefaultTask() {
