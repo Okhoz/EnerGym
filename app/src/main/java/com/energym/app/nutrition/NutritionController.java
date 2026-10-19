@@ -19,6 +19,11 @@ public final class NutritionController {
 	public SortedMap<LocalDate, Double> weights = new TreeMap<>();
 	public LocalDate selected;
 	public FoodProduct product;
+	/**
+	 * Nombre del alimento elegido de una lista (habituales, recientes o Open Food Facts) cuyos valores rellenan el
+	 * formulario; null si se escribe a mano. Sirve para avisar si luego se cambia el nombre y los valores no.
+	 */
+	public String chosenFood;
 	public boolean busy, looking;
 	/** Ya se leyó el diario de la cuenta activa (sin esto, «sin datos físicos» podría ser solo «aún cargando»). */
 	public boolean loaded;
@@ -485,6 +490,7 @@ public final class NutritionController {
 		foodRevision++;
 		looking = false;
 		product = null;
+		chosenFood = null;
 		foodDraft.clear();
 		foodDraft.put("unit", "G");
 		foodDraft.put("meal", (targetMeal == null ? defaultMeal() : targetMeal).name());
@@ -520,6 +526,7 @@ public final class NutritionController {
 		foodDraft.put("protein100", format(recent.protein100));
 		foodDraft.put("carbs100", format(recent.carbs100));
 		foodDraft.put("fat100", format(recent.fat100));
+		chosenFood = recent.name;
 	}
 
 	/** Rellena el formulario con un alimento genérico: valores orientativos y su ración típica, editables. */
@@ -534,6 +541,7 @@ public final class NutritionController {
 		foodDraft.put("protein100", format(food.protein100));
 		foodDraft.put("carbs100", format(food.carbs100));
 		foodDraft.put("fat100", format(food.fat100));
+		chosenFood = food.name;
 	}
 
 	/** Abre la misma entrada, conservando ID, día y fecha de alta para la sincronización. */
@@ -596,6 +604,7 @@ public final class NutritionController {
 		foodDraft.put("protein100", format(known.protein100));
 		foodDraft.put("carbs100", format(known.carbs100));
 		foodDraft.put("fat100", format(known.fat100));
+		chosenFood = known.name;
 	}
 
 	public List<FoodEntry> recentFoods(int limit) {
@@ -722,6 +731,7 @@ public final class NutritionController {
 		put("protein100", found.protein100);
 		put("carbs100", found.carbs100);
 		put("fat100", found.fat100);
+		chosenFood = found.displayName();
 		onlineResults = Collections.emptyList();
 		status = Txt.t(found.complete() ? R.string.nc_off_product : R.string.nc_product_incomplete);
 	}

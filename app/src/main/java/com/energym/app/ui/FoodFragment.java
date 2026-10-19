@@ -40,8 +40,10 @@ public final class FoodFragment extends ScreenFragment {
 		boolean chosen = p != null || !d.getOrDefault("barcode", "").isEmpty() || !d.getOrDefault("name", "").isEmpty();
 		if (!n.editingFood() && !chosen)
 			recents(n);
-		// Con un alimento ya elegido, siempre se puede volver al buscador y escoger otro.
+		// Con un alimento ya elegido, el buscador sigue arriba: si te has equivocado, eliges otro y sus datos
+		// sustituyen a todos los del anterior. «Elegir otro alimento» lo deja todo en blanco.
 		if (!n.editingFood() && chosen) {
+			common(n, true);
 			com.google.android.material.button.MaterialButton other = action(rows, Txt.t(R.string.food_choose_other), !n.busy, () -> {
 				commonQuery = "";
 				n.changeFood();
@@ -96,12 +98,19 @@ public final class FoodFragment extends ScreenFragment {
 		}
 		LinearLayout values = card(Txt.t(R.string.food_label_data), Txt.t(R.string.food_label_data_body));
 		com.google.android.material.button.MaterialButton[] reuse = new com.google.android.material.button.MaterialButton[1];
+		TextView[] stale = new TextView[1];
 		textField(values, "name", Txt.t(R.string.food_name), d.getOrDefault("name", ""), false, false, v -> {
 			d.put("name", v);
 			refresh.run();
 			if (reuse[0] != null)
 				suggest(n, reuse[0], v);
+			staleValues(n, stale[0], v);
 		});
+		// Si cambias el nombre de un alimento elegido de la lista, sus valores siguen siendo los del anterior: se avisa.
+		stale[0] = text(values, "", R.style.EnerGym_FieldCaption, 4);
+		stale[0].setTag("food_stale_values");
+		stale[0].setAccessibilityLiveRegion(android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE);
+		staleValues(n, stale[0], d.getOrDefault("name", ""));
 		// Autocompletar: si ya anotaste este alimento, sus valores de etiqueta se reutilizan con un toque.
 		if (p == null && !n.editingFood()) {
 			reuse[0] = action(values, "", !n.busy, () -> {
@@ -204,7 +213,7 @@ public final class FoodFragment extends ScreenFragment {
 	 */
 	private void recents(NutritionController n) {
 		primary(action(rows, Txt.t(R.string.food_scan_barcode), !n.busy, () -> NutritionFragment.scan(this)));
-		common(n);
+		common(n, false);
 		List<FoodEntry> recent = n.recentFoods(8);
 		if (recent.isEmpty())
 			return;
@@ -224,10 +233,14 @@ public final class FoodFragment extends ScreenFragment {
 		}
 	}
 
-	/** Búsqueda en los alimentos genéricos de la app: un toque rellena valores y ración. */
-	private void common(NutritionController n) {
-		LinearLayout card = card(Txt.t(R.string.food_common),
-			Txt.t(R.string.food_common_body));
+	/**
+	 * Búsqueda en los alimentos genéricos de la app: un toque rellena valores y ración. Con {@code change}, es el
+	 * buscador para cambiar el alimento ya elegido por otro.
+	 */
+	private void common(NutritionController n, boolean change) {
+		LinearLayout card = card(Txt.t(change ? R.string.food_change_title : R.string.food_common),
+			Txt.t(change ? R.string.food_change_body : R.string.food_common_body));
+		card.setTag(change ? "food_change_search" : "food_search");
 		LinearLayout results = new LinearLayout(requireContext());
 		results.setOrientation(LinearLayout.VERTICAL);
 		textField(card, "common_food", Txt.t(R.string.food_search), commonQuery, false, false, Txt.t(R.string.food_search_hint), "", v -> {
@@ -316,6 +329,14 @@ public final class FoodFragment extends ScreenFragment {
 			n.searchingOnline && mine ? Txt.t(R.string.food_searching_off) : Txt.t(R.string.food_search_off, q),
 			!n.searchingOnline && !n.busy, () -> n.searchOnline(q));
 		search.setTag("food_search_online");
+	}
+
+	private static void staleValues(NutritionController n, TextView warning, String typed) {
+		if (warning == null)
+			return;
+		boolean renamed = n.chosenFood != null && !n.chosenFood.trim().equalsIgnoreCase(typed.trim());
+		warning.setText(renamed ? Txt.t(R.string.food_values_from, n.chosenFood) : "");
+		warning.setVisibility(renamed ? android.view.View.VISIBLE : android.view.View.GONE);
 	}
 
 	private static void suggest(NutritionController n, android.widget.Button button, String typed) {

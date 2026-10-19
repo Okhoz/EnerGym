@@ -98,8 +98,9 @@ public final class CommonFoods {
 				rank.put(f, score);
 			}
 		}
-		// A igual relevancia, los nombres más cortos (más genéricos) primero: «Arroz blanco» antes que «Arroz con…».
-		found.sort(Comparator.<Food>comparingInt(rank::get).thenComparingInt(f -> f.name.length()));
+		// A igual relevancia se respeta el orden de la tabla (la ordenación es estable), que pone primero lo básico y
+		// como se suele comer: «Arroz blanco cocido» antes que «Arroz con leche», aunque este tenga el nombre más corto.
+		found.sort(Comparator.comparingInt(rank::get));
 		return found.size() > limit ? found.subList(0, limit) : found;
 	}
 

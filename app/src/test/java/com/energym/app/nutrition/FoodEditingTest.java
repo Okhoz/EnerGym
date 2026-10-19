@@ -127,6 +127,34 @@ public final class FoodEditingTest {
 		assertEquals(720, c.historyCalories(DAY), 0.001);
 	}
 
+	/** Si eliges un alimento por error y luego otro, no queda nada del primero (cantidad, valores ni nombre). */
+	@Test public void choosingAnotherFoodReplacesEveryValueOfTheFirst() throws Exception {
+		try (java.io.FileInputStream in = new java.io.FileInputStream("src/main/assets/foods.tsv")) {
+			CommonFoods.load(in);
+		}
+		NutritionController c = controller(new Store());
+		c.startManual(FoodEntry.Meal.DINNER);
+		CommonFoods.Food rice = CommonFoods.search("arroz con leche", 1).get(0);
+		CommonFoods.Food chicken = CommonFoods.search("pechuga de pollo", 1).get(0);
+		c.startCommon(rice);
+		c.foodDraft.put("amount", "320");
+		assertEquals(rice.name, c.chosenFood);
+		c.startCommon(chicken);
+		assertEquals(chicken.name, c.foodDraft.get("name"));
+		assertEquals(NutritionController.format(chicken.portion), c.foodDraft.get("amount"));
+		assertEquals(NutritionController.format(chicken.kcal100), c.foodDraft.get("kcal100"));
+		assertEquals(NutritionController.format(chicken.protein100), c.foodDraft.get("protein100"));
+		assertEquals("La comida elegida se conserva", "DINNER", c.foodDraft.get("meal"));
+		assertEquals(chicken.name, c.chosenFood);
+		// «Elegir otro alimento» lo deja todo en blanco, salvo la comida.
+		c.changeFood();
+		assertNull(c.chosenFood);
+		assertEquals("", c.foodDraft.getOrDefault("name", ""));
+		assertEquals("", c.foodDraft.getOrDefault("kcal100", ""));
+		assertEquals("", c.foodDraft.getOrDefault("amount", ""));
+		assertEquals("DINNER", c.foodDraft.get("meal"));
+	}
+
 	private static FoodEntry entry(String id, double amount) {
 		return new FoodEntry(id, DAY, FoodEntry.Meal.LUNCH, "Arroz", "", FoodEntry.Unit.G,
 			amount, 360, 7, 79, 1, 1000);

@@ -53,4 +53,18 @@ public class CommonFoodsTest {
 		assertTrue("Jugo = zumo", CommonFoods.search("jugo", 8).stream().anyMatch(f -> f.name.startsWith("Zumo")));
 		assertEquals("Lo exacto primero", "Plátano", CommonFoods.search("platano", 5).get(0).name);
 	}
+
+	/** Caso visto en el emulador: al buscar «arroz» salía primero «Arroz con leche». */
+	@Test
+	public void basicFoodsComeBeforeDishesWithTheSameStart() {
+		assertEquals("Arroz blanco cocido", CommonFoods.search("arroz", 8).get(0).name);
+		assertEquals("Pan blanco", CommonFoods.search("pan", 8).get(0).name);
+		assertEquals("Leche entera", CommonFoods.search("leche", 8).get(0).name);
+		assertEquals("Huevo", CommonFoods.search("huevo", 8).get(0).name);
+		List<String> rice = new ArrayList<>();
+		for (CommonFoods.Food f : CommonFoods.search("arroz", 8))
+			rice.add(f.name);
+		assertTrue("El postre va detrás del arroz normal",
+			rice.indexOf("Arroz con leche") > rice.indexOf("Arroz integral cocido"));
+	}
 }

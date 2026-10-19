@@ -617,6 +617,9 @@
 	<string name="food_looking">Looking up the product…</string>
 	<string name="food_looking_body">Checking Open Food Facts with the scanned code.</string>
 	<string name="food_choose_other">↺ Choose another food</string>
+	<string name="food_change_title">Not this one? Search for another</string>
+	<string name="food_change_body">Picking another food replaces all its details.</string>
+	<string name="food_values_from">These values are for “%1$s”. If it\'s a different food, search for it above and they\'ll be replaced.</string>
 	<string name="food_pack">Pack: %1$s</string>
 	<string name="food_code_values">Code %1$s\nValues per 100 %2$s from the product record. Check they match your label.</string>
 	<string name="food_how_much">How much did you have?</string>

@@ -721,6 +721,9 @@
 	<string name="food_looking">Buscando la ficha…</string>
 	<string name="food_looking_body">Consultando Open Food Facts con el código escaneado.</string>
 	<string name="food_choose_other">↺ Elegir otro alimento</string>
+	<string name="food_change_title">¿No es este? Busca otro</string>
+	<string name="food_change_body">Al elegir otro alimento se cambian todos sus datos.</string>
+	<string name="food_values_from">Estos valores son de «%1$s». Si es otro alimento, búscalo arriba y se cambiarán.</string>
 	<string name="food_pack">Envase: %1$s</string>
 	<string name="food_code_values">Código %1$s\nValores por 100 %2$s según la ficha. Comprueba que coinciden con tu etiqueta.</string>
 	<string name="food_how_much">¿Cuánto has tomado?</string>
