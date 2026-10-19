@@ -861,7 +861,7 @@ public final class AppController {
 				double load = number(last.get("loadKg"));
 				if (load > 0 && number(p.get("loadKg")) != load) {
 					p.put("loadKg", ProgressionEngine.fmt(load));
-					note = Txt.t(R.string.app_note_last_load, ProgressionEngine.fmt(load).replace('.', ','));
+					note = Txt.t(R.string.app_note_last_load, Txt.decimal(ProgressionEngine.fmt(load)));
 				}
 			} else if (last != null && type == MetricType.ISOMETRIC) {
 				double held = number(last.get("durationSeconds"));
@@ -1373,7 +1373,7 @@ public final class AppController {
 					lines.add(Txt.t(R.string.app_load_bodyweight));
 				else
 					lines.add((planned ? plannedLabel(field) : field.label) + ": " +
-						("side".equals(field.key) ? MetricValidator.choiceLabel(value) : value.replace('.', ',')));
+						("side".equals(field.key) ? MetricValidator.choiceLabel(value) : Txt.decimal(value)));
 			}
 		return String.join("\n", lines);
 	}

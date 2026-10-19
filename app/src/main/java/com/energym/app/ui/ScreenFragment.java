@@ -294,7 +294,8 @@ public abstract class ScreenFragment extends Fragment {
 			b.setAllCaps(false);
 			b.setTextSize(14);
 			b.setMinWidth(0);
-			b.setMinHeight(dp(44));
+			// Zona táctil mínima de 48 dp, como el resto de botones.
+			b.setMinHeight(dp(48));
 			b.setMaxLines(1);
 			b.setGravity(android.view.Gravity.CENTER);
 			androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(b, 10, 14, 1,
@@ -309,11 +310,11 @@ public abstract class ScreenFragment extends Fragment {
 			b.setRippleColor(android.content.res.ColorStateList.valueOf(0x22FFFFFF));
 			b.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(),
 				chosen ? R.color.surface : R.color.text_secondary));
-			b.setContentDescription(labels[i] + (chosen ? ", seleccionado" : ""));
+			b.setContentDescription(labels[i] + (chosen ? ", " + Txt.t(R.string.sf_selected) : ""));
 			b.setOnClickListener(v -> {
 				if (index != selected) select.accept(index);
 			});
-			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(44), 1);
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(48), 1);
 			if (i > 0) params.setMarginStart(dp(4));
 			row.addView(b, params);
 		}
@@ -330,7 +331,7 @@ public abstract class ScreenFragment extends Fragment {
 		});
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 			ViewGroup.LayoutParams.WRAP_CONTENT);
-		params.bottomMargin = dp(28);
+		params.bottomMargin = dp(20);
 		rows.addView(frame, params);
 		return row;
 	}
@@ -342,10 +343,11 @@ public abstract class ScreenFragment extends Fragment {
 
 	/** Rótulo de sección discreto, con aire por encima para separar bloques. */
 	protected TextView section(String label, int topDp) {
-		TextView view = text(rows, label.toUpperCase(new Locale("es", "ES")), R.style.EnerGym_FieldCaption, topDp);
+		// Diseño minimalista: el rótulo separa bloques con poco aire; las tarjetas ya marcan el ritmo.
+		TextView view = text(rows, label.toUpperCase(Txt.locale()), R.style.EnerGym_FieldCaption, Math.min(topDp, 16));
 		view.setLetterSpacing(0.08f);
 		view.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_tertiary));
-		((LinearLayout.LayoutParams) view.getLayoutParams()).bottomMargin = dp(12);
+		((LinearLayout.LayoutParams) view.getLayoutParams()).bottomMargin = dp(8);
 		ViewCompat.setAccessibilityHeading(view, true);
 		return view;
 	}

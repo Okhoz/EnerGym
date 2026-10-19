@@ -76,6 +76,6 @@ public final class Goal {
 	}
 
 	static String fmt(double v) {
-		return v == Math.rint(v) ? Long.toString((long) v) : String.format(Locale.ROOT, "%.1f", v).replace('.', ',');
+		return v == Math.rint(v) ? Long.toString((long) v) : Txt.decimal(String.format(Locale.ROOT, "%.1f", v));
 	}
 }

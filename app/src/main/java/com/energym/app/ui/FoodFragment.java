@@ -67,9 +67,9 @@ public final class FoodFragment extends ScreenFragment {
 			// Se recalcula con cada cifra que escribes: lo que vas a tomar, no los valores por 100.
 			preview[0].setText(e == null ? Txt.t(R.string.food_type_amount) :
 				Txt.t(R.string.food_preview, NutritionController.format(e.amount) + " " + e.unit.symbol, Math.round(e.kcal()),
-					NutritionController.format(round(e.protein())).replace('.', ','),
-					NutritionController.format(round(e.carbs())).replace('.', ','),
-					NutritionController.format(round(e.fat())).replace('.', ',')));
+					NutritionController.format(round(e.protein())),
+					NutritionController.format(round(e.carbs())),
+					NutritionController.format(round(e.fat()))));
 		};
 		textField(amount, "amount", Txt.t(R.string.food_amount, unit.symbol), d.getOrDefault("amount", ""), true, false, v -> {
 			d.put("amount", v);
@@ -165,7 +165,7 @@ public final class FoodFragment extends ScreenFragment {
 		for (String[] f : fields) {
 			String v = n.scannedValue(f[0]);
 			if (v != null)
-				fixed.append(fixed.length() == 0 ? "" : "\n").append(f[1]).append(": ").append(v.replace('.', ','))
+				fixed.append(fixed.length() == 0 ? "" : "\n").append(f[1]).append(": ").append(Txt.decimal(v))
 					.append(" ").append(f[2]);
 			else
 				missing = true;

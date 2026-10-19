@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Idioma: globo con meridianos, mismo trazo fino que el resto de iconos del menú. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+	android:width="24dp"
+	android:height="24dp"
+	android:viewportWidth="24"
+	android:viewportHeight="24">
+	<path
+		android:fillColor="@android:color/transparent"
+		android:strokeColor="@color/white"
+		android:strokeWidth="1.6"
+		android:strokeLineCap="round"
+		android:strokeLineJoin="round"
+		android:pathData="M12,3 A9,9 0,1 1,12 21 A9,9 0,1 1,12 3 Z M3,12 L21,12 M12,3 C9.5,5.5 8.5,8.6 8.5,12 C8.5,15.4 9.5,18.5 12,21 M12,3 C14.5,5.5 15.5,8.6 15.5,12 C15.5,15.4 14.5,18.5 12,21" />
+</vector>

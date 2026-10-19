@@ -82,11 +82,8 @@
 	<string name="hist_tab_goals">Goals</string>
 	<string name="hist_totals_title">Everything you\'ve done</string>
 	<string name="hist_totals_empty">Finish your first session and everything will add up here.</string>
-	<string name="hist_stat_sessions">sessions</string>
 	<string name="hist_stat_hours">hours</string>
-	<string name="hist_stat_exercises">exercises</string>
 	<string name="hist_stat_kg_lifted">kg lifted</string>
-	<string name="hist_stat_diet_days">days with diet log</string>
 	<string name="hist_trend_title">Your improvement</string>
 	<string name="hist_trend_subtitle">Last 4 weeks vs the previous 4</string>
 	<string name="hist_trend_sessions">Sessions: %1$s</string>
@@ -95,7 +92,6 @@
 		<item quantity="one">week in a row</item>
 		<item quantity="other">weeks in a row</item>
 	</plurals>
-	<string name="hist_days_this_month">days this month</string>
 	<string name="hist_bars_sessions">Sessions per week</string>
 	<string name="hist_bars_minutes">Minutes per week</string>
 	<string name="hist_bars_kg">Kilos lifted per week</string>
@@ -153,7 +149,6 @@
 	<string name="hist_exercises_of_total">%1$d of %2$d exercises</string>
 	<string name="hist_continue_workout">▶ Continue workout</string>
 	<string name="hist_food_title">Food</string>
-	<string name="hist_food_empty">Log meals in Food and you\'ll see your progress here.</string>
 	<string name="hist_last_days">Last %1$d days</string>
 	<plurals name="hist_days_logged">
 		<item quantity="one">day logged</item>
@@ -294,7 +289,7 @@
 	<string name="ses_discard_title">Discard this workout?</string>
 	<string name="ses_discard_message">Its logs will be deleted from your account. This can\'t be undone.</string>
 	<string name="ses_discard_confirm">Discard</string>
-	<string name="ses_position">Exercise %1$d of %2$d · %3$d logged</string>
+	<string name="ses_position">Exercise %1$d of %2$d · %3$s</string>
 	<string name="ses_previous">Previous exercise</string>
 	<string name="ses_next">Next exercise</string>
 	<string name="ses_hide_list">Hide list</string>
@@ -1187,21 +1182,21 @@
 	<string name="ff_optional">optional</string>
 	<!-- Tutorial -->
 	<string name="tut_welcome">Welcome to EnerGym</string>
-	<string name="tut_welcome_body">Your trainer, your diet and your progress in one place.\n\nIn a minute we\'ll show you where everything is. Swipe or tap “Next”.</string>
+	<string name="tut_welcome_body">Train, eat better and track your progress, with an AI trainer that runs on your phone.\n\nIn a minute we\'ll show you the essentials.</string>
 	<string name="tut_home">Home: what\'s on today</string>
-	<string name="tut_home_body">You see the day\'s workout and your food and water summary.\n\nWith “+ Meal” and “+ Glass” you log it straight away.</string>
+	<string name="tut_home_body">Today\'s workout, food and water at a glance.\n\nOne tap to continue your workout or log a glass.</string>
 	<string name="tut_training">Workout: your routines</string>
-	<string name="tut_training_body">Tap “Start workout” to do today\'s routine.\n\nWith “+ New” you create a free workout, ask for a suggestion or a routine from the AI, a weekly plan, or build it yourself.</string>
+	<string name="tut_training_body">Pick a routine and tap “Start workout”.\n\nWith “+ New” you get a free workout, a suggestion, an AI-made routine, a weekly plan, classic programs (5/3/1, GZCLP…) or build your own.</string>
 	<string name="tut_log">Log every set</string>
-	<string name="tut_log_body">Adjust weight and reps with − and + and tap “Save set”: the rest timer starts on its own.\n\nIn “More options” you have RPE, notes, supersets and plates. Your routine levels up on its own when you complete it.</string>
+	<string name="tut_log_body">Adjust weight and reps with − and + and tap “Save set”: the rest timer starts on its own.\n\nThe app tells you when to add weight (📈) based on your previous sets.</string>
 	<string name="tut_3d">Technique in 3D</string>
-	<string name="tut_3d_body">Exercises with a 3D model show the full movement, like this one.\n\nOpen it in Workout › Exercises › choose an exercise › “3D preview”.</string>
-	<string name="tut_nutrition_body">Scan the barcode or search for the food: you only enter how much you had and calories and macros are calculated.\n\nAlso: water, saved meals and a monthly AI diet.</string>
-	<string name="tut_progress_body">In tabs: Summary (totals and badges), Calendar, Body (weight, measurements and photos) and Goals.</string>
+	<string name="tut_3d_body">Many exercises have a 3D model showing the full movement, like this one.\n\nFind it in Workout › Exercises › pick one › “3D preview”.</string>
+	<string name="tut_nutrition_body">“+ Add” and “Scan” are right at the top: enter how much you had and calories and macros are calculated.\n\nBelow, the day\'s water and your meals.</string>
+	<string name="tut_progress_body">Four tabs: Summary, Calendar, Body and Goals.\n\nShare a workout or a record with “📤 Share”.</string>
 	<string name="tut_trainer">Your AI trainer</string>
-	<string name="tut_trainer_body">In Assistant ask it anything: technique, routines, whether to add weight…\n\nIt uses your real data and runs on your phone, without sending your messages anywhere.</string>
-	<string name="tut_account">Account and settings</string>
-	<string name="tut_account_body">Top right: cloud backup, reminders, kg/lb, Health Connect and CSV.\n\nFrom there you can watch this tutorial again whenever you like. Now fill in your profile and body details so your routines and diet fit you. 💪</string>
+	<string name="tut_trainer_body">Ask it anything: whether to add weight, technique, a routine, what to eat…\n\nIt knows your data and runs on your phone, without sending your messages anywhere.</string>
+	<string name="tut_account">Your menu</string>
+	<string name="tut_account_body">Tap your photo at the top right: profile, body data, account, language, reminders and kg/lb.\n\nNow complete your profile and body data so everything fits you. 💪</string>
 	<string name="tut_back">Back</string>
 	<string name="tut_next">Next</string>
 	<string name="tut_complete">Complete the tutorial to start using EnerGym</string>
@@ -1752,4 +1747,58 @@
 	<string name="app_program_empty">This program has no exercises available in the catalogue.</string>
 	<string name="main_onboarding_done">All set! Your profile and targets are configured. Start with today\'s workout.</string>
 	<string name="main_overlay_blocked">Another app is covering EnerGym; close it to be able to tap.</string>
+	<!-- Conocimiento del entrenador IA (fichas por tema) -->
+	<string name="kc_pain" formatted="false">Pain: if it\'s sharp, stabbing or swollen, stop and don\'t train that area. Mild discomfort (3 out of 10 or less) lets you train with less load or range, switching to a variation that doesn\'t hurt. If it lasts more than 1–2 weeks, gets worse or comes with tingling or loss of strength, have a health professional check it. Don\'t diagnose injuries.</string>
+	<string name="kc_lower_back" formatted="false">Lower back: avoid loading with a rounded back. If it bothers you, swap deadlifts and heavy squats for more stable variations (light Romanian deadlift, leg press, hip thrust) and strengthen the core with planks, bird dogs and dead bugs. Walking usually helps; total rest doesn\'t. Pain running down the leg or tingling: see a health professional.</string>
+	<string name="kc_progression" formatted="false">Progression (double progression): work in a range (e.g. 8–12). When you hit the top of the range on every set with good form at RPE 8 or less, add the smallest load (2.5 kg barbell or machine, 1–2 kg dumbbells) and go back to the bottom of the range. Otherwise, add reps. After 3 sessions without improving: deload (10 percent less for a week) or change variation or range. Ideal effort RPE 7–8 (2–3 reps left in the tank).</string>
+	<string name="kc_rest_sets" formatted="false">Rest between sets: 2–3 min on heavy compound lifts (3–5 min for maximal strength), 1–2 min on accessories and isolation, 30–60 s in circuits. Short rests don\'t build more muscle: the next set suffers. To save time, use supersets of opposing muscles.</string>
+	<string name="kc_hypertrophy" formatted="false">Building muscle: 10–20 effective sets per muscle group per week, spread over 2 or more sessions. Range 6–12 reps (5 to 30 works if you get close to failure), 1–3 reps short of failure. Rest 1.5–3 min on compound lifts. Slight surplus (about 200–300 kcal) and protein 1.6–2.2 g/kg.</string>
+	<string name="kc_strength" formatted="false">Maximal strength: compound lifts for 1–6 reps at 80–90 percent of 1RM, 3–5 sets and 3–5 min rest. Technique comes first: leave 1–2 reps in reserve almost always. Estimated 1RM ≈ weight × (1 + reps/30). Add 8–12 rep accessories for weak points.</string>
+	<string name="kc_split" formatted="false">Planning the week: with 2–3 days, full body; with 4, upper/lower; with 5–6, push/pull/legs. What matters is training each muscle group about twice a week and spreading the sets. Change the program every 6–12 weeks or when you stall, not every week.</string>
+	<string name="kc_fat_loss" formatted="false">Losing fat: a deficit of 300–500 kcal a day to lose 0.5–1 percent of body weight per week. High protein (1.8–2.2 g/kg) and keep strength training so you don\'t lose muscle. 7,000–10,000 steps a day help more than exhausting cardio. You can\'t spot-reduce fat with ab exercises.</string>
+	<string name="kc_recomp" formatted="false">Recomposition (losing fat and gaining muscle at once): works best for beginners or when returning after a break. Eat at maintenance or a small deficit (about 200 kcal), protein 2 g/kg and strength train with progression. Track waist, photos and loads, not just the scale.</string>
+	<string name="kc_scale" formatted="false">Scale stuck: weight swings 1–2 kg day to day from water, salt and food. Weigh yourself fasted on several days and look at the weekly average. If the average doesn\'t drop in 2–3 weeks, cut about 150–200 kcal or add 2,000 steps a day. If you strength train, your waist can shrink even when the scale doesn\'t.</string>
+	<string name="kc_nutrition" formatted="false">Nutrition: protein 1.6–2.2 g/kg a day in 3–5 servings of 20–40 g. Carbs according to training volume (3–5 g/kg if you train hard). Creatine monohydrate 3–5 g a day is the best-supported supplement (no loading phase needed); the rest is rarely necessary. Water: about 35 ml/kg, more if you sweat a lot.</string>
+	<string name="kc_meal_timing" formatted="false">Before and after training: 1–3 h before, a meal with carbs and some protein (e.g. rice and chicken or toast with yogurt). After, 20–40 g of protein within the next 2–3 h. The daily total matters most; training fasted is fine if it suits you.</string>
+	<string name="kc_warmup" formatted="false">Warm-up: 5 min of easy activity and mobility for the joints you\'ll use. Then ramp-up sets of the first exercise: about 8 reps at 40 percent, 5 at 60 and 3 at 80 of your working weight. Long static stretches are better afterwards or at another time.</string>
+	<string name="kc_mobility" formatted="false">Mobility and stretching: 5–10 min a day of mobility (hips, ankles, upper back and shoulders) improves technique more than long stretching before training. Static stretches of 30–60 s per area, after training or on rest days. Training through the full range of motion also builds mobility.</string>
+	<string name="kc_recovery" formatted="false">Recovery: sleep 7–9 h. Allow 48–72 h before loading the same muscle group hard again. Soreness doesn\'t mean a good workout; you can train another group or do something light. Take a deload week (fewer sets or 10 percent less load) every 4–8 weeks or if you notice lasting fatigue, worse performance or poor sleep.</string>
+	<string name="kc_squat" formatted="false">Squat: feet shoulder-width apart and slightly turned out, knees tracking over the toes, a braced torso (breathe in and tighten your abs), go down as far as you can keep a neutral back and drive up by pushing the floor away. Common mistakes: knees caving in, heels lifting and rounding the back.</string>
+	<string name="kc_bench" formatted="false">Bench press: shoulder blades pulled together and down, a slight arch, feet planted, grip slightly wider than shoulders, lower under control to the lower chest with elbows at about 45–70 degrees and press in a straight line. Use safeties or a spotter when going heavy.</string>
+	<string name="kc_deadlift" formatted="false">Deadlift: bar over mid-foot, hips back, neutral spine and lats engaged, the bar close to your legs the whole way. Push the floor away with your legs and finish with your hips, without leaning back. If your back rounds, lower the load.</string>
+	<string name="kc_pull" formatted="false">Pulling (pull-ups, lat pulldown, rows): start by pulling your shoulder blades down and together, drive your elbows towards your hips and control the way down. For your first pull-up: slow negatives (3–5 s), band-assisted pull-ups and heavy lat pulldowns 2–3 times a week.</string>
+	<string name="kc_overhead" formatted="false">Overhead press: squeeze glutes and abs so your lower back doesn\'t arch; the bar or dumbbells travel in line with your head. Light lateral raises, 12 to 20 reps, without swinging. If your shoulder bothers you, try dumbbell presses with a neutral grip.</string>
+	<string name="kc_arms" formatted="false">Arms: biceps and triceps grow with 8–15 weekly sets each (pressing and pulling compounds already count). Curls and triceps extensions for 8–15 reps, full range and no swinging; the long head of the triceps responds well to overhead extensions.</string>
+	<string name="kc_glutes" formatted="false">Glutes: hip thrusts, deep squats, Romanian deadlifts and lunges are the foundation; add abductions for the side of the glutes. 10–20 sets a week, full range and a squeeze at the top of the hip thrust.</string>
+	<string name="kc_core" formatted="false">Abs and core: planks, dead bugs, ab wheel and leg raises, 2–3 times a week. A strong core shows more in your technique on the big lifts than in doing hundreds of crunches. Visible abs depend mostly on body fat percentage.</string>
+	<string name="kc_pushup" formatted="false">Push-ups: hands slightly wider than shoulders, body straight from head to heels, elbows at about 45 degrees and chest almost to the floor. To progress: incline (hands on a bench) → regular → feet elevated → with a pause or added weight.</string>
+	<string name="kc_cardio" formatted="false">Cardio: about 80 percent of sessions easy (zone 2: you can talk) and 20 hard (intervals). Increase weekly volume by 10 percent at most. If you combine it with strength, separate hard leg sessions and runs by at least 6 h. Recommended minimum: 150 min a week of moderate activity.</string>
+	<string name="kc_short_time" formatted="false">Short on time: 30–40 min fits 4–5 compound exercises with 2–3 sets each. Use supersets (push with pull, legs with core), 60–90 s rests on accessories and leave cardio for another time. Short, frequent sessions beat long, rare ones.</string>
+	<string name="kc_older" formatted="false">Over 50: strength training 2–3 times a week is one of the best things for health (muscle, bones and balance). Start with moderate loads, warm up longer, prioritise technique and add balance and power work (standing up quickly from a chair). With heart or joint problems, check with a professional first.</string>
+	<string name="kc_motivation" formatted="false">Consistency: a minimal plan you stick to (2–3 sessions of 30–45 min) beats an ideal one you abandon. Train at the same time, lay out your clothes and log every session. If you miss a day, come back the next one without making up for it. Celebrate small wins.</string>
+	<string name="kc_beginner" formatted="false">Beginners: 2–3 full-body sessions a week with basic exercises (squat, push, pull, hip hinge and core). 2–3 sets of 8–12 reps at RPE 6–7 while you learn the technique. Add load every week while you can: progress is very fast at the start.</string>
+	<string name="kc_home" formatted="false">At home without equipment: progress by making the exercise harder (incline push-ups → regular → feet elevated), single-leg, slower (3 s down) or with pauses, and get close to failure (1–2 reps in reserve). A backpack with books makes good extra weight.</string>
+	<string name="tp_calculated_load">Based on your history, next time on %1$s: %2$s.</string>
+	<!-- Plurales de cifras -->
+	<plurals name="stat_sessions">
+		<item quantity="one">session</item>
+		<item quantity="other">sessions</item>
+	</plurals>
+	<plurals name="stat_exercises">
+		<item quantity="one">exercise</item>
+		<item quantity="other">exercises</item>
+	</plurals>
+	<plurals name="stat_diet_days">
+		<item quantity="one">day with diet log</item>
+		<item quantity="other">days with diet log</item>
+	</plurals>
+	<plurals name="ses_logged_count">
+		<item quantity="one">%1$d logged</item>
+		<item quantity="other">%1$d logged</item>
+	</plurals>
+	<plurals name="stat_days_month">
+		<item quantity="one">day this month</item>
+		<item quantity="other">days this month</item>
+	</plurals>
+	<string name="sf_selected">selected</string>
 </resources>

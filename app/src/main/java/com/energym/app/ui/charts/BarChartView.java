@@ -93,9 +93,9 @@ public final class BarChartView extends View {
 		if (v >= 10000)
 			return String.format(Locale.ROOT, "%.0fk", v / 1000);
 		if (v >= 1000)
-			return String.format(Locale.ROOT, "%.1fk", v / 1000).replace('.', ',');
+			return com.energym.app.i18n.Txt.decimal(String.format(Locale.ROOT, "%.1fk", v / 1000));
 		if (v == Math.rint(v) || v >= 100)
 			return Long.toString(Math.round(v));
-		return String.format(Locale.ROOT, "%.1f", v).replace('.', ',');
+		return com.energym.app.i18n.Txt.decimal(String.format(Locale.ROOT, "%.1f", v));
 	}
 }

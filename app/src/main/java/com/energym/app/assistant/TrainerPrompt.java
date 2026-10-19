@@ -17,7 +17,7 @@ public final class TrainerPrompt {
 	 * El mensaje del cliente no tiene límite al escribirlo; al modelo le llega entero si cabe en el prompt y, si no,
 	 * su principio y su final (MIN_MESSAGE es lo mínimo que se le reserva aunque haya mucho contexto).
 	 */
-	static final int MAX_EXERCISES = 30, MAX_RECENT = 6, MAX_RECENT_CHARS = 300, MAX_DESCRIPTION = 800,
+	static final int MAX_EXERCISES = 30, MAX_RECENT = 6, MAX_RECENT_CHARS = 600, MAX_DESCRIPTION = 800,
 		MAX_TRAINING = 3800, MIN_TRAINING = 600, MIN_MESSAGE = 1500, MAX_PROMPT = 11500;
 	private static final List<String> REQUIRED = Arrays.asList("sportId", "goal", "environment", "focus", "category",
 		"resources", "daysPerWeek", "durationMinutes", "level");
@@ -268,7 +268,7 @@ public final class TrainerPrompt {
 			text = com.energym.app.i18n.Txt.t(proposal != null ? com.energym.app.R.string.tp_here_is_routine :
 				com.energym.app.R.string.tp_no_answer);
 		Map<String, Object> m = new LinkedHashMap<>();
-		m.put("text", cut(plain(text), 4000));
+		m.put("text", cut(ground(dedupe(plain(text)), r), 4000));
 		m.put("missingFields", r.profile == null ? new ArrayList<Object>(missing(r.profileData)) : new ArrayList<>());
 		m.put("proposal", proposal);
 		m.put("commands", new ArrayList<>());
@@ -518,6 +518,83 @@ public final class TrainerPrompt {
 	 * El chat solo entiende **negritas** y viñetas «• »: los títulos pasan a negrita y el resto del Markdown que
 	 * suelen añadir los modelos pequeños se normaliza (ChatFormat lo pinta).
 	 */
+	/**
+	 * Los modelos pequeños a veces repiten una frase o un punto entero: se quitan las líneas y frases idénticas a
+	 * otra anterior (sin distinguir mayúsculas, espacios ni la viñeta).
+	 */
+	static String dedupe(String text) {
+		Set<String> seen = new HashSet<>();
+		StringBuilder out = new StringBuilder();
+		for (String line : text.split("\n", -1)) {
+			String key = CoachKnowledge.normalize(line).replaceAll("^[•\\s]+|[\\s.!¡?¿]+$", "");
+			if (!key.isEmpty() && !seen.add(key))
+				continue;
+			StringBuilder sentences = new StringBuilder();
+			for (String sentence : line.split("(?<=[.!?])\\s+")) {
+				String s = CoachKnowledge.normalize(sentence).replaceAll("^[•\\s]+|[\\s.!¡?¿]+$", "");
+				if (s.length() >= 12 && !seen.add("frase:" + s))
+					continue;
+				sentences.append(sentences.length() == 0 ? "" : " ").append(sentence);
+			}
+			out.append(out.length() == 0 && sentences.length() == 0 ? "" : "\n").append(sentences);
+		}
+		return out.toString().replaceAll("^\n+", "").replaceAll("\n{3,}", "\n\n").trim();
+	}
+
+	private static final java.util.regex.Pattern LOAD_LINE =
+		java.util.regex.Pattern.compile("^(.+?): última vez .*?→ (.*)$");
+
+	/**
+	 * Comprobación final de cifras: si pregunta si subir de peso en un ejercicio y la respuesta no da la carga que
+	 * calcula la app, se añade una línea con ella. El modelo puede explicar mejor o peor, pero el número es el bueno.
+	 */
+	static String ground(String text, ChatClient.Request r) {
+		if (r.training == null || r.training.isEmpty() ||
+			!CoachKnowledge.topics(r.message).contains(CoachKnowledge.Topic.PROGRESSION))
+			return text;
+		int at = r.training.indexOf("[PRÓXIMA CARGA CALCULADA]");
+		if (at < 0)
+			return text;
+		String asked = " " + CoachKnowledge.normalize(r.message) + " ";
+		String section = r.training.substring(at);
+		int next = section.indexOf("\n[", 1);
+		for (String line : (next < 0 ? section : section.substring(0, next)).split("\n")) {
+			java.util.regex.Matcher m = LOAD_LINE.matcher(line.trim());
+			if (!m.matches() || !names(asked, m.group(1)))
+				continue;
+			java.util.regex.Matcher kg = java.util.regex.Pattern.compile("(\\d+(?:\\.\\d+)?) kg").matcher(m.group(2));
+			java.util.regex.Matcher reps = java.util.regex.Pattern.compile("(\\d+) repeticiones|× (\\d+)").matcher(m.group(2));
+			if (!reps.find())
+				return text;
+			int count = Integer.parseInt(reps.group(1) != null ? reps.group(1) : reps.group(2));
+			boolean weighted = kg.find();
+			String dot = weighted ? kg.group(1) : Integer.toString(count), comma = dot.replace('.', ',');
+			if (text.contains(dot + " kg") || text.contains(comma + " kg") || (!weighted && text.contains(dot)))
+				return text;
+			boolean spanish = "es".equals(com.energym.app.i18n.Txt.locale().getLanguage());
+			String load = weighted ? (spanish ? comma : dot) + " kg × " +
+				com.energym.app.i18n.Txt.n(com.energym.app.R.plurals.ses_reps_count, count) :
+				com.energym.app.i18n.Txt.n(com.energym.app.R.plurals.ses_reps_count, count);
+			return text + "\n\n📈 " + com.energym.app.i18n.Txt.t(com.energym.app.R.string.tp_calculated_load, m.group(1), load);
+		}
+		return text;
+	}
+
+	/** Palabras que no identifican el ejercicio («press», «barra», «peso»…): se mira la siguiente. */
+	private static final Set<String> GENERIC = new HashSet<>(Arrays.asList("press", "barra", "mancuerna", "mancuernas",
+		"maquina", "polea", "peso", "trasera", "frontal", "con", "del", "los", "las", "una", "para"));
+
+	/** El mensaje nombra el ejercicio entero o su primera palabra distintiva («sentadilla», «banca», «muerto»…). */
+	static boolean names(String asked, String exercise) {
+		String name = CoachKnowledge.normalize(exercise);
+		if (asked.contains(name))
+			return true;
+		for (String word : name.split("[^\\p{L}]+"))
+			if (word.length() >= 4 && !GENERIC.contains(word))
+				return asked.matches("(?s).*\\b" + java.util.regex.Pattern.quote(word) + "\\b.*");
+		return false;
+	}
+
 	static String plain(String text) {
 		return text.replace("__", "**").replaceAll("(?m)^\\s*[*-]\\s+", "• ")
 			.replaceAll("(?m)^#++\\s*+(?!\\*\\*)(\\S.*)$", "**$1**").replaceAll("(?m)^#+\\s*", "")

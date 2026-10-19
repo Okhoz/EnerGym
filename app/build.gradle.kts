@@ -183,7 +183,8 @@ android {
 		versionCode = 1
 		versionName = "1.0"
 
-		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+		// Fija la app en español durante los tests de interfaz (comparan sus textos).
+		testInstrumentationRunner = "com.energym.app.EnerGymTestRunner"
 	}
 	buildFeatures {
 		buildConfig = true
