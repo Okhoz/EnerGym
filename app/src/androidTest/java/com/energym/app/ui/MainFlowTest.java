@@ -173,6 +173,38 @@ public class MainFlowTest {
 		}
 	}
 
+	/** La sugerencia se pinta debajo del menú «Crea tu primer entreno»: al pedirla, la pantalla baja hasta ella. */
+	@Test
+	public void suggestionScrollsIntoView() {
+		try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+			await();
+			click(scenario, "Cuenta");
+			click(scenario, "Entrar en demo local");
+			click(scenario, "Configurar mi perfil");
+			click(scenario, "Guardar perfil");
+			training(scenario);
+			scenario.onActivity(a -> {
+				View suggest = a.getWindow().getDecorView().findViewWithTag("training_suggest");
+				assertNotNull("Opción «Que me sugiera uno» ausente", suggest);
+				suggest.performClick();
+			});
+			boolean[] shown = {false};
+			for (int i = 0; i < 20 && !shown[0]; i++) {
+				await();
+				scenario.onActivity(a -> {
+					View card = a.getWindow().getDecorView().findViewWithTag("training_suggestion");
+					assertNotNull("Sugerencia ausente", card);
+					while (((View) card.getParent()).getId() != R.id.rows)
+						card = (View) card.getParent();
+					View title = card.findViewById(R.id.card_title);
+					android.graphics.Rect visible = new android.graphics.Rect();
+					shown[0] = title.getGlobalVisibleRect(visible) && visible.height() == title.getHeight();
+				});
+			}
+			assertTrue("La sugerencia queda fuera de la pantalla", shown[0]);
+		}
+	}
+
 	private void assertSavedSquat(android.content.Context context, String repetitions) {
 		try (EnerGymDatabase db = new EnerGymDatabase(context, EnerGymDatabase.DEMO_OWNER_UID)) {
 			Session stored = new SessionRepository(db).pending().get(0);

@@ -27,6 +27,8 @@ public final class TrainingFragment extends ScreenFragment {
 	private String featuredDraftId = "";
 	/** Sugerencia del entrenador pedida desde «+ Nuevo». */
 	private boolean suggesting;
+	/** La sugerencia se pinta al final del menú: tras pedirla, la pantalla baja hasta ella una sola vez. */
+	private boolean revealSuggestion;
 
 	public TrainingFragment() {
 		super(R.layout.fragment_training);
@@ -129,11 +131,12 @@ public final class TrainingFragment extends ScreenFragment {
 			return;
 		Routine s = app.suggest();
 		if (s == null) {
-			card(Txt.t(R.string.tr_no_suggestion), Txt.t(R.string.tr_no_suggestion_body));
+			reveal(card(Txt.t(R.string.tr_no_suggestion), Txt.t(R.string.tr_no_suggestion_body)));
 			return;
 		}
 		LinearLayout card = card("💡 " + s.getTitle(), app.suggestionReason + "\n" + summary(s));
 		card.setTag("training_suggestion");
+		reveal(card);
 		for (com.energym.app.domain.RoutineItem item : s.getItems()) {
 			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, card, false);
 			((android.widget.TextView) row.findViewById(R.id.food_name)).setText(item.getExercise().getName());
@@ -143,10 +146,27 @@ public final class TrainingFragment extends ScreenFragment {
 			row.setOnClickListener(v -> app.openExercise(item.getExercise()));
 			card.addView(row);
 		}
-		action(card, Txt.t(R.string.tr_other_suggestion), !app.trainingMutation, app::nextSuggestion);
+		action(card, Txt.t(R.string.tr_other_suggestion), !app.trainingMutation, () -> {
+			revealSuggestion = true;
+			app.nextSuggestion();
+		});
 		action(card, Txt.t(R.string.tr_modify), !app.trainingMutation, () -> app.editProposal(s)).setTag("suggestion_edit");
 		primary(action(card, Txt.t(R.string.tr_do_it_now), !app.trainingMutation && !app.sessions.busy,
 			() -> app.acceptAndStart(s, true)));
+	}
+
+	/** Si se acaba de pedir, desplaza la pantalla hasta la tarjeta: entera si cabe y, si no, desde su título. */
+	private void reveal(LinearLayout actions) {
+		if (!revealSuggestion)
+			return;
+		revealSuggestion = false;
+		View card = actions;
+		while (card.getParent() instanceof View && card.getParent() != rows)
+			card = (View) card.getParent();
+		View target = card;
+		// Tras la medida: antes de pintarse la tarjeta no tiene posición ni alto.
+		target.post(() -> target.requestRectangleOnScreen(
+			new android.graphics.Rect(0, 0, target.getWidth(), target.getHeight()), false));
 	}
 
 	private void routines(boolean hasNextStep) {
@@ -204,6 +224,7 @@ public final class TrainingFragment extends ScreenFragment {
 		freeStart.setTag("training_free");
 		option(create, Txt.t(R.string.tr_suggest), Txt.t(R.string.tr_suggest_help), ready && !app.trainingMutation, () -> {
 			suggesting = true;
+			revealSuggestion = true;
 			render();
 		}).setTag("training_suggest");
 		View ai = option(create, Txt.t(R.string.tr_ask_trainer), Txt.t(R.string.tr_ask_trainer_help),
