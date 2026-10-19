@@ -61,6 +61,8 @@ Empieza hoy: elige tu objetivo, entrena y deja que EnerGym te ayude a progresar 
 - Gráfico destacado: `destacado-1024x500.png` (1024 × 500)
 - Capturas de teléfono: `captura-1.png` … (1080 × 2160)
 
+**Vídeo promocional** (en `docs/google-play/`): `video-promocional.mp4` (1080 × 1920, 40 s). Play Console no admite subir el archivo: pide la URL de un vídeo de YouTube público o no listado, sin anuncios y sin restricción de edad.
+
 ## Contenido de la aplicación (formularios)
 
 **Anuncios:** No, la aplicación no contiene anuncios.
@@ -101,6 +103,7 @@ EnerGym escribe en Health Connect los entrenamientos que el usuario termina en l
 
 ## Antes de publicar (pendiente)
 
+1. Subir `video-promocional.mp4` a YouTube (no listado) y pegar la URL en «Vídeo» de la ficha principal.
 2. Activar GitHub Pages (Settings › Pages › Deploy from a branch › `codex/energym` › `/docs`).
 3. Añadir en la app la opción de **borrar la cuenta y los datos de la nube**: Google Play la exige a las apps con inicio de sesión.
 4. Tras subir el primer .aab: copiar la huella SHA-1 de «Firma de apps de Play» en Firebase para que funcione el inicio con Google.
