@@ -3,6 +3,7 @@ package com.energym.app.catalog;
 import com.energym.app.domain.Exercise;
 import com.energym.app.domain.TextMatch;
 import com.energym.app.domain.TrainingProfile.*;
+import com.energym.app.i18n.Txt;
 
 import java.text.Normalizer;
 import java.util.*;
@@ -30,7 +31,8 @@ public final class ExerciseSearch {
 	}
 
 	private static final Set<String> CONNECTORS = new HashSet<>(Arrays.asList(
-		"a", "al", "de", "del", "el", "la", "las", "los", "y", "en", "con", "por", "para", "un", "una"));
+		"a", "al", "de", "del", "el", "la", "las", "los", "y", "en", "con", "por", "para", "un", "una",
+		"an", "the", "of", "with", "and", "on", "for"));
 	private final List<Exercise> catalog;
 
 	public ExerciseSearch(Collection<Exercise> catalog) {
@@ -87,15 +89,20 @@ public final class ExerciseSearch {
 		int inName = TextMatch.matchAll(terms, name, 3);
 		if (inName <= TextMatch.PREFIX)
 			return name.startsWith(query) ? 1 : 2;
-		String identifiers = name + " " + normalize(e.getId()) + " " + aliases(e.getId());
+		// En inglés también se encuentra por el nombre original en español.
+		String identifiers = name + " " + normalize(e.getId()) + " " + aliases(e.getId()) +
+			(Txt.english() ? " " + normalize(e.getSourceName()) : "");
 		if (TextMatch.matchAll(terms, identifiers, 3) <= TextMatch.PREFIX)
 			return 3;
 		StringBuilder metadata = new StringBuilder(identifiers);
 		for (Resource resource : e.getRequiredResources())
 			metadata.append(' ').append(materialWords(resource));
 		// El grupo muscular también se busca: «pecho», «gluteos», «espalda»…
-		for (com.energym.app.domain.RoutineRequest.Area area : com.energym.app.domain.RoutineRequest.areas(e))
+		for (com.energym.app.domain.RoutineRequest.Area area : com.energym.app.domain.RoutineRequest.areas(e)) {
 			metadata.append(' ').append(normalize(area.label));
+			if (Txt.english())
+				metadata.append(' ').append(normalize(area.display()));
+		}
 		int inMetadata = TextMatch.matchAll(terms, metadata.toString(), 3);
 		if (inMetadata <= TextMatch.PREFIX)
 			return 4;

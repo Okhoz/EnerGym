@@ -176,11 +176,11 @@ public final class SnapshotCodec {
 	}
 
 	private static JSONObject exercise(Exercise e) throws JSONException {
-		return new JSONObject().put("id", e.getId()).put("name", e.getName())
+		return new JSONObject().put("id", e.getId()).put("name", e.getSourceName())
 			.put("metricType", e.getMetricType().name()).put("goals", array(e.getGoals()))
 			.put("environments", array(e.getEnvironments())).put("resources", array(e.getRequiredResources()))
 			.put("sportIds", array(e.getSportIds())).put("coverage", e.getCoverage().name())
-			.put("reviewed", e.isReviewed()).put("description", e.getDescription())
+			.put("reviewed", e.isReviewed()).put("description", e.getSourceDescription())
 			.put("alternatives", array(e.getAlternativeIds()));
 	}
 

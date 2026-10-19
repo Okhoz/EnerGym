@@ -98,7 +98,7 @@ public final class CoachInsights {
 							top = Math.max(top, x.reps);
 				if (top > 0) {
 					best.computeIfAbsent(e.getId(), k -> new ArrayList<>()).add(top);
-					names.put(e.getId(), e.getName());
+					names.put(e.getId(), e.getSourceName());
 				}
 			}
 		List<String> stalled = new ArrayList<>();
@@ -138,7 +138,7 @@ public final class CoachInsights {
 				String note = values == null ? "" : values.getOrDefault(SetLog.NOTE, "").trim();
 				if (note.isEmpty())
 					continue;
-				String line = item.getExercise().getName() + " (" + day(s, zone) + "): «" +
+				String line = item.getExercise().getSourceName() + " (" + day(s, zone) + "): «" +
 					(note.length() > 120 ? note.substring(0, 119) + "…" : note) + "»";
 				(PAIN.matcher(note).find() ? pain : other).add(line);
 			}

@@ -50,13 +50,13 @@ public final class CsvBackup {
 					for (Map.Entry<String, String> v : values.entrySet())
 						if (!v.getKey().equals(SetLog.NOTE) && !v.getKey().equals(SetLog.KEY))
 							parts.add(v.getKey() + "=" + v.getValue());
-					row(out, "entreno", day.toString(), s.getRoutine().getTitle(), e.getName(), "", "", "", "", "", "", "",
+					row(out, "entreno", day.toString(), s.getRoutine().getTitle(), e.getSourceName(), "", "", "", "", "", "", "",
 						"", "", "", "", String.join("; ", parts), note);
 					continue;
 				}
 				for (int i = 0; i < sets.size(); i++) {
 					SetLog.Entry x = sets.get(i);
-					row(out, "entreno", day.toString(), s.getRoutine().getTitle(), e.getName(), Integer.toString(i + 1),
+					row(out, "entreno", day.toString(), s.getRoutine().getTitle(), e.getSourceName(), Integer.toString(i + 1),
 						SetLog.format(x.kg), Integer.toString(x.reps), x.kind == SetLog.Kind.NORMAL ? "" : x.kind.label,
 						x.rpe > 0 ? SetLog.format(x.rpe) : "", "", "", "", "", "", "", "", i == 0 ? note : "");
 				}

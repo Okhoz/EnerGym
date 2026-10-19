@@ -1437,6 +1437,8 @@
 	<string name="ex_resources">Recursos necesarios: %1$s</string>
 	<string name="ex_reviewed">Contenido revisado.</string>
 	<string name="ex_not_reviewed">Ejemplo sin revisión profesional.</string>
+	<string name="sport_coverage_pending">Contenido especializado pendiente de validación</string>
+	<string name="sport_coverage_example">Ejemplos de producto sin revisión profesional</string>
 	<string name="ex_questions">¿Dudas?</string>
 	<string name="ex_questions_body">Pregunta al asistente por este ejercicio.</string>
 	<string name="ex_guided">Explicación guiada</string>

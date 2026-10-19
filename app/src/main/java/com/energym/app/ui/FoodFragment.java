@@ -220,11 +220,11 @@ public final class FoodFragment extends ScreenFragment {
 		LinearLayout list = card(Txt.t(R.string.food_recent), "");
 		for (FoodEntry e : recent) {
 			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, list, false);
-			((TextView) row.findViewById(R.id.food_name)).setText(e.name);
+			((TextView) row.findViewById(R.id.food_name)).setText(e.label());
 			((TextView) row.findViewById(R.id.food_detail)).setText(NutritionController.format(e.amount) + " " +
 				e.unit.symbol + " · " + NutritionController.format(e.kcal100) + " kcal/100 " + e.unit.symbol);
 			((TextView) row.findViewById(R.id.food_kcal)).setText("+");
-			row.setContentDescription(Txt.t(R.string.food_add_again_named, e.name));
+			row.setContentDescription(Txt.t(R.string.food_add_again_named, e.label()));
 			row.setOnClickListener(v -> {
 				n.startFrom(e);
 				app.changed();
@@ -261,16 +261,16 @@ public final class FoodFragment extends ScreenFragment {
 		if (!terms.isEmpty())
 			for (FoodEntry e : n.recentFoods(Integer.MAX_VALUE)) {
 				if (mine == 3 || com.energym.app.domain.TextMatch.matchAll(terms,
-					com.energym.app.domain.TextMatch.normalize(e.name)) == com.energym.app.domain.TextMatch.NONE)
+					com.energym.app.domain.TextMatch.normalize(e.label())) == com.energym.app.domain.TextMatch.NONE)
 					continue;
 				if (mine++ == 0)
 					text(results, Txt.t(R.string.food_yours), R.style.EnerGym_FieldCaption, 12);
 				android.view.View row = getLayoutInflater().inflate(R.layout.row_food, results, false);
-				((TextView) row.findViewById(R.id.food_name)).setText(e.name);
+				((TextView) row.findViewById(R.id.food_name)).setText(e.label());
 				((TextView) row.findViewById(R.id.food_detail)).setText(NutritionController.format(e.amount) + " " +
 					e.unit.symbol + " · " + NutritionController.format(e.kcal100) + " kcal/100 " + e.unit.symbol);
 				((TextView) row.findViewById(R.id.food_kcal)).setText("+");
-				row.setContentDescription(Txt.t(R.string.food_add_again_named, e.name));
+				row.setContentDescription(Txt.t(R.string.food_add_again_named, e.label()));
 				row.setOnClickListener(v -> {
 					commonQuery = "";
 					n.startFrom(e);
@@ -284,11 +284,11 @@ public final class FoodFragment extends ScreenFragment {
 			text(results, Txt.t(R.string.food_not_common), R.style.EnerGym_FieldCaption, 4);
 		for (CommonFoods.Food f : found) {
 			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, results, false);
-			((TextView) row.findViewById(R.id.food_name)).setText(f.name);
+			((TextView) row.findViewById(R.id.food_name)).setText(f.label());
 			((TextView) row.findViewById(R.id.food_detail)).setText(Txt.t(R.string.food_portion) + " " + NutritionController.format(f.portion) + " " +
 				f.unit.symbol + " · " + NutritionController.format(f.kcal100) + " kcal/100 " + f.unit.symbol);
 			((TextView) row.findViewById(R.id.food_kcal)).setText("+");
-			row.setContentDescription(Txt.t(R.string.food_use, f.name));
+			row.setContentDescription(Txt.t(R.string.food_use, f.label()));
 			row.setOnClickListener(v -> {
 				commonQuery = "";
 				n.startCommon(f);
@@ -341,11 +341,11 @@ public final class FoodFragment extends ScreenFragment {
 
 	private static void suggest(NutritionController n, android.widget.Button button, String typed) {
 		FoodEntry known = n.known(typed);
-		boolean same = known != null && known.name.equalsIgnoreCase(typed.trim()) &&
+		boolean same = known != null && known.label().equalsIgnoreCase(typed.trim()) &&
 			NutritionController.format(known.kcal100).equals(n.foodDraft.getOrDefault("kcal100", ""));
 		button.setVisibility(known == null || same ? android.view.View.GONE : android.view.View.VISIBLE);
 		if (known != null)
-			button.setText(Txt.t(R.string.food_use_known, known.name, NutritionController.format(known.kcal100) + " kcal/100 " +
+			button.setText(Txt.t(R.string.food_use_known, known.label(), NutritionController.format(known.kcal100) + " kcal/100 " +
 				known.unit.symbol));
 	}
 
@@ -362,7 +362,7 @@ public final class FoodFragment extends ScreenFragment {
 		StringBuilder list = new StringBuilder();
 		for (FoodEntry e : added) {
 			kcal += e.kcal();
-			list.append(list.length() == 0 ? "" : "\n").append("✓ ").append(e.name).append(" · ")
+			list.append(list.length() == 0 ? "" : "\n").append("✓ ").append(e.label()).append(" · ")
 				.append(NutritionController.format(e.amount)).append(" ").append(e.unit.symbol).append(" · ")
 				.append(Math.round(e.kcal())).append(" kcal");
 		}

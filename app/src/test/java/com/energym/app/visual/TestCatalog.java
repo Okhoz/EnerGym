@@ -16,14 +16,19 @@ public final class TestCatalog {
 		Map<?, ?> root = (Map<?, ?>) MiniJson.parse(new String(
 			Files.readAllBytes(Paths.get("src/main/assets/catalog.json")), StandardCharsets.UTF_8));
 		List<Exercise> exercises = new ArrayList<>();
+		Map<String, Exercise.English> english = new HashMap<>();
 		for (Object value : (List<?>) root.get("exercises")) {
 			Map<?, ?> row = (Map<?, ?>) value;
+			if (row.get("nameEn") != null && row.get("descriptionEn") != null)
+				english.put((String) row.get("id"), new Exercise.English((String) row.get("name"),
+					(String) row.get("nameEn"), (String) row.get("descriptionEn")));
 			exercises.add(new Exercise((String) row.get("id"), (String) row.get("name"),
 				MetricType.valueOf((String) row.get("metricType")), enums(row.get("goals"), Goal.class),
 				enums(row.get("environments"), Environment.class), enums(row.get("requiredResources"), Resource.class),
 				new LinkedHashSet<>(strings(row.get("sportIds"))), Exercise.Coverage.valueOf((String) row.get("coverage")),
 				Boolean.TRUE.equals(row.get("reviewed")), (String) row.get("description"), strings(row.get("alternativeIds"))));
 		}
+		Exercise.setEnglish(english);
 		return exercises;
 	}
 
@@ -34,7 +39,7 @@ public final class TestCatalog {
 		List<Sport> sports = new ArrayList<>();
 		for (Object value : (List<?>) root.get("sports")) {
 			Map<?, ?> row = (Map<?, ?>) value;
-			sports.add(new Sport((String) row.get("id"), (String) row.get("name"),
+			sports.add(new Sport((String) row.get("id"), (String) row.get("name"), (String) row.get("nameEn"),
 				Sport.CoverageStatus.valueOf((String) row.get("specificCoverage")),
 				Sport.CoverageStatus.valueOf((String) row.get("complementaryCoverage"))));
 		}

@@ -42,6 +42,11 @@ public final class Txt {
 		};
 	}
 
+	/** Solo para las pruebas de JVM: otro origen de textos (por ejemplo, el de values-en). */
+	static void use(Resolver other) {
+		resolver = other;
+	}
+
 	public static String t(int id, Object... args) {
 		return resolver.string(id, args);
 	}
@@ -55,12 +60,18 @@ public final class Txt {
 		return resolver.locale();
 	}
 
+	/** La app se muestra en inglés: los datos de la app (ejercicios, alimentos) usan su versión en inglés. */
+	public static boolean english() {
+		Resolver r = resolver;
+		return r != null && "en".equals(r.locale().getLanguage());
+	}
+
 	/**
 	 * Número ya escrito con punto decimal («82.5») en la forma del idioma: coma en español, punto en inglés.
 	 * Solo para mostrar; lo que se guarda o se lee siempre acepta los dos.
 	 */
 	public static String decimal(String number) {
-		return "en".equals(locale().getLanguage()) ? number : number.replace('.', ',');
+		return english() ? number : number.replace('.', ',');
 	}
 
 	private static Resolver fallback() {

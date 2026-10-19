@@ -674,7 +674,8 @@ public final class ProposalController {
 	}
 
 	private boolean sameExercise(Exercise a, Exercise b) {
-		return b != null && a.getName().equals(b.getName()) && a.getDescription().equals(b.getDescription()) &&
+		return b != null && a.getSourceName().equals(b.getSourceName()) &&
+			a.getSourceDescription().equals(b.getSourceDescription()) &&
 			a.getMetricType() == b.getMetricType() && a.getRequiredResources().equals(b.getRequiredResources()) &&
 			a.getGoals().equals(b.getGoals()) && a.getEnvironments().equals(b.getEnvironments()) &&
 			a.getSportIds().equals(b.getSportIds()) && a.getCoverage() == b.getCoverage();
@@ -700,19 +701,31 @@ public final class ProposalController {
 	private String techniqueReply(String raw) {
 		String text = " " + com.energym.app.catalog.ExerciseSearch.normalize(raw) + " ";
 		Exercise named = null;
-		for (Exercise e : catalog) {
-			String name = com.energym.app.catalog.ExerciseSearch.normalize(e.getName());
-			if (!name.isEmpty() && text.contains(" " + name + " ") &&
-				(named == null || name.length() > named.getName().length()))
-				named = e;
-		}
+		int namedLength = 0;
+		for (Exercise e : catalog)
+			// En inglés también vale el nombre original en español.
+			for (String n : new String[]{e.getName(), e.getSourceName()}) {
+				String name = com.energym.app.catalog.ExerciseSearch.normalize(n);
+				if (!name.isEmpty() && text.contains(" " + name + " ") && name.length() > namedLength) {
+					named = e;
+					namedLength = name.length();
+				}
+			}
 		if (named != null)
 			return explanation(named);
+		// Palabra base de la familia: en español va primero («plancha lateral»); en inglés puede ir en cualquier
+		// sitio («side plank», «plank jacks»).
+		boolean english = Txt.english();
 		List<Exercise> family = new ArrayList<>();
+		Map<Exercise, String> baseOf = new HashMap<>();
 		for (Exercise e : catalog) {
-			String first = com.energym.app.catalog.ExerciseSearch.normalize(e.getName()).split(" ")[0];
-			if (first.length() >= 5 && (text.contains(" " + first + " ") || text.contains(" " + first + "s ")))
-				family.add(e);
+			String[] words = com.energym.app.catalog.ExerciseSearch.normalize(e.getName()).split(" ");
+			for (String word : english ? words : new String[]{words[0]})
+				if (word.length() >= 5 && (text.contains(" " + word + " ") || text.contains(" " + word + "s "))) {
+					family.add(e);
+					baseOf.put(e, word);
+					break;
+				}
 		}
 		if (family.isEmpty())
 			return null;
@@ -723,7 +736,7 @@ public final class ProposalController {
 		List<String> names = new ArrayList<>();
 		for (Exercise e : family.subList(0, Math.min(8, family.size())))
 			names.add(e.getName());
-		String base = family.get(0).getName().split(" ")[0];
+		String base = english ? baseOf.get(family.get(0)) : family.get(0).getName().split(" ")[0];
 		return Txt.t(R.string.pc_variants, family.size(), base.toLowerCase(Locale.ROOT),
 			String.join(", ", names) + (family.size() > names.size() ? " " + Txt.t(R.string.pc_and_more) : ""),
 			Collections.min(names, Comparator.comparingInt(String::length)).toLowerCase(Locale.ROOT));

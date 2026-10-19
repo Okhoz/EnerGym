@@ -170,13 +170,13 @@ public final class TrainerPrompt {
 		if (!eligible.isEmpty()) {
 			tail.append("\nEJERCICIOS DISPONIBLES (id | nombre | tipo)\n");
 			for (Exercise e : eligible)
-				tail.append(e.getId()).append(" | ").append(e.getName()).append(" | ").append(metric(e.getMetricType()))
+				tail.append(e.getId()).append(" | ").append(e.getSourceName()).append(" | ").append(metric(e.getMetricType()))
 					.append('\n');
 		}
 		Exercise asked = r.exerciseId == null ? null : ChatProtocol.find(catalog, r.exerciseId);
 		if (asked != null)
-			tail.append("\nEJERCICIO QUE CONSULTA: ").append(asked.getName()).append(". Técnica: ")
-				.append(cut(asked.getDescription(), MAX_DESCRIPTION)).append('\n');
+			tail.append("\nEJERCICIO QUE CONSULTA: ").append(asked.getSourceName()).append(". Técnica: ")
+				.append(cut(asked.getSourceDescription(), MAX_DESCRIPTION)).append('\n');
 		String trainingIntro = "\nSU ENTRENAMIENTO Y TODO LO QUE HA HECHO EN LA APP (datos reales)\n";
 		String trainingRules = "Conoces todo esto: úsalo en cada respuesta y cita sus datos concretos (sesiones, cargas, " +
 			"peso, comidas, objetivos). No inventes datos que no aparezcan. Relaciona entreno y dieta con su objetivo, " +
@@ -333,7 +333,10 @@ public final class TrainerPrompt {
 		TreeMap<Integer, Exercise> found = new TreeMap<>();
 		boolean byId = false;
 		for (Exercise e : eligible) {
-			int at = lower.indexOf(e.getName().toLowerCase(Locale.ROOT));
+			// La IA recibe los nombres en español, pero puede traducirlos si responde en inglés.
+			int at = lower.indexOf(e.getSourceName().toLowerCase(Locale.ROOT));
+			int shown = lower.indexOf(e.getName().toLowerCase(Locale.ROOT));
+			at = at < 0 ? shown : shown < 0 ? at : Math.min(at, shown);
 			// Un ID entre comillas procede de un JSON de rutina (aunque esté cortado): basta con uno.
 			int id = lower.indexOf("\"" + e.getId() + "\"");
 			if (id >= 0)

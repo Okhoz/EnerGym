@@ -119,7 +119,7 @@ public final class AssistantContext {
 					next = "repite " + (s.kg > 0 ? SetLog.format(s.kg) + " kg " : "") + "hasta hacer " + s.reps +
 						" repeticiones en todas las series";
 			}
-			lines.add(item.getExercise().getName() + ": última vez " + last + " (rango " + range[0] + "–" + range[1] +
+			lines.add(item.getExercise().getSourceName() + ": última vez " + last + " (rango " + range[0] + "–" + range[1] +
 				") → " + next + ".");
 		}
 		return String.join("\n", lines);
@@ -147,7 +147,7 @@ public final class AssistantContext {
 					continue;
 				double oneRm = SetLog.best(SetLog.of(values));
 				if (oneRm > 0)
-					best.merge(e.getName(), oneRm, Math::max);
+					best.merge(e.getSourceName(), oneRm, Math::max);
 			}
 		}
 		List<Map.Entry<String, Double>> top = new ArrayList<>(best.entrySet());

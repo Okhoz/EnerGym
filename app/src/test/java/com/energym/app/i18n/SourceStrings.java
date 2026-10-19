@@ -13,18 +13,38 @@ import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-/** Resuelve los textos de Txt en los tests de JVM leyendo res/values/strings.xml (español). */
+/**
+ * Resuelve los textos de Txt en los tests de JVM leyendo res/values/strings.xml (español); con {@link #use}, también
+ * los de values-en para probar la app en inglés.
+ */
 public final class SourceStrings implements Txt.Resolver {
 	private static final Locale ES = Locale.forLanguageTag("es-ES");
+	private final Locale locale;
 	private final Map<String, String> strings = new HashMap<>();
 	private final Map<String, Map<String, String>> plurals = new HashMap<>();
 	private final Map<Integer, String> stringNames = names(R.string.class);
 	private final Map<Integer, String> pluralNames = names(R.plurals.class);
 
 	public SourceStrings() {
+		this(ES);
+	}
+
+	private SourceStrings(Locale locale) {
+		this.locale = locale;
+		read("values");
+		if ("en".equals(locale.getLanguage()))
+			read("values-en");
+	}
+
+	/** Textos de la app en este idioma (inglés o español) hasta la siguiente llamada; las pruebas vuelven a ES. */
+	public static void use(Locale locale) {
+		Txt.use(new SourceStrings(locale));
+	}
+
+	private void read(String folder) {
 		try {
-			File file = new File("src/main/res/values/strings.xml");
-			if (!file.exists()) file = new File("app/src/main/res/values/strings.xml");
+			File file = new File("src/main/res/" + folder + "/strings.xml");
+			if (!file.exists()) file = new File("app/src/main/res/" + folder + "/strings.xml");
 			Element root = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file).getDocumentElement();
 			NodeList list = root.getElementsByTagName("string");
 			for (int i = 0; i < list.getLength(); i++) {
@@ -51,7 +71,7 @@ public final class SourceStrings implements Txt.Resolver {
 	public String string(int id, Object... args) {
 		String value = strings.get(stringNames.get(id));
 		if (value == null) throw new IllegalArgumentException("Texto desconocido: " + id);
-		return args.length == 0 ? value : String.format(ES, value, args);
+		return args.length == 0 ? value : String.format(locale, value, args);
 	}
 
 	@Override
@@ -59,12 +79,12 @@ public final class SourceStrings implements Txt.Resolver {
 		Map<String, String> items = plurals.get(pluralNames.get(id));
 		if (items == null) throw new IllegalArgumentException("Plural desconocido: " + id);
 		String value = count == 1 && items.containsKey("one") ? items.get("one") : items.get("other");
-		return String.format(ES, value, args.length == 0 ? new Object[]{count} : args);
+		return String.format(locale, value, args.length == 0 ? new Object[]{count} : args);
 	}
 
 	@Override
 	public Locale locale() {
-		return ES;
+		return locale;
 	}
 
 	private static Map<Integer, String> names(Class<?> type) {

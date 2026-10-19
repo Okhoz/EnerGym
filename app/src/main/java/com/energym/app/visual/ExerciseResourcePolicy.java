@@ -43,8 +43,8 @@ public final class ExerciseResourcePolicy {
 	 * aceptadas antes.
 	 */
 	public static boolean same(Exercise a, Exercise b) {
-		return a != null && b != null && a.getId().equals(b.getId()) && a.getName().equals(b.getName()) &&
-			a.getDescription().equals(b.getDescription()) && a.getMetricType() == b.getMetricType() &&
+		return a != null && b != null && a.getId().equals(b.getId()) && a.getSourceName().equals(b.getSourceName()) &&
+			a.getSourceDescription().equals(b.getSourceDescription()) && a.getMetricType() == b.getMetricType() &&
 			a.getGoals().equals(b.getGoals()) && a.getEnvironments().equals(b.getEnvironments()) &&
 			a.getRequiredResources().equals(b.getRequiredResources()) &&
 			a.getCoverage() == b.getCoverage() && a.isReviewed() == b.isReviewed() &&

@@ -1,6 +1,7 @@
 package com.energym.app.nutrition;
 
 import com.energym.app.domain.TextMatch;
+import com.energym.app.i18n.Txt;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -10,19 +11,24 @@ import java.util.*;
 /**
  * MODELO: alimentos genéricos habituales con valores orientativos por 100 g/ml, una ración típica y sinónimos
  * («macarrones», «penne»…). Vienen en assets/foods.tsv dentro de la app (sin red ni coste); si el envase indica
- * otra cosa, manda la etiqueta.
+ * otra cosa, manda la etiqueta. Cada uno tiene también nombre y sinónimos en inglés: con la app en inglés se
+ * muestran y se buscan en inglés (y en español), pero lo anotado se guarda siempre con el nombre en español.
  */
 public final class CommonFoods {
 	public static final class Food {
+		/** Nombre en español: el que se guarda en el diario y recibe la IA. */
 		public final String name;
+		/** Nombre en inglés; vacío si la tabla no lo trae (entonces se muestra el español). */
+		public final String nameEn;
 		public final FoodEntry.Unit unit;
 		/** Ración típica en g o ml. */
 		public final double portion, kcal100, protein100, carbs100, fat100;
-		final String searchable;
+		final String searchable, searchableEn;
 
 		Food(String name, FoodEntry.Unit unit, double portion, double kcal, double protein, double carbs, double fat,
-			String aliases) {
+			String aliases, String nameEn, String aliasesEn) {
 			this.name = name;
+			this.nameEn = nameEn;
 			this.unit = unit;
 			this.portion = portion;
 			this.kcal100 = kcal;
@@ -30,10 +36,18 @@ public final class CommonFoods {
 			this.carbs100 = carbs;
 			this.fat100 = fat;
 			searchable = " " + normalize(name + " " + aliases.replace(',', ' ')) + " ";
+			searchableEn = " " + normalize(nameEn + " " + aliasesEn.replace(',', ' ')) + searchable;
+		}
+
+		/** Nombre en el idioma de la app. */
+		public String label() {
+			return Txt.english() && !nameEn.isEmpty() ? nameEn : name;
 		}
 	}
 
 	private static volatile List<Food> all = Collections.emptyList();
+	/** Nombre en español y en inglés (en minúsculas) → alimento, para traducir lo anotado. */
+	private static volatile Map<String, Food> bySpanish = Collections.emptyMap(), byEnglish = Collections.emptyMap();
 
 	private CommonFoods() {
 	}
@@ -52,13 +66,38 @@ public final class CommonFoods {
 				try {
 					foods.add(new Food(c[0].trim(), FoodEntry.Unit.valueOf(c[1].trim()), Double.parseDouble(c[2]),
 						Double.parseDouble(c[3]), Double.parseDouble(c[4]), Double.parseDouble(c[5]),
-						Double.parseDouble(c[6]), c.length > 7 ? c[7] : ""));
+						Double.parseDouble(c[6]), c.length > 7 ? c[7] : "", c.length > 8 ? c[8].trim() : "",
+						c.length > 9 ? c[9] : ""));
 				} catch (IllegalArgumentException ignored) {
 					// Fila incompleta: no se ofrece.
 				}
 			}
 		}
+		Map<String, Food> spanish = new HashMap<>(), english = new HashMap<>();
+		for (Food f : foods) {
+			spanish.putIfAbsent(f.name.toLowerCase(Locale.ROOT), f);
+			if (!f.nameEn.isEmpty())
+				english.putIfAbsent(f.nameEn.toLowerCase(Locale.ROOT), f);
+		}
 		all = Collections.unmodifiableList(foods);
+		bySpanish = spanish;
+		byEnglish = english;
+	}
+
+	/** Nombre anotado tal como se muestra: los alimentos de la tabla, en el idioma de la app. */
+	public static String label(String stored) {
+		if (stored == null || !Txt.english())
+			return stored;
+		Food f = bySpanish.get(stored.trim().toLowerCase(Locale.ROOT));
+		return f == null ? stored : f.label();
+	}
+
+	/** Nombre que se guarda: con la app en inglés, un alimento de la tabla vuelve a su nombre en español. */
+	public static String stored(String shown) {
+		if (shown == null || !Txt.english())
+			return shown;
+		Food f = byEnglish.get(shown.trim().toLowerCase(Locale.ROOT));
+		return f == null ? shown : f.name;
 	}
 
 	public static List<Food> all() {
@@ -80,16 +119,20 @@ public final class CommonFoods {
 		List<String> terms = TextMatch.terms(q);
 		if (terms.isEmpty())
 			return Collections.emptyList();
+		// En inglés: primero el nombre en inglés y, detrás, sus sinónimos y todo lo español.
+		boolean english = Txt.english();
 		List<Food> found = new ArrayList<>();
 		Map<Food, Integer> rank = new HashMap<>();
 		for (Food f : all) {
-			String name = normalize(f.name);
+			String name = normalize(f.label());
 			int score;
-			if (name.startsWith(q) || name.startsWith(stem(q)))
+			// En inglés lo principal no siempre va delante («White rice, cooked»): basta con la palabra exacta.
+			if (name.startsWith(q) || name.startsWith(stem(q)) ||
+				english && TextMatch.matchAll(terms, name) == TextMatch.EXACT)
 				score = 0;
 			else {
 				int inName = TextMatch.matchAll(terms, name);
-				int inAll = TextMatch.matchAll(terms, f.searchable.trim());
+				int inAll = TextMatch.matchAll(terms, (english ? f.searchableEn : f.searchable).trim());
 				score = inName <= TextMatch.PREFIX ? 1 : inAll <= TextMatch.PREFIX ? 2 :
 					inAll == TextMatch.SYNONYM ? 3 : inAll == TextMatch.TYPO ? 4 : -1;
 			}

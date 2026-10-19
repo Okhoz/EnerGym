@@ -67,6 +67,11 @@ public final class FoodEntry {
 			throw new IllegalArgumentException(Txt.t(R.string.fe_out_of_range, label, (int) min, (int) max));
 	}
 
+	/** Nombre para mostrar: los alimentos de la tabla se guardan en español y se ven en el idioma de la app. */
+	public String label() {
+		return CommonFoods.label(name);
+	}
+
 	public double kcal() {
 		return kcal100 * amount / 100.0;
 	}

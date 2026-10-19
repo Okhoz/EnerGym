@@ -804,7 +804,7 @@ public final class AppController {
 				.append(" min): ");
 			List<String> items = new ArrayList<>();
 			for (RoutineItem i : active.getItems())
-				items.add(i.getExercise().getName() + " " +
+				items.add(i.getExercise().getSourceName() + " " +
 					com.energym.app.assistant.RoutineCard.dose(i.getExercise().getMetricType(), i.getPrescription()));
 			s.append(String.join("; ", items)).append('\n');
 		}
@@ -822,7 +822,7 @@ public final class AppController {
 				if (r == null)
 					continue;
 				String effort = r.containsKey("effort") ? " · esfuerzo " + r.get("effort") + "/10" : "";
-				done.add(i.getExercise().getName() + " " +
+				done.add(i.getExercise().getSourceName() + " " +
 					com.energym.app.assistant.RoutineCard.dose(i.getExercise().getMetricType(), r) + effort);
 			}
 			s.append(done.isEmpty() ? "sin datos anotados" : String.join("; ", done)).append('\n');

@@ -55,7 +55,7 @@ public final class CustomExercises {
 		if (clean.length() < 2 || clean.length() > 60)
 			return Txt.t(R.string.ce_name);
 		for (Exercise e : catalog.getExercises())
-			if (e.getName().equalsIgnoreCase(clean))
+			if (e.getName().equalsIgnoreCase(clean) || e.getSourceName().equalsIgnoreCase(clean))
 				return Txt.t(R.string.ce_exists, e.getName());
 		Set<String> sports = new LinkedHashSet<>();
 		for (Sport sport : catalog.getSports())
@@ -94,9 +94,9 @@ public final class CustomExercises {
 
 	/** Grupo muscular elegido al crear el ejercicio (null si no es propio). */
 	public static Area area(Exercise e) {
-		if (!e.getId().startsWith("custom-") || !e.getDescription().startsWith(AREA_MARK))
+		if (!e.getId().startsWith("custom-") || !e.getSourceDescription().startsWith(AREA_MARK))
 			return null;
-		String label = e.getDescription().substring(AREA_MARK.length()).split("\\.")[0];
+		String label = e.getSourceDescription().substring(AREA_MARK.length()).split("\\.")[0];
 		for (Area a : Area.values())
 			if (a.label.equals(label))
 				return a;

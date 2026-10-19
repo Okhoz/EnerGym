@@ -1326,6 +1326,8 @@
 	<string name="ex_resources">Equipment needed: %1$s</string>
 	<string name="ex_reviewed">Reviewed content.</string>
 	<string name="ex_not_reviewed">Example without professional review.</string>
+	<string name="sport_coverage_pending">Specialist content pending validation</string>
+	<string name="sport_coverage_example">Product examples without professional review</string>
 	<string name="ex_questions">Questions?</string>
 	<string name="ex_questions_body">Ask the assistant about this exercise.</string>
 	<string name="ex_guided">Guided explanation</string>

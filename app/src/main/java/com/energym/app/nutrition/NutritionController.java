@@ -580,7 +580,7 @@ public final class NutritionController {
 	public void startFrom(FoodEntry recent) {
 		if (busy) return;
 		startManual();
-		foodDraft.put("name", recent.name);
+		foodDraft.put("name", recent.label());
 		foodDraft.put("barcode", recent.barcode);
 		foodDraft.put("unit", recent.unit.name());
 		foodDraft.put("amount", format(recent.amount));
@@ -588,7 +588,7 @@ public final class NutritionController {
 		foodDraft.put("protein100", format(recent.protein100));
 		foodDraft.put("carbs100", format(recent.carbs100));
 		foodDraft.put("fat100", format(recent.fat100));
-		chosenFood = recent.name;
+		chosenFood = recent.label();
 	}
 
 	/** Rellena el formulario con un alimento genérico: valores orientativos y su ración típica, editables. */
@@ -596,14 +596,14 @@ public final class NutritionController {
 		if (busy) return;
 		FoodEntry.Meal meal = FoodEntry.Meal.valueOf(foodDraft.getOrDefault("meal", defaultMeal().name()));
 		startManual(meal);
-		foodDraft.put("name", food.name);
+		foodDraft.put("name", food.label());
 		foodDraft.put("unit", food.unit.name());
 		foodDraft.put("amount", format(food.portion));
 		foodDraft.put("kcal100", format(food.kcal100));
 		foodDraft.put("protein100", format(food.protein100));
 		foodDraft.put("carbs100", format(food.carbs100));
 		foodDraft.put("fat100", format(food.fat100));
-		chosenFood = food.name;
+		chosenFood = food.label();
 	}
 
 	/** Abre la misma entrada, conservando ID, día y fecha de alta para la sincronización. */
@@ -652,21 +652,21 @@ public final class NutritionController {
 		if (q.length() < 3)
 			return null;
 		for (FoodEntry e : recentFoods(Integer.MAX_VALUE))
-			if (e.name.toLowerCase(Locale.ROOT).startsWith(q))
+			if (e.label().toLowerCase(Locale.ROOT).startsWith(q))
 				return e;
 		return null;
 	}
 
 	/** Copia la etiqueta (nombre y valores por 100) de un alimento ya anotado; cantidad y comida se conservan. */
 	public void useLabelOf(FoodEntry known) {
-		foodDraft.put("name", known.name);
+		foodDraft.put("name", known.label());
 		foodDraft.put("barcode", known.barcode);
 		foodDraft.put("unit", known.unit.name());
 		foodDraft.put("kcal100", format(known.kcal100));
 		foodDraft.put("protein100", format(known.protein100));
 		foodDraft.put("carbs100", format(known.carbs100));
 		foodDraft.put("fat100", format(known.fat100));
-		chosenFood = known.name;
+		chosenFood = known.label();
 	}
 
 	public List<FoodEntry> recentFoods(int limit) {
@@ -852,7 +852,8 @@ public final class NutritionController {
 				foodDraft.put(key, fixed);
 		}
 		FoodEntry value = FoodEntry.create(editing == null ? selected : editing.day, FoodEntry.Meal.valueOf(foodDraft.getOrDefault("meal", "OTHER")),
-			foodDraft.getOrDefault("name", ""), foodDraft.get("barcode"),
+			product == null ? CommonFoods.stored(foodDraft.getOrDefault("name", "")) : foodDraft.getOrDefault("name", ""),
+			foodDraft.get("barcode"),
 			FoodEntry.Unit.valueOf(foodDraft.getOrDefault("unit", "G")), number(foodDraft.get("amount")),
 			number(foodDraft.get("kcal100")), number(foodDraft.get("protein100")), number(foodDraft.get("carbs100")),
 			number(foodDraft.get("fat100")));
@@ -889,7 +890,7 @@ public final class NutritionController {
 				foodDraft.clear();
 				editing = null;
 				foodRevision++;
-				status = Txt.t(update ? R.string.nc_food_updated : R.string.nc_food_added, entry.name, Math.round(entry.kcal()));
+				status = Txt.t(update ? R.string.nc_food_updated : R.string.nc_food_added, entry.label(), Math.round(entry.kcal()));
 				done.run();
 				changed.run();
 			}
@@ -1028,7 +1029,7 @@ public final class NutritionController {
 					dailyCalories.put(entry.day, totals(entry.day)[0]);
 				else
 					dailyCalories.remove(entry.day);
-				status = Txt.t(R.string.nc_food_removed, entry.name);
+				status = Txt.t(R.string.nc_food_removed, entry.label());
 				changed.run();
 			}
 

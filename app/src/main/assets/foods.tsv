@@ -1,352 +1,352 @@
 # Alimentos genéricos con valores orientativos por 100 g o 100 ml (referencias habituales de tablas de composición).
-# nombre	unidad(G|ML)	ración	kcal	proteínas	hidratos	grasas	sinónimos (separados por comas)
+# nombre	unidad(G|ML)	ración	kcal	proteínas	hidratos	grasas	sinónimos (separados por comas)	nombre en inglés	sinónimos en inglés (separados por comas)
 # --- Cereales, pasta y pan ---
-Arroz blanco cocido	G	150	130	2.7	28	0.3	arroz hervido
-Arroz blanco crudo	G	70	360	6.7	79	0.6	arroz seco
-Arroz integral cocido	G	150	123	2.7	25.6	1
-Arroz integral crudo	G	70	362	7.5	76	2.7
-Arroz basmati cocido	G	150	121	3.5	25	0.4	basmati
-Arroz con leche	G	150	130	3.2	22	3.2
-Paella de marisco	G	300	150	8	18	5	paella
-Paella mixta	G	300	165	9	18	6
-Risotto	G	250	150	4	22	5
-Pasta cocida	G	180	158	5.8	31	0.9	pasta hervida
-Pasta cruda	G	80	360	12.5	72	1.5	pasta seca
-Macarrones cocidos	G	180	158	5.8	31	0.9	macarrones,macarron,penne,pajaritas,fusilli,hélices,tiburones
-Macarrones crudos	G	80	360	12.5	72	1.5	macarrones secos
-Macarrones con tomate	G	300	150	5	24	3.5	macarrones con tomate y queso
-Macarrones a la boloñesa	G	300	165	8	20	6	macarrones con carne
-Espaguetis cocidos	G	180	158	5.8	31	0.9	espaguetis,spaghetti,espagueti,tallarines,fideos largos,linguine
-Espaguetis a la carbonara	G	300	215	8	22	10	carbonara
-Espaguetis a la boloñesa	G	300	150	8	19	4.5	boloñesa,bolognesa
-Tallarines cocidos	G	180	158	5.8	31	0.9	tagliatelle,fettuccine
-Fideos cocidos	G	180	150	5	30	0.8	fideos
-Fideuá	G	300	170	8	22	5.5	fideua
-Lasaña de carne	G	300	140	7.5	12	7	lasaña,lasagna
-Canelones de carne	G	250	150	7	14	7	canelones
-Ñoquis	G	200	130	3	28	0.5	gnocchi,noquis
-Tortellini rellenos	G	200	220	9	32	6	tortellini,raviolis,ravioli,pasta rellena
-Pasta integral cocida	G	180	149	6	30	1.5
-Cuscús cocido	G	150	112	3.8	23	0.2	cuscus,couscous
-Quinoa cocida	G	150	120	4.4	21.3	1.9	quinoa,quinua
-Bulgur cocido	G	150	83	3.1	18.6	0.2
-Copos de avena	G	40	389	16.9	66	6.9	avena,porridge seco
-Gachas de avena con leche	G	250	95	4	14	2.5	porridge,papilla de avena
-Muesli	G	50	370	10	66	6
-Granola	G	40	470	10	60	20
-Cereales de desayuno (copos de maíz)	G	40	357	7.5	84	0.4	corn flakes,cereales
-Cereales azucarados de chocolate	G	40	390	7	80	4	cereales de chocolate
-Pan blanco	G	60	265	9	49	3.2	pan,barra de pan,baguette
-Pan integral	G	60	247	13	41	3.4
-Pan de molde blanco	G	50	265	8	49	4	pan de molde,pan bimbo
-Pan de molde integral	G	50	250	10	43	4
-Pan de centeno	G	60	259	8.5	48	3.3
-Pan tostado	G	30	400	11	75	5	biscotes,tostadas,pan tostado de paquete
-Picos de pan	G	30	420	12	72	9	picos,regañás,colines
-Pan de hamburguesa	G	60	270	9	48	4.5
-Pan pita	G	60	275	9	55	1.2	pita
-Tortilla de trigo (wrap)	G	60	310	8	52	7.5	wrap,fajita,tortilla mexicana
-Tortilla de maíz	G	30	218	5.7	45	2.9	taco
-Harina de trigo	G	30	364	10	76	1	harina
-Harina de maíz	G	30	365	7	79	1.5	maicena
-Maíz dulce	G	80	86	3.3	19	1.3	maíz,elote,mazorca
-Palomitas de maíz	G	30	387	13	78	4.5	palomitas
-Tortitas de arroz	G	10	387	8	81	2.8	tortitas de arroz inflado
+Arroz blanco cocido	G	150	130	2.7	28	0.3	arroz hervido	White rice, cooked	boiled rice,steamed rice
+Arroz blanco crudo	G	70	360	6.7	79	0.6	arroz seco	White rice, raw	uncooked rice,dry rice
+Arroz integral cocido	G	150	123	2.7	25.6	1		Brown rice, cooked	wholegrain rice
+Arroz integral crudo	G	70	362	7.5	76	2.7		Brown rice, raw	uncooked brown rice
+Arroz basmati cocido	G	150	121	3.5	25	0.4	basmati	Basmati rice, cooked	basmati
+Arroz con leche	G	150	130	3.2	22	3.2		Rice pudding	
+Paella de marisco	G	300	150	8	18	5	paella	Seafood paella	paella
+Paella mixta	G	300	165	9	18	6		Mixed paella	meat and seafood paella
+Risotto	G	250	150	4	22	5		Risotto	
+Pasta cocida	G	180	158	5.8	31	0.9	pasta hervida	Pasta, cooked	boiled pasta
+Pasta cruda	G	80	360	12.5	72	1.5	pasta seca	Pasta, dry	uncooked pasta,raw pasta
+Macarrones cocidos	G	180	158	5.8	31	0.9	macarrones,macarron,penne,pajaritas,fusilli,hélices,tiburones	Macaroni, cooked	penne,fusilli,farfalle,rigatoni
+Macarrones crudos	G	80	360	12.5	72	1.5	macarrones secos	Macaroni, dry	uncooked macaroni
+Macarrones con tomate	G	300	150	5	24	3.5	macarrones con tomate y queso	Macaroni with tomato sauce	pasta with tomato sauce
+Macarrones a la boloñesa	G	300	165	8	20	6	macarrones con carne	Macaroni bolognese	pasta with meat sauce
+Espaguetis cocidos	G	180	158	5.8	31	0.9	espaguetis,spaghetti,espagueti,tallarines,fideos largos,linguine	Spaghetti, cooked	linguine
+Espaguetis a la carbonara	G	300	215	8	22	10	carbonara	Spaghetti carbonara	carbonara
+Espaguetis a la boloñesa	G	300	150	8	19	4.5	boloñesa,bolognesa	Spaghetti bolognese	bolognese,spag bol
+Tallarines cocidos	G	180	158	5.8	31	0.9	tagliatelle,fettuccine	Tagliatelle, cooked	fettuccine
+Fideos cocidos	G	180	150	5	30	0.8	fideos	Vermicelli noodles, cooked	noodles,fideos
+Fideuá	G	300	170	8	22	5.5	fideua	Fideuà (seafood noodles)	fideua
+Lasaña de carne	G	300	140	7.5	12	7	lasaña,lasagna	Meat lasagne	lasagna
+Canelones de carne	G	250	150	7	14	7	canelones	Meat cannelloni	cannelloni
+Ñoquis	G	200	130	3	28	0.5	gnocchi,noquis	Gnocchi	
+Tortellini rellenos	G	200	220	9	32	6	tortellini,raviolis,ravioli,pasta rellena	Stuffed tortellini	ravioli,filled pasta
+Pasta integral cocida	G	180	149	6	30	1.5		Wholewheat pasta, cooked	whole wheat pasta,wholegrain pasta
+Cuscús cocido	G	150	112	3.8	23	0.2	cuscus,couscous	Couscous, cooked	
+Quinoa cocida	G	150	120	4.4	21.3	1.9	quinoa,quinua	Quinoa, cooked	
+Bulgur cocido	G	150	83	3.1	18.6	0.2		Bulgur, cooked	bulgur wheat
+Copos de avena	G	40	389	16.9	66	6.9	avena,porridge seco	Rolled oats	oats,oatmeal,porridge oats
+Gachas de avena con leche	G	250	95	4	14	2.5	porridge,papilla de avena	Porridge with milk	oatmeal,oat porridge
+Muesli	G	50	370	10	66	6		Muesli	
+Granola	G	40	470	10	60	20		Granola	
+Cereales de desayuno (copos de maíz)	G	40	357	7.5	84	0.4	corn flakes,cereales	Breakfast cereal (cornflakes)	cornflakes,corn flakes,cereal
+Cereales azucarados de chocolate	G	40	390	7	80	4	cereales de chocolate	Sugary chocolate cereal	chocolate cereal,coco pops
+Pan blanco	G	60	265	9	49	3.2	pan,barra de pan,baguette	White bread	bread,baguette
+Pan integral	G	60	247	13	41	3.4		Wholemeal bread	whole wheat bread,brown bread
+Pan de molde blanco	G	50	265	8	49	4	pan de molde,pan bimbo	White sliced bread	sandwich bread,sliced bread
+Pan de molde integral	G	50	250	10	43	4		Wholemeal sliced bread	whole wheat sandwich bread
+Pan de centeno	G	60	259	8.5	48	3.3		Rye bread	
+Pan tostado	G	30	400	11	75	5	biscotes,tostadas,pan tostado de paquete	Packaged toast (rusks)	toast,melba toast,crispbread
+Picos de pan	G	30	420	12	72	9	picos,regañás,colines	Breadsticks	grissini
+Pan de hamburguesa	G	60	270	9	48	4.5		Burger bun	hamburger bun
+Pan pita	G	60	275	9	55	1.2	pita	Pitta bread	pita
+Tortilla de trigo (wrap)	G	60	310	8	52	7.5	wrap,fajita,tortilla mexicana	Flour tortilla (wrap)	wrap,fajita
+Tortilla de maíz	G	30	218	5.7	45	2.9	taco	Corn tortilla	taco
+Harina de trigo	G	30	364	10	76	1	harina	Wheat flour	flour
+Harina de maíz	G	30	365	7	79	1.5	maicena	Cornflour	cornstarch,corn starch
+Maíz dulce	G	80	86	3.3	19	1.3	maíz,elote,mazorca	Sweetcorn	corn,sweet corn,corn on the cob
+Palomitas de maíz	G	30	387	13	78	4.5	palomitas	Popcorn	
+Tortitas de arroz	G	10	387	8	81	2.8	tortitas de arroz inflado	Rice cakes	puffed rice cakes
 # --- Patatas, tubérculos ---
-Patata cocida	G	200	87	1.9	20	0.1	patata hervida,papa
-Patata asada	G	200	93	2.5	21	0.1	papa al horno
-Patatas fritas caseras	G	150	300	3.4	35	15	patatas fritas,papas fritas
-Patatas fritas de bolsa	G	30	536	7	53	34	chips,patatas chips
-Puré de patatas	G	200	88	2	14	3	pure de patata
-Boniato cocido	G	200	90	2	20.7	0.2	batata,camote
-Yuca cocida	G	150	160	1.4	38	0.3	mandioca
+Patata cocida	G	200	87	1.9	20	0.1	patata hervida,papa	Boiled potato	potato
+Patata asada	G	200	93	2.5	21	0.1	papa al horno	Baked potato	jacket potato,roast potato
+Patatas fritas caseras	G	150	300	3.4	35	15	patatas fritas,papas fritas	French fries (homemade)	fries,chips
+Patatas fritas de bolsa	G	30	536	7	53	34	chips,patatas chips	Potato crisps	crisps,chips,potato chips
+Puré de patatas	G	200	88	2	14	3	pure de patata	Mashed potato	mash,mashed potatoes
+Boniato cocido	G	200	90	2	20.7	0.2	batata,camote	Sweet potato, cooked	yam
+Yuca cocida	G	150	160	1.4	38	0.3	mandioca	Cassava, cooked	yuca,manioc
 # --- Legumbres ---
-Lentejas cocidas	G	200	116	9	20	0.4	lentejas
-Lentejas crudas	G	70	352	24.6	60	1.1
-Lentejas guisadas	G	300	110	7	14	3	lentejas con chorizo,potaje de lentejas
-Garbanzos cocidos	G	200	164	8.9	27.4	2.6	garbanzos
-Cocido madrileño	G	400	150	10	11	7	cocido
-Alubias cocidas	G	200	127	8.7	22.8	0.5	judías blancas,frijoles,habichuelas,alubias blancas
-Alubias rojas cocidas	G	200	127	8.7	22.8	0.5	frijoles rojos
-Fabada asturiana	G	300	150	9	12	7.5	fabada
-Guisantes cocidos	G	100	84	5.4	15.6	0.2	guisantes,arvejas,chícharos
-Habas cocidas	G	100	110	7.6	19.6	0.4	habas
-Edamame	G	100	121	11.9	8.9	5.2	soja verde
-Soja texturizada	G	30	330	50	30	1	soja,proteína de soja
-Hummus	G	50	166	7.9	14.3	9.6	humus,crema de garbanzos
-Falafel	G	100	333	13	32	18
+Lentejas cocidas	G	200	116	9	20	0.4	lentejas	Lentils, cooked	
+Lentejas crudas	G	70	352	24.6	60	1.1		Lentils, dry	uncooked lentils
+Lentejas guisadas	G	300	110	7	14	3	lentejas con chorizo,potaje de lentejas	Lentil stew	lentils with chorizo
+Garbanzos cocidos	G	200	164	8.9	27.4	2.6	garbanzos	Chickpeas, cooked	garbanzo beans
+Cocido madrileño	G	400	150	10	11	7	cocido	Madrid chickpea stew (cocido)	cocido
+Alubias cocidas	G	200	127	8.7	22.8	0.5	judías blancas,frijoles,habichuelas,alubias blancas	White beans, cooked	beans,haricot beans,cannellini beans,navy beans
+Alubias rojas cocidas	G	200	127	8.7	22.8	0.5	frijoles rojos	Red kidney beans, cooked	kidney beans,red beans
+Fabada asturiana	G	300	150	9	12	7.5	fabada	Asturian bean stew (fabada)	fabada
+Guisantes cocidos	G	100	84	5.4	15.6	0.2	guisantes,arvejas,chícharos	Peas, cooked	green peas,garden peas
+Habas cocidas	G	100	110	7.6	19.6	0.4	habas	Broad beans, cooked	fava beans
+Edamame	G	100	121	11.9	8.9	5.2	soja verde	Edamame	green soybeans
+Soja texturizada	G	30	330	50	30	1	soja,proteína de soja	Textured soy protein	soya,soy,tvp,soy protein
+Hummus	G	50	166	7.9	14.3	9.6	humus,crema de garbanzos	Hummus	houmous,chickpea dip
+Falafel	G	100	333	13	32	18		Falafel	
 # --- Carnes ---
-Pechuga de pollo a la plancha	G	150	165	31	0	3.6	pollo,pechuga,pollo a la plancha
-Pechuga de pollo cruda	G	150	120	22.5	0	2.6	pollo crudo
-Muslo de pollo asado	G	150	209	26	0	10.9	muslo de pollo,contramuslo
-Alitas de pollo	G	150	254	24	0	17	alas de pollo
-Pollo asado con piel	G	200	239	27	0	14	pollo asado
-Nuggets de pollo	G	100	296	15	18	18	nuggets
-Pechuga de pavo	G	150	135	30	0	1	pavo
-Fiambre de pavo	G	50	105	18	3	2	pavo en lonchas,lonchas de pavo
-Ternera magra a la plancha	G	150	170	26	0	7	ternera,filete de ternera,bistec
-Solomillo de ternera	G	150	190	29	0	8	solomillo
-Entrecot	G	200	250	24	0	17	chuletón,lomo de vaca
-Carne picada de vacuno cocinada	G	125	250	26	0	15	carne picada,picada de ternera
-Carne picada mixta	G	125	260	17	0	21	picada mixta
-Hamburguesa de ternera	G	120	250	17	2	20	hamburguesa
-Albóndigas en salsa	G	200	190	12	8	12	albondigas
-Lomo de cerdo a la plancha	G	150	143	26	0	3.5	lomo,cinta de lomo,cerdo
-Chuleta de cerdo	G	150	231	23	0	15	chuletas
-Costillas de cerdo	G	200	290	24	0	21	costillas
-Secreto ibérico	G	150	330	17	0	29	presa,pluma ibérica
-Panceta	G	50	393	14	0	37	bacon,beicon,tocino
-Cordero asado	G	150	258	25	0	17	cordero,chuletas de cordero
-Conejo guisado	G	200	150	22	0	7	conejo
-Hígado de ternera	G	100	135	20	4	3.6	higado
-Jamón serrano	G	40	241	31	0.5	13	jamón,jamon serrano
-Jamón ibérico	G	40	375	31	0.5	28	pata negra
-Jamón cocido (york)	G	50	110	18	1.5	3.5	jamón york,jamón cocido
-Chorizo	G	40	455	24	2	39
-Salchichón	G	40	430	25	2	36	fuet,longaniza
-Lomo embuchado	G	40	300	40	1	15
-Mortadela	G	40	311	15	3	27
-Salchichas cocidas	G	100	280	12	3	25	salchichas,frankfurt,perrito
-Morcilla	G	60	378	14	12	31
-Paté	G	30	320	12	3	29	foie gras
-Kebab de carne	G	200	215	14	10	13	kebab,shawarma,döner
+Pechuga de pollo a la plancha	G	150	165	31	0	3.6	pollo,pechuga,pollo a la plancha	Grilled chicken breast	chicken,chicken breast
+Pechuga de pollo cruda	G	150	120	22.5	0	2.6	pollo crudo	Chicken breast, raw	raw chicken
+Muslo de pollo asado	G	150	209	26	0	10.9	muslo de pollo,contramuslo	Roast chicken thigh	chicken thigh,chicken leg,drumstick
+Alitas de pollo	G	150	254	24	0	17	alas de pollo	Chicken wings	wings
+Pollo asado con piel	G	200	239	27	0	14	pollo asado	Roast chicken with skin	roast chicken,rotisserie chicken
+Nuggets de pollo	G	100	296	15	18	18	nuggets	Chicken nuggets	nuggets
+Pechuga de pavo	G	150	135	30	0	1	pavo	Turkey breast	turkey
+Fiambre de pavo	G	50	105	18	3	2	pavo en lonchas,lonchas de pavo	Sliced turkey (deli)	turkey slices,turkey ham,deli turkey
+Ternera magra a la plancha	G	150	170	26	0	7	ternera,filete de ternera,bistec	Grilled lean beef	beef,beef steak,steak
+Solomillo de ternera	G	150	190	29	0	8	solomillo	Beef tenderloin	fillet steak,filet mignon
+Entrecot	G	200	250	24	0	17	chuletón,lomo de vaca	Ribeye steak	entrecote,sirloin steak,t-bone
+Carne picada de vacuno cocinada	G	125	250	26	0	15	carne picada,picada de ternera	Minced beef, cooked	ground beef,mince
+Carne picada mixta	G	125	260	17	0	21	picada mixta	Mixed mince (beef and pork)	mixed minced meat,ground meat
+Hamburguesa de ternera	G	120	250	17	2	20	hamburguesa	Beef burger patty	burger,hamburger
+Albóndigas en salsa	G	200	190	12	8	12	albondigas	Meatballs in sauce	meatballs
+Lomo de cerdo a la plancha	G	150	143	26	0	3.5	lomo,cinta de lomo,cerdo	Grilled pork loin	pork,pork loin
+Chuleta de cerdo	G	150	231	23	0	15	chuletas	Pork chop	chops
+Costillas de cerdo	G	200	290	24	0	21	costillas	Pork ribs	ribs,spare ribs
+Secreto ibérico	G	150	330	17	0	29	presa,pluma ibérica	Iberian pork (secreto)	presa,pluma
+Panceta	G	50	393	14	0	37	bacon,beicon,tocino	Pork belly (bacon)	bacon,pancetta
+Cordero asado	G	150	258	25	0	17	cordero,chuletas de cordero	Roast lamb	lamb,lamb chops
+Conejo guisado	G	200	150	22	0	7	conejo	Rabbit stew	rabbit
+Hígado de ternera	G	100	135	20	4	3.6	higado	Beef liver	liver
+Jamón serrano	G	40	241	31	0.5	13	jamón,jamon serrano	Serrano ham	cured ham,ham,prosciutto
+Jamón ibérico	G	40	375	31	0.5	28	pata negra	Iberian ham	pata negra,jamon iberico
+Jamón cocido (york)	G	50	110	18	1.5	3.5	jamón york,jamón cocido	Cooked ham	ham,sliced ham,deli ham
+Chorizo	G	40	455	24	2	39		Chorizo	
+Salchichón	G	40	430	25	2	36	fuet,longaniza	Salami (salchichón)	salami,fuet
+Lomo embuchado	G	40	300	40	1	15		Cured pork loin (lomo)	lomo embuchado
+Mortadela	G	40	311	15	3	27		Mortadella	bologna
+Salchichas cocidas	G	100	280	12	3	25	salchichas,frankfurt,perrito	Frankfurter sausages	sausages,hot dog,frankfurter,wiener
+Morcilla	G	60	378	14	12	31		Black pudding (morcilla)	blood sausage
+Paté	G	30	320	12	3	29	foie gras	Pâté	liver pate,foie gras
+Kebab de carne	G	200	215	14	10	13	kebab,shawarma,döner	Meat kebab	kebab,shawarma,doner
 # --- Pescados y marisco ---
-Salmón	G	150	208	20	0	13	salmón,salmon
-Salmón ahumado	G	50	117	18	0	4.3
-Merluza	G	150	90	18	0	1.5	merluza,pescadilla
-Bacalao	G	150	82	18	0	0.7	bacalao fresco
-Bacalao desalado	G	150	82	18	0	0.7
-Atún fresco	G	150	144	23	0	5	atún,bonito
-Atún al natural (lata, escurrido)	G	80	116	26	0	1	atun al natural,atún en lata
-Atún en aceite (lata, escurrido)	G	80	198	29	0	8	atun en aceite
-Sardinas	G	150	208	25	0	11.5	sardina
-Sardinas en aceite (lata)	G	80	208	25	0	11.5
-Caballa	G	150	205	19	0	14	verdel
-Boquerones en vinagre	G	80	130	20	0	5	boquerones,anchoas frescas
-Anchoas en aceite	G	20	210	29	0	10	anchoas
-Dorada	G	150	100	19	0	2.5
-Lubina	G	150	97	18	0	2.5
-Lenguado	G	150	86	17	0	1.5	gallo
-Rape	G	150	76	15	0	1.5
-Trucha	G	150	141	20	0	6.6
-Emperador	G	150	121	20	0	4	pez espada
-Gambas cocidas	G	100	99	24	0.2	0.3	gambas,langostinos,camarones
-Mejillones	G	100	172	24	7.4	4.5	mejillón
-Calamares a la plancha	G	150	92	15.6	3.1	1.4	calamar,sepia,chipirones
-Calamares a la romana	G	150	250	12	18	14	rabas
-Pulpo cocido	G	150	82	15	2	1	pulpo,pulpo a la gallega
-Almejas	G	100	86	14.7	3.6	1	berberechos
-Surimi	G	50	95	7.6	15	0.9	palitos de cangrejo
-Pescado rebozado	G	150	230	13	17	12	varitas de merluza,palitos de pescado
+Salmón	G	150	208	20	0	13	salmón,salmon	Salmon	
+Salmón ahumado	G	50	117	18	0	4.3		Smoked salmon	
+Merluza	G	150	90	18	0	1.5	merluza,pescadilla	Hake	whiting
+Bacalao	G	150	82	18	0	0.7	bacalao fresco	Cod	fresh cod
+Bacalao desalado	G	150	82	18	0	0.7		Salt cod, desalted	bacalao
+Atún fresco	G	150	144	23	0	5	atún,bonito	Fresh tuna	tuna,bonito
+Atún al natural (lata, escurrido)	G	80	116	26	0	1	atun al natural,atún en lata	Tuna in water (canned, drained)	canned tuna,tinned tuna,tuna in brine
+Atún en aceite (lata, escurrido)	G	80	198	29	0	8	atun en aceite	Tuna in oil (canned, drained)	tinned tuna in oil
+Sardinas	G	150	208	25	0	11.5	sardina	Sardines	
+Sardinas en aceite (lata)	G	80	208	25	0	11.5		Sardines in oil (canned)	tinned sardines
+Caballa	G	150	205	19	0	14	verdel	Mackerel	
+Boquerones en vinagre	G	80	130	20	0	5	boquerones,anchoas frescas	Anchovies in vinegar (boquerones)	white anchovies,boquerones
+Anchoas en aceite	G	20	210	29	0	10	anchoas	Anchovies in oil	anchovies
+Dorada	G	150	100	19	0	2.5		Sea bream	gilthead bream,dorado
+Lubina	G	150	97	18	0	2.5		Sea bass	bass
+Lenguado	G	150	86	17	0	1.5	gallo	Sole	flatfish
+Rape	G	150	76	15	0	1.5		Monkfish	
+Trucha	G	150	141	20	0	6.6		Trout	
+Emperador	G	150	121	20	0	4	pez espada	Swordfish	
+Gambas cocidas	G	100	99	24	0.2	0.3	gambas,langostinos,camarones	Prawns, cooked	shrimp,king prawns
+Mejillones	G	100	172	24	7.4	4.5	mejillón	Mussels	
+Calamares a la plancha	G	150	92	15.6	3.1	1.4	calamar,sepia,chipirones	Grilled squid	squid,cuttlefish,calamari
+Calamares a la romana	G	150	250	12	18	14	rabas	Fried calamari	calamari,battered squid
+Pulpo cocido	G	150	82	15	2	1	pulpo,pulpo a la gallega	Octopus, cooked	octopus,galician octopus
+Almejas	G	100	86	14.7	3.6	1	berberechos	Clams	cockles
+Surimi	G	50	95	7.6	15	0.9	palitos de cangrejo	Surimi (crab sticks)	crab sticks,seafood sticks
+Pescado rebozado	G	150	230	13	17	12	varitas de merluza,palitos de pescado	Breaded fish	fish fingers,fish sticks,battered fish
 # --- Huevos ---
-Huevo	G	55	143	12.6	0.7	9.5	huevos,huevo cocido,huevo duro
-Huevo frito	G	60	196	13.6	0.8	15	huevos fritos
-Huevos revueltos	G	120	149	10	1.6	11	revuelto
-Tortilla francesa	G	120	154	11	0.7	12
-Clara de huevo	G	100	52	11	0.7	0.2	claras
-Yema de huevo	G	17	322	15.9	3.6	26.5
-Tortilla de patata	G	150	180	6.5	13	11	tortilla española
+Huevo	G	55	143	12.6	0.7	9.5	huevos,huevo cocido,huevo duro	Egg	boiled egg,hard-boiled egg
+Huevo frito	G	60	196	13.6	0.8	15	huevos fritos	Fried egg	
+Huevos revueltos	G	120	149	10	1.6	11	revuelto	Scrambled eggs	
+Tortilla francesa	G	120	154	11	0.7	12		Plain omelette	omelette,omelet
+Clara de huevo	G	100	52	11	0.7	0.2	claras	Egg white	
+Yema de huevo	G	17	322	15.9	3.6	26.5		Egg yolk	
+Tortilla de patata	G	150	180	6.5	13	11	tortilla española	Spanish potato omelette	tortilla,spanish tortilla
 # --- Lácteos ---
-Leche entera	ML	250	64	3.2	4.7	3.6	leche
-Leche semidesnatada	ML	250	47	3.3	4.8	1.6	leche semi
-Leche desnatada	ML	250	35	3.4	5	0.1
-Leche sin lactosa	ML	250	47	3.3	4.8	1.6
-Bebida de soja	ML	250	39	3.3	2.5	1.8	leche de soja
-Bebida de avena	ML	250	45	1	7	1.5	leche de avena
-Bebida de almendras	ML	250	24	0.5	3	1.1	leche de almendras
-Batido de chocolate	ML	200	75	3.3	11	2	cacao con leche,colacao con leche
-Yogur natural	G	125	61	3.5	4.7	3.3	yogur
-Yogur natural desnatado	G	125	40	4.3	5.5	0.2	yogur desnatado
-Yogur de sabores	G	125	95	3	15	2.5	yogur de fresa,yogur azucarado
-Yogur griego	G	125	122	3.6	4	10	griego
-Yogur griego ligero	G	125	65	6	5	2
-Skyr o yogur proteico	G	150	63	11	4	0.2	skyr,yogur proteico
-Kéfir	ML	200	55	3.3	4.5	2.5	kefir
-Queso fresco	G	60	174	12.4	3	12.8	queso de burgos
-Queso fresco batido	G	125	46	8	3.5	0.2	queso batido
-Requesón	G	100	98	11	3.4	4.3	cottage
-Queso curado	G	30	410	26	0.5	34	queso manchego,queso viejo
-Queso semicurado	G	30	370	24	0.5	30
-Queso tierno	G	30	330	22	1	26
-Queso mozzarella	G	50	280	22	2	20	mozzarella
-Queso de cabra	G	30	364	22	0.1	30
-Queso parmesano	G	15	431	38	4	29	parmesano,grana padano
-Queso en lonchas	G	20	300	18	4	24	queso de sándwich,tranchete
-Queso rallado	G	20	390	28	1	30
-Queso crema	G	30	342	6	4	34	philadelphia
-Nata para cocinar	ML	50	195	2.5	3.5	18	nata
-Nata montada	G	30	257	2.3	12	22
-Natillas	G	125	122	3.5	19	3.5
-Flan	G	100	130	4	21	3.5
-Helado de vainilla	G	100	207	3.5	24	11	helado
-Mantequilla	G	10	717	0.9	0.1	81
-Margarina	G	10	717	0.2	0.7	80
+Leche entera	ML	250	64	3.2	4.7	3.6	leche	Whole milk	milk,full-fat milk
+Leche semidesnatada	ML	250	47	3.3	4.8	1.6	leche semi	Semi-skimmed milk	2% milk,reduced-fat milk
+Leche desnatada	ML	250	35	3.4	5	0.1		Skimmed milk	skim milk,fat-free milk
+Leche sin lactosa	ML	250	47	3.3	4.8	1.6		Lactose-free milk	
+Bebida de soja	ML	250	39	3.3	2.5	1.8	leche de soja	Soy drink	soy milk,soya milk
+Bebida de avena	ML	250	45	1	7	1.5	leche de avena	Oat drink	oat milk
+Bebida de almendras	ML	250	24	0.5	3	1.1	leche de almendras	Almond drink	almond milk
+Batido de chocolate	ML	200	75	3.3	11	2	cacao con leche,colacao con leche	Chocolate milk	chocolate milkshake,cocoa milk
+Yogur natural	G	125	61	3.5	4.7	3.3	yogur	Plain yoghurt	yogurt,natural yogurt
+Yogur natural desnatado	G	125	40	4.3	5.5	0.2	yogur desnatado	Fat-free plain yoghurt	low-fat yogurt,skimmed yogurt
+Yogur de sabores	G	125	95	3	15	2.5	yogur de fresa,yogur azucarado	Flavoured yoghurt	strawberry yogurt,fruit yogurt,sweetened yogurt
+Yogur griego	G	125	122	3.6	4	10	griego	Greek yoghurt	greek yogurt
+Yogur griego ligero	G	125	65	6	5	2		Light Greek yoghurt	low-fat greek yogurt
+Skyr o yogur proteico	G	150	63	11	4	0.2	skyr,yogur proteico	Skyr or high-protein yoghurt	skyr,protein yogurt
+Kéfir	ML	200	55	3.3	4.5	2.5	kefir	Kefir	
+Queso fresco	G	60	174	12.4	3	12.8	queso de burgos	Fresh cheese	queso fresco,farmer cheese
+Queso fresco batido	G	125	46	8	3.5	0.2	queso batido	Quark	fromage frais,whipped fresh cheese
+Requesón	G	100	98	11	3.4	4.3	cottage	Cottage cheese	ricotta,curd cheese
+Queso curado	G	30	410	26	0.5	34	queso manchego,queso viejo	Cured cheese (manchego)	manchego,aged cheese,hard cheese
+Queso semicurado	G	30	370	24	0.5	30		Semi-cured cheese	semi-hard cheese
+Queso tierno	G	30	330	22	1	26		Young cheese (mild)	soft cheese
+Queso mozzarella	G	50	280	22	2	20	mozzarella	Mozzarella	mozzarella cheese
+Queso de cabra	G	30	364	22	0.1	30		Goat's cheese	goat cheese
+Queso parmesano	G	15	431	38	4	29	parmesano,grana padano	Parmesan	parmesan cheese,grana padano
+Queso en lonchas	G	20	300	18	4	24	queso de sándwich,tranchete	Cheese slices	sliced cheese,sandwich cheese,processed cheese
+Queso rallado	G	20	390	28	1	30		Grated cheese	shredded cheese
+Queso crema	G	30	342	6	4	34	philadelphia	Cream cheese	philadelphia
+Nata para cocinar	ML	50	195	2.5	3.5	18	nata	Cooking cream	cream,single cream
+Nata montada	G	30	257	2.3	12	22		Whipped cream	
+Natillas	G	125	122	3.5	19	3.5		Custard	vanilla custard
+Flan	G	100	130	4	21	3.5		Crème caramel (flan)	flan,caramel custard
+Helado de vainilla	G	100	207	3.5	24	11	helado	Vanilla ice cream	ice cream
+Mantequilla	G	10	717	0.9	0.1	81		Butter	
+Margarina	G	10	717	0.2	0.7	80		Margarine	
 # --- Aceites, salsas, frutos secos ---
-Aceite de oliva	G	10	884	0	0	100	aceite,aove,aceite de oliva virgen
-Aceite de girasol	G	10	884	0	0	100
-Mayonesa	G	15	680	1	1	75
-Mayonesa ligera	G	15	300	1	8	30
-Kétchup	G	15	112	1.2	26	0.1	ketchup
-Mostaza	G	10	66	4	6	3.3
-Salsa de tomate	G	50	80	1.5	12	3	tomate frito
-Tomate triturado	G	100	32	1.6	5.5	0.3
-Salsa barbacoa	G	20	172	1	40	0.6	barbacoa
-Salsa de soja	ML	15	53	8	4.9	0.6	soja salsa
-Pesto	G	20	460	5	6	46
-Alioli	G	15	700	1	2	76	ali oli
-Guacamole	G	50	160	2	8.5	14.7
-Vinagre	ML	10	18	0	0.4	0
-Aguacate	G	100	160	2	8.5	14.7	palta
-Aceitunas	G	30	145	1	3.8	15	olivas
-Almendras	G	30	579	21	21.6	50
-Nueces	G	30	654	15	13.7	65
-Cacahuetes	G	30	567	25.8	16	49	maní
-Anacardos	G	30	553	18	30	44
-Pistachos	G	30	560	20	28	45
-Avellanas	G	30	628	15	17	61
-Pipas de girasol	G	30	584	21	20	51	pipas
-Semillas de chía	G	15	486	17	42	31	chía
-Semillas de lino	G	15	534	18	29	42	linaza
-Crema de cacahuete	G	20	588	25	20	50	mantequilla de cacahuete
-Crema de cacao y avellanas	G	20	539	6.3	57.5	30.9	nutella,nocilla
-Coco rallado	G	15	660	7	24	64	coco
+Aceite de oliva	G	10	884	0	0	100	aceite,aove,aceite de oliva virgen	Olive oil	oil,extra virgin olive oil,evoo
+Aceite de girasol	G	10	884	0	0	100		Sunflower oil	vegetable oil
+Mayonesa	G	15	680	1	1	75		Mayonnaise	mayo
+Mayonesa ligera	G	15	300	1	8	30		Light mayonnaise	light mayo
+Kétchup	G	15	112	1.2	26	0.1	ketchup	Ketchup	tomato ketchup
+Mostaza	G	10	66	4	6	3.3		Mustard	
+Salsa de tomate	G	50	80	1.5	12	3	tomate frito	Tomato sauce	fried tomato sauce
+Tomate triturado	G	100	32	1.6	5.5	0.3		Crushed tomatoes	passata,chopped tomatoes
+Salsa barbacoa	G	20	172	1	40	0.6	barbacoa	Barbecue sauce	bbq sauce
+Salsa de soja	ML	15	53	8	4.9	0.6	soja salsa	Soy sauce	soya sauce
+Pesto	G	20	460	5	6	46		Pesto	
+Alioli	G	15	700	1	2	76	ali oli	Aioli	garlic mayonnaise
+Guacamole	G	50	160	2	8.5	14.7		Guacamole	
+Vinagre	ML	10	18	0	0.4	0		Vinegar	
+Aguacate	G	100	160	2	8.5	14.7	palta	Avocado	
+Aceitunas	G	30	145	1	3.8	15	olivas	Olives	
+Almendras	G	30	579	21	21.6	50		Almonds	
+Nueces	G	30	654	15	13.7	65		Walnuts	nuts
+Cacahuetes	G	30	567	25.8	16	49	maní	Peanuts	
+Anacardos	G	30	553	18	30	44		Cashews	cashew nuts
+Pistachos	G	30	560	20	28	45		Pistachios	
+Avellanas	G	30	628	15	17	61		Hazelnuts	
+Pipas de girasol	G	30	584	21	20	51	pipas	Sunflower seeds	
+Semillas de chía	G	15	486	17	42	31	chía	Chia seeds	chia
+Semillas de lino	G	15	534	18	29	42	linaza	Flaxseeds	linseed,flax
+Crema de cacahuete	G	20	588	25	20	50	mantequilla de cacahuete	Peanut butter	
+Crema de cacao y avellanas	G	20	539	6.3	57.5	30.9	nutella,nocilla	Chocolate hazelnut spread	nutella
+Coco rallado	G	15	660	7	24	64	coco	Desiccated coconut	coconut,shredded coconut
 # --- Fruta ---
-Plátano	G	120	89	1.1	22.8	0.3	platano,banana,banano
-Manzana	G	180	52	0.3	13.8	0.2
-Naranja	G	200	47	0.9	11.8	0.1
-Mandarina	G	80	53	0.8	13.3	0.3	clementina
-Pera	G	180	57	0.4	15	0.1
-Kiwi	G	100	61	1.1	14.7	0.5
-Fresas	G	150	32	0.7	7.7	0.3	fresa,fresón
-Uvas	G	150	69	0.7	18	0.2	uva
-Sandía	G	300	30	0.6	7.6	0.2
-Melón	G	300	34	0.8	8.2	0.2
-Piña	G	150	50	0.5	13	0.1	ananá
-Mango	G	150	60	0.8	15	0.4
-Melocotón	G	150	39	0.9	9.5	0.3	durazno
-Nectarina	G	150	44	1.1	10.6	0.3
-Albaricoque	G	100	48	1.4	11	0.4
-Ciruela	G	100	46	0.7	11.4	0.3
-Cerezas	G	100	63	1.1	16	0.2
-Arándanos	G	100	57	0.7	14.5	0.3
-Frambuesas	G	100	52	1.2	12	0.7
-Moras	G	100	43	1.4	10	0.5
-Higos	G	100	74	0.8	19	0.3
-Granada	G	100	83	1.7	18.7	1.2
-Papaya	G	150	43	0.5	11	0.3
-Pomelo	G	200	42	0.8	10.7	0.1
-Limón	G	50	29	1.1	6	0.3
-Caqui	G	150	70	0.6	18.6	0.2
-Dátiles	G	30	282	2.5	75	0.4
-Pasas	G	30	299	3.1	79	0.5	uvas pasas
-Orejones	G	30	241	3.4	63	0.5	albaricoque seco
-Fruta en almíbar	G	150	70	0.4	18	0.1	melocotón en almíbar
-Compota de manzana	G	100	68	0.2	17	0.1	compota
+Plátano	G	120	89	1.1	22.8	0.3	platano,banana,banano	Banana	
+Manzana	G	180	52	0.3	13.8	0.2		Apple	
+Naranja	G	200	47	0.9	11.8	0.1		Orange	
+Mandarina	G	80	53	0.8	13.3	0.3	clementina	Tangerine	mandarin,clementine,satsuma
+Pera	G	180	57	0.4	15	0.1		Pear	
+Kiwi	G	100	61	1.1	14.7	0.5		Kiwi	kiwi fruit
+Fresas	G	150	32	0.7	7.7	0.3	fresa,fresón	Strawberries	strawberry
+Uvas	G	150	69	0.7	18	0.2	uva	Grapes	
+Sandía	G	300	30	0.6	7.6	0.2		Watermelon	
+Melón	G	300	34	0.8	8.2	0.2		Melon	honeydew,cantaloupe
+Piña	G	150	50	0.5	13	0.1	ananá	Pineapple	
+Mango	G	150	60	0.8	15	0.4		Mango	
+Melocotón	G	150	39	0.9	9.5	0.3	durazno	Peach	
+Nectarina	G	150	44	1.1	10.6	0.3		Nectarine	
+Albaricoque	G	100	48	1.4	11	0.4		Apricot	
+Ciruela	G	100	46	0.7	11.4	0.3		Plum	
+Cerezas	G	100	63	1.1	16	0.2		Cherries	cherry
+Arándanos	G	100	57	0.7	14.5	0.3		Blueberries	blueberry,bilberries
+Frambuesas	G	100	52	1.2	12	0.7		Raspberries	raspberry
+Moras	G	100	43	1.4	10	0.5		Blackberries	blackberry
+Higos	G	100	74	0.8	19	0.3		Figs	
+Granada	G	100	83	1.7	18.7	1.2		Pomegranate	
+Papaya	G	150	43	0.5	11	0.3		Papaya	
+Pomelo	G	200	42	0.8	10.7	0.1		Grapefruit	
+Limón	G	50	29	1.1	6	0.3		Lemon	
+Caqui	G	150	70	0.6	18.6	0.2		Persimmon	sharon fruit,kaki
+Dátiles	G	30	282	2.5	75	0.4		Dates	
+Pasas	G	30	299	3.1	79	0.5	uvas pasas	Raisins	sultanas
+Orejones	G	30	241	3.4	63	0.5	albaricoque seco	Dried apricots	
+Fruta en almíbar	G	150	70	0.4	18	0.1	melocotón en almíbar	Fruit in syrup	canned peaches,tinned fruit
+Compota de manzana	G	100	68	0.2	17	0.1	compota	Apple sauce	apple compote,applesauce
 # --- Verdura y hortalizas ---
-Brócoli	G	150	34	2.8	7	0.4	brocoli
-Coliflor	G	150	25	1.9	5	0.3
-Lechuga	G	80	15	1.4	2.9	0.2
-Ensalada verde	G	100	17	1.3	3	0.2	ensalada,canónigos,rúcula,mezclum
-Ensalada mixta	G	250	60	3	5	3	ensalada con atún
-Tomate	G	150	18	0.9	3.9	0.2	tomates
-Pepino	G	150	15	0.7	3.6	0.1
-Zanahoria	G	100	41	0.9	9.6	0.2
-Espinacas	G	100	23	2.9	3.6	0.4
-Acelgas	G	150	19	1.8	3.7	0.2
-Calabacín	G	200	17	1.2	3.1	0.3	calabacin
-Berenjena	G	200	25	1	6	0.2
-Pimiento rojo	G	150	31	1	6	0.3	pimiento
-Pimiento verde	G	150	20	0.9	4.6	0.2
-Cebolla	G	100	40	1.1	9.3	0.1
-Ajo	G	5	149	6.4	33	0.5
-Puerro	G	100	61	1.5	14	0.3
-Champiñones	G	100	22	3.1	3.3	0.3	setas,champiñón
-Judías verdes	G	150	31	1.8	7	0.2	judias verdes,vainas
-Alcachofa	G	150	47	3.3	10.5	0.2	alcachofas
-Espárragos	G	100	20	2.2	3.9	0.1	esparragos
-Calabaza	G	200	26	1	6.5	0.1
-Remolacha	G	100	43	1.6	10	0.2
-Repollo	G	100	25	1.3	5.8	0.1	col,lombarda
-Coles de Bruselas	G	100	43	3.4	9	0.3
-Apio	G	100	16	0.7	3	0.2
-Rábanos	G	50	16	0.7	3.4	0.1
-Pisto	G	200	70	1.5	7	4
-Menestra de verduras	G	250	45	2.5	7	1	menestra,verduras salteadas
-Verduras a la plancha	G	250	55	2	7	2.5	parrillada de verduras
-Gazpacho	ML	250	40	0.8	4	2.4	salmorejo ligero
-Salmorejo	G	250	100	2	9	6.5
-Crema de verduras	ML	250	50	1.5	6	2.3	puré de verduras
-Sopa de pollo	ML	300	35	3	3	1.2	caldo de pollo,sopa
-Caldo de verduras	ML	250	8	0.3	1.5	0.1	caldo
+Brócoli	G	150	34	2.8	7	0.4	brocoli	Broccoli	
+Coliflor	G	150	25	1.9	5	0.3		Cauliflower	
+Lechuga	G	80	15	1.4	2.9	0.2		Lettuce	
+Ensalada verde	G	100	17	1.3	3	0.2	ensalada,canónigos,rúcula,mezclum	Green salad	salad,lamb's lettuce,rocket,arugula,mixed leaves
+Ensalada mixta	G	250	60	3	5	3	ensalada con atún	Mixed salad	tuna salad
+Tomate	G	150	18	0.9	3.9	0.2	tomates	Tomato	
+Pepino	G	150	15	0.7	3.6	0.1		Cucumber	
+Zanahoria	G	100	41	0.9	9.6	0.2		Carrot	
+Espinacas	G	100	23	2.9	3.6	0.4		Spinach	
+Acelgas	G	150	19	1.8	3.7	0.2		Chard	swiss chard
+Calabacín	G	200	17	1.2	3.1	0.3	calabacin	Courgette	zucchini
+Berenjena	G	200	25	1	6	0.2		Aubergine	eggplant
+Pimiento rojo	G	150	31	1	6	0.3	pimiento	Red pepper	pepper,bell pepper
+Pimiento verde	G	150	20	0.9	4.6	0.2		Green pepper	green bell pepper
+Cebolla	G	100	40	1.1	9.3	0.1		Onion	
+Ajo	G	5	149	6.4	33	0.5		Garlic	
+Puerro	G	100	61	1.5	14	0.3		Leek	
+Champiñones	G	100	22	3.1	3.3	0.3	setas,champiñón	Mushrooms	
+Judías verdes	G	150	31	1.8	7	0.2	judias verdes,vainas	Green beans	french beans,string beans
+Alcachofa	G	150	47	3.3	10.5	0.2	alcachofas	Artichoke	
+Espárragos	G	100	20	2.2	3.9	0.1	esparragos	Asparagus	
+Calabaza	G	200	26	1	6.5	0.1		Pumpkin	squash,butternut squash
+Remolacha	G	100	43	1.6	10	0.2		Beetroot	beet,beets
+Repollo	G	100	25	1.3	5.8	0.1	col,lombarda	Cabbage	red cabbage
+Coles de Bruselas	G	100	43	3.4	9	0.3		Brussels sprouts	sprouts
+Apio	G	100	16	0.7	3	0.2		Celery	
+Rábanos	G	50	16	0.7	3.4	0.1		Radishes	
+Pisto	G	200	70	1.5	7	4		Spanish ratatouille (pisto)	ratatouille,pisto
+Menestra de verduras	G	250	45	2.5	7	1	menestra,verduras salteadas	Mixed vegetable stew	mixed vegetables,stir-fried vegetables
+Verduras a la plancha	G	250	55	2	7	2.5	parrillada de verduras	Grilled vegetables	roasted vegetables
+Gazpacho	ML	250	40	0.8	4	2.4	salmorejo ligero	Gazpacho	cold tomato soup
+Salmorejo	G	250	100	2	9	6.5		Salmorejo	cold tomato and bread soup
+Crema de verduras	ML	250	50	1.5	6	2.3	puré de verduras	Cream of vegetable soup	vegetable puree,blended vegetable soup
+Sopa de pollo	ML	300	35	3	3	1.2	caldo de pollo,sopa	Chicken soup	chicken broth,soup
+Caldo de verduras	ML	250	8	0.3	1.5	0.1	caldo	Vegetable broth	broth,stock
 # --- Platos preparados ---
-Pizza	G	200	266	11	33	10	pizza margarita
-Pizza barbacoa	G	200	270	12	30	11	pizza de carne
-Hamburguesa con pan	G	220	250	13	25	11	hamburguesa completa,burger
-Bocadillo de jamón	G	150	250	14	35	6	bocata de jamón
-Bocadillo de tortilla	G	200	240	8	32	9
-Sándwich mixto	G	120	270	14	27	12	sandwich,bikini
-Burrito	G	250	206	9	25	8
-Croquetas	G	100	240	7	21	14	croqueta
-Empanadilla	G	60	300	8	30	17	empanada
-Ensaladilla rusa	G	200	150	3	10	11	ensaladilla
-Patatas bravas	G	200	190	2.5	24	9.5	bravas
-Huevos rotos	G	300	210	8	17	12.5
-Pollo al curry	G	300	140	13	6	7	curry
-Arroz tres delicias	G	250	165	5	27	4	arroz frito
-Sushi	G	200	145	6	29	0.6	maki,nigiri
-Ramen	ML	500	90	4.5	12	2.8
-Poke de salmón	G	350	150	9	17	5	poke
-Lentejas con verduras	G	300	95	6	14	1.5
-Crepes	G	60	227	6.5	28	9.8	crep,crepe
-Tortitas americanas	G	80	227	6.4	28	9.7	pancakes,tortitas
-Gofre	G	75	290	8	37	12	gofres,waffle
+Pizza	G	200	266	11	33	10	pizza margarita	Pizza	margherita pizza
+Pizza barbacoa	G	200	270	12	30	11	pizza de carne	Barbecue pizza	bbq pizza,meat pizza
+Hamburguesa con pan	G	220	250	13	25	11	hamburguesa completa,burger	Burger in a bun	burger,cheeseburger,hamburger
+Bocadillo de jamón	G	150	250	14	35	6	bocata de jamón	Ham baguette	ham sandwich,ham roll
+Bocadillo de tortilla	G	200	240	8	32	9		Spanish omelette baguette	omelette sandwich
+Sándwich mixto	G	120	270	14	27	12	sandwich,bikini	Ham and cheese toastie	toasted sandwich,croque monsieur
+Burrito	G	250	206	9	25	8		Burrito	
+Croquetas	G	100	240	7	21	14	croqueta	Croquettes	
+Empanadilla	G	60	300	8	30	17	empanada	Empanada (pasty)	empanada,pasty,turnover
+Ensaladilla rusa	G	200	150	3	10	11	ensaladilla	Russian salad	potato salad,olivier salad
+Patatas bravas	G	200	190	2.5	24	9.5	bravas	Patatas bravas	spicy potatoes,bravas
+Huevos rotos	G	300	210	8	17	12.5		Eggs over fries (huevos rotos)	broken eggs,egg and chips
+Pollo al curry	G	300	140	13	6	7	curry	Chicken curry	curry
+Arroz tres delicias	G	250	165	5	27	4	arroz frito	Special fried rice	fried rice,egg fried rice
+Sushi	G	200	145	6	29	0.6	maki,nigiri	Sushi	maki,nigiri
+Ramen	ML	500	90	4.5	12	2.8		Ramen	noodle soup
+Poke de salmón	G	350	150	9	17	5	poke	Salmon poke bowl	poke
+Lentejas con verduras	G	300	95	6	14	1.5		Lentils with vegetables	vegetable lentil stew
+Crepes	G	60	227	6.5	28	9.8	crep,crepe	Crêpes	crepe
+Tortitas americanas	G	80	227	6.4	28	9.7	pancakes,tortitas	Pancakes	american pancakes,hotcakes
+Gofre	G	75	290	8	37	12	gofres,waffle	Waffle	
 # --- Dulces, bollería y snacks ---
-Croissant	G	60	406	8.2	45.8	21	cruasán,cruasan
-Napolitana de chocolate	G	80	420	7	50	21	napolitana
-Magdalena	G	40	420	6	50	21	magdalenas,muffin
-Donut	G	60	421	5	50	22	dónut,rosquilla
-Bizcocho	G	60	350	6	50	14
-Tarta de queso	G	120	321	5.5	25.5	22.5	cheesecake
-Tarta de chocolate	G	100	370	5	50	17
-Churros	G	100	350	4.5	40	19	churro,porras
-Galletas tipo María	G	30	436	7	74	12	galletas maría
-Galletas de chocolate	G	30	490	6	65	23	galletas con chocolate,cookies
-Galletas integrales	G	30	440	8	66	15
-Chocolate negro (70 %)	G	20	598	7.8	46	43	chocolate negro
-Chocolate con leche	G	20	535	7.7	59	30	chocolate
-Bombones	G	20	530	6	55	31
-Gominolas	G	30	340	6	78	0.2	chuches,golosinas,caramelos de goma
-Barrita de cereales	G	25	400	6	68	12	barrita
-Barrita de proteínas	G	60	360	33	35	10	barrita proteica
-Miel	G	20	304	0.3	82	0
-Azúcar	G	10	387	0	100	0	azucar
-Mermelada	G	20	250	0.4	60	0.1	confitura
-Cacao en polvo azucarado	G	15	380	5	83	3.5	colacao,nesquik,cola cao
-Turrón	G	30	500	10	50	30
-Polvorones	G	30	520	6	55	30	mantecados
-Nachos	G	30	500	7	63	25	totopos,doritos
-Frutos secos fritos	G	30	600	18	20	50	cóctel de frutos secos
-Proteína en polvo (whey)	G	30	400	78	8	6	proteina,whey,batido de proteinas
-Creatina	G	5	0	0	0	0
+Croissant	G	60	406	8.2	45.8	21	cruasán,cruasan	Croissant	
+Napolitana de chocolate	G	80	420	7	50	21	napolitana	Pain au chocolat	chocolate croissant
+Magdalena	G	40	420	6	50	21	magdalenas,muffin	Spanish muffin (magdalena)	muffin,cupcake
+Donut	G	60	421	5	50	22	dónut,rosquilla	Doughnut	donut
+Bizcocho	G	60	350	6	50	14		Sponge cake	cake
+Tarta de queso	G	120	321	5.5	25.5	22.5	cheesecake	Cheesecake	
+Tarta de chocolate	G	100	370	5	50	17		Chocolate cake	
+Churros	G	100	350	4.5	40	19	churro,porras	Churros	
+Galletas tipo María	G	30	436	7	74	12	galletas maría	Marie biscuits	plain biscuits,tea biscuits,cookies
+Galletas de chocolate	G	30	490	6	65	23	galletas con chocolate,cookies	Chocolate biscuits	chocolate chip cookies,cookies
+Galletas integrales	G	30	440	8	66	15		Wholemeal biscuits	digestive biscuits,whole wheat cookies
+Chocolate negro (70 %)	G	20	598	7.8	46	43	chocolate negro	Dark chocolate (70%)	
+Chocolate con leche	G	20	535	7.7	59	30	chocolate	Milk chocolate	chocolate
+Bombones	G	20	530	6	55	31		Filled chocolates	pralines,bonbons
+Gominolas	G	30	340	6	78	0.2	chuches,golosinas,caramelos de goma	Gummy sweets	gummies,gummy bears,jelly sweets,candy
+Barrita de cereales	G	25	400	6	68	12	barrita	Cereal bar	granola bar
+Barrita de proteínas	G	60	360	33	35	10	barrita proteica	Protein bar	
+Miel	G	20	304	0.3	82	0		Honey	
+Azúcar	G	10	387	0	100	0	azucar	Sugar	
+Mermelada	G	20	250	0.4	60	0.1	confitura	Jam	jelly,marmalade
+Cacao en polvo azucarado	G	15	380	5	83	3.5	colacao,nesquik,cola cao	Sweetened cocoa powder	nesquik,cocoa,hot chocolate powder
+Turrón	G	30	500	10	50	30		Turrón (nougat)	nougat,turron
+Polvorones	G	30	520	6	55	30	mantecados	Polvorones (shortbread)	shortbread,mantecados
+Nachos	G	30	500	7	63	25	totopos,doritos	Nachos	tortilla chips,doritos
+Frutos secos fritos	G	30	600	18	20	50	cóctel de frutos secos	Fried mixed nuts	salted nuts,mixed nuts
+Proteína en polvo (whey)	G	30	400	78	8	6	proteina,whey,batido de proteinas	Protein powder (whey)	whey,protein,protein shake
+Creatina	G	5	0	0	0	0		Creatine	
 # --- Bebidas ---
-Agua	ML	250	0	0	0	0
-Zumo de naranja	ML	200	45	0.7	10.4	0.2	zumo,jugo de naranja
-Zumo de manzana	ML	200	46	0.1	11.3	0.1
-Zumo de piña	ML	200	53	0.4	12.9	0.1
-Batido de frutas	ML	250	60	1	14	0.3	smoothie
-Refresco de cola	ML	330	42	0	10.6	0	coca cola,cola,refresco
-Refresco de cola sin azúcar	ML	330	1	0	0	0	cola zero,coca cola zero,light
-Refresco de naranja	ML	330	40	0	10	0	fanta
-Bebida isotónica	ML	500	25	0	6	0	aquarius,isotónica,powerade
-Bebida energética	ML	250	45	0	11	0	red bull,monster
-Cerveza	ML	330	43	0.5	3.6	0	caña
-Cerveza sin alcohol	ML	330	22	0.4	4.6	0
-Vino tinto	ML	150	85	0.1	2.6	0	vino
-Vino blanco	ML	150	82	0.1	2.6	0
-Sangría	ML	200	85	0.1	10	0	tinto de verano
-Café solo	ML	50	2	0.1	0	0	café,expreso
-Café con leche	ML	200	40	2.2	3.5	1.8	cortado,capuchino
-Café con leche desnatada	ML	200	25	2.3	3.6	0.1
-Té	ML	250	1	0	0.2	0	infusión,te
-Chocolate caliente	ML	200	85	3.5	12	3	cacao caliente
-Horchata	ML	250	70	0.6	13	1.9
+Agua	ML	250	0	0	0	0		Water	
+Zumo de naranja	ML	200	45	0.7	10.4	0.2	zumo,jugo de naranja	Orange juice	juice,oj
+Zumo de manzana	ML	200	46	0.1	11.3	0.1		Apple juice	
+Zumo de piña	ML	200	53	0.4	12.9	0.1		Pineapple juice	
+Batido de frutas	ML	250	60	1	14	0.3	smoothie	Fruit smoothie	smoothie
+Refresco de cola	ML	330	42	0	10.6	0	coca cola,cola,refresco	Cola	coke,coca cola,soda,soft drink,pop
+Refresco de cola sin azúcar	ML	330	1	0	0	0	cola zero,coca cola zero,light	Diet cola (sugar-free)	coke zero,diet coke,cola zero
+Refresco de naranja	ML	330	40	0	10	0	fanta	Orange soda	fanta,orangeade
+Bebida isotónica	ML	500	25	0	6	0	aquarius,isotónica,powerade	Sports drink (isotonic)	isotonic drink,gatorade,powerade,aquarius
+Bebida energética	ML	250	45	0	11	0	red bull,monster	Energy drink	red bull,monster
+Cerveza	ML	330	43	0.5	3.6	0	caña	Beer	lager
+Cerveza sin alcohol	ML	330	22	0.4	4.6	0		Alcohol-free beer	non-alcoholic beer
+Vino tinto	ML	150	85	0.1	2.6	0	vino	Red wine	wine
+Vino blanco	ML	150	82	0.1	2.6	0		White wine	
+Sangría	ML	200	85	0.1	10	0	tinto de verano	Sangria	tinto de verano
+Café solo	ML	50	2	0.1	0	0	café,expreso	Black coffee	coffee,espresso
+Café con leche	ML	200	40	2.2	3.5	1.8	cortado,capuchino	Coffee with milk	latte,cappuccino,flat white,white coffee
+Café con leche desnatada	ML	200	25	2.3	3.6	0.1		Coffee with skimmed milk	skinny latte
+Té	ML	250	1	0	0.2	0	infusión,te	Tea	herbal tea,infusion
+Chocolate caliente	ML	200	85	3.5	12	3	cacao caliente	Hot chocolate	hot cocoa
+Horchata	ML	250	70	0.6	13	1.9		Horchata (tiger nut drink)	tiger nut milk

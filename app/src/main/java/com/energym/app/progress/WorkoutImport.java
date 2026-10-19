@@ -145,7 +145,8 @@ public final class WorkoutImport {
 			return null;
 		String n = name.trim();
 		for (Exercise e : catalog)
-			if (normalize(e.getName()).equals(normalize(n)) || e.getId().equals(n))
+			if (normalize(e.getName()).equals(normalize(n)) || normalize(e.getSourceName()).equals(normalize(n)) ||
+				e.getId().equals(n))
 				return e.getId();
 		String base = n, equipment = "";
 		int open = n.lastIndexOf('(');

@@ -130,14 +130,19 @@ public final class CatalogRepository {
 			JSONArray sportRows = root.getJSONArray("sports");
 			for (int i = 0; i < sportRows.length(); i++) {
 				JSONObject row = sportRows.getJSONObject(i);
-				sports.add(new Sport(row.getString("id"), row.getString("name"),
+				sports.add(new Sport(row.getString("id"), row.getString("name"), row.optString("nameEn", null),
 					Sport.CoverageStatus.valueOf(row.getString("specificCoverage")),
 					Sport.CoverageStatus.valueOf(row.getString("complementaryCoverage"))));
 			}
 			List<Exercise> exercises = new ArrayList<>();
+			Map<String, Exercise.English> english = new HashMap<>();
 			JSONArray exerciseRows = root.getJSONArray("exercises");
 			for (int i = 0; i < exerciseRows.length(); i++) {
 				JSONObject row = exerciseRows.getJSONObject(i);
+				// Nombre y técnica en inglés: solo se muestran; lo guardado y lo que va a la IA sigue en español.
+				if (row.has("nameEn") && row.has("descriptionEn"))
+					english.put(row.getString("id"), new Exercise.English(row.getString("name"),
+						row.getString("nameEn"), row.getString("descriptionEn")));
 				exercises.add(new Exercise(row.getString("id"), row.getString("name"),
 					MetricType.valueOf(row.getString("metricType")),
 					enumSet(row.getJSONArray("goals"), TrainingProfile.Goal.class),
@@ -147,7 +152,9 @@ public final class CatalogRepository {
 					Exercise.Coverage.valueOf(row.getString("coverage")), row.getBoolean("reviewed"),
 					row.getString("description"), strings(row.getJSONArray("alternativeIds"))));
 			}
-			return new CatalogRepository(root.getInt("version"), sports, exercises);
+			CatalogRepository catalog = new CatalogRepository(root.getInt("version"), sports, exercises);
+			Exercise.setEnglish(english);
+			return catalog;
 		} catch (JSONException | IllegalArgumentException | NullPointerException exception) {
 			throw new IOException("El catálogo local es inválido", exception);
 		}

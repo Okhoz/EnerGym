@@ -1,9 +1,28 @@
 package com.energym.app.domain;
 
+import com.energym.app.i18n.Txt;
+
 import java.util.*;
 
 public final class Exercise {
 	public enum Coverage {SPECIFIC, COMPLEMENTARY}
+
+	/** Nombre y técnica en inglés de un ejercicio del catálogo, y el nombre en español del que se tradujeron. */
+	public static final class English {
+		final String sourceName, name, description;
+
+		public English(String sourceName, String name, String description) {
+			this.sourceName = TrainingProfile.required(sourceName, "sourceName");
+			this.name = TrainingProfile.required(name, "nameEn");
+			this.description = TrainingProfile.required(description, "descriptionEn");
+		}
+	}
+
+	/**
+	 * Traducciones del catálogo publicado, por ID. Valen también para las copias guardadas en rutinas y sesiones,
+	 * que solo llevan el español; si el nombre en español ya no coincide (otro ejercicio), no se traduce.
+	 */
+	private static volatile Map<String, English> english = Collections.emptyMap();
 
 	private final String id, name, description;
 	private final MetricType metricType;
@@ -46,11 +65,30 @@ public final class Exercise {
 		return Collections.unmodifiableSet(new LinkedHashSet<>(source));
 	}
 
+	/** Sustituye las traducciones al inglés del catálogo (al cargarlo). */
+	public static void setEnglish(Map<String, English> byId) {
+		english = Collections.unmodifiableMap(new HashMap<>(byId));
+	}
+
+	private English english() {
+		if (!Txt.english())
+			return null;
+		English en = english.get(id);
+		return en != null && en.sourceName.equals(name) ? en : null;
+	}
+
 	public String getId() {
 		return id;
 	}
 
+	/** Nombre en el idioma de la app (los ejercicios propios, tal como se crearon). */
 	public String getName() {
+		English en = english();
+		return en == null ? name : en.name;
+	}
+
+	/** Nombre original del catálogo (español): el que se guarda y el que recibe la IA. */
+	public String getSourceName() {
 		return name;
 	}
 
@@ -82,7 +120,14 @@ public final class Exercise {
 		return reviewed;
 	}
 
+	/** Técnica en el idioma de la app. */
 	public String getDescription() {
+		English en = english();
+		return en == null ? description : en.description;
+	}
+
+	/** Técnica original del catálogo (español): la que se guarda y la que recibe la IA. */
+	public String getSourceDescription() {
 		return description;
 	}
 

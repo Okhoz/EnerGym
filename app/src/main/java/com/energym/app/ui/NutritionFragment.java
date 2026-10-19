@@ -162,7 +162,7 @@ public final class NutritionFragment extends ScreenFragment {
 			((TextView) row.findViewById(R.id.food_name)).setText(m.name);
 			List<String> names = new ArrayList<>();
 			for (FoodEntry f : m.foods)
-				names.add(f.name);
+				names.add(f.label());
 			((TextView) row.findViewById(R.id.food_detail)).setText(String.join(", ", names));
 			((TextView) row.findViewById(R.id.food_kcal)).setText(Math.round(m.kcal()) + " kcal");
 			row.setContentDescription(m.name + ", " + Math.round(m.kcal()) + " kcal. " + Txt.t(R.string.nut_tap_to_log));
@@ -444,16 +444,16 @@ public final class NutritionFragment extends ScreenFragment {
 
 	private void foodRow(LinearLayout section, FoodEntry e, NutritionController n) {
 		View row = getLayoutInflater().inflate(R.layout.row_food, section, false);
-		((TextView) row.findViewById(R.id.food_name)).setText(e.name);
+		((TextView) row.findViewById(R.id.food_name)).setText(e.label());
 		((TextView) row.findViewById(R.id.food_detail)).setText(NutritionController.format(e.amount) + " " +
 			e.unit.symbol + " · " + Txt.t(R.string.nut_macros_short, one(e.protein()), one(e.carbs()), one(e.fat())));
 		((TextView) row.findViewById(R.id.food_kcal)).setText(Long.toString(Math.round(e.kcal())));
-		row.setContentDescription(e.name + ", " + NutritionController.format(e.amount) + " " + e.unit.symbol + ", " +
+		row.setContentDescription(e.label() + ", " + NutritionController.format(e.amount) + " " + e.unit.symbol + ", " +
 			Txt.t(R.string.nut_food_row_description, Math.round(e.kcal())));
 		long scope = n.scopeRevision();
 		row.setTag("food_options_" + e.id);
 		row.setOnClickListener(v -> new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-			.setTitle(e.name)
+			.setTitle(e.label())
 			.setItems(new String[]{Txt.t(R.string.nut_edit_food), Txt.t(R.string.nut_add_again), Txt.t(R.string.nut_remove_from_diary)}, (dialog, which) -> {
 				if (n.busy || scope != n.scopeRevision()) return;
 				if (which == 0) {
@@ -464,7 +464,7 @@ public final class NutritionFragment extends ScreenFragment {
 					app.navigate(Screen.FOOD);
 				} else new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
 					.setTitle(Txt.t(R.string.nut_remove_food_title))
-					.setMessage(Txt.t(R.string.nut_remove_food_message, e.name))
+					.setMessage(Txt.t(R.string.nut_remove_food_message, e.label()))
 					.setNegativeButton(Txt.t(R.string.common_cancel), null)
 					.setPositiveButton(Txt.t(R.string.common_remove), (confirm, button) -> {
 						if (scope == n.scopeRevision()) n.remove(e);

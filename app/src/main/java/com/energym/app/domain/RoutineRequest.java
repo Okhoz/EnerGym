@@ -109,8 +109,8 @@ public final class RoutineRequest {
 	public static Set<Area> areas(Exercise e) {
 		Set<Area> a = EnumSet.noneOf(Area.class);
 		// Ejercicio propio: su grupo muscular es el que eligió la persona al crearlo.
-		if (e.getId().startsWith("custom-") && e.getDescription().startsWith("Grupo muscular: ")) {
-			String label = e.getDescription().substring("Grupo muscular: ".length()).split("\\.")[0];
+		if (e.getId().startsWith("custom-") && e.getSourceDescription().startsWith("Grupo muscular: ")) {
+			String label = e.getSourceDescription().substring("Grupo muscular: ".length()).split("\\.")[0];
 			for (Area area : Area.values())
 				if (area.label.equals(label)) {
 					a.add(area);
@@ -125,7 +125,7 @@ public final class RoutineRequest {
 			a.add(Area.CARDIO);
 			return a;
 		}
-		String s = " " + normalize(e.getId().replace('-', ' ') + " " + e.getName()) + " ";
+		String s = " " + normalize(e.getId().replace('-', ' ') + " " + e.getSourceName()) + " ";
 		boolean legCurl = has(s, "leg curl|hamstring curl|femoral");
 		boolean dips = has(s, "dips|fondos") && !has(s, "plank|plancha");
 		if (has(s, "squat|sentadilla|lunge|zancada|leg press|prensa|leg extension|cuadriceps|calf|gemelo|talones|" +

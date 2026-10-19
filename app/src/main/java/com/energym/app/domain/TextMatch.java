@@ -115,7 +115,8 @@ public final class TextMatch {
 	}
 
 	private static final Set<String> CONNECTORS = new HashSet<>(Arrays.asList(
-		"a", "al", "de", "del", "el", "la", "las", "los", "y", "en", "con", "por", "para", "un", "una", "sin"));
+		"a", "al", "de", "del", "el", "la", "las", "los", "y", "en", "con", "por", "para", "un", "una", "sin",
+		"an", "the", "of", "with", "and", "on", "for"));
 
 	/** Términos útiles de una consulta (normalizados, sin conectores ni letras sueltas). */
 	public static List<String> terms(String query) {
