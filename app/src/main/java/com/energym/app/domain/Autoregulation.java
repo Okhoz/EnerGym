@@ -60,6 +60,6 @@ public final class Autoregulation {
 	}
 
 	private static String fmt(double kg) {
-		return SetLog.format(kg).replace('.', ',');
+		return Txt.decimal(SetLog.format(kg));
 	}
 }

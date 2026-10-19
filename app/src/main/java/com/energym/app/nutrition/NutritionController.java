@@ -985,7 +985,7 @@ public final class NutritionController {
 	public static String format(double value) {
 		if (value == Math.rint(value))
 			return Long.toString((long) value);
-		return String.format(Locale.ROOT, "%.1f", value).replace('.', ',');
+		return Txt.decimal(String.format(Locale.ROOT, "%.1f", value));
 	}
 
 	private static String message(RuntimeException e, String fallback) {

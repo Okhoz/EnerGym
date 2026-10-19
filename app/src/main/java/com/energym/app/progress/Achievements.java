@@ -94,6 +94,6 @@ public final class Achievements {
 	}
 
 	private static String format(double v) {
-		return v == Math.rint(v) ? Long.toString((long) v) : String.format(Locale.ROOT, "%.1f", v).replace('.', ',');
+		return v == Math.rint(v) ? Long.toString((long) v) : Txt.decimal(String.format(Locale.ROOT, "%.1f", v));
 	}
 }

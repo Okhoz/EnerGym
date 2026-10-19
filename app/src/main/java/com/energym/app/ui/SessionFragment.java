@@ -140,7 +140,7 @@ public final class SessionFragment extends ScreenFragment {
 	 */
 	private void exercises(List<String> names, Set<Integer> links, int saved) {
 		int at = app.sessions.selected, count = names.size();
-		section(Txt.t(R.string.ses_position, at + 1, count, saved), 8);
+		section(Txt.t(R.string.ses_position, at + 1, count, Txt.n(R.plurals.ses_logged_count, saved)), 8);
 		LinearLayout nav = columns(rows, 0);
 		com.google.android.material.button.MaterialButton back =
 			compact(nav, "‹", at > 0 && !app.sessions.busy, () -> app.sessions.select(at - 1));
@@ -279,10 +279,10 @@ public final class SessionFragment extends ScreenFragment {
 			if (advice != null) {
 				String target = advice.kg > 0 ? SetLog.format(Plates.toUnit(advice.kg, lb)) : "";
 				boolean differs = advice.kg > 0 ? !target.equals(kgInput) : !Integer.toString(advice.reps).equals(repsInput);
-				text(log, "🧠 " + (lb && advice.kg > 0 ? advice.text.replaceAll("[0-9]+(,[0-9]+)? kg",
-					target.replace('.', ',') + " lb") : advice.text), R.style.EnerGym_Body, 12).setTag("track_advice");
+				text(log, "🧠 " + (lb && advice.kg > 0 ? advice.text.replaceAll("[0-9]+([.,][0-9]+)? kg",
+					Txt.decimal(target) + " lb") : advice.text), R.style.EnerGym_Body, 12).setTag("track_advice");
 				if (differs)
-					action(log, advice.kg > 0 ? Txt.t(R.string.ses_use_weight, target.replace('.', ','), Plates.unit(lb)) :
+					action(log, advice.kg > 0 ? Txt.t(R.string.ses_use_weight, Txt.decimal(target), Plates.unit(lb)) :
 						Txt.t(R.string.ses_use_reps, advice.reps), true, () -> {
 						if (advice.kg > 0) {
 							kgInput = target;
@@ -338,7 +338,7 @@ public final class SessionFragment extends ScreenFragment {
 		if (!"N".equals(kindInput))
 			chosen.add(SetLog.Kind.valueOf(kindName(kindInput)).display());
 		if (!rpeInput.isEmpty())
-			chosen.add("RPE " + rpeInput.replace('.', ','));
+			chosen.add("RPE " + Txt.decimal(rpeInput));
 		action(log, Txt.t(moreOptions ? R.string.ses_less_options : R.string.ses_more_options) +
 			(chosen.isEmpty() ? "" : " · " + String.join(" · ", chosen)), true, () -> {
 			moreOptions = !moreOptions;
@@ -462,7 +462,7 @@ public final class SessionFragment extends ScreenFragment {
 		if (s.kind != SetLog.Kind.NORMAL)
 			parts.add(s.kind.display());
 		if (s.rpe > 0)
-			parts.add("RPE " + SetLog.format(s.rpe).replace('.', ','));
+			parts.add("RPE " + Txt.decimal(SetLog.format(s.rpe)));
 		if (!detail.isEmpty())
 			parts.add(detail);
 		return String.join(" · ", parts);
@@ -505,7 +505,7 @@ public final class SessionFragment extends ScreenFragment {
 		});
 		List<String> rpeNames = new ArrayList<>();
 		for (String r : RPE)
-			rpeNames.add(r.isEmpty() ? Txt.t(R.string.ses_rpe_none) : "RPE " + r.replace('.', ',') + (r.equals("10") ?
+			rpeNames.add(r.isEmpty() ? Txt.t(R.string.ses_rpe_none) : "RPE " + Txt.decimal(r) + (r.equals("10") ?
 				Txt.t(R.string.ses_rpe_10) : r.equals("8") ? Txt.t(R.string.ses_rpe_8) : r.equals("9") ? Txt.t(R.string.ses_rpe_9) : ""));
 		choice(log, "track_rpe", Txt.t(R.string.ses_rpe_label), RPE, rpeNames, rpeInput, v -> {
 			rpeInput = v;

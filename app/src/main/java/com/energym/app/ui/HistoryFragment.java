@@ -85,13 +85,14 @@ public final class HistoryFragment extends ScreenFragment {
 		LinearLayout totals = card(Txt.t(R.string.hist_totals_title), stats.total() == 0 ?
 			Txt.t(R.string.hist_totals_empty) : "");
 		LinearLayout row1 = columns(totals, 4);
-		stat(row1, Integer.toString(stats.total()), Txt.t(R.string.hist_stat_sessions));
+		stat(row1, Integer.toString(stats.total()), Txt.n(R.plurals.stat_sessions, stats.total()));
 		stat(row1, BarChartView.compact(stats.totalMinutes() / 60.0), Txt.t(R.string.hist_stat_hours));
-		stat(row1, Integer.toString(stats.exercisesDone()), Txt.t(R.string.hist_stat_exercises));
+		stat(row1, Integer.toString(stats.exercisesDone()), Txt.n(R.plurals.stat_exercises, stats.exercisesDone()));
 		LinearLayout row2 = columns(totals, 16);
 		stat(row2, BarChartView.compact(stats.totalVolume()), Txt.t(R.string.hist_stat_kg_lifted));
 		stat(row2, BarChartView.compact(stats.totalDistance()), "km");
-		stat(row2, Integer.toString(n == null ? 0 : n.loggedDays().size()), Txt.t(R.string.hist_stat_diet_days));
+		int dietDays = n == null ? 0 : n.loggedDays().size();
+		stat(row2, Integer.toString(dietDays), Txt.n(R.plurals.stat_diet_days, dietDays));
 
 		inProgress();
 
@@ -102,7 +103,7 @@ public final class HistoryFragment extends ScreenFragment {
 			text(trend, Txt.t(R.string.hist_trend_time, trend(stats.minutesTrend(), " min")), R.style.EnerGym_Body, 4);
 			LinearLayout figures = columns(trend, 12);
 			stat(figures, Integer.toString(stats.weekStreak()), Txt.n(R.plurals.hist_weeks_in_row, stats.weekStreak()));
-			stat(figures, Integer.toString(stats.daysThisMonth()), Txt.t(R.string.hist_days_this_month));
+			stat(figures, Integer.toString(stats.daysThisMonth()), Txt.n(R.plurals.stat_days_month, stats.daysThisMonth()));
 
 			bars(Txt.t(R.string.hist_bars_sessions), stats.sessionsPerWeek(), stats);
 			bars(Txt.t(R.string.hist_bars_minutes), stats.minutesPerWeek(), stats);

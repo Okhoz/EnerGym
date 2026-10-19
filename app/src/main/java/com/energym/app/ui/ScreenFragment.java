@@ -309,7 +309,7 @@ public abstract class ScreenFragment extends Fragment {
 			b.setRippleColor(android.content.res.ColorStateList.valueOf(0x22FFFFFF));
 			b.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(),
 				chosen ? R.color.surface : R.color.text_secondary));
-			b.setContentDescription(labels[i] + (chosen ? ", seleccionado" : ""));
+			b.setContentDescription(labels[i] + (chosen ? ", " + Txt.t(R.string.sf_selected) : ""));
 			b.setOnClickListener(v -> {
 				if (index != selected) select.accept(index);
 			});

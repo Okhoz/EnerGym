@@ -128,15 +128,19 @@ public final class CoachKnowledge {
 	}
 
 	/**
-	 * Respuesta del guiado local (móviles sin IA): las fichas de los dos temas más prioritarios, o vacío si la pregunta
-	 * no toca ninguno.
+	 * Respuesta del guiado local (móviles sin IA): la ficha más prioritaria, breve y al grano. Ante dolor en un
+	 * ejercicio concreto se añade su ficha de técnica, que suele ser la causa. Vacío si no toca ningún tema.
 	 */
 	public static String answer(String message) {
 		List<Card> found = matching(message);
-		StringBuilder out = new StringBuilder();
-		for (int i = 0; i < Math.min(2, found.size()); i++)
-			out.append(out.length() == 0 ? "" : "\n\n").append(Txt.t(found.get(i).text));
-		return out.toString();
+		if (found.isEmpty())
+			return "";
+		String first = Txt.t(found.get(0).text);
+		if (found.get(0).topic == Topic.PAIN)
+			for (Card c : found)
+				if (TECHNIQUE.contains(c.topic))
+					return first + "\n\n" + Txt.t(c.text);
+		return first;
 	}
 
 	static String normalize(String text) {

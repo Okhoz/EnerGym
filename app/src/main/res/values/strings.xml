@@ -161,11 +161,8 @@
 	<string name="hist_tab_goals">Metas</string>
 	<string name="hist_totals_title">Todo lo que has hecho</string>
 	<string name="hist_totals_empty">Finaliza tu primera sesión y aquí se irá sumando todo.</string>
-	<string name="hist_stat_sessions">sesiones</string>
 	<string name="hist_stat_hours">horas</string>
-	<string name="hist_stat_exercises">ejercicios</string>
 	<string name="hist_stat_kg_lifted">kg levantados</string>
-	<string name="hist_stat_diet_days">días con dieta</string>
 	<string name="hist_trend_title">Tu mejora</string>
 	<string name="hist_trend_subtitle">Últimas 4 semanas frente a las 4 anteriores</string>
 	<string name="hist_trend_sessions">Sesiones: %1$s</string>
@@ -175,7 +172,6 @@
 		<item quantity="many">semanas seguidas</item>
 		<item quantity="other">semanas seguidas</item>
 	</plurals>
-	<string name="hist_days_this_month">días este mes</string>
 	<string name="hist_bars_sessions">Sesiones por semana</string>
 	<string name="hist_bars_minutes">Minutos por semana</string>
 	<string name="hist_bars_kg">Kilos levantados por semana</string>
@@ -235,7 +231,6 @@
 	<string name="hist_exercises_of_total">%1$d de %2$d ejercicios</string>
 	<string name="hist_continue_workout">▶ Continuar entreno</string>
 	<string name="hist_food_title">Alimentación</string>
-	<string name="hist_food_empty">Anota comidas en Alimentación y aquí verás tu evolución.</string>
 	<string name="hist_last_days">Últimos %1$d días</string>
 	<plurals name="hist_days_logged">
 		<item quantity="one">día anotado</item>
@@ -382,7 +377,7 @@
 	<string name="ses_discard_title">¿Descartar este entreno?</string>
 	<string name="ses_discard_message">Se eliminarán sus registros de tu cuenta. Esta acción no se puede deshacer.</string>
 	<string name="ses_discard_confirm">Descartar</string>
-	<string name="ses_position">Ejercicio %1$d de %2$d · %3$d apuntados</string>
+	<string name="ses_position">Ejercicio %1$d de %2$d · %3$s</string>
 	<string name="ses_previous">Ejercicio anterior</string>
 	<string name="ses_next">Ejercicio siguiente</string>
 	<string name="ses_hide_list">Ocultar lista</string>
@@ -1812,5 +1807,32 @@
 	<string name="kc_beginner" formatted="false">Principiantes: 2–3 sesiones de cuerpo completo por semana con ejercicios básicos (sentadilla, empuje, tracción, bisagra de cadera y core). 2–3 series de 8–12 repeticiones a RPE 6–7 mientras aprendes la técnica. Sube la carga cada semana mientras puedas: al principio se progresa muy rápido.</string>
 	<string name="kc_home" formatted="false">En casa sin material: progresa haciendo el ejercicio más difícil (flexiones inclinadas → normales → pies elevados), a una pierna, más lento (3 s bajando) o con pausas, y acércate al fallo (1–2 repeticiones en reserva). Una mochila con libros sirve de lastre.</string>
 	<string name="tp_calculated_load">Según tu historial, la próxima vez en %1$s: %2$s.</string>
+	<!-- Plurales de cifras -->
+	<plurals name="stat_sessions">
+		<item quantity="one">sesión</item>
+		<item quantity="many">sesiones</item>
+		<item quantity="other">sesiones</item>
+	</plurals>
+	<plurals name="stat_exercises">
+		<item quantity="one">ejercicio</item>
+		<item quantity="many">ejercicios</item>
+		<item quantity="other">ejercicios</item>
+	</plurals>
+	<plurals name="stat_diet_days">
+		<item quantity="one">día con dieta</item>
+		<item quantity="many">días con dieta</item>
+		<item quantity="other">días con dieta</item>
+	</plurals>
+	<plurals name="ses_logged_count">
+		<item quantity="one">%1$d apuntado</item>
+		<item quantity="many">%1$d apuntados</item>
+		<item quantity="other">%1$d apuntados</item>
+	</plurals>
+	<plurals name="stat_days_month">
+		<item quantity="one">día este mes</item>
+		<item quantity="many">días este mes</item>
+		<item quantity="other">días este mes</item>
+	</plurals>
+	<string name="sf_selected">seleccionado</string>
 </resources>
 

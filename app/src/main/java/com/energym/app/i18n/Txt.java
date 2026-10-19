@@ -55,6 +55,14 @@ public final class Txt {
 		return resolver.locale();
 	}
 
+	/**
+	 * Número ya escrito con punto decimal («82.5») en la forma del idioma: coma en español, punto en inglés.
+	 * Solo para mostrar; lo que se guarda o se lee siempre acepta los dos.
+	 */
+	public static String decimal(String number) {
+		return "en".equals(locale().getLanguage()) ? number : number.replace('.', ',');
+	}
+
 	private static Resolver fallback() {
 		try {
 			return (Resolver) Class.forName("com.energym.app.i18n.SourceStrings").getDeclaredConstructor().newInstance();

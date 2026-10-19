@@ -82,11 +82,8 @@
 	<string name="hist_tab_goals">Goals</string>
 	<string name="hist_totals_title">Everything you\'ve done</string>
 	<string name="hist_totals_empty">Finish your first session and everything will add up here.</string>
-	<string name="hist_stat_sessions">sessions</string>
 	<string name="hist_stat_hours">hours</string>
-	<string name="hist_stat_exercises">exercises</string>
 	<string name="hist_stat_kg_lifted">kg lifted</string>
-	<string name="hist_stat_diet_days">days with diet log</string>
 	<string name="hist_trend_title">Your improvement</string>
 	<string name="hist_trend_subtitle">Last 4 weeks vs the previous 4</string>
 	<string name="hist_trend_sessions">Sessions: %1$s</string>
@@ -95,7 +92,6 @@
 		<item quantity="one">week in a row</item>
 		<item quantity="other">weeks in a row</item>
 	</plurals>
-	<string name="hist_days_this_month">days this month</string>
 	<string name="hist_bars_sessions">Sessions per week</string>
 	<string name="hist_bars_minutes">Minutes per week</string>
 	<string name="hist_bars_kg">Kilos lifted per week</string>
@@ -153,7 +149,6 @@
 	<string name="hist_exercises_of_total">%1$d of %2$d exercises</string>
 	<string name="hist_continue_workout">▶ Continue workout</string>
 	<string name="hist_food_title">Food</string>
-	<string name="hist_food_empty">Log meals in Food and you\'ll see your progress here.</string>
 	<string name="hist_last_days">Last %1$d days</string>
 	<plurals name="hist_days_logged">
 		<item quantity="one">day logged</item>
@@ -294,7 +289,7 @@
 	<string name="ses_discard_title">Discard this workout?</string>
 	<string name="ses_discard_message">Its logs will be deleted from your account. This can\'t be undone.</string>
 	<string name="ses_discard_confirm">Discard</string>
-	<string name="ses_position">Exercise %1$d of %2$d · %3$d logged</string>
+	<string name="ses_position">Exercise %1$d of %2$d · %3$s</string>
 	<string name="ses_previous">Previous exercise</string>
 	<string name="ses_next">Next exercise</string>
 	<string name="ses_hide_list">Hide list</string>
@@ -1784,4 +1779,26 @@
 	<string name="kc_beginner" formatted="false">Beginners: 2–3 full-body sessions a week with basic exercises (squat, push, pull, hip hinge and core). 2–3 sets of 8–12 reps at RPE 6–7 while you learn the technique. Add load every week while you can: progress is very fast at the start.</string>
 	<string name="kc_home" formatted="false">At home without equipment: progress by making the exercise harder (incline push-ups → regular → feet elevated), single-leg, slower (3 s down) or with pauses, and get close to failure (1–2 reps in reserve). A backpack with books makes good extra weight.</string>
 	<string name="tp_calculated_load">Based on your history, next time on %1$s: %2$s.</string>
+	<!-- Plurales de cifras -->
+	<plurals name="stat_sessions">
+		<item quantity="one">session</item>
+		<item quantity="other">sessions</item>
+	</plurals>
+	<plurals name="stat_exercises">
+		<item quantity="one">exercise</item>
+		<item quantity="other">exercises</item>
+	</plurals>
+	<plurals name="stat_diet_days">
+		<item quantity="one">day with diet log</item>
+		<item quantity="other">days with diet log</item>
+	</plurals>
+	<plurals name="ses_logged_count">
+		<item quantity="one">%1$d logged</item>
+		<item quantity="other">%1$d logged</item>
+	</plurals>
+	<plurals name="stat_days_month">
+		<item quantity="one">day this month</item>
+		<item quantity="other">days this month</item>
+	</plurals>
+	<string name="sf_selected">selected</string>
 </resources>
