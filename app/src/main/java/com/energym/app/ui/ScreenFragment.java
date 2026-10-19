@@ -294,7 +294,8 @@ public abstract class ScreenFragment extends Fragment {
 			b.setAllCaps(false);
 			b.setTextSize(14);
 			b.setMinWidth(0);
-			b.setMinHeight(dp(44));
+			// Zona táctil mínima de 48 dp, como el resto de botones.
+			b.setMinHeight(dp(48));
 			b.setMaxLines(1);
 			b.setGravity(android.view.Gravity.CENTER);
 			androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(b, 10, 14, 1,
@@ -313,7 +314,7 @@ public abstract class ScreenFragment extends Fragment {
 			b.setOnClickListener(v -> {
 				if (index != selected) select.accept(index);
 			});
-			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(44), 1);
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(48), 1);
 			if (i > 0) params.setMarginStart(dp(4));
 			row.addView(b, params);
 		}
