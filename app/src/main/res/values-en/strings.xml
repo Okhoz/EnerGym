@@ -144,9 +144,15 @@
 	<string name="hist_measures_today">Today\'s measurements</string>
 	<string name="hist_measures_hint">Fill in only the ones you measure. Always measure in the same spot and at the same time.</string>
 	<string name="hist_save_measures">Save measurements</string>
-	<string name="hist_saved_of_total">%1$d of %2$d exercises saved</string>
+	<plurals name="hist_saved_of_total">
+		<item quantity="one">%1$d of %2$d exercise saved</item>
+		<item quantity="other">%1$d of %2$d exercises saved</item>
+	</plurals>
 	<string name="hist_in_progress">Workout in progress: %1$s</string>
-	<string name="hist_exercises_of_total">%1$d of %2$d exercises</string>
+	<plurals name="hist_exercises_of_total">
+		<item quantity="one">%1$d of %2$d exercise</item>
+		<item quantity="other">%1$d of %2$d exercises</item>
+	</plurals>
 	<string name="hist_continue_workout">▶ Continue workout</string>
 	<string name="hist_food_title">Food</string>
 	<string name="hist_last_days">Last %1$d days</string>
@@ -283,7 +289,10 @@
 	<string name="ses_all_logged">🎉 All logged!</string>
 	<string name="ses_finish_title">Finish the workout</string>
 	<string name="ses_all_logged_body">Finish to save it to your history so your routine can level up.</string>
-	<string name="ses_logged_of_total">%1$d of %2$d exercises logged. Log them all to finish.</string>
+	<plurals name="ses_logged_of_total">
+		<item quantity="one">%1$d of %2$d exercise logged. Log it to finish.</item>
+		<item quantity="other">%1$d of %2$d exercises logged. Log them all to finish.</item>
+	</plurals>
 	<string name="ses_finish">Finish workout</string>
 	<string name="ses_discard">Discard workout</string>
 	<string name="ses_discard_title">Discard this workout?</string>
@@ -423,7 +432,10 @@
 	<string name="tr_space_body">Connect your account to create and save your routines.</string>
 	<string name="tr_choose_account">Choose account</string>
 	<string name="tr_half_done">⏸ Unfinished workout</string>
-	<string name="tr_done_of_total">%1$d of %2$d exercises done</string>
+	<plurals name="tr_done_of_total">
+		<item quantity="one">%1$d of %2$d exercise done</item>
+		<item quantity="other">%1$d of %2$d exercises done</item>
+	</plurals>
 	<string name="tr_keep_training">Keep training</string>
 	<string name="tr_review_new">Review new routine</string>
 	<string name="tr_new_routine">✨ New routine: %1$s</string>
@@ -478,7 +490,10 @@
 	<string name="tr_collapsed">collapsed</string>
 	<string name="tr_drafts">Unfinished workouts</string>
 	<string name="tr_drafts_body">Each keeps what you already logged.</string>
-	<string name="tr_exercises_logged">%1$d exercises logged</string>
+	<plurals name="tr_exercises_logged">
+		<item quantity="one">%1$d exercise logged</item>
+		<item quantity="other">%1$d exercises logged</item>
+	</plurals>
 	<string name="tr_continue_this">Continue this one</string>
 	<string name="tr_delete_draft_title">Delete this draft?</string>
 	<string name="tr_library">Exercise library</string>
@@ -496,7 +511,10 @@
 	<string name="tr_delete_exercise_title">Delete “%1$s”?</string>
 	<string name="tr_delete_exercise_message">It will no longer appear for new routines. Routines and workouts that already use it keep it.</string>
 	<string name="tr_create_exercise">+ Create exercise</string>
-	<string name="tr_summary">%1$d exercises · %2$d min</string>
+	<plurals name="tr_summary">
+		<item quantity="one">%1$d exercise · %2$d min</item>
+		<item quantity="other">%1$d exercises · %2$d min</item>
+	</plurals>
 	<string name="tr_origin_saved">Saved routine</string>
 	<string name="tr_origin_ai">✦ Made with AI</string>
 	<string name="tr_origin_manual">✍ Made by you</string>
@@ -801,7 +819,10 @@
 	<string name="acc_read_file_failed">Couldn\'t read the file</string>
 	<string name="acc_import_done">Import finished</string>
 	<string name="acc_import_summary">%1$d meals, %2$d weights and %3$d days of measurements added.</string>
-	<string name="acc_import_skipped">%1$d rows couldn\'t be understood and were skipped.</string>
+	<plurals name="acc_import_skipped">
+		<item quantity="one">%1$d row couldn\'t be understood and was skipped.</item>
+		<item quantity="other">%1$d rows couldn\'t be understood and were skipped.</item>
+	</plurals>
 	<string name="acc_import_workouts">Workouts are already in your account, so they aren\'t imported again.</string>
 	<string name="acc_reminder_time_title">Training reminder time</string>
 	<string name="acc_delete_local_title">Delete local data?</string>
@@ -824,7 +845,10 @@
 	<string name="man_hide_context">Hide context</string>
 	<string name="man_adjust_context">Adjust this routine\'s context</string>
 	<string name="man_chosen">Chosen exercises</string>
-	<string name="man_chosen_body">%1$d exercises · select one to edit it.</string>
+	<plurals name="man_chosen_body">
+		<item quantity="one">%1$d exercise · select it to edit it.</item>
+		<item quantity="other">%1$d exercises · select one to edit it.</item>
+	</plurals>
 	<string name="man_editing">editing</string>
 	<string name="man_add_first">Add your first exercise from the catalogue.</string>
 	<string name="man_add_from_catalog">Add from the catalogue</string>
@@ -1221,7 +1245,10 @@
 	<string name="eb_only_compatible">Only compatible with this routine</string>
 	<string name="eb_clear_all">Clear search and filters</string>
 	<string name="eb_hide_filters">Hide filters</string>
-	<string name="eb_active">%1$d active</string>
+	<plurals name="eb_active">
+		<item quantity="one">%1$d active</item>
+		<item quantity="other">%1$d active</item>
+	</plurals>
 	<string name="eb_remove_filter">Remove filter %1$s</string>
 	<string name="eb_show_more">Show more exercises</string>
 	<string name="eb_no_results">No exercises match this search and these filters. Try another name or remove a filter.</string>
@@ -1229,8 +1256,14 @@
 		<item quantity="one">%1$d result</item>
 		<item quantity="other">%1$d results</item>
 	</plurals>
-	<string name="eb_visible">%1$d shown</string>
-	<string name="eb_active_filters">%1$d active filters</string>
+	<plurals name="eb_visible">
+		<item quantity="one">%1$d shown</item>
+		<item quantity="other">%1$d shown</item>
+	</plurals>
+	<plurals name="eb_active_filters">
+		<item quantity="one">%1$d active filter</item>
+		<item quantity="other">%1$d active filters</item>
+	</plurals>
 	<!-- Visor 3D -->
 	<string name="an_bad_context">Invalid exercise context.</string>
 	<string name="an_pick_exercise">Choose an exercise from the catalogue to open its reference.</string>
@@ -1412,7 +1445,10 @@
 	<!-- Estado de la app -->
 	<string name="st_catalog_failed">Couldn\'t read the catalogue: %1$s</string>
 	<string name="st_plan_failed">I couldn\'t prepare the plan: check your days per week, place and equipment in Profile.</string>
-	<string name="st_exercises_count">%1$d exercises</string>
+	<plurals name="st_exercises_count">
+		<item quantity="one">%1$d exercise</item>
+		<item quantity="other">%1$d exercises</item>
+	</plurals>
 	<string name="st_plan_ready">📅 I\'ve prepared a %1$d-day plan for you:\n%2$s\n\nReview it and tap “Save plan”. When you finish each day I\'ll have the next one ready and raise the loads when you hit the target. 💪</string>
 	<string name="st_reference_unavailable">This reference isn\'t available in the current context. Check the selected exercise\'s written explanation.</string>
 	<string name="st_account_error">Account: %1$s</string>
@@ -1694,7 +1730,10 @@
 	<string name="share_sets_kg">%1$d × %2$d · %3$s kg</string>
 	<string name="share_sets_bodyweight">%1$d × %2$d · bodyweight</string>
 	<string name="share_km">%s km</string>
-	<string name="share_more">and %d more exercises</string>
+	<plurals name="share_more">
+		<item quantity="one">and %d more exercise</item>
+		<item quantity="other">and %d more exercises</item>
+	</plurals>
 	<string name="share_footer">Trained with EnerGym</string>
 	<string name="share_text">I finished “%1$s” on EnerGym: %2$d min and %3$s of volume.</string>
 	<string name="share_text_records">New record on %s! 🏆</string>
@@ -1848,4 +1887,9 @@
 	<string name="nut_edit_named">Edit %1$s</string>
 	<string name="nut_delete_named">Delete %1$s</string>
 	<string name="nut_delete_saved_meal_title">Delete the saved meal “%1$s”?</string>
+	<string name="anatomy_play">Play</string>
+	<string name="an_speed_quarter">0.25×</string>
+	<string name="an_speed_half">0.5×</string>
+	<string name="picker_results">Results</string>
+	<string name="picker_other">Other</string>
 </resources>

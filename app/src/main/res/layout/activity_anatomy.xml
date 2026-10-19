@@ -227,7 +227,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:minHeight="@dimen/touch_target"
-						android:text="0,25×" />
+						android:text="@string/an_speed_quarter" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:backgroundTint="@color/viewer_control_surface"
@@ -236,7 +236,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:minHeight="@dimen/touch_target"
-						android:text="0,5×" />
+						android:text="@string/an_speed_half" />
 
 					<com.energym.app.ui.effects.GlassButton
 						android:backgroundTint="@color/viewer_control_surface"
@@ -245,7 +245,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:minHeight="@dimen/touch_target"
-						android:text="1×" />
+						android:text="@string/an_speed_normal" />
 
 					<androidx.constraintlayout.helper.widget.Flow
 						android:layout_width="0dp"

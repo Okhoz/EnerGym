@@ -43,7 +43,7 @@ final class ExercisePicker {
 		scroll.addView(list);
 		root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (int) (420 * density)));
 		androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
-			.setTitle(title).setView(root).setNegativeButton("Cancelar", null).create();
+			.setTitle(title).setView(root).setNegativeButton(Txt.t(R.string.common_cancel), null).create();
 		ExerciseSearch searcher = new ExerciseSearch(options);
 		Runnable refresh = () -> {
 			list.removeAllViews();
@@ -55,21 +55,23 @@ final class ExercisePicker {
 			}
 			// Sin búsqueda, por grupo muscular; al buscar, lista única por relevancia (lo más parecido primero).
 			Map<String, List<Exercise>> groups = new LinkedHashMap<>();
+			// Títulos de grupo en el idioma de la app (el nombre interno del grupo sigue en español).
+			String other = Txt.t(R.string.picker_other);
 			if (!q.isEmpty())
-				groups.put("resultados", new ArrayList<>(found.subList(0, Math.min(40, found.size()))));
+				groups.put(Txt.t(R.string.picker_results), new ArrayList<>(found.subList(0, Math.min(40, found.size()))));
 			else {
 				for (RoutineRequest.Area a : RoutineRequest.Area.values())
-					groups.put(a.label, new ArrayList<>());
-				groups.put("otros", new ArrayList<>());
+					groups.put(a.display(), new ArrayList<>());
+				groups.put(other, new ArrayList<>());
 				for (Exercise e : found) {
 					Set<RoutineRequest.Area> areas = RoutineRequest.areas(e);
-					groups.get(areas.isEmpty() ? "otros" : areas.iterator().next().label).add(e);
+					groups.get(areas.isEmpty() ? other : areas.iterator().next().display()).add(e);
 				}
 			}
 			for (Map.Entry<String, List<Exercise>> g : groups.entrySet()) {
 				if (g.getValue().isEmpty())
 					continue;
-				list.addView(label(context, g.getKey().toUpperCase(Locale.ROOT), true));
+				list.addView(label(context, g.getKey().toUpperCase(Txt.locale()), true));
 				for (Exercise e : g.getValue()) {
 					TextView row = label(context, e.getName(), false);
 					row.setMinHeight((int) (48 * density));

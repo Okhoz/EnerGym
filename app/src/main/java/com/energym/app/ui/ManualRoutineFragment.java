@@ -47,7 +47,7 @@ public final class ManualRoutineFragment extends ScreenFragment {
 		});
 		if (contextExpanded) contextFields();
 		List<ManualRoutineController.Entry> entries = c.entries();
-		LinearLayout chosen = card(Txt.t(R.string.man_chosen), Txt.t(R.string.man_chosen_body, entries.size()));
+		LinearLayout chosen = card(Txt.t(R.string.man_chosen), Txt.n(R.plurals.man_chosen_body, entries.size()));
 		for (int i = 0; i < entries.size(); i++) {
 			final int index = i;
 			action(chosen, (i + 1) + ". " + entries.get(i).exercise.getName() + (i == c.selected ? " · " + Txt.t(R.string.man_editing) : ""),

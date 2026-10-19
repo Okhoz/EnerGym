@@ -238,7 +238,7 @@ public final class MainActivity extends AppCompatActivity {
 				String error = app.error;
 				app.dismissError();
 				new MaterialAlertDialogBuilder(this).setTitle(Txt.t(R.string.main_check_action)).setMessage(error)
-					.setPositiveButton("Entendido", null).show();
+					.setPositiveButton(Txt.t(R.string.main_understood), null).show();
 			}
 		} finally {
 			rendering = false;

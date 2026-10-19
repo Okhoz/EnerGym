@@ -148,7 +148,7 @@ public final class ShareCard {
 		if (s.lines.size() > shown) {
 			p.setColor(grey);
 			p.setTextSize(34);
-			canvas.drawText(c.getString(R.string.share_more, s.lines.size() - shown), PAD, y + 40, p);
+			canvas.drawText(c.getResources().getQuantityString(R.plurals.share_more, s.lines.size() - shown, s.lines.size() - shown), PAD, y + 40, p);
 		}
 
 		p.setColor(grey);

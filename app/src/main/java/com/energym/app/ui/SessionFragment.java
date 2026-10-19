@@ -116,7 +116,7 @@ public final class SessionFragment extends ScreenFragment {
 		add(rows, new android.view.View(requireContext()), 24);
 		boolean done = saved >= ids.size();
 		LinearLayout finish = card(Txt.t(done ? R.string.ses_all_logged : R.string.ses_finish_title), done ?
-			Txt.t(R.string.ses_all_logged_body) : Txt.t(R.string.ses_logged_of_total, saved, ids.size()));
+			Txt.t(R.string.ses_all_logged_body) : Txt.n(R.plurals.ses_logged_of_total, ids.size(), saved, ids.size()));
 		com.google.android.material.button.MaterialButton end =
 			action(finish, Txt.t(R.string.ses_finish), !app.sessions.busy, app.sessions::finish);
 		if (done)

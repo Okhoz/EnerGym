@@ -64,7 +64,7 @@ public final class HomeFragment extends ScreenFragment {
 			app.sessions.session : app.pending.isEmpty() ? null : app.pending.get(0);
 		if (draft != null) {
 			LinearLayout resume = card(Txt.t(R.string.home_half_done), draft.getRoutine().getTitle() + " · " +
-				Txt.t(R.string.hist_exercises_of_total, draft.getResults().size(), draft.getRoutine().getItems().size()));
+				Txt.n(R.plurals.hist_exercises_of_total, draft.getRoutine().getItems().size(), draft.getResults().size(), draft.getRoutine().getItems().size()));
 			primary(action(resume, Txt.t(R.string.home_continue), !app.sessions.busy, () -> {
 				if (draft == app.sessions.session)
 					app.navigate(Screen.SESSION);
@@ -82,7 +82,7 @@ public final class HomeFragment extends ScreenFragment {
 		}
 		if (app.routines.accepted != null) {
 			LinearLayout ready = card(Txt.t(R.string.home_today_workout), app.routines.accepted.getTitle() + " · " +
-				Txt.t(R.string.tr_summary, app.routines.accepted.getItems().size(), app.routines.accepted.getEstimatedMinutes()));
+				Txt.n(R.plurals.tr_summary, app.routines.accepted.getItems().size(), app.routines.accepted.getItems().size(), app.routines.accepted.getEstimatedMinutes()));
 			primary(action(ready, Txt.t(R.string.home_start), !app.sessions.busy, app::startSession));
 			return;
 		}

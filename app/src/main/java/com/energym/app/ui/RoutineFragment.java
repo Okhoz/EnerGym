@@ -22,7 +22,7 @@ public final class RoutineFragment extends ScreenFragment {
 		Routine r = app.routines.preview != null ? app.routines.preview : app.routines.accepted;
 		heading("", Txt.t(app.routines.preview == null ? R.string.rt_routine : R.string.rt_proposal),
 			r == null ? Txt.t(R.string.rt_create_from_training) : r.getTitle() + " · " +
-				Txt.t(R.string.tr_summary, r.getItems().size(), r.getEstimatedMinutes()));
+				Txt.n(R.plurals.tr_summary, r.getItems().size(), r.getItems().size(), r.getEstimatedMinutes()));
 		if (r == null)
 			return;
 		// Lista compacta: cada ejercicio en una fila; técnica y sustituir al tocarla.
@@ -45,7 +45,7 @@ public final class RoutineFragment extends ScreenFragment {
 			action(rows, Txt.t(R.string.rt_save), app.routines.canAccept(), app.routines::accept).setTag("proposal_accept");
 			action(rows, Txt.t(R.string.rt_edit_before_saving), !app.routines.busy && !app.trainingMutation,
 				() -> app.editProposal(proposal)).setTag("proposal_edit");
-			action(rows, "Descartar", !app.routines.busy, () -> {
+			action(rows, Txt.t(R.string.ses_discard_confirm), !app.routines.busy, () -> {
 				app.routines.reject();
 				app.back();
 			}).setTag("proposal_reject");

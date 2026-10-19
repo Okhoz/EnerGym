@@ -247,7 +247,7 @@ public final class AppState extends AndroidViewModel {
 				return Txt.t(R.string.st_plan_failed);
 			java.util.List<String> days = new java.util.ArrayList<>();
 			for (com.energym.app.domain.Routine r : app.planPreview)
-				days.add("• " + r.getTitle() + " (" + Txt.t(R.string.st_exercises_count, r.getItems().size()) + ")");
+				days.add("• " + r.getTitle() + " (" + Txt.n(R.plurals.st_exercises_count, r.getItems().size()) + ")");
 			return Txt.t(R.string.st_plan_ready, app.planPreview.size(), String.join("\n", days));
 		});
 		// El entrenador ve todo lo que la persona ha hecho en la app (solo en el móvil, nunca en la red).

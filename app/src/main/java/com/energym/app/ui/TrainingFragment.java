@@ -90,7 +90,7 @@ public final class TrainingFragment extends ScreenFragment {
 				int saved = draft.getResults().size(), total = draft.getRoutine().getItems().size();
 			LinearLayout resume = card(Txt.t(R.string.tr_half_done), draft.getRoutine().getTitle());
 			add(resume, new com.energym.app.ui.charts.ProgressBarView(requireContext()), 4)
-				.set(total == 0 ? 0 : saved / (double) total, Txt.t(R.string.tr_done_of_total, saved, total));
+				.set(total == 0 ? 0 : saved / (double) total, Txt.n(R.plurals.tr_done_of_total, total, saved, total));
 			primary(action(resume, Txt.t(R.string.tr_keep_training), !app.sessions.busy,
 				() -> {
 					if (active != null) app.navigate(Screen.SESSION);
@@ -377,7 +377,7 @@ public final class TrainingFragment extends ScreenFragment {
 		if (!state.training.draftsExpanded) return;
 		LinearLayout drafts = card(Txt.t(R.string.tr_drafts), Txt.t(R.string.tr_drafts_body));
 		for (Session draft : others) {
-			text(drafts, draft.getRoutine().getTitle() + " · " + Txt.t(R.string.tr_exercises_logged, draft.getResults().size()),
+			text(drafts, draft.getRoutine().getTitle() + " · " + Txt.n(R.plurals.tr_exercises_logged, draft.getResults().size()),
 				R.style.EnerGym_FieldCaption, 12);
 			action(drafts, Txt.t(R.string.tr_continue_this), !app.sessions.busy, () -> app.resume(draft));
 			action(drafts, Txt.t(R.string.ses_discard_confirm), !app.trainingMutation && !app.sessions.busy, () -> confirmDraftDelete(draft));
@@ -464,7 +464,7 @@ public final class TrainingFragment extends ScreenFragment {
 	}
 
 	private String summary(Routine routine) {
-		return Txt.t(R.string.tr_summary, routine.getItems().size(), routine.getEstimatedMinutes());
+		return Txt.n(R.plurals.tr_summary, routine.getItems().size(), routine.getItems().size(), routine.getEstimatedMinutes());
 	}
 
 	private String origin(Routine routine) {

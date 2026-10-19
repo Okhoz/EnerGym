@@ -101,7 +101,11 @@
 	<string name="share_sets_kg">%1$d × %2$d · %3$s kg</string>
 	<string name="share_sets_bodyweight">%1$d × %2$d · peso corporal</string>
 	<string name="share_km">%s km</string>
-	<string name="share_more">y %d ejercicios más</string>
+	<plurals name="share_more">
+		<item quantity="one">y %d ejercicio más</item>
+		<item quantity="many">y %d ejercicios más</item>
+		<item quantity="other">y %d ejercicios más</item>
+	</plurals>
 	<string name="share_footer">Entrenado con EnerGym</string>
 	<string name="share_text">He terminado «%1$s» en EnerGym: %2$d min y %3$s de volumen.</string>
 	<string name="share_text_records">¡Nuevo récord en %s! 🏆</string>
@@ -237,9 +241,17 @@
 	<string name="hist_measures_today">Medidas de hoy</string>
 	<string name="hist_measures_hint">Rellena solo las que midas. Mide siempre en el mismo sitio y a la misma hora.</string>
 	<string name="hist_save_measures">Guardar medidas</string>
-	<string name="hist_saved_of_total">%1$d de %2$d ejercicios guardados</string>
+	<plurals name="hist_saved_of_total">
+		<item quantity="one">%1$d de %2$d ejercicio guardado</item>
+		<item quantity="many">%1$d de %2$d ejercicios guardados</item>
+		<item quantity="other">%1$d de %2$d ejercicios guardados</item>
+	</plurals>
 	<string name="hist_in_progress">Entreno en curso: %1$s</string>
-	<string name="hist_exercises_of_total">%1$d de %2$d ejercicios</string>
+	<plurals name="hist_exercises_of_total">
+		<item quantity="one">%1$d de %2$d ejercicio</item>
+		<item quantity="many">%1$d de %2$d ejercicios</item>
+		<item quantity="other">%1$d de %2$d ejercicios</item>
+	</plurals>
 	<string name="hist_continue_workout">▶ Continuar entreno</string>
 	<string name="hist_food_title">Alimentación</string>
 	<string name="hist_last_days">Últimos %1$d días</string>
@@ -382,7 +394,11 @@
 	<string name="ses_all_logged">🎉 ¡Todo apuntado!</string>
 	<string name="ses_finish_title">Terminar el entreno</string>
 	<string name="ses_all_logged_body">Termina para guardarlo en tu historial y que tu rutina pueda subir de nivel.</string>
-	<string name="ses_logged_of_total">%1$d de %2$d ejercicios apuntados. Apunta todos para poder terminar.</string>
+	<plurals name="ses_logged_of_total">
+		<item quantity="one">%1$d de %2$d ejercicio apuntado. Apúntalo para poder terminar.</item>
+		<item quantity="many">%1$d de %2$d ejercicios apuntados. Apunta todos para poder terminar.</item>
+		<item quantity="other">%1$d de %2$d ejercicios apuntados. Apunta todos para poder terminar.</item>
+	</plurals>
 	<string name="ses_finish">Terminar entreno</string>
 	<string name="ses_discard">Descartar entreno</string>
 	<string name="ses_discard_title">¿Descartar este entreno?</string>
@@ -524,7 +540,11 @@
 	<string name="tr_space_body">Conecta tu cuenta para crear y guardar tus rutinas.</string>
 	<string name="tr_choose_account">Elegir cuenta</string>
 	<string name="tr_half_done">⏸ Entreno a medias</string>
-	<string name="tr_done_of_total">%1$d de %2$d ejercicios hechos</string>
+	<plurals name="tr_done_of_total">
+		<item quantity="one">%1$d de %2$d ejercicio hecho</item>
+		<item quantity="many">%1$d de %2$d ejercicios hechos</item>
+		<item quantity="other">%1$d de %2$d ejercicios hechos</item>
+	</plurals>
 	<string name="tr_keep_training">Seguir entrenando</string>
 	<string name="tr_review_new">Revisar rutina nueva</string>
 	<string name="tr_new_routine">✨ Rutina nueva: %1$s</string>
@@ -579,7 +599,11 @@
 	<string name="tr_collapsed">plegados</string>
 	<string name="tr_drafts">Entrenos a medias</string>
 	<string name="tr_drafts_body">Cada uno conserva lo que ya apuntaste.</string>
-	<string name="tr_exercises_logged">%1$d ejercicios registrados</string>
+	<plurals name="tr_exercises_logged">
+		<item quantity="one">%1$d ejercicio registrado</item>
+		<item quantity="many">%1$d ejercicios registrados</item>
+		<item quantity="other">%1$d ejercicios registrados</item>
+	</plurals>
 	<string name="tr_continue_this">Seguir este</string>
 	<string name="tr_delete_draft_title">¿Eliminar este borrador?</string>
 	<string name="tr_library">Biblioteca de ejercicios</string>
@@ -598,7 +622,11 @@
 	<string name="tr_delete_exercise_title">¿Borrar «%1$s»?</string>
 	<string name="tr_delete_exercise_message">Deja de aparecer para nuevas rutinas. Las rutinas y entrenos que ya lo usan lo conservan.</string>
 	<string name="tr_create_exercise">+ Crear ejercicio</string>
-	<string name="tr_summary">%1$d ejercicios · %2$d min</string>
+	<plurals name="tr_summary">
+		<item quantity="one">%1$d ejercicio · %2$d min</item>
+		<item quantity="many">%1$d ejercicios · %2$d min</item>
+		<item quantity="other">%1$d ejercicios · %2$d min</item>
+	</plurals>
 	<string name="tr_origin_saved">Rutina guardada</string>
 	<string name="tr_origin_ai">✦ Hecha con IA</string>
 	<string name="tr_origin_manual">✍ Hecha por ti</string>
@@ -908,7 +936,11 @@
 	<string name="acc_read_file_failed">No se pudo leer el archivo</string>
 	<string name="acc_import_done">Importación terminada</string>
 	<string name="acc_import_summary">%1$d comidas, %2$d pesos y %3$d días de medidas añadidos.</string>
-	<string name="acc_import_skipped">%1$d filas no se entendieron y se han saltado.</string>
+	<plurals name="acc_import_skipped">
+		<item quantity="one">%1$d fila no se entendió y se ha saltado.</item>
+		<item quantity="many">%1$d filas no se entendieron y se han saltado.</item>
+		<item quantity="other">%1$d filas no se entendieron y se han saltado.</item>
+	</plurals>
 	<string name="acc_import_workouts">Los entrenos ya están en tu cuenta, así que no se importan de nuevo.</string>
 	<string name="acc_reminder_time_title">Hora del aviso de entreno</string>
 	<string name="acc_delete_local_title">¿Borrar los datos locales?</string>
@@ -931,7 +963,11 @@
 	<string name="man_hide_context">Ocultar contexto</string>
 	<string name="man_adjust_context">Ajustar contexto de esta rutina</string>
 	<string name="man_chosen">Ejercicios elegidos</string>
-	<string name="man_chosen_body">%1$d ejercicios · selecciona uno para editarlo.</string>
+	<plurals name="man_chosen_body">
+		<item quantity="one">%1$d ejercicio · selecciónalo para editarlo.</item>
+		<item quantity="many">%1$d ejercicios · selecciona uno para editarlo.</item>
+		<item quantity="other">%1$d ejercicios · selecciona uno para editarlo.</item>
+	</plurals>
 	<string name="man_editing">editando</string>
 	<string name="man_add_first">Añade tu primer ejercicio desde el catálogo.</string>
 	<string name="man_add_from_catalog">Añadir del catálogo</string>
@@ -1330,7 +1366,11 @@
 	<string name="eb_only_compatible">Sólo compatibles con esta rutina</string>
 	<string name="eb_clear_all">Limpiar búsqueda y filtros</string>
 	<string name="eb_hide_filters">Ocultar filtros</string>
-	<string name="eb_active">%1$d activos</string>
+	<plurals name="eb_active">
+		<item quantity="one">%1$d activo</item>
+		<item quantity="many">%1$d activos</item>
+		<item quantity="other">%1$d activos</item>
+	</plurals>
 	<string name="eb_remove_filter">Quitar filtro %1$s</string>
 	<string name="eb_show_more">Mostrar más ejercicios</string>
 	<string name="eb_no_results">No hay ejercicios con esta búsqueda y estos filtros. Prueba otro nombre o quita algún filtro.</string>
@@ -1339,8 +1379,16 @@
 		<item quantity="many">%1$d resultados</item>
 		<item quantity="other">%1$d resultados</item>
 	</plurals>
-	<string name="eb_visible">%1$d visibles</string>
-	<string name="eb_active_filters">%1$d filtros activos</string>
+	<plurals name="eb_visible">
+		<item quantity="one">%1$d visible</item>
+		<item quantity="many">%1$d visibles</item>
+		<item quantity="other">%1$d visibles</item>
+	</plurals>
+	<plurals name="eb_active_filters">
+		<item quantity="one">%1$d filtro activo</item>
+		<item quantity="many">%1$d filtros activos</item>
+		<item quantity="other">%1$d filtros activos</item>
+	</plurals>
 	<!-- Visor 3D -->
 	<string name="an_bad_context">Contexto de ejercicio inválido.</string>
 	<string name="an_pick_exercise">Selecciona un ejercicio del catálogo para abrir su referencia.</string>
@@ -1526,7 +1574,11 @@
 	<!-- Estado de la app -->
 	<string name="st_catalog_failed">No se pudo leer el catálogo: %1$s</string>
 	<string name="st_plan_failed">No he podido preparar el plan: revisa en Perfil tus días por semana, lugar y material.</string>
-	<string name="st_exercises_count">%1$d ejercicios</string>
+	<plurals name="st_exercises_count">
+		<item quantity="one">%1$d ejercicio</item>
+		<item quantity="many">%1$d ejercicios</item>
+		<item quantity="other">%1$d ejercicios</item>
+	</plurals>
 	<string name="st_plan_ready">📅 Te he preparado un plan de %1$d días:\n%2$s\n\nRevísalo y pulsa «Guardar plan». Al terminar cada día te dejo listo el siguiente y subo las cargas cuando cumplas el objetivo. 💪</string>
 	<string name="st_reference_unavailable">Esta referencia no está disponible en el contexto actual. Consulta la explicación escrita del ejercicio seleccionado.</string>
 	<string name="st_account_error">Cuenta: %1$s</string>
@@ -1884,5 +1936,11 @@
 	<string name="nut_edit_named">Editar %1$s</string>
 	<string name="nut_delete_named">Borrar %1$s</string>
 	<string name="nut_delete_saved_meal_title">¿Borrar la comida guardada «%1$s»?</string>
+	<string name="anatomy_play">Reproducir</string>
+	<string name="an_speed_quarter">0,25×</string>
+	<string name="an_speed_half">0,5×</string>
+	<string name="picker_results">Resultados</string>
+	<string name="picker_other">Otros</string>
+	<string name="an_speed_normal" translatable="false">1×</string>
 </resources>
 

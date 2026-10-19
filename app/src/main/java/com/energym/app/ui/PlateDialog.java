@@ -59,7 +59,7 @@ final class PlateDialog {
 		android.widget.ScrollView scroll = new android.widget.ScrollView(c);
 		scroll.addView(box);
 		new com.google.android.material.dialog.MaterialAlertDialogBuilder(c).setView(scroll)
-			.setPositiveButton("Cerrar", null).show();
+			.setPositiveButton(Txt.t(R.string.common_close), null).show();
 	}
 
 	private static TextView add(LinearLayout box, Context c, String text, int style) {

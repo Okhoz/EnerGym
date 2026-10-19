@@ -290,7 +290,7 @@ public final class AnatomyActivity extends AppCompatActivity implements ViewerCo
 	public void render(ViewerState state) {
 		controls.setVisibility(state.ready ? android.view.View.VISIBLE : android.view.View.GONE);
 		loading.setVisibility(state.ready ? android.view.View.GONE : android.view.View.VISIBLE);
-		((TextView) findViewById(R.id.viewer_play)).setText(state.playing ? "Pausar" : "Reproducir");
+		((TextView) findViewById(R.id.viewer_play)).setText(Txt.t(state.playing ? R.string.anatomy_pause : R.string.anatomy_play));
 		if (state.ready)
 			status.setText(Txt.t(R.string.an_offline) + " · " + (manifest == null ? "" : manifest.label() + " · ") +
 				Txt.t(state.playing ? R.string.an_playing : R.string.an_paused) + " · " +

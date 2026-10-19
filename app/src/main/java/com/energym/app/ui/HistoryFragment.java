@@ -346,7 +346,7 @@ public final class HistoryFragment extends ScreenFragment {
 			if (s.getStatus() != Session.Status.DRAFT)
 				continue;
 			int total = s.getRoutine().getItems().size(), saved = s.getResults().size();
-			StringBuilder done = new StringBuilder(Txt.t(R.string.hist_saved_of_total, saved, total));
+			StringBuilder done = new StringBuilder(Txt.n(R.plurals.hist_saved_of_total, total, saved, total));
 			for (RoutineItem item : s.getRoutine().getItems()) {
 				Map<String, String> values = s.getResults().get(item.getExercise().getId());
 				if (values != null)
@@ -356,7 +356,7 @@ public final class HistoryFragment extends ScreenFragment {
 			gap(32);
 			LinearLayout card = card(Txt.t(R.string.hist_in_progress, s.getRoutine().getTitle()), done.toString());
 			add(card, new ProgressBarView(requireContext()), 12).set(total == 0 ? 0 : saved / (double) total,
-				Txt.t(R.string.hist_exercises_of_total, saved, total));
+				Txt.n(R.plurals.hist_exercises_of_total, total, saved, total));
 			primary(action(card, Txt.t(R.string.hist_continue_workout), !app.trainingMutation, () -> app.resume(s)));
 			return;
 		}
@@ -530,7 +530,7 @@ public final class HistoryFragment extends ScreenFragment {
 		List<WeeklyVolume.Line> low = WeeklyVolume.low(lines);
 		List<String> names = new ArrayList<>();
 		for (WeeklyVolume.Line l : low)
-			names.add(l.area.label);
+			names.add(l.area.display());
 		LinearLayout card = card(getString(R.string.volume_title), low.isEmpty() ?
 			getString(R.string.volume_all_ok, WeeklyVolume.MIN_SETS, WeeklyVolume.MAX_SETS) :
 			getString(R.string.volume_low, String.join(", ", names), WeeklyVolume.MIN_SETS));
@@ -538,7 +538,7 @@ public final class HistoryFragment extends ScreenFragment {
 		for (WeeklyVolume.Line l : lines) {
 			android.view.View row = getLayoutInflater().inflate(R.layout.row_food, card, false);
 			TextView name = row.findViewById(R.id.food_name);
-			name.setText("●  " + capital(l.area.label));
+			name.setText("●  " + capital(l.area.display()));
 			android.text.SpannableString dot = new android.text.SpannableString(name.getText());
 			dot.setSpan(new android.text.style.ForegroundColorSpan(areaColor(l.area)), 0, 1, 0);
 			name.setText(dot);
@@ -546,7 +546,7 @@ public final class HistoryFragment extends ScreenFragment {
 				NutritionController.format(Math.round(l.sets * 10) / 10.0), WeeklyVolume.MIN_SETS, WeeklyVolume.MAX_SETS));
 			((TextView) row.findViewById(R.id.food_kcal)).setText(l.status == WeeklyVolume.Status.LOW ? "⚠️" :
 				l.status == WeeklyVolume.Status.HIGH ? "⬆️" : "✅");
-			row.setContentDescription(capital(l.area.label) + ": " + ((TextView) row.findViewById(R.id.food_detail)).getText());
+			row.setContentDescription(capital(l.area.display()) + ": " + ((TextView) row.findViewById(R.id.food_detail)).getText());
 			card.addView(row);
 		}
 	}

@@ -227,7 +227,7 @@ final class ExerciseBrowser {
 		panel.setVisibility(state.expanded ? View.VISIBLE : View.GONE);
 		toggle.setText(Txt.t(state.expanded ? R.string.eb_hide_filters : R.string.eb_filter));
 		toggle.setContentDescription(Txt.t(state.expanded ? R.string.eb_hide_filters : R.string.eb_filter) +
-			(state.activeCount() == 0 ? "" : ", " + Txt.t(R.string.eb_active, state.activeCount())));
+			(state.activeCount() == 0 ? "" : ", " + Txt.n(R.plurals.eb_active, state.activeCount())));
 	}
 
 	private void refresh() {
@@ -251,7 +251,7 @@ final class ExerciseBrowser {
 		List<Exercise> found = source.find(state.query, state.filters(), state.onlyCompatible);
 		int shown = Math.min(state.visible, found.size());
 		TextView count = host.text(results, Txt.n(R.plurals.eb_results, found.size()) +
-			" · " + Txt.t(R.string.eb_visible, shown) + (state.activeCount() == 0 ? "" : " · " + Txt.t(R.string.eb_active_filters, state.activeCount())),
+			" · " + Txt.n(R.plurals.eb_visible, shown) + (state.activeCount() == 0 ? "" : " · " + Txt.n(R.plurals.eb_active_filters, state.activeCount())),
 			R.style.EnerGym_FieldCaption, 12);
 		count.setTag(prefix + "_result_count");
 		count.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);

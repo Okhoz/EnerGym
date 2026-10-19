@@ -30,7 +30,7 @@ public final class PlanFragment extends ScreenFragment {
 			minutes += r.getEstimatedMinutes();
 		heading(Txt.t(R.string.plan_eyebrow), Txt.n(R.plurals.plan_days, plan.size()), Txt.t(R.string.plan_body));
 		for (Routine r : plan) {
-			LinearLayout day = card(r.getTitle(), Txt.t(R.string.tr_summary, r.getItems().size(), r.getEstimatedMinutes()));
+			LinearLayout day = card(r.getTitle(), Txt.n(R.plurals.tr_summary, r.getItems().size(), r.getItems().size(), r.getEstimatedMinutes()));
 			for (RoutineItem item : r.getItems()) {
 				android.view.View row = getLayoutInflater().inflate(R.layout.row_food, day, false);
 				((TextView) row.findViewById(R.id.food_name)).setText(item.getExercise().getName());
@@ -45,7 +45,7 @@ public final class PlanFragment extends ScreenFragment {
 			R.style.EnerGym_FieldCaption, 8);
 		action(rows, Txt.t(R.string.plan_shuffle), !app.trainingMutation, app::shufflePlan);
 		primary(action(rows, Txt.t(R.string.plan_save), !app.trainingMutation, app::acceptPlan));
-		action(rows, "Cancelar", !app.trainingMutation, app::cancelPlan);
+		action(rows, Txt.t(R.string.common_cancel), !app.trainingMutation, app::cancelPlan);
 	}
 
 	/** «3 × 10 · 20 kg», «2 × 30 s», «20 min»… según el tipo de ejercicio. */

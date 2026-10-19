@@ -306,7 +306,7 @@ public final class AccountFragment extends ScreenFragment {
 					message += "\n\n" + getString(R.string.switch_apps_unmatched, String.join(", ", result.unmatched));
 			}
 			new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-				.setTitle(R.string.switch_apps_title).setMessage(message).setPositiveButton("Vale", null).show();
+				.setTitle(R.string.switch_apps_title).setMessage(message).setPositiveButton(Txt.t(R.string.common_ok), null).show();
 		});
 	}
 
@@ -380,7 +380,7 @@ public final class AccountFragment extends ScreenFragment {
 				new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
 					.setTitle(Txt.t(R.string.acc_import_done))
 					.setMessage(Txt.t(R.string.acc_import_summary, foods, weights, savedMeasures) +
-						(skipped > 0 ? "\n" + Txt.t(R.string.acc_import_skipped, skipped) : "") +
+						(skipped > 0 ? "\n" + Txt.n(R.plurals.acc_import_skipped, skipped) : "") +
 						"\n" + Txt.t(R.string.acc_import_workouts))
 					.setPositiveButton(Txt.t(R.string.common_ok), null).show();
 		});
