@@ -99,6 +99,8 @@ public final class NutritionFragment extends ScreenFragment {
 		if (!n.status.isEmpty())
 			text(rows, n.status, R.style.EnerGym_FieldCaption, 0);
 
+		progress(n, targets);
+
 		// Lo que no se usa a diario, plegado: objetivo, consulta con la IA y la dieta del mes.
 		section(Txt.t(R.string.nut_more), 32);
 		MaterialButton more = action(rows, Txt.t(moreOpen ? R.string.nut_hide : R.string.nut_more_toggle), true, () -> {
@@ -184,6 +186,8 @@ public final class NutritionFragment extends ScreenFragment {
 
 	/** Sección «Más» desplegada. */
 	private static boolean moreOpen;
+	/** Días de «Tu progreso»: 7 (cada día) o 28 (media de cada semana). */
+	private static int progressDays = 7;
 
 	private static String euros(double value) {
 		return String.format(Txt.locale(), "%.2f €", value);
@@ -332,6 +336,47 @@ public final class NutritionFragment extends ScreenFragment {
 		macro(card, Txt.t(R.string.nut_carbs), totals[2], targets.carbs, 0);
 		macro(card, Txt.t(R.string.nut_protein), totals[1], targets.protein, 1);
 		macro(card, Txt.t(R.string.nut_fat), totals[3], targets.fat, 2);
+	}
+
+	/**
+	 * Tu progreso: calorías de cada día (o media de cada semana) frente al objetivo, días en objetivo y la media de
+	 * cada macro. Siempre hasta hoy, sea cual sea el día elegido arriba.
+	 */
+	private void progress(NutritionController n, BodyProfile.Targets targets) {
+		section(Txt.t(R.string.nut_progress), 32);
+		NutritionController.Progress p = n.progress(progressDays);
+		segmented("nutrition_progress", new String[]{Txt.t(R.string.nut_progress_week), Txt.t(R.string.nut_progress_month)},
+			new String[]{"nutrition_progress_7", "nutrition_progress_28"}, progressDays == 7 ? 0 : 1, index -> {
+				progressDays = index == 0 ? 7 : NutritionController.HISTORY_DAYS;
+				render();
+			});
+		boolean week = progressDays == 7;
+		LinearLayout card = card(Txt.t(R.string.nut_progress_kcal),
+			p.logged == 0 ? Txt.t(R.string.nut_progress_empty) :
+				Txt.t(week ? R.string.nut_progress_body_week : R.string.nut_progress_body_month));
+		card.setTag("nutrition_progress");
+		if (p.logged == 0)
+			return;
+		LinearLayout figures = columns(card, 12);
+		stat(figures, Long.toString(Math.round(p.kcal)), Txt.t(R.string.nut_progress_avg));
+		stat(figures, p.logged + "/" + p.days, Txt.n(R.plurals.nut_progress_logged, p.logged));
+		if (targets != null)
+			stat(figures, p.onTarget + "/" + p.logged, Txt.t(R.string.nut_progress_on_target));
+		StringBuilder values = new StringBuilder();
+		for (int i = 0; i < p.bars.length; i++)
+			values.append(i == 0 ? "" : ", ").append(p.labels[i]).append(' ').append(Math.round(p.bars[i]));
+		add(card, new BarChartView(requireContext()), 12).set(p.bars, p.labels, targets == null ? 0 : targets.kcal,
+			Txt.t(week ? R.string.nut_progress_chart_week : R.string.nut_progress_chart_month, values.toString()))
+			.highlightLast(week);
+		text(card, Txt.t(R.string.nut_progress_macros), R.style.EnerGym_CardTitle, 16);
+		if (targets == null) {
+			text(card, Txt.t(R.string.nut_progress_macros_plain, Math.round(p.protein), Math.round(p.carbs),
+				Math.round(p.fat)), R.style.EnerGym_Body, 4);
+			return;
+		}
+		macro(card, Txt.t(R.string.nut_carbs), p.carbs, targets.carbs, 0);
+		macro(card, Txt.t(R.string.nut_protein), p.protein, targets.protein, 1);
+		macro(card, Txt.t(R.string.nut_fat), p.fat, targets.fat, 2);
 	}
 
 	private void term(LinearLayout row, long value, String label, boolean highlight) {

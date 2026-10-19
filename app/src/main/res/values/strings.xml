@@ -1853,5 +1853,23 @@
 		<item quantity="many">Calendario de %1$s: %2$d días entrenados</item>
 		<item quantity="other">Calendario de %1$s: %2$d días entrenados</item>
 	</plurals>
+	<string name="nut_progress">Tu progreso</string>
+	<string name="nut_progress_week">7 días</string>
+	<string name="nut_progress_month">4 semanas</string>
+	<string name="nut_progress_kcal">Calorías y macros</string>
+	<string name="nut_progress_body_week">Las calorías de cada día frente a tu objetivo (línea discontinua).</string>
+	<string name="nut_progress_body_month">La media diaria de cada semana frente a tu objetivo (línea discontinua).</string>
+	<string name="nut_progress_empty">Cuando anotes comidas, aquí verás tus calorías y macros de cada día frente a tu objetivo.</string>
+	<string name="nut_progress_avg">kcal de media</string>
+	<string name="nut_progress_on_target">en objetivo</string>
+	<string name="nut_progress_macros">Macros · media diaria</string>
+	<string name="nut_progress_macros_plain">Proteínas %1$d g · Hidratos %2$d g · Grasas %3$d g</string>
+	<string name="nut_progress_chart_week">Calorías de los últimos 7 días: %1$s</string>
+	<string name="nut_progress_chart_month">Media diaria de calorías de las últimas 4 semanas, por semana: %1$s</string>
+	<plurals name="nut_progress_logged">
+		<item quantity="one">día anotado</item>
+		<item quantity="many">días anotados</item>
+		<item quantity="other">días anotados</item>
+	</plurals>
 </resources>
 

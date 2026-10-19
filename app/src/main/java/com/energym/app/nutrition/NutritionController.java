@@ -231,6 +231,68 @@ public final class NutritionController {
 			Math.round(t.protein) + " g de proteína") + ".";
 	}
 
+	/**
+	 * Cómo vas en calorías y macros, para la sección «Tu progreso» de Nutrición. Con 7 días, una barra por día; con
+	 * más, la media diaria de cada semana (28 barras no se leerían). Las medias cuentan solo los días anotados.
+	 */
+	public static final class Progress {
+		/** Calorías por barra (antiguo → reciente) y su rótulo: inicial del día o fecha de inicio de la semana. */
+		public final double[] bars;
+		public final String[] labels;
+		public final int days, logged, onTarget;
+		public final double kcal, protein, carbs, fat;
+
+		Progress(double[] bars, String[] labels, int days, int logged, int onTarget, double kcal, double protein,
+			double carbs, double fat) {
+			this.bars = bars;
+			this.labels = labels;
+			this.days = days;
+			this.logged = logged;
+			this.onTarget = onTarget;
+			this.kcal = kcal;
+			this.protein = protein;
+			this.carbs = carbs;
+			this.fat = fat;
+		}
+	}
+
+	/** Progreso de los últimos {@code days} días hasta hoy (7 o un múltiplo de 7, hasta {@link #HISTORY_DAYS}). */
+	public Progress progress(int days) {
+		double[] kcal = recentSeries(days, 0), protein = recentSeries(days, 1), carbs = recentSeries(days, 2),
+			fat = recentSeries(days, 3);
+		BodyProfile.Targets t = targets();
+		int logged = 0, onTarget = 0;
+		for (double v : kcal)
+			if (v > 0) {
+				logged++;
+				// En objetivo: a menos de un 10 % de las calorías del día.
+				if (t != null && Math.abs(v - t.kcal) <= t.kcal * 0.1)
+					onTarget++;
+			}
+		LocalDate today = clock.get();
+		double[] bars;
+		String[] labels;
+		if (days <= 7) {
+			bars = kcal;
+			labels = new String[days];
+			for (int i = 0; i < days; i++)
+				labels[i] = today.minusDays(days - 1 - i).getDayOfWeek()
+					.getDisplayName(java.time.format.TextStyle.NARROW, Txt.locale());
+		} else {
+			int weeks = days / 7;
+			bars = new double[weeks];
+			labels = new String[weeks];
+			for (int w = 0; w < weeks; w++) {
+				double[] week = Arrays.copyOfRange(kcal, w * 7, w * 7 + 7);
+				bars[w] = loggedAverage(week, week);
+				LocalDate start = today.minusDays(days - 1 - w * 7);
+				labels[w] = start.getDayOfMonth() + "/" + start.getMonthValue();
+			}
+		}
+		return new Progress(bars, labels, days, logged, onTarget, loggedAverage(kcal, kcal),
+			loggedAverage(protein, kcal), loggedAverage(carbs, kcal), loggedAverage(fat, kcal));
+	}
+
 	/** Media de los días con comida anotada en la serie; 0 si no hay ninguno. */
 	public static double loggedAverage(double[] values, double[] kcal) {
 		double total = 0;

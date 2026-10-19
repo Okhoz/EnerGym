@@ -1819,4 +1819,21 @@
 		<item quantity="one">Calendar for %1$s: %2$d day trained</item>
 		<item quantity="other">Calendar for %1$s: %2$d days trained</item>
 	</plurals>
+	<string name="nut_progress">Your progress</string>
+	<string name="nut_progress_week">7 days</string>
+	<string name="nut_progress_month">4 weeks</string>
+	<string name="nut_progress_kcal">Calories and macros</string>
+	<string name="nut_progress_body_week">Each day\'s calories against your target (dashed line).</string>
+	<string name="nut_progress_body_month">Each week\'s daily average against your target (dashed line).</string>
+	<string name="nut_progress_empty">Once you log meals, you\'ll see your daily calories and macros against your target here.</string>
+	<string name="nut_progress_avg">kcal on average</string>
+	<string name="nut_progress_on_target">on target</string>
+	<string name="nut_progress_macros">Macros · daily average</string>
+	<string name="nut_progress_macros_plain">Protein %1$d g · Carbs %2$d g · Fat %3$d g</string>
+	<string name="nut_progress_chart_week">Calories over the last 7 days: %1$s</string>
+	<string name="nut_progress_chart_month">Daily calorie average over the last 4 weeks, by week: %1$s</string>
+	<plurals name="nut_progress_logged">
+		<item quantity="one">day logged</item>
+		<item quantity="other">days logged</item>
+	</plurals>
 </resources>
