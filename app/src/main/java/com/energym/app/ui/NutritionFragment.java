@@ -60,16 +60,87 @@ public final class NutritionFragment extends ScreenFragment {
 
 		double[] totals = n.totals(day);
 		BodyProfile.Targets targets = n.targets();
-		// Arriba, de un vistazo: lo que te queda hoy (o configurar el objetivo si aún no hay).
+		// Sin objetivo, lo primero es fijarlo: esa tarjeta no se pliega.
 		if (targets == null)
 			dailyGoal(n, null);
-		else
-			remaining(n, day, totals, targets);
-		water(n, day);
+		// Cada bloque se pliega con su cabecera y, plegado, deja ver su cifra clave.
+		long left = targets == null ? 0 :
+			Math.round(targets.kcal) - Math.round(totals[0]) + Math.round(exerciseKcal(n, day));
+		if (fold("summary", Txt.t(R.string.nut_fold_summary),
+			targets == null ? "" : Txt.t(R.string.nut_fold_left, left), true)) {
+			if (targets != null)
+				remaining(n, day, totals, targets);
+			water(n, day);
+		}
 
-		section(Txt.t(R.string.nut_your_meals), 32);
-		// Solo las comidas con algo anotado; si el día está vacío, una tarjeta y copiar lo de ayer a un toque.
 		List<FoodEntry> entries = n.entriesOn(day);
+		if (fold("meals", Txt.t(R.string.nut_fold_meals), entries.isEmpty() ? "" :
+			Txt.n(R.plurals.nut_fold_meals_detail, entries.size(), entries.size(), Math.round(totals[0])), true))
+			meals(n, day, entries);
+		if (!n.status.isEmpty())
+			text(rows, n.status, R.style.EnerGym_FieldCaption, 0);
+
+		NutritionController.Progress p = n.progress(progressDays);
+		if (fold("progress", Txt.t(R.string.nut_fold_progress), p.logged == 0 ? "" :
+			Txt.t(R.string.nut_fold_progress_detail, Math.round(p.kcal)), true))
+			progress(n, targets, p);
+
+		// Lo que no se usa a diario empieza plegado: objetivo, consulta con la IA y la dieta del mes.
+		if (fold("more", Txt.t(R.string.nut_fold_more), "", false)) {
+			if (targets != null)
+				dailyGoal(n, targets);
+			diet(n, targets);
+			text(rows, Txt.t(R.string.nut_disclaimer), R.style.EnerGym_FieldCaption, 4);
+		}
+
+		// Añadir, siempre al final: alimento a mano o escaneando.
+		LinearLayout add = columns(rows, 32);
+		MaterialButton addFood = compact(add, Txt.t(R.string.nut_add), !n.busy, () -> {
+			n.startManual(n.defaultMeal());
+			app.navigate(Screen.FOOD);
+		});
+		primary(addFood);
+		addFood.setTag("nutrition_add_food");
+		addFood.setContentDescription(Txt.t(R.string.nut_add_food));
+		compact(add, Txt.t(R.string.nut_scan), !n.busy, () -> {
+			n.startManual(n.defaultMeal());
+			scan(this);
+		}).setTag("nutrition_scan");
+	}
+
+	/** Preferencias de los apartados plegados; se recuerdan aunque se cierre la app. */
+	static final String FOLDS = "nutrition_folds";
+
+	/**
+	 * Cabecera desplegable de un apartado: «▾» plegado y «▴» abierto. Cada apartado es independiente. Devuelve si
+	 * está abierto; plegado, {@code detail} resume su contenido en la propia cabecera.
+	 */
+	private boolean fold(String key, String label, String detail, boolean openByDefault) {
+		android.content.SharedPreferences prefs =
+			requireContext().getSharedPreferences(FOLDS, android.content.Context.MODE_PRIVATE);
+		boolean open = prefs.getBoolean(key, openByDefault);
+		View header = listRow(rows, label, open ? "" : detail, open ? "▴" : "▾", true, () -> {
+			prefs.edit().putBoolean(key, !open).apply();
+			render();
+		});
+		header.setTag("nutrition_fold_" + key);
+		androidx.core.view.ViewCompat.setStateDescription(header,
+			Txt.t(open ? R.string.nut_fold_expanded : R.string.nut_fold_collapsed));
+		header.setPadding(dp(20), dp(14), dp(20), dp(14));
+		header.setBackground(rounded(open ? R.color.surface_selected : R.color.surface_card, 18, R.color.gold,
+			open ? 1 : 0));
+		LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) header.getLayoutParams();
+		lp.topMargin = dp(16);
+		lp.bottomMargin = dp(open ? 12 : 0);
+		header.setLayoutParams(lp);
+		return open;
+	}
+
+	/**
+	 * Comidas del día: solo las que tienen algo anotado; si el día está vacío, una tarjeta y copiar lo de ayer a un
+	 * toque. Debajo, las comidas guardadas.
+	 */
+	private void meals(NutritionController n, LocalDate day, List<FoodEntry> entries) {
 		for (FoodEntry.Meal meal : FoodEntry.Meal.values()) {
 			List<FoodEntry> items = new ArrayList<>();
 			double mealKcal = 0;
@@ -96,38 +167,6 @@ public final class NutritionFragment extends ScreenFragment {
 					})).setTag("copy_yesterday");
 		}
 		savedMeals(n);
-		if (!n.status.isEmpty())
-			text(rows, n.status, R.style.EnerGym_FieldCaption, 0);
-
-		progress(n, targets);
-
-		// Lo que no se usa a diario, plegado: objetivo, consulta con la IA y la dieta del mes.
-		section(Txt.t(R.string.nut_more), 32);
-		MaterialButton more = action(rows, Txt.t(moreOpen ? R.string.nut_hide : R.string.nut_more_toggle), true, () -> {
-			moreOpen = !moreOpen;
-			render();
-		});
-		more.setTag("nutrition_more");
-		if (moreOpen) {
-			if (targets != null)
-				dailyGoal(n, targets);
-			diet(n, targets);
-			text(rows, Txt.t(R.string.nut_disclaimer), R.style.EnerGym_FieldCaption, 4);
-		}
-
-		// Añadir, siempre al final: alimento a mano o escaneando.
-		LinearLayout add = columns(rows, 32);
-		MaterialButton addFood = compact(add, Txt.t(R.string.nut_add), !n.busy, () -> {
-			n.startManual(n.defaultMeal());
-			app.navigate(Screen.FOOD);
-		});
-		primary(addFood);
-		addFood.setTag("nutrition_add_food");
-		addFood.setContentDescription(Txt.t(R.string.nut_add_food));
-		compact(add, Txt.t(R.string.nut_scan), !n.busy, () -> {
-			n.startManual(n.defaultMeal());
-			scan(this);
-		}).setTag("nutrition_scan");
 	}
 
 	/** Pide un nombre y guarda esos alimentos como comida para anotarla otro día de un toque. */
@@ -171,21 +210,23 @@ public final class NutritionFragment extends ScreenFragment {
 					n.logAll(m.foods, n.defaultMeal(), m.name, () -> {
 					});
 			});
+			Runnable delete = () -> new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+				.setTitle(Txt.t(R.string.nut_delete_saved_meal_title, m.name)).setNegativeButton(Txt.t(R.string.common_cancel), null)
+				.setPositiveButton(Txt.t(R.string.common_delete), (d, w) -> {
+					saved.remove(m.name);
+					render();
+				}).show();
 			row.setOnLongClickListener(v -> {
-				new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-					.setTitle(Txt.t(R.string.tr_delete_exercise_title, m.name)).setNegativeButton(Txt.t(R.string.common_cancel), null)
-					.setPositiveButton(Txt.t(R.string.common_delete), (d, w) -> {
-						saved.remove(m.name);
-						render();
-					}).show();
+				delete.run();
 				return true;
 			});
+			rowIcon((LinearLayout) row, R.drawable.ic_delete, Txt.t(R.string.nut_delete_named, m.name),
+				"saved_meal_delete_" + m.name, delete);
 			card.addView(row);
 		}
 	}
 
 	/** Sección «Más» desplegada. */
-	private static boolean moreOpen;
 	/** Días de «Tu progreso»: 7 (cada día) o 28 (media de cada semana). */
 	private static int progressDays = 7;
 
@@ -342,9 +383,7 @@ public final class NutritionFragment extends ScreenFragment {
 	 * Tu progreso: calorías de cada día (o media de cada semana) frente al objetivo, días en objetivo y la media de
 	 * cada macro. Siempre hasta hoy, sea cual sea el día elegido arriba.
 	 */
-	private void progress(NutritionController n, BodyProfile.Targets targets) {
-		section(Txt.t(R.string.nut_progress), 32);
-		NutritionController.Progress p = n.progress(progressDays);
+	private void progress(NutritionController n, BodyProfile.Targets targets, NutritionController.Progress p) {
 		segmented("nutrition_progress", new String[]{Txt.t(R.string.nut_progress_week), Txt.t(R.string.nut_progress_month)},
 			new String[]{"nutrition_progress_7", "nutrition_progress_28"}, progressDays == 7 ? 0 : 1, index -> {
 				progressDays = index == 0 ? 7 : NutritionController.HISTORY_DAYS;
@@ -448,6 +487,8 @@ public final class NutritionFragment extends ScreenFragment {
 		((TextView) row.findViewById(R.id.food_detail)).setText(NutritionController.format(e.amount) + " " +
 			e.unit.symbol + " · " + Txt.t(R.string.nut_macros_short, one(e.protein()), one(e.carbs()), one(e.fat())));
 		((TextView) row.findViewById(R.id.food_kcal)).setText(Long.toString(Math.round(e.kcal())));
+		// Con los botones de editar y borrar queda menos ancho: los macros pasan a una segunda línea en vez de cortarse.
+		((TextView) row.findViewById(R.id.food_detail)).setMaxLines(2);
 		row.setContentDescription(e.label() + ", " + NutritionController.format(e.amount) + " " + e.unit.symbol + ", " +
 			Txt.t(R.string.nut_food_row_description, Math.round(e.kcal())));
 		long scope = n.scopeRevision();
@@ -456,24 +497,57 @@ public final class NutritionFragment extends ScreenFragment {
 			.setTitle(e.label())
 			.setItems(new String[]{Txt.t(R.string.nut_edit_food), Txt.t(R.string.nut_add_again), Txt.t(R.string.nut_remove_from_diary)}, (dialog, which) -> {
 				if (n.busy || scope != n.scopeRevision()) return;
-				if (which == 0) {
-					n.edit(e);
-					app.navigate(Screen.FOOD);
-				} else if (which == 1) {
+				if (which == 0)
+					editFood(n, e, scope);
+				else if (which == 1) {
 					n.startFrom(e);
 					app.navigate(Screen.FOOD);
-				} else new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-					.setTitle(Txt.t(R.string.nut_remove_food_title))
-					.setMessage(Txt.t(R.string.nut_remove_food_message, e.label()))
-					.setNegativeButton(Txt.t(R.string.common_cancel), null)
-					.setPositiveButton(Txt.t(R.string.common_remove), (confirm, button) -> {
-						if (scope == n.scopeRevision()) n.remove(e);
-					}).show();
+				} else
+					removeFood(n, e, scope);
 			}).setNegativeButton(Txt.t(R.string.common_cancel), null).show());
+		// Editar y borrar a la vista, sin tener que descubrir el menú de la fila.
+		rowIcon((LinearLayout) row, R.drawable.ic_edit, Txt.t(R.string.nut_edit_named, e.label()), "food_edit_" + e.id,
+			() -> editFood(n, e, scope));
+		rowIcon((LinearLayout) row, R.drawable.ic_delete, Txt.t(R.string.nut_delete_named, e.label()),
+			"food_delete_" + e.id, () -> removeFood(n, e, scope));
 		section.addView(row);
 		View divider = new View(requireContext());
 		divider.setBackgroundColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.divider));
 		section.addView(divider, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
+	}
+
+	/** Abre el alimento anotado para cambiar cantidad, comida, nombre o valores; se guarda en la misma entrada. */
+	private void editFood(NutritionController n, FoodEntry e, long scope) {
+		if (n.busy || scope != n.scopeRevision())
+			return;
+		n.edit(e);
+		app.navigate(Screen.FOOD);
+	}
+
+	/** Borrar del diario siempre pide confirmación. */
+	private void removeFood(NutritionController n, FoodEntry e, long scope) {
+		if (n.busy || scope != n.scopeRevision())
+			return;
+		new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+			.setTitle(Txt.t(R.string.nut_remove_food_title))
+			.setMessage(Txt.t(R.string.nut_remove_food_message, e.label()))
+			.setNegativeButton(Txt.t(R.string.common_cancel), null)
+			.setPositiveButton(Txt.t(R.string.common_remove), (confirm, button) -> {
+				if (scope == n.scopeRevision()) n.remove(e);
+			}).show();
+	}
+
+	/** Botón de icono de 48 dp al final de una fila (editar, borrar). */
+	private void rowIcon(LinearLayout row, int icon, String description, String tag, Runnable click) {
+		android.widget.ImageButton button = new android.widget.ImageButton(requireContext());
+		button.setImageResource(icon);
+		android.util.TypedValue ripple = new android.util.TypedValue();
+		requireContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, ripple, true);
+		button.setBackgroundResource(ripple.resourceId);
+		button.setContentDescription(description);
+		button.setTag(tag);
+		button.setOnClickListener(v -> click.run());
+		row.addView(button, new LinearLayout.LayoutParams(dp(48), dp(48)));
 	}
 
 	private static String one(double value) {

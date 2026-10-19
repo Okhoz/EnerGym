@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Borrar: papelera con el mismo trazo fino que el resto de iconos. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+	android:width="24dp"
+	android:height="24dp"
+	android:viewportWidth="24"
+	android:viewportHeight="24">
+	<path
+		android:fillColor="@android:color/transparent"
+		android:strokeColor="@color/white"
+		android:strokeWidth="1.6"
+		android:strokeLineCap="round"
+		android:strokeLineJoin="round"
+		android:pathData="M4.5,7 L19.5,7 M9.5,7 L9.5,4.5 L14.5,4.5 L14.5,7 M6.5,7 L7.4,19.5 L16.6,19.5 L17.5,7 M10.2,10.5 L10.2,16 M13.8,10.5 L13.8,16" />
+</vector>

@@ -517,7 +517,6 @@
 	<string name="nut_next_day">Next day</string>
 	<string name="nut_shown_day">Day shown: %1$s</string>
 	<string name="nut_go_today">Go to today</string>
-	<string name="nut_your_meals">Your meals</string>
 	<string name="nut_save_as_meal">★ Save as meal</string>
 	<string name="nut_nothing_today">Nothing logged today</string>
 	<string name="nut_nothing_day">Nothing logged this day</string>
@@ -527,9 +526,6 @@
 		<item quantity="other">↺ Copy the previous day (%1$d foods)</item>
 	</plurals>
 	<string name="nut_copied_yesterday">Copied from the previous day</string>
-	<string name="nut_more">More</string>
-	<string name="nut_hide">Hide ▴</string>
-	<string name="nut_more_toggle">Goal, monthly diet and AI ▾</string>
 	<string name="nut_disclaimer">Data from Open Food Facts (ODbL): check the label. Targets are estimates; they don\'t replace a dietitian or doctor.</string>
 	<string name="nut_add">+ Add</string>
 	<string name="nut_add_food">Add food</string>
@@ -1194,7 +1190,7 @@
 	<string name="tut_log_body">Adjust weight and reps with − and + and tap “Save set”: the rest timer starts on its own.\n\nThe app tells you when to add weight (📈) based on your previous sets.</string>
 	<string name="tut_3d">Technique in 3D</string>
 	<string name="tut_3d_body">Many exercises have a 3D model showing the full movement, like this one.\n\nFind it in Workout › Exercises › pick one › “3D preview”.</string>
-	<string name="tut_nutrition_body">At the top you see what\'s left for the day; below, the water and your meals.\n\nAt the bottom are “+ Add” and “Scan”: enter how much you had and calories and macros are calculated.</string>
+	<string name="tut_nutrition_body">At the top you see what\'s left for the day; below, your water, meals and progress. Tap a section\'s title to collapse or expand it.\n\nAt the bottom are “+ Add” and “Scan”. Each food has ✏️ to edit it and 🗑️ to delete it.</string>
 	<string name="tut_progress_body">Four tabs: Summary, Calendar, Body and Goals.\n\nShare a workout or a record with “📤 Share”.</string>
 	<string name="tut_trainer">Your AI trainer</string>
 	<string name="tut_trainer_body">Ask it anything: whether to add weight, technique, a routine, what to eat…\n\nIt knows your data and runs on your phone, without sending your messages anywhere.</string>
@@ -1821,7 +1817,6 @@
 		<item quantity="one">Calendar for %1$s: %2$d day trained</item>
 		<item quantity="other">Calendar for %1$s: %2$d days trained</item>
 	</plurals>
-	<string name="nut_progress">Your progress</string>
 	<string name="nut_progress_week">7 days</string>
 	<string name="nut_progress_month">4 weeks</string>
 	<string name="nut_progress_kcal">Calories and macros</string>
@@ -1838,4 +1833,19 @@
 		<item quantity="one">day logged</item>
 		<item quantity="other">days logged</item>
 	</plurals>
+	<string name="nut_fold_summary">🔥 Day summary</string>
+	<string name="nut_fold_meals">🍽️ Your meals</string>
+	<string name="nut_fold_more">⚙️ Target, monthly diet and AI</string>
+	<string name="nut_fold_left">%1$d kcal left</string>
+	<string name="nut_fold_progress_detail">%1$d kcal/day on average</string>
+	<string name="nut_fold_expanded">expanded</string>
+	<string name="nut_fold_collapsed">collapsed</string>
+	<plurals name="nut_fold_meals_detail">
+		<item quantity="one">%1$d food · %2$d kcal</item>
+		<item quantity="other">%1$d foods · %2$d kcal</item>
+	</plurals>
+	<string name="nut_fold_progress">📈 Your progress</string>
+	<string name="nut_edit_named">Edit %1$s</string>
+	<string name="nut_delete_named">Delete %1$s</string>
+	<string name="nut_delete_saved_meal_title">Delete the saved meal “%1$s”?</string>
 </resources>
