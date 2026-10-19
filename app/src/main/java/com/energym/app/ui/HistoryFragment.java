@@ -72,8 +72,9 @@ public final class HistoryFragment extends ScreenFragment {
 
 	/** Separación entre tarjetas sin cabecera (las tarjetas ya llevan su título). */
 	private void gap(int dp) {
+		// Las tarjetas ya llevan su margen: solo un poco de aire extra entre bloques.
 		if (dp > 0)
-			add(rows, new android.view.View(requireContext()), dp - 8);
+			add(rows, new android.view.View(requireContext()), Math.min(dp, 16) - 8);
 	}
 
 	// ---------------- Resumen ----------------
@@ -370,11 +371,11 @@ public final class HistoryFragment extends ScreenFragment {
 		for (double v : kcal)
 			if (v > 0) logged++;
 		com.energym.app.nutrition.BodyProfile.Targets targets = n.targets();
-		gap(32);
-		LinearLayout card = card(Txt.t(R.string.hist_food_title), logged == 0 ?
-			Txt.t(R.string.hist_food_empty) : Txt.t(R.string.hist_last_days, days));
+		// Sin comidas anotadas no hay nada que enseñar: se omite la tarjeta en vez de llenar la pantalla de avisos.
 		if (logged == 0)
 			return;
+		gap(32);
+		LinearLayout card = card(Txt.t(R.string.hist_food_title), Txt.t(R.string.hist_last_days, days));
 		LinearLayout figures = columns(card, 4);
 		stat(figures, Integer.toString(logged), Txt.n(R.plurals.hist_days_logged, logged));
 		stat(figures, Long.toString(Math.round(NutritionController.loggedAverage(kcal, kcal))), Txt.t(R.string.hist_kcal_avg));

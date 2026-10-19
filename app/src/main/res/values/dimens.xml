@@ -5,16 +5,16 @@
 	<dimen name="control_gap_horizontal">16dp</dimen>
 	<dimen name="control_gap_vertical">16dp</dimen>
 	<dimen name="group_gap">24dp</dimen>
-	<dimen name="section_gap">24dp</dimen>
+	<dimen name="section_gap">16dp</dimen>
 	<dimen name="field_gap">24dp</dimen>
-	<dimen name="space_inline">12dp</dimen>
+	<dimen name="space_inline">6dp</dimen>
 	<!-- Separación entre botones apilados y entre el texto de una tarjeta y sus acciones. -->
-	<dimen name="button_gap">16dp</dimen>
+	<dimen name="button_gap">12dp</dimen>
 	<dimen name="label_gap">8dp</dimen>
 	<dimen name="screen_gutter">20dp</dimen>
-	<dimen name="card_padding">24dp</dimen>
+	<dimen name="card_padding">20dp</dimen>
 	<dimen name="chrome_padding">12dp</dimen>
-	<dimen name="content_bottom">40dp</dimen>
+	<dimen name="content_bottom">32dp</dimen>
 	<dimen name="touch_target">48dp</dimen>
-	<dimen name="primary_touch_target">56dp</dimen>
+	<dimen name="primary_touch_target">48dp</dimen>
 </resources>

@@ -313,7 +313,9 @@ public final class MainActivity extends AppCompatActivity {
 		sheet.item(R.drawable.ic_training, getString(R.string.menu_profile), false, () -> go.accept(R.id.menu_profile))
 			.item(R.drawable.ic_scale, getString(R.string.menu_body), false, () -> go.accept(R.id.menu_body))
 			.item(R.drawable.ic_settings, getString(R.string.menu_account), false, () -> go.accept(R.id.menu_account))
-			.item(R.drawable.ic_assistant, getString(R.string.menu_language), false, this::chooseLanguage);
+			// El idioma activo a la vista («Idioma · English»): se entiende aunque no se lea bien el idioma actual.
+			.item(R.drawable.ic_language, getString(R.string.menu_language) + " · " + languageName(), false,
+				this::chooseLanguage);
 		// La foto es el propio botón del menú: con cuenta, aquí se elige, cambia o quita.
 		if (owner != null) {
 			boolean has = avatars().has(owner);
@@ -337,6 +339,11 @@ public final class MainActivity extends AppCompatActivity {
 		}
 		menuSheet = sheet;
 		sheet.show();
+	}
+
+	/** Nombre del idioma en que se ve la app ahora mismo, escrito en ese idioma. */
+	private static String languageName() {
+		return "en".equals(Txt.locale().getLanguage()) ? "English" : "Español";
 	}
 
 	/** Idioma de la app: el del móvil, español o inglés. Android lo guarda y recrea la pantalla. */

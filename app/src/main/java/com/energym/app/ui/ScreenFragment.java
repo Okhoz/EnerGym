@@ -330,7 +330,7 @@ public abstract class ScreenFragment extends Fragment {
 		});
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 			ViewGroup.LayoutParams.WRAP_CONTENT);
-		params.bottomMargin = dp(28);
+		params.bottomMargin = dp(20);
 		rows.addView(frame, params);
 		return row;
 	}
@@ -342,10 +342,11 @@ public abstract class ScreenFragment extends Fragment {
 
 	/** Rótulo de sección discreto, con aire por encima para separar bloques. */
 	protected TextView section(String label, int topDp) {
-		TextView view = text(rows, label.toUpperCase(new Locale("es", "ES")), R.style.EnerGym_FieldCaption, topDp);
+		// Diseño minimalista: el rótulo separa bloques con poco aire; las tarjetas ya marcan el ritmo.
+		TextView view = text(rows, label.toUpperCase(Txt.locale()), R.style.EnerGym_FieldCaption, Math.min(topDp, 16));
 		view.setLetterSpacing(0.08f);
 		view.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_tertiary));
-		((LinearLayout.LayoutParams) view.getLayoutParams()).bottomMargin = dp(12);
+		((LinearLayout.LayoutParams) view.getLayoutParams()).bottomMargin = dp(8);
 		ViewCompat.setAccessibilityHeading(view, true);
 		return view;
 	}

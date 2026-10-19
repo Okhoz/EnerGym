@@ -56,7 +56,21 @@ public final class NutritionFragment extends ScreenFragment {
 		MaterialButton next = compact(dates, "›", day.isBefore(n.today()), () -> n.select(day.plusDays(1)));
 		next.setContentDescription(Txt.t(R.string.nut_next_day));
 		((LinearLayout.LayoutParams) today.getLayoutParams()).weight = 3;
-		add(rows, new android.widget.Space(requireContext()), 24);
+
+		// Lo más habitual, arriba y a un toque: añadir un alimento a mano o escaneando su código.
+		LinearLayout add = columns(rows, 12);
+		MaterialButton addFood = compact(add, Txt.t(R.string.nut_add), !n.busy, () -> {
+			n.startManual(n.defaultMeal());
+			app.navigate(Screen.FOOD);
+		});
+		primary(addFood);
+		addFood.setTag("nutrition_add_food");
+		addFood.setContentDescription(Txt.t(R.string.nut_add_food));
+		compact(add, Txt.t(R.string.nut_scan), !n.busy, () -> {
+			n.startManual(n.defaultMeal());
+			scan(this);
+		}).setTag("nutrition_scan");
+		add(rows, new android.widget.Space(requireContext()), 16);
 
 		double[] totals = n.totals(day);
 		BodyProfile.Targets targets = n.targets();
@@ -112,20 +126,6 @@ public final class NutritionFragment extends ScreenFragment {
 			diet(n, targets);
 			text(rows, Txt.t(R.string.nut_disclaimer), R.style.EnerGym_FieldCaption, 4);
 		}
-
-		// Añadir, siempre al final: alimento a mano o escaneando.
-		LinearLayout add = columns(rows, 32);
-		MaterialButton addFood = compact(add, Txt.t(R.string.nut_add), !n.busy, () -> {
-			n.startManual(n.defaultMeal());
-			app.navigate(Screen.FOOD);
-		});
-		primary(addFood);
-		addFood.setTag("nutrition_add_food");
-		addFood.setContentDescription(Txt.t(R.string.nut_add_food));
-		compact(add, Txt.t(R.string.nut_scan), !n.busy, () -> {
-			n.startManual(n.defaultMeal());
-			scan(this);
-		}).setTag("nutrition_scan");
 	}
 
 	/** Pide un nombre y guarda esos alimentos como comida para anotarla otro día de un toque. */
