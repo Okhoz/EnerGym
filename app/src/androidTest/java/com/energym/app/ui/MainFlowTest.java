@@ -285,7 +285,9 @@ public class MainFlowTest {
 		s.onActivity(a -> {
 			View v = a.getWindow().getDecorView().findViewWithTag("setting_" + key);
 			assertNotNull("Ajuste ausente: " + key, v);
-			if ("›".contentEquals(((android.widget.TextView) v.findViewById(com.energym.app.R.id.food_kcal)).getText()))
+			// Plegado se ve «▾» (antes «›»); abierto, «▴».
+			CharSequence arrow = ((android.widget.TextView) v.findViewById(com.energym.app.R.id.food_kcal)).getText();
+			if ("›".contentEquals(arrow) || "▾".contentEquals(arrow))
 				v.performClick();
 		});
 		await();

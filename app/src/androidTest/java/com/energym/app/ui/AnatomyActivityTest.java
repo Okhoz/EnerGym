@@ -448,6 +448,10 @@ public class AnatomyActivityTest {
 
 	@Test
 	public void correlatedHttpOpenUsesCurrentContextAndLateReplyCannotStealFocus() throws Exception {
+		// Desde que el entrenador funciona en el móvil (Gemini Nano o Gemma), el emparejamiento con un servidor HTTP
+		// está desactivado a propósito: esta prueba solo aplica a un cliente que admita emparejar.
+		parent.onActivity(a -> Assume.assumeFalse("Emparejamiento HTTP desactivado con la IA del móvil",
+			a.state().assistant.onDevice()));
 		try (OpenFixture fixture = new OpenFixture()) {
 			parent.onActivity(a -> {
 				a.state().app.openExercise(a.state().app.catalog.findExercise("standard-pushup"));

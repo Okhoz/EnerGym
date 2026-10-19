@@ -34,7 +34,8 @@ public class LocalDeletionFlowTest {
 				scenario.onActivity(a -> a.state().accounts.enterDemo());
 				MainFlowTest.await();
 				scenario.onActivity(a -> {
-					a.state().assistant.sendLocal("3 días en casa sin material 30min fuerza principiante");
+					// La rutina solo se prepara si se pide expresamente (entrenador conversacional).
+					a.state().assistant.sendLocal("Prepárame una rutina de 3 días en casa sin material 30min fuerza principiante");
 					assertNotNull(a.state().assistant.preview);
 					a.state().app.navigate(AppController.Screen.ACCOUNT);
 				});
