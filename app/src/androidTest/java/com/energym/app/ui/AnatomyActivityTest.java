@@ -244,16 +244,12 @@ public class AnatomyActivityTest {
 			click("viewer_initial");
 			String child = pid();
 
-			shell("wm user-rotation lock 1");
-			awaitReady();
-			Thread.sleep(1200);
+			rotate(1);
 			assertEquals("Se mató el proceso al recrear", child, pid());
 			assertTrue(text("viewer_status").contains("En pausa"));
 			assertTrue(text("viewer_status").contains("0,50"));
 
-			shell("wm user-rotation lock 0");
-			awaitReady();
-			Thread.sleep(900);
+			rotate(0);
 			assertEquals(child, pid());
 			assertTrue(text("viewer_status").contains("En pausa"));
 
@@ -615,6 +611,27 @@ public class AnatomyActivityTest {
 	private void awaitReady() throws Exception {
 		awaitText("viewer_status", "Sin conexión");
 		Thread.sleep(700);
+	}
+
+	/**
+	 * wm user-rotation vuelve antes de recrear el visor: hay que esperar a la ventana nueva ya cargada. Leer la
+	 * anterior adelantaba las comprobaciones y el cierre a mitad de la recreación, donde el broadcast se pierde.
+	 */
+	private void rotate(int rotation) throws Exception {
+		AccessibilityNodeInfo before = node("viewer_status");
+		assertNotNull(before);
+		int window = before.getWindowId();
+		shell("wm user-rotation lock " + rotation);
+		for (int i = 0; i < 80; i++) {
+			AccessibilityNodeInfo status = node("viewer_status");
+			if (status != null && status.getWindowId() != window && status.getText() != null &&
+				status.getText().toString().contains("Sin conexión")) {
+				Thread.sleep(700);
+				return;
+			}
+			Thread.sleep(250);
+		}
+		fail("El visor no se recreó al girar: " + text("viewer_load_message"));
 	}
 
 	private void awaitNode(String id) throws Exception {
