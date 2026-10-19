@@ -72,7 +72,8 @@ public final class FormFieldGuidance {
 	}
 
 	private static String example(String value) {
-		return Txt.t(R.string.ff_example, value);
+		// Los decimales con la coma o el punto de cada idioma («75,5» / «75.5»); el campo acepta los dos.
+		return Txt.t(R.string.ff_example, value.matches("\\d+\\.\\d+") ? Txt.decimal(value) : value);
 	}
 
 	private static String goalExample(String label) {

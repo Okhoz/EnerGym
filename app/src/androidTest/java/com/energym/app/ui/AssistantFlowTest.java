@@ -53,7 +53,8 @@ public class AssistantFlowTest {
 		try (ActivityScenario<MainActivity> s = ActivityScenario.launch(MainActivity.class)) {
 			enter(s);
 			capture("assistant");
-			send(s, "Quiero entrenar tres días en casa, sin material, 30min");
+			// Desde el entrenador conversacional, la rutina solo se prepara si se pide expresamente.
+			send(s, "Prepárame una rutina: quiero entrenar tres días en casa, sin material, 30min");
 			s.onActivity(a -> {
 				assertNull(a.state().assistant.preview);
 				assertTrue(MainFlowTest.textContaining(a.getWindow().getDecorView(), "objetivo"));
@@ -63,7 +64,8 @@ public class AssistantFlowTest {
 			send(s, "fuerza principiante");
 			s.onActivity(a -> {
 				assertNotNull(a.state().assistant.preview);
-				assertTrue(MainFlowTest.textContaining(a.getWindow().getDecorView(), "Propuesta · sin guardar"));
+				// La tarjeta de la rutina avisa de que aún no está guardada: «Aceptar» la guarda en Entreno.
+				assertTrue(MainFlowTest.textContaining(a.getWindow().getDecorView(), a.getString(R.string.card_accept_reject)));
 				assertTrue(a.state().app.versions.isEmpty());
 			});
 			scrollToText(s, "Aceptar");
@@ -74,16 +76,26 @@ public class AssistantFlowTest {
 				assertTrue(a.state().app.versions.isEmpty());
 				assertNull(a.state().assistant.preview);
 			});
-			send(s, "fuerza principiante");
+			send(s, "Prepárame otra rutina de fuerza principiante");
 			s.recreate();
 			MainFlowTest.await();
 			s.onActivity(a -> assertNotNull(a.state().assistant.preview));
+			// «−5 min» quita ejercicios del final de la propuesta; el tiempo por sesión del perfil no cambia.
+			int[] before = new int[2];
+			s.onActivity(a -> {
+				before[0] = a.state().assistant.preview.getItems().size();
+				before[1] = a.state().assistant.preview.getEstimatedMinutes();
+			});
 			MainFlowTest.click(s, "−5 min");
-			s.onActivity(a -> assertEquals(25, a.state().assistant.preview.getProfile().getDurationMinutes()));
+			s.onActivity(a -> {
+				assertTrue(a.state().assistant.preview.getItems().size() < before[0]);
+				assertTrue(a.state().assistant.preview.getEstimatedMinutes() < before[1]);
+				assertEquals(30, a.state().assistant.preview.getProfile().getDurationMinutes());
+			});
 			MainFlowTest.click(s, "Aceptar");
 			waitUntil(s, a -> a.state().app.profile != null);
 			s.onActivity(a -> {
-				assertEquals(25, a.state().app.profile.getDurationMinutes());
+				assertEquals(30, a.state().app.profile.getDurationMinutes());
 				assertEquals(3, a.state().app.profile.getDaysPerWeek());
 				assertNotNull(a.state().app.routines.accepted);
 				assertFalse(a.state().app.versions.isEmpty());
@@ -183,7 +195,7 @@ public class AssistantFlowTest {
 			try {
 				MainFlowTest.await();
 				capture("assistant-font130");
-				send(s, "3 días en casa sin material 30 min fuerza principiante");
+				send(s, "Prepárame una rutina de 3 días en casa sin material 30 min fuerza principiante");
 				scrollToText(s, "Aceptar");
 				capture("proposal-font130");
 				s.onActivity(a -> {

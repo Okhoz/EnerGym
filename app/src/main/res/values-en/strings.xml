@@ -1191,7 +1191,7 @@
 	<string name="tut_log_body">Adjust weight and reps with − and + and tap “Save set”: the rest timer starts on its own.\n\nThe app tells you when to add weight (📈) based on your previous sets.</string>
 	<string name="tut_3d">Technique in 3D</string>
 	<string name="tut_3d_body">Many exercises have a 3D model showing the full movement, like this one.\n\nFind it in Workout › Exercises › pick one › “3D preview”.</string>
-	<string name="tut_nutrition_body">“+ Add” and “Scan” are right at the top: enter how much you had and calories and macros are calculated.\n\nBelow, the day\'s water and your meals.</string>
+	<string name="tut_nutrition_body">At the top you see what\'s left for the day; below, the water and your meals.\n\nAt the bottom are “+ Add” and “Scan”: enter how much you had and calories and macros are calculated.</string>
 	<string name="tut_progress_body">Four tabs: Summary, Calendar, Body and Goals.\n\nShare a workout or a record with “📤 Share”.</string>
 	<string name="tut_trainer">Your AI trainer</string>
 	<string name="tut_trainer_body">Ask it anything: whether to add weight, technique, a routine, what to eat…\n\nIt knows your data and runs on your phone, without sending your messages anywhere.</string>
@@ -1648,8 +1648,19 @@
 	<string name="followup_warmup">How should I warm up?</string>
 	<string name="followup_deload">Do I need a deload week?</string>
 	<string name="followup_nutrition">What should I eat for my goal?</string>
-	<string name="followup_rest">How much should I rest?</string>
+	<string name="followup_rest">How many rest days do I need?</string>
 	<string name="followup_motivation">Motivate me to train 💪</string>
+	<string name="followup_rest_sets">How long should I rest between sets?</string>
+	<string name="followup_sets_per_muscle">How many sets per muscle?</string>
+	<string name="followup_supersets">Are supersets worth it?</string>
+	<string name="followup_protein">How much protein do I need?</string>
+	<string name="followup_deficit">How big a deficit is safe?</string>
+	<string name="followup_cardio">How much cardio should I do?</string>
+	<string name="followup_sleep">How much should I sleep?</string>
+	<string name="followup_split_days">How many days a week should I train?</string>
+	<string name="followup_pre_workout">What should I have before training?</string>
+	<string name="followup_mobility">Which stretches should I do?</string>
+	<string name="followup_home">How do I do it at home?</string>
 	<string name="chat_mode_guided">💬 Local guidance · no AI</string>
 	<string name="chat_mode_device">🔒 %1$s · private, on your phone</string>
 	<string name="chat_mode_device_off">💬 Local guidance · on-device AI not available</string>
@@ -1801,4 +1812,8 @@
 		<item quantity="other">days this month</item>
 	</plurals>
 	<string name="sf_selected">selected</string>
+	<plurals name="cal_days_trained">
+		<item quantity="one">Calendar for %1$s: %2$d day trained</item>
+		<item quantity="other">Calendar for %1$s: %2$d days trained</item>
+	</plurals>
 </resources>

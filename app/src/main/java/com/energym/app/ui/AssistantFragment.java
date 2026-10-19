@@ -259,10 +259,12 @@ public final class AssistantFragment extends ScreenFragment {
 
 	/** Bajo la última respuesta: copiar, regenerar y preguntas de seguimiento. */
 	private void replyActions(ProposalController c, String reply) {
-		String asked = null;
-		for (int i = c.messages.size() - 1; i >= 0 && asked == null; i--)
+		// Todo lo que ha preguntado el cliente: las sugerencias siguen el hilo y no repiten lo ya preguntado.
+		java.util.List<String> questions = new java.util.ArrayList<>();
+		for (int i = 0; i < c.messages.size(); i++)
 			if (c.messages.get(i).role.equals("user"))
-				asked = c.messages.get(i).text;
+				questions.add(c.messages.get(i).text);
+		String asked = questions.isEmpty() ? null : questions.get(questions.size() - 1);
 		// Solo la bienvenida, sin nada preguntado aún: sugerencias para empezar, sin copiar ni regenerar.
 		if (asked == null) {
 			chips(c, FollowUps.STARTERS);
@@ -281,7 +283,7 @@ public final class AssistantFragment extends ScreenFragment {
 		small(row, "🔄 " + getString(R.string.chat_regenerate), getString(R.string.chat_regenerate_description),
 			"chat_regenerate", !c.busy, () -> c.send(again));
 		add(rows, row, 2);
-		chips(c, FollowUps.suggest(asked, ChatFormat.plain(reply), c.preview != null));
+		chips(c, FollowUps.suggest(questions, ChatFormat.plain(reply), c.preview != null));
 	}
 
 	/** Botón de texto pequeño bajo la burbuja, como los iconos de acción de Gemini. */
@@ -331,6 +333,28 @@ public final class AssistantFragment extends ScreenFragment {
 				return R.string.followup_nutrition;
 			case REST:
 				return R.string.followup_rest;
+			case REST_SETS:
+				return R.string.followup_rest_sets;
+			case SETS_PER_MUSCLE:
+				return R.string.followup_sets_per_muscle;
+			case SUPERSETS:
+				return R.string.followup_supersets;
+			case PROTEIN:
+				return R.string.followup_protein;
+			case DEFICIT:
+				return R.string.followup_deficit;
+			case CARDIO:
+				return R.string.followup_cardio;
+			case SLEEP:
+				return R.string.followup_sleep;
+			case SPLIT_DAYS:
+				return R.string.followup_split_days;
+			case PRE_WORKOUT:
+				return R.string.followup_pre_workout;
+			case MOBILITY:
+				return R.string.followup_mobility;
+			case HOME:
+				return R.string.followup_home;
 			default:
 				return R.string.followup_motivation;
 		}

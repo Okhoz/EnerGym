@@ -1,5 +1,8 @@
 package com.energym.app.ui.charts;
 
+import com.energym.app.R;
+import com.energym.app.i18n.Txt;
+
 import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
@@ -57,8 +60,8 @@ public final class MonthCalendarView extends View {
 		for (LocalDate d : training)
 			if (YearMonth.from(d).equals(month))
 				count++;
-		setContentDescription("Calendario de " + month.getMonthValue() + "/" + month.getYear() + ": " + count +
-			" días entrenados");
+		setContentDescription(Txt.n(R.plurals.cal_days_trained, count,
+			month.getMonthValue() + "/" + month.getYear(), count));
 		requestLayout();
 		invalidate();
 		return this;

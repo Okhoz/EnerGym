@@ -55,8 +55,19 @@
 	<string name="followup_warmup">¿Cómo caliento antes?</string>
 	<string name="followup_deload">¿Necesito una semana de descarga?</string>
 	<string name="followup_nutrition">¿Qué como para mi objetivo?</string>
-	<string name="followup_rest">¿Cuánto debo descansar?</string>
+	<string name="followup_rest">¿Cuántos días de descanso necesito?</string>
 	<string name="followup_motivation">Motívame para entrenar 💪</string>
+	<string name="followup_rest_sets">¿Cuánto descanso entre series?</string>
+	<string name="followup_sets_per_muscle">¿Cuántas series hago por músculo?</string>
+	<string name="followup_supersets">¿Me sirven las superseries?</string>
+	<string name="followup_protein">¿Cuánta proteína necesito?</string>
+	<string name="followup_deficit">¿Cuánto déficit es seguro?</string>
+	<string name="followup_cardio">¿Cuánto cardio hago?</string>
+	<string name="followup_sleep">¿Cuánto debería dormir?</string>
+	<string name="followup_split_days">¿Cuántos días entreno a la semana?</string>
+	<string name="followup_pre_workout">¿Qué como antes de entrenar?</string>
+	<string name="followup_mobility">¿Qué estiramientos hago?</string>
+	<string name="followup_home">¿Cómo lo hago en casa?</string>
 	<string name="chat_mode_guided">💬 Guiado local · sin IA</string>
 	<string name="chat_mode_device">🔒 %1$s · privado, en tu móvil</string>
 	<string name="chat_mode_device_off">💬 Guiado local · la IA del móvil no está disponible</string>
@@ -1289,7 +1300,7 @@
 	<string name="tut_log_body">Ajusta peso y repeticiones con − y + y pulsa «Guardar serie»: el descanso empieza solo.\n\nLa app te dice cuándo subir el peso (📈) según tus series anteriores.</string>
 	<string name="tut_3d">Técnica en 3D</string>
 	<string name="tut_3d_body">Muchos ejercicios tienen un modelo 3D con el movimiento completo, como este.\n\nEstá en Entreno › Ejercicios › elige uno › «Vista previa 3D».</string>
-	<string name="tut_nutrition_body">«+ Añadir» y «Escanear» están arriba del todo: indicas cuánto has tomado y se calculan calorías y macros.\n\nDebajo, el agua del día y tus comidas.</string>
+	<string name="tut_nutrition_body">Arriba ves lo que te queda del día; debajo, el agua y tus comidas.\n\nAl final están «+ Añadir» y «Escanear»: indicas cuánto has tomado y se calculan calorías y macros.</string>
 	<string name="tut_progress_body">Cuatro pestañas: Resumen, Calendario, Cuerpo y Metas.\n\nComparte un entreno o un récord con «📤 Compartir».</string>
 	<string name="tut_trainer">Tu entrenador con IA</string>
 	<string name="tut_trainer_body">Pregúntale lo que quieras: si subir peso, técnica, una rutina, qué comer…\n\nConoce tus datos y funciona en el móvil, sin enviar tus mensajes fuera.</string>
@@ -1834,5 +1845,10 @@
 		<item quantity="other">días este mes</item>
 	</plurals>
 	<string name="sf_selected">seleccionado</string>
+	<plurals name="cal_days_trained">
+		<item quantity="one">Calendario de %1$s: %2$d día entrenado</item>
+		<item quantity="many">Calendario de %1$s: %2$d días entrenados</item>
+		<item quantity="other">Calendario de %1$s: %2$d días entrenados</item>
+	</plurals>
 </resources>
 
