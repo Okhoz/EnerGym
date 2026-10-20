@@ -226,6 +226,21 @@ public final class AccountFragment extends ScreenFragment {
 		}
 	}
 
+	/** La misma dirección que figura en la ficha de Google Play. */
+	static final String PRIVACY_POLICY_URL = "https://okhoz.github.io/EnerGym/privacidad.html";
+
+	private void openPrivacyPolicy() {
+		try {
+			startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
+				android.net.Uri.parse(PRIVACY_POLICY_URL)));
+		} catch (android.content.ActivityNotFoundException e) {
+			// Sin navegador instalado: se muestra la dirección para copiarla.
+			new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+				.setTitle(Txt.t(R.string.acc_privacy_policy)).setMessage(PRIVACY_POLICY_URL)
+				.setPositiveButton(Txt.t(R.string.main_understood), null).show();
+		}
+	}
+
 	/** Preferencias de este móvil: unidad de peso del registro de entreno. */
 	private void preferences() {
 		LinearLayout card = card(Txt.t(R.string.acc_preferences), Txt.t(R.string.acc_preferences_body));
@@ -236,6 +251,8 @@ public final class AccountFragment extends ScreenFragment {
 		action(card, Txt.t(R.string.acc_replay_tutorial), true,
 			() -> startActivity(new android.content.Intent(requireContext(), TutorialActivity.class)))
 			.setTag("replay_tutorial");
+		// Google Play pide que la política también se pueda abrir desde la app, con o sin cuenta.
+		action(card, Txt.t(R.string.acc_privacy_policy), true, this::openPrivacyPolicy).setTag("privacy_policy");
 		if (app.owner() == null)
 			return;
 		if (com.energym.app.health.HealthSync.available()) {

@@ -920,6 +920,7 @@
 	<string name="acc_pounds">Libras (lb)</string>
 	<string name="acc_weight_unit_help">Tus registros se guardan igual; solo cambia cómo se muestran y escriben.</string>
 	<string name="acc_replay_tutorial">Ver el tutorial otra vez</string>
+	<string name="acc_privacy_policy">Política de privacidad</string>
 	<string name="acc_health_body">Envía tus entrenos terminados y tu peso a Health Connect para verlos en Samsung Health u otras apps. EnerGym no lee nada de allí.</string>
 	<string name="acc_health_send">Enviar a Health Connect</string>
 	<string name="acc_health_unavailable">Health Connect no está disponible en este móvil</string>

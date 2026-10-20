@@ -803,6 +803,7 @@
 	<string name="acc_pounds">Pounds (lb)</string>
 	<string name="acc_weight_unit_help">Your logs are stored the same way; only how they\'re shown and typed changes.</string>
 	<string name="acc_replay_tutorial">Watch the tutorial again</string>
+	<string name="acc_privacy_policy">Privacy policy</string>
 	<string name="acc_health_body">Sends your finished workouts and your weight to Health Connect so you can see them in Samsung Health or other apps. EnerGym doesn\'t read anything from there.</string>
 	<string name="acc_health_send">Send to Health Connect</string>
 	<string name="acc_health_unavailable">Health Connect isn\'t available on this phone</string>
