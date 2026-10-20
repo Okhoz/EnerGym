@@ -9,12 +9,11 @@ public final class TrainingViewStateTest {
 		TrainingViewState state = new TrainingViewState();
 		state.resetFor("owner-a");
 		state.select(TrainingViewState.Pane.EXERCISES);
-		state.draftsExpanded = state.optionsExpanded = true;
+		state.draftsExpanded = true;
 		long revision = state.bindingRevision();
 		state.resetFor(new String("owner-a"));
 		assertEquals(TrainingViewState.Pane.EXERCISES, state.pane);
 		assertTrue(state.draftsExpanded);
-		assertTrue(state.optionsExpanded);
 		assertEquals(revision, state.bindingRevision());
 	}
 
@@ -22,12 +21,11 @@ public final class TrainingViewStateTest {
 		TrainingViewState state = new TrainingViewState();
 		state.resetFor("owner-a");
 		state.select(TrainingViewState.Pane.AI);
-		state.draftsExpanded = state.optionsExpanded = true;
+		state.draftsExpanded = true;
 		long revision = state.bindingRevision();
 		state.resetFor("owner-b");
 		assertEquals(TrainingViewState.Pane.MINE, state.pane);
 		assertFalse(state.draftsExpanded);
-		assertFalse(state.optionsExpanded);
 		assertTrue(state.bindingRevision() > revision);
 	}
 
@@ -46,10 +44,9 @@ public final class TrainingViewStateTest {
 	@Test public void changingPaneDoesNotDiscardExpandedSectionPreferences() {
 		TrainingViewState state = new TrainingViewState();
 		state.resetFor("owner-a");
-		state.draftsExpanded = state.optionsExpanded = true;
+		state.draftsExpanded = true;
 		state.select(TrainingViewState.Pane.AI);
 		state.select(TrainingViewState.Pane.MINE);
 		assertTrue(state.draftsExpanded);
-		assertTrue(state.optionsExpanded);
 	}
 }

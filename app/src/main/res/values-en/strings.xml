@@ -453,12 +453,9 @@
 	<string name="tr_other_suggestion">🔀 Another suggestion</string>
 	<string name="tr_modify">✏️ Modify it</string>
 	<string name="tr_do_it_now">Do it now</string>
-	<string name="tr_your_routines">Your routines</string>
 	<string name="tr_profile_first">First, your profile</string>
 	<string name="tr_profile_first_body">Your goal, days and equipment: that\'s what we use to prepare your workouts.</string>
 	<string name="tr_new">New</string>
-	<string name="tr_close_menu">Close ▴</string>
-	<string name="tr_new_menu">+ New workout or routine</string>
 	<string name="tr_create_first">Create your first workout</string>
 	<string name="tr_what_to_do">What do you want to do?</string>
 	<string name="tr_free">🏋️ Free workout</string>
@@ -1209,7 +1206,7 @@
 	<string name="tut_home">Home: what\'s on today</string>
 	<string name="tut_home_body">Today\'s workout, food and water at a glance.\n\nOne tap to continue your workout or log a glass.</string>
 	<string name="tut_training">Workout: your routines</string>
-	<string name="tut_training_body">Pick a routine and tap “Start workout”.\n\nWith “+ New” you get a free workout, a suggestion, an AI-made routine, a weekly plan, classic programs (5/3/1, GZCLP…) or build your own.</string>
+	<string name="tut_training_body">Each section folds when you tap its title. In “Today”, tap “Start workout”.\n\nIn “Create or ask for a routine” you get a free workout, a suggestion, an AI-made routine, a weekly plan, classic programs (5/3/1, GZCLP…) or build your own.</string>
 	<string name="tut_log">Log every set</string>
 	<string name="tut_log_body">Adjust weight and reps with − and + and tap “Save set”: the rest timer starts on its own.\n\nThe app tells you when to add weight (📈) based on your previous sets.</string>
 	<string name="tut_3d">Technique in 3D</string>
@@ -1922,4 +1919,25 @@
 	<string name="hist_goals_summary">Active: %1$d · Achieved: %2$d</string>
 	<string name="ff_ex_goal_name">Read books</string>
 	<string name="ff_ex_goal_unit">books</string>
+	<!-- Training in collapsible sections -->
+	<string name="tr_fold_today">🏋️ Today</string>
+	<string name="tr_fold_today_draft">Unfinished: %1$s</string>
+	<string name="tr_fold_today_new">New routine: %1$s</string>
+	<string name="tr_fold_routines">📋 Your routines</string>
+	<plurals name="tr_fold_routines_detail">
+		<item quantity="one">%1$d routine</item>
+		<item quantity="other">%1$d routines</item>
+	</plurals>
+	<string name="tr_fold_new">➕ Create or ask for a routine</string>
+	<string name="tr_fold_new_detail">Free, suggestion, AI, weekly plan…</string>
+	<string name="tr_fold_mine">✍️ Your exercises</string>
+	<plurals name="tr_fold_mine_detail">
+		<item quantity="one">%1$d exercise</item>
+		<item quantity="other">%1$d exercises</item>
+	</plurals>
+	<string name="tr_fold_library">📚 Exercise library</string>
+	<plurals name="tr_fold_library_detail">
+		<item quantity="one">%1$d exercise</item>
+		<item quantity="other">%1$d exercises</item>
+	</plurals>
 </resources>

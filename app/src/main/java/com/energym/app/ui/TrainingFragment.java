@@ -46,10 +46,49 @@ public final class TrainingFragment extends ScreenFragment {
 			library();
 			return;
 		}
-		boolean hasNextStep = nextStep();
-		routines(hasNextStep);
-		otherDrafts();
+		// Sin cuenta solo hay una cosa que hacer: elegirla; esa tarjeta no se pliega.
+		if (app.owner() == null) {
+			nextStep();
+			return;
+		}
+		// Como en Nutrición, cada bloque se pliega con su cabecera y, plegado, deja ver su dato clave.
+		Session featured = featuredDraft();
+		featuredDraftId = featured == null ? "" : featured.getSyncId();
+		String today = todaySummary(featured);
+		if (today != null && fold(FOLDS, "training_", "today", Txt.t(R.string.tr_fold_today), today, true))
+			nextStep();
+		List<Routine> routines = savedRoutines();
+		List<Session> others = otherDraftList();
+		if ((!routines.isEmpty() || !others.isEmpty()) && fold(FOLDS, "training_", "routines",
+			Txt.t(R.string.tr_fold_routines), routines.isEmpty() ? Txt.t(R.string.tr_drafts) :
+				Txt.n(R.plurals.tr_fold_routines_detail, routines.size()), true)) {
+			for (Routine routine : routines)
+				routineRow(routine);
+			otherDrafts(others);
+		}
 		createSection();
+	}
+
+	/** Preferencias de los apartados plegados de Entreno; se recuerdan aunque se cierre la app. */
+	static final String FOLDS = "training_folds";
+
+	/** El entreno a medias que se ofrece continuar: el abierto ahora o, si no, el primero pendiente. */
+	private Session featuredDraft() {
+		if (app.sessions.session != null && app.sessions.session.getStatus() == Session.Status.DRAFT)
+			return app.sessions.session;
+		List<Session> pending = distinctDrafts();
+		return pending.isEmpty() ? null : pending.get(0);
+	}
+
+	/** Lo que muestra «Hoy toca» plegado; null si no hay nada que ofrecer (mismo orden que nextStep()). */
+	private String todaySummary(Session draft) {
+		if (draft != null)
+			return Txt.t(R.string.tr_fold_today_draft, draft.getRoutine().getTitle());
+		if (app.routines.preview != null)
+			return Txt.t(R.string.tr_fold_today_new, app.routines.preview.getTitle());
+		if (app.progression() != null)
+			return Txt.t(R.string.tr_level_up);
+		return app.routines.accepted == null ? null : app.routines.accepted.getTitle();
 	}
 
 	/** Dos pestañas: todas las rutinas juntas (las haya creado quien sea) y la biblioteca de ejercicios. */
@@ -83,10 +122,8 @@ public final class TrainingFragment extends ScreenFragment {
 		}
 		Session active = app.sessions.session != null && app.sessions.session.getStatus() == Session.Status.DRAFT ?
 			app.sessions.session : null;
-		List<Session> pending = distinctDrafts();
-		Session draft = active != null ? active : pending.isEmpty() ? null : pending.get(0);
+		Session draft = featuredDraft();
 		if (draft != null) {
-			featuredDraftId = draft.getSyncId();
 				int saved = draft.getResults().size(), total = draft.getRoutine().getItems().size();
 			LinearLayout resume = card(Txt.t(R.string.tr_half_done), draft.getRoutine().getTitle());
 			add(resume, new com.energym.app.ui.charts.ProgressBarView(requireContext()), 4)
@@ -169,7 +206,8 @@ public final class TrainingFragment extends ScreenFragment {
 			new android.graphics.Rect(0, 0, target.getWidth(), target.getHeight()), false));
 	}
 
-	private void routines(boolean hasNextStep) {
+	/** Rutinas guardadas para «Tus rutinas»; vacío si la única es la de hoy, que ya se ve en «Hoy toca». */
+	private List<Routine> savedRoutines() {
 		List<Routine> routines = new ArrayList<>(app.versions);
 		// El entreno libre no es una rutina guardada: se ve en «Ahora» mientras está abierto.
 		routines.removeIf(com.energym.app.domain.FreeWorkout::is);
@@ -178,12 +216,10 @@ public final class TrainingFragment extends ScreenFragment {
 			.thenComparingInt(r -> com.energym.app.domain.WeeklyPlan.dayOf(r) == null ? 0 :
 				com.energym.app.domain.WeeklyPlan.dayOf(r)[0]));
 		// Si la única rutina es la de hoy, ya se ve arriba.
-		if (routines.isEmpty() || routines.size() == 1 && app.routines.accepted != null &&
+		if (routines.size() == 1 && app.routines.accepted != null &&
 			routines.get(0).getProposalId().equals(app.routines.accepted.getProposalId()))
-			return;
-		section(Txt.t(R.string.tr_your_routines), hasNextStep ? 32 : 0);
-		for (Routine routine : routines)
-			routineRow(routine);
+			return Collections.emptyList();
+		return routines;
 	}
 
 	/**
@@ -202,21 +238,15 @@ public final class TrainingFragment extends ScreenFragment {
 			primary(setup);
 			return;
 		}
+		// La primera vez no hay nada más en pantalla: las formas de crear se ven sin desplegar nada.
 		boolean first = app.versions.isEmpty() && app.routines.accepted == null;
-		boolean open = state.training.optionsExpanded || first;
-		section(Txt.t(R.string.tr_new), 32);
-		if (!first) {
-			MaterialButton toggle = action(rows, Txt.t(open ? R.string.tr_close_menu : R.string.tr_new_menu), true, () -> {
-				state.training.optionsExpanded = !state.training.optionsExpanded;
-				suggesting = false;
-				render();
-			});
-			toggle.setTag("training_new");
-			if (!open)
-				primary(toggle);
-		}
-		if (!open)
+		if (first)
+			section(Txt.t(R.string.tr_new), 32);
+		else if (!fold(FOLDS, "training_", "new", Txt.t(R.string.tr_fold_new), Txt.t(R.string.tr_fold_new_detail),
+			false)) {
+			suggesting = false;
 			return;
+		}
 		LinearLayout create = card(Txt.t(first ? R.string.tr_create_first : R.string.tr_what_to_do), "");
 		View freeStart = option(create, Txt.t(R.string.tr_free), Txt.t(R.string.tr_free_help),
 			ready && !app.trainingMutation && app.profile != null,
@@ -364,9 +394,14 @@ public final class TrainingFragment extends ScreenFragment {
 		return new ArrayList<>(unique.values());
 	}
 
-	private void otherDrafts() {
+	/** Entrenos a medias además del que se ofrece en «Hoy toca». */
+	private List<Session> otherDraftList() {
 		List<Session> others = distinctDrafts();
 		others.removeIf(draft -> featuredDraftId.equals(draft.getSyncId()));
+		return others;
+	}
+
+	private void otherDrafts(List<Session> others) {
 		if (others.isEmpty()) return;
 		MaterialButton toggle = action(rows, Txt.t(R.string.tr_other_drafts, others.size()), true, () -> {
 			state.training.draftsExpanded = !state.training.draftsExpanded;
@@ -396,7 +431,17 @@ public final class TrainingFragment extends ScreenFragment {
 	}
 
 	private void library() {
-		myExercises();
+		com.energym.app.catalog.CustomExercises custom = state.customExercises;
+		if (custom != null && app.owner() != null) {
+			int mine = custom.mine().size();
+			if (fold(FOLDS, "training_", "exercises_mine", Txt.t(R.string.tr_fold_mine),
+				mine == 0 ? "" : Txt.n(R.plurals.tr_fold_mine_detail, mine), true))
+				myExercises();
+		}
+		int total = app.catalog.getExercises().size();
+		if (!fold(FOLDS, "training_", "library", Txt.t(R.string.tr_fold_library),
+			Txt.n(R.plurals.tr_fold_library_detail, total), true))
+			return;
 		LinearLayout library = card(Txt.t(R.string.tr_library), Txt.t(R.string.tr_library_body, app.catalog.getExercises().size()));
 		ExerciseSearch search = new ExerciseSearch(app.catalog.getExercises());
 		browser = new ExerciseBrowser(this, library, state.exerciseBrowser, "exercise", false, new ExerciseBrowser.Results() {
@@ -486,7 +531,6 @@ public final class TrainingFragment extends ScreenFragment {
 				state.training.select(TrainingViewState.Pane.MINE);
 			}
 			state.training.draftsExpanded = restored.getBoolean("training.drafts", false);
-			state.training.optionsExpanded = restored.getBoolean("training.options", false);
 		}
 		restored = null;
 	}
@@ -512,7 +556,6 @@ public final class TrainingFragment extends ScreenFragment {
 		saved.putLong("training.binding", state.training.bindingRevision());
 		saved.putString("training.pane", state.training.pane.name());
 		saved.putBoolean("training.drafts", state.training.draftsExpanded);
-		saved.putBoolean("training.options", state.training.optionsExpanded);
 	}
 
 	@Override

@@ -7,7 +7,7 @@ public final class TrainingViewState {
 	public enum Pane { MINE, AI, EXERCISES }
 
 	public Pane pane = Pane.MINE;
-	public boolean draftsExpanded, optionsExpanded;
+	public boolean draftsExpanded;
 	private String owner;
 	private long bindingRevision;
 
@@ -16,7 +16,7 @@ public final class TrainingViewState {
 		owner = nextOwner;
 		bindingRevision++;
 		pane = Pane.MINE;
-		draftsExpanded = optionsExpanded = false;
+		draftsExpanded = false;
 	}
 
 	public void select(Pane next) {

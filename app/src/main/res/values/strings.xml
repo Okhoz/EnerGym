@@ -562,12 +562,9 @@
 	<string name="tr_other_suggestion">🔀 Otra sugerencia</string>
 	<string name="tr_modify">✏️ Modificarla</string>
 	<string name="tr_do_it_now">Hacerla ahora</string>
-	<string name="tr_your_routines">Tus rutinas</string>
 	<string name="tr_profile_first">Primero, tu perfil</string>
 	<string name="tr_profile_first_body">Tu objetivo, días y material: con eso te preparamos los entrenos.</string>
 	<string name="tr_new">Nuevo</string>
-	<string name="tr_close_menu">Cerrar ▴</string>
-	<string name="tr_new_menu">+ Nuevo entreno o rutina</string>
 	<string name="tr_create_first">Crea tu primer entreno</string>
 	<string name="tr_what_to_do">¿Qué quieres hacer?</string>
 	<string name="tr_free">🏋️ Entreno libre</string>
@@ -1330,7 +1327,7 @@
 	<string name="tut_home">Inicio: lo que toca hoy</string>
 	<string name="tut_home_body">Tu entreno del día y tu comida y agua de hoy, de un vistazo.\n\nUn toque para seguir el entreno o apuntar un vaso.</string>
 	<string name="tut_training">Entreno: tus rutinas</string>
-	<string name="tut_training_body">Elige una rutina y pulsa «Empezar entreno».\n\nCon «+ Nuevo» tienes entreno libre, una sugerencia, una rutina hecha por la IA, un plan semanal, programas clásicos (5/3/1, GZCLP…) o hacerla tú.</string>
+	<string name="tut_training_body">Cada apartado se pliega tocando su título. En «Hoy toca» pulsa «Empezar entreno».\n\nEn «Crear o pedir una rutina» tienes entreno libre, una sugerencia, una rutina hecha por la IA, un plan semanal, programas clásicos (5/3/1, GZCLP…) o hacerla tú.</string>
 	<string name="tut_log">Apunta cada serie</string>
 	<string name="tut_log_body">Ajusta peso y repeticiones con − y + y pulsa «Guardar serie»: el descanso empieza solo.\n\nLa app te dice cuándo subir el peso (📈) según tus series anteriores.</string>
 	<string name="tut_3d">Técnica en 3D</string>
@@ -1972,5 +1969,29 @@
 	<string name="hist_goals_summary">Activas: %1$d · Cumplidas: %2$d</string>
 	<string name="ff_ex_goal_name">Leer libros</string>
 	<string name="ff_ex_goal_unit">libros</string>
+	<!-- Entreno por apartados desplegables -->
+	<string name="tr_fold_today">🏋️ Hoy toca</string>
+	<string name="tr_fold_today_draft">A medias: %1$s</string>
+	<string name="tr_fold_today_new">Nueva rutina: %1$s</string>
+	<string name="tr_fold_routines">📋 Tus rutinas</string>
+	<plurals name="tr_fold_routines_detail">
+		<item quantity="one">%1$d rutina</item>
+		<item quantity="many">%1$d rutinas</item>
+		<item quantity="other">%1$d rutinas</item>
+	</plurals>
+	<string name="tr_fold_new">➕ Crear o pedir una rutina</string>
+	<string name="tr_fold_new_detail">Libre, sugerencia, IA, plan semanal…</string>
+	<string name="tr_fold_mine">✍️ Tus ejercicios</string>
+	<plurals name="tr_fold_mine_detail">
+		<item quantity="one">%1$d ejercicio</item>
+		<item quantity="many">%1$d ejercicios</item>
+		<item quantity="other">%1$d ejercicios</item>
+	</plurals>
+	<string name="tr_fold_library">📚 Biblioteca de ejercicios</string>
+	<plurals name="tr_fold_library_detail">
+		<item quantity="one">%1$d ejercicio</item>
+		<item quantity="many">%1$d ejercicios</item>
+		<item quantity="other">%1$d ejercicios</item>
+	</plurals>
 </resources>
 

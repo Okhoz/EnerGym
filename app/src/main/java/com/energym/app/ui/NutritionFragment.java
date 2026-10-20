@@ -111,29 +111,8 @@ public final class NutritionFragment extends ScreenFragment {
 	/** Preferencias de los apartados plegados; se recuerdan aunque se cierre la app. */
 	static final String FOLDS = "nutrition_folds";
 
-	/**
-	 * Cabecera desplegable de un apartado: «▾» plegado y «▴» abierto. Cada apartado es independiente. Devuelve si
-	 * está abierto; plegado, {@code detail} resume su contenido en la propia cabecera.
-	 */
 	private boolean fold(String key, String label, String detail, boolean openByDefault) {
-		android.content.SharedPreferences prefs =
-			requireContext().getSharedPreferences(FOLDS, android.content.Context.MODE_PRIVATE);
-		boolean open = prefs.getBoolean(key, openByDefault);
-		View header = listRow(rows, label, open ? "" : detail, open ? "▴" : "▾", true, () -> {
-			prefs.edit().putBoolean(key, !open).apply();
-			render();
-		});
-		header.setTag("nutrition_fold_" + key);
-		androidx.core.view.ViewCompat.setStateDescription(header,
-			Txt.t(open ? R.string.nut_fold_expanded : R.string.nut_fold_collapsed));
-		header.setPadding(dp(20), dp(14), dp(20), dp(14));
-		header.setBackground(rounded(open ? R.color.surface_selected : R.color.surface_card, 18, R.color.gold,
-			open ? 1 : 0));
-		LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) header.getLayoutParams();
-		lp.topMargin = dp(16);
-		lp.bottomMargin = dp(open ? 12 : 0);
-		header.setLayoutParams(lp);
-		return open;
+		return fold(FOLDS, "nutrition_fold_", key, label, detail, openByDefault);
 	}
 
 	/**

@@ -341,6 +341,32 @@ public abstract class ScreenFragment extends Fragment {
 		return new android.graphics.RectF(child.getLeft(), child.getTop(), child.getRight(), child.getBottom());
 	}
 
+	/**
+	 * Cabecera desplegable de un apartado: «▾» plegado y «▴» abierto. Cada apartado es independiente y la elección
+	 * se recuerda en {@code prefsName} aunque se cierre la app. Devuelve si está abierto; plegado, {@code detail}
+	 * resume su contenido en la propia cabecera. La etiqueta de la vista es {@code tagPrefix + key}.
+	 */
+	protected boolean fold(String prefsName, String tagPrefix, String key, String label, String detail,
+		boolean openByDefault) {
+		android.content.SharedPreferences prefs =
+			requireContext().getSharedPreferences(prefsName, android.content.Context.MODE_PRIVATE);
+		boolean open = prefs.getBoolean(key, openByDefault);
+		View header = listRow(rows, label, open ? "" : detail, open ? "▴" : "▾", true, () -> {
+			prefs.edit().putBoolean(key, !open).apply();
+			render();
+		});
+		header.setTag(tagPrefix + key);
+		ViewCompat.setStateDescription(header, Txt.t(open ? R.string.nut_fold_expanded : R.string.nut_fold_collapsed));
+		header.setPadding(dp(20), dp(14), dp(20), dp(14));
+		header.setBackground(rounded(open ? R.color.surface_selected : R.color.surface_card, 18, R.color.gold,
+			open ? 1 : 0));
+		LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) header.getLayoutParams();
+		lp.topMargin = dp(16);
+		lp.bottomMargin = dp(open ? 12 : 0);
+		header.setLayoutParams(lp);
+		return open;
+	}
+
 	/** Rótulo de sección discreto, con aire por encima para separar bloques. */
 	protected TextView section(String label, int topDp) {
 		// Diseño minimalista: el rótulo separa bloques con poco aire; las tarjetas ya marcan el ritmo.
