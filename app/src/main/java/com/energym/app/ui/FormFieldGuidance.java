@@ -67,6 +67,11 @@ public final class FormFieldGuidance {
 			case "assistant_endpoint": return example(Txt.t(R.string.ff_ex_https_ia_tudominio_es));
 			case "assistant_pairing": return Txt.t(R.string.ff_paste_pairing);
 			case "goal_target": return goalExample(label);
+			case "goal_name": return example(Txt.t(R.string.ff_ex_goal_name));
+			case "goal_unit": return example(Txt.t(R.string.ff_ex_goal_unit));
+			case "goal_start": return example("0");
+			case "goal_custom_target": return example("12");
+			case "goal_progress": return example("3");
 			default: return number ? (integer ? example("3") : example("10.5")) : Txt.t(R.string.ff_type_answer);
 		}
 	}

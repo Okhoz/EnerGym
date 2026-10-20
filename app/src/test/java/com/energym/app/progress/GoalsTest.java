@@ -107,4 +107,83 @@ public class GoalsTest {
 		assertEquals(1, saved.size());
 		assertEquals(1, c.goals.size());
 	}
+
+	@Test
+	public void customGoalCountsTheLatestLoggedValueInEitherDirection() {
+		Goal books = Goal.custom("Leer libros", "libros", 12, 0);
+		GoalProgress empty = GoalProgress.of(books, stats, new TreeMap<>());
+		assertEquals(0, empty.ratio, 0);
+		assertEquals(0, empty.series.length);
+		Goal logged = books.withEntry(TODAY.minusDays(3), 2).withEntry(TODAY, 3).withEntry(TODAY, 6);
+		assertEquals(2, logged.entries.size());
+		GoalProgress p = GoalProgress.of(logged, stats, new TreeMap<>());
+		assertEquals(6, p.current, 0);
+		assertEquals(0.5, p.ratio, 0.001);
+		assertArrayEquals(new double[]{2, 6}, p.series, 0);
+		assertEquals("Leer libros: 12 libros", logged.title());
+		// Bajar un tiempo: de 30 a 25 min, ahora 27.
+		Goal run = Goal.custom("5 km", "min", 25, 30).withEntry(TODAY, 27);
+		assertEquals(0.6, GoalProgress.of(run, stats, new TreeMap<>()).ratio, 0.001);
+		assertTrue(GoalProgress.of(run.withEntry(TODAY, 24), stats, new TreeMap<>()).reached);
+		assertEquals(1, logged.withoutEntry(TODAY).entries.size());
+		assertThrows(IllegalArgumentException.class, () -> Goal.custom(" ", "", 10, 0));
+		assertThrows(IllegalArgumentException.class, () -> Goal.custom("Igual", "", 5, 5));
+		assertThrows(IllegalStateException.class,
+			() -> Goal.create(Goal.Type.SESSIONS_PER_WEEK, 3, 0, null, null).withEntry(TODAY, 1));
+	}
+
+	@Test
+	public void completingKeepsTheGoalAndReopeningBringsItBack() {
+		List<Goal> saved = new ArrayList<>();
+		List<String> errors = new ArrayList<>();
+		GoalsController c = new GoalsController(new GoalsController.Store() {
+			public void load(String owner, Callback<List<Goal>> callback) {
+				callback.success(new ArrayList<>(saved));
+			}
+
+			public void save(String owner, Goal goal, Callback<Void> callback) {
+				saved.removeIf(g -> g.id.equals(goal.id));
+				saved.add(goal);
+				callback.success(null);
+			}
+
+			public void remove(String owner, String goalId, Callback<Void> callback) {
+				saved.removeIf(g -> g.id.equals(goalId));
+				callback.success(null);
+			}
+		}, () -> {
+		}, errors::add);
+		c.today = () -> TODAY;
+		c.clock = () -> 1_000L;
+		c.activate("uid");
+		c.startNew();
+		c.draft.put("type", "CUSTOM");
+		c.draft.put("name", "Dominadas seguidas");
+		c.draft.put("target", "15");
+		c.draft.put("start", "4");
+		c.save(0, null);
+		assertTrue(errors.toString(), errors.isEmpty());
+		Goal goal = c.goals.get(0);
+		assertEquals(4, goal.start, 0);
+		c.startLogging(goal);
+		c.progressDraft = "muchas";
+		c.logProgress(goal);
+		assertEquals(1, errors.size());
+		assertEquals(goal.id, c.logging);
+		c.progressDraft = "8,5";
+		c.logProgress(goal);
+		assertNull(c.logging);
+		assertEquals(8.5, c.goals.get(0).entries.get(TODAY), 0);
+		assertEquals(1, saved.size());
+		c.complete(c.goals.get(0));
+		assertTrue(c.active().isEmpty());
+		assertEquals(1, c.completed().size());
+		assertEquals(1_000L, saved.get(0).completedAt);
+		assertEquals(8.5, saved.get(0).entries.get(TODAY), 0);
+		c.reopen(c.completed().get(0));
+		assertEquals(1, c.active().size());
+		assertFalse(saved.get(0).completed());
+		c.removeEntry(c.goals.get(0), TODAY);
+		assertTrue(c.goals.get(0).entries.isEmpty());
+	}
 }

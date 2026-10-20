@@ -46,9 +46,21 @@ public final class GoalRepository {
 
 	public static String encode(Goal g) {
 		try {
-			return new JSONObject().put("id", g.id).put("type", g.type.name()).put("target", g.target)
+			JSONObject o = new JSONObject().put("id", g.id).put("type", g.type.name()).put("target", g.target)
 				.put("start", g.start).put("exerciseId", g.exerciseId).put("exerciseName", g.exerciseName)
-				.put("createdAt", g.createdAt).put("deleted", false).toString();
+				.put("createdAt", g.createdAt).put("deleted", false);
+			// Campos nuevos solo cuando hacen falta: un objetivo de antes se guarda igual que siempre.
+			if (g.type == Goal.Type.CUSTOM)
+				o.put("name", g.name).put("unit", g.customUnit);
+			if (g.completedAt > 0)
+				o.put("completedAt", g.completedAt);
+			if (!g.entries.isEmpty()) {
+				JSONArray entries = new JSONArray();
+				for (Map.Entry<java.time.LocalDate, Double> e : g.entries.entrySet())
+					entries.put(new JSONObject().put("day", e.getKey().toString()).put("value", e.getValue()));
+				o.put("entries", entries);
+			}
+			return o.toString();
 		} catch (JSONException e) {
 			throw new IllegalArgumentException("Objetivo inválido", e);
 		}
@@ -59,9 +71,16 @@ public final class GoalRepository {
 			JSONObject o = new JSONObject(json);
 			if (o.optBoolean("deleted", false))
 				throw new IllegalArgumentException("Objetivo eliminado");
+			SortedMap<java.time.LocalDate, Double> entries = new TreeMap<>();
+			JSONArray rows = o.optJSONArray("entries");
+			for (int i = 0; rows != null && i < rows.length(); i++) {
+				JSONObject row = rows.getJSONObject(i);
+				entries.put(java.time.LocalDate.parse(row.getString("day")), row.getDouble("value"));
+			}
 			return new Goal(o.getString("id"), Goal.Type.valueOf(o.getString("type")), o.getDouble("target"),
-				o.getDouble("start"), o.getString("exerciseId"), o.getString("exerciseName"), o.getLong("createdAt"));
-		} catch (JSONException e) {
+				o.getDouble("start"), o.getString("exerciseId"), o.getString("exerciseName"), o.optString("name", ""),
+				o.optString("unit", ""), o.getLong("createdAt"), o.optLong("completedAt", 0), entries);
+		} catch (JSONException | java.time.format.DateTimeParseException e) {
 			throw new IllegalArgumentException("Objetivo inválido", e);
 		}
 	}

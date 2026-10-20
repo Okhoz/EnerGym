@@ -614,6 +614,7 @@ public final class HistoryFragment extends ScreenFragment {
 			return;
 		}
 		SortedMap<LocalDate, Double> weights = state.nutrition == null ? new TreeMap<>() : state.nutrition.weights;
+		List<Goal> active = g.active(), done = g.completed();
 		if (g.editing)
 			form(g, weights);
 		else
@@ -622,23 +623,78 @@ public final class HistoryFragment extends ScreenFragment {
 			primary(add);
 			((LinearLayout.LayoutParams) add.getLayoutParams()).bottomMargin = dp(16);
 		}
-		if (g.goals.isEmpty() && !g.editing)
+		if (!g.goals.isEmpty())
+			text(rows, Txt.t(R.string.hist_goals_summary, active.size(), done.size()), R.style.EnerGym_FieldCaption, 0);
+		if (active.isEmpty() && !g.editing)
 			card(Txt.t(R.string.hist_no_goals), Txt.t(R.string.hist_no_goals_body));
-		for (Goal goal : g.goals) {
-			GoalProgress p = GoalProgress.of(goal, stats, weights);
-			LinearLayout card = card(goal.title(), p.status() + (p.reached ? "\n" + Txt.t(R.string.hist_goal_reached) : ""));
-			add(card, new ProgressBarView(requireContext()), 12).set(p.ratio, goal.title());
-			if (p.series.length > 0) {
-				if (goal.type.weekly)
-					add(card, new BarChartView(requireContext()), 12).set(p.series, p.labels, goal.target,
-						Txt.t(R.string.hist_per_week, goal.title()));
-				else if (p.series.length > 1)
-					add(card, new LineChartView(requireContext()), 12).set(p.series,
-						new String[]{p.labels[0], p.labels[p.labels.length - 1]}, goal.type.unit(), goal.title());
-			}
-			MaterialButton remove = action(card, Txt.t(R.string.hist_remove_goal), !g.busy, () -> g.remove(goal));
-			remove.setContentDescription(Txt.t(R.string.hist_remove_goal_named, goal.title()));
+		for (Goal goal : active)
+			activeGoal(g, goal, GoalProgress.of(goal, stats, weights));
+		if (done.isEmpty())
+			return;
+		section(Txt.t(R.string.hist_goals_completed) + " · " + done.size(), 24);
+		text(rows, Txt.t(R.string.hist_goals_completed_body), R.style.EnerGym_FieldCaption, 0);
+		java.time.format.DateTimeFormatter day = java.time.format.DateTimeFormatter
+			.ofLocalizedDate(java.time.format.FormatStyle.MEDIUM).withLocale(Txt.locale());
+		for (Goal goal : done) {
+			LocalDate on = java.time.Instant.ofEpochMilli(goal.completedAt).atZone(java.time.ZoneId.systemDefault())
+				.toLocalDate();
+			LinearLayout card = card(goal.title(), Txt.t(R.string.hist_goal_completed_on, day.format(on)));
+			LinearLayout buttons = columns(card, 8);
+			compact(buttons, Txt.t(R.string.hist_goal_reopen), !g.busy, () -> g.reopen(goal))
+				.setContentDescription(Txt.t(R.string.hist_goal_reopen_named, goal.title()));
+			compact(buttons, Txt.t(R.string.hist_remove_goal), !g.busy, () -> g.remove(goal))
+				.setContentDescription(Txt.t(R.string.hist_remove_goal_named, goal.title()));
 		}
+	}
+
+	private void activeGoal(GoalsController g, Goal goal, GoalProgress p) {
+		LinearLayout card = card(goal.title(), p.status() + (p.reached ? "\n" + Txt.t(R.string.hist_goal_reached) : ""));
+		add(card, new ProgressBarView(requireContext()), 12).set(p.ratio, goal.title());
+		if (p.series.length > 0) {
+			if (goal.type.weekly)
+				add(card, new BarChartView(requireContext()), 12).set(p.series, p.labels, goal.target,
+					Txt.t(R.string.hist_per_week, goal.title()));
+			else if (p.series.length > 1)
+				add(card, new LineChartView(requireContext()), 12).set(p.series,
+					new String[]{p.labels[0], p.labels[p.labels.length - 1]}, goal.unit(), goal.title());
+		}
+		if (goal.type == Goal.Type.CUSTOM) {
+			if (!goal.entries.isEmpty()) {
+				// Los más recientes primero; borrar solo el último evita tocar uno equivocado.
+				List<LocalDate> days = new ArrayList<>(goal.entries.keySet());
+				Collections.reverse(days);
+				StringBuilder list = new StringBuilder(Txt.t(R.string.hist_goal_entries));
+				String unit = goal.unit().isEmpty() ? "" : " " + goal.unit();
+				for (LocalDate d : days.subList(0, Math.min(5, days.size())))
+					list.append("\n").append(short_(d)).append(" · ").append(Goal.fmt(goal.entries.get(d)))
+						.append(unit);
+				text(card, list.toString(), R.style.EnerGym_FieldCaption, 12);
+			}
+			if (goal.id.equals(g.logging)) {
+				textField(card, "goal_progress", Txt.t(R.string.hist_goal_log_field) +
+					(goal.unit().isEmpty() ? "" : " (" + goal.unit() + ")"), g.progressDraft, true, false,
+					Txt.t(R.string.hist_goal_log_note), v -> g.progressDraft = v);
+				LinearLayout buttons = columns(card, 8);
+				compact(buttons, Txt.t(R.string.common_cancel), true, g::cancelLogging);
+				primary(compact(buttons, Txt.t(R.string.common_save), !g.busy, () -> g.logProgress(goal)));
+			} else {
+				MaterialButton log = action(card, Txt.t(R.string.hist_goal_log), !g.busy && g.logging == null,
+					() -> g.startLogging(goal));
+				log.setContentDescription(Txt.t(R.string.hist_goal_log_named, goal.title()));
+				if (!goal.entries.isEmpty()) {
+					LocalDate last = goal.entries.lastKey();
+					action(card, Txt.t(R.string.hist_goal_remove_entry, short_(last)), !g.busy,
+						() -> g.removeEntry(goal, last));
+				}
+			}
+		}
+		MaterialButton complete = action(card, Txt.t(R.string.hist_goal_complete), !g.busy, () -> g.complete(goal));
+		complete.setContentDescription(Txt.t(R.string.hist_goal_complete_named, goal.title()));
+		// Al llegar a la meta, cerrarla es lo siguiente que toca.
+		if (p.reached)
+			primary(complete);
+		MaterialButton remove = action(card, Txt.t(R.string.hist_remove_goal), !g.busy, () -> g.remove(goal));
+		remove.setContentDescription(Txt.t(R.string.hist_remove_goal_named, goal.title()));
 	}
 
 	private void form(GoalsController g, SortedMap<LocalDate, Double> weights) {
@@ -667,8 +723,18 @@ public final class HistoryFragment extends ScreenFragment {
 			choice(form, "goal_exercise", Txt.t(R.string.common_exercise), ids, exerciseNames, d.get("exerciseId"),
 				v -> d.put("exerciseId", v));
 		}
-		textField(form, "goal_target", Txt.t(type.weekly ? R.string.hist_goal_target_weekly : R.string.hist_goal_target, type.unit()),
-			d.getOrDefault("target", ""), true, false, v -> d.put("target", v));
+		if (type == Goal.Type.CUSTOM) {
+			textField(form, "goal_name", Txt.t(R.string.hist_goal_name), d.getOrDefault("name", ""), false, false,
+				v -> d.put("name", v));
+			textField(form, "goal_unit", Txt.t(R.string.hist_goal_unit), d.getOrDefault("unit", ""), false, false,
+				v -> d.put("unit", v));
+			textField(form, "goal_start", Txt.t(R.string.hist_goal_start_value), d.getOrDefault("start", ""), true,
+				false, v -> d.put("start", v));
+			textField(form, "goal_custom_target", Txt.t(R.string.hist_goal_target_plain), d.getOrDefault("target", ""),
+				true, false, Txt.t(R.string.hist_goal_custom_note), v -> d.put("target", v));
+		} else
+			textField(form, "goal_target", Txt.t(type.weekly ? R.string.hist_goal_target_weekly : R.string.hist_goal_target, type.unit()),
+				d.getOrDefault("target", ""), true, false, v -> d.put("target", v));
 		double latest = weights.isEmpty() ? 0 : weights.get(weights.lastKey());
 		if (type == Goal.Type.TARGET_WEIGHT)
 			text(form, latest > 0 ? Txt.t(R.string.hist_goal_start_weight, NutritionController.format(latest)) :

@@ -294,7 +294,7 @@
 	<string name="hist_goals_signed_out">Entra con tu cuenta para marcar objetivos.</string>
 	<string name="hist_new_goal">Nuevo objetivo</string>
 	<string name="hist_no_goals">Aún no tienes objetivos</string>
-	<string name="hist_no_goals_body">Por ejemplo: 3 sesiones por semana, 150 minutos por semana, llegar a 75 kg o levantar 60 kg en sentadilla.</string>
+	<string name="hist_no_goals_body">Por ejemplo: 3 sesiones por semana, 150 minutos por semana, llegar a 75 kg, levantar 60 kg en sentadilla o una meta personal como leer 12 libros.</string>
 	<string name="hist_goal_reached">✓ ¡Objetivo cumplido!</string>
 	<string name="hist_per_week">%1$s por semana</string>
 	<string name="hist_remove_goal">Quitar objetivo</string>
@@ -1942,5 +1942,35 @@
 	<string name="picker_results">Resultados</string>
 	<string name="picker_other">Otros</string>
 	<string name="an_speed_normal" translatable="false">1×</string>
+	<!-- Metas personales y metas cumplidas -->
+	<string name="goal_custom">Meta personal</string>
+	<string name="goal_custom_range">La meta tiene que estar entre 0 y %1$s.</string>
+	<string name="goal_custom_name">Ponle un nombre a la meta (máximo de caracteres: %1$d).</string>
+	<string name="goal_custom_unit">La unidad es demasiado larga (máximo de caracteres: %1$d).</string>
+	<string name="goal_custom_same">La meta tiene que ser distinta del valor de partida.</string>
+	<string name="goal_status_custom_empty">Aún no has apuntado ningún avance.</string>
+	<string name="goal_status_custom">Llevas %1$s de %2$s</string>
+	<string name="goal_need_progress">Indica una cifra para apuntar el avance.</string>
+	<string name="hist_goal_name">Nombre de la meta</string>
+	<string name="hist_goal_unit">Unidad (opcional: libros, km, min…)</string>
+	<string name="hist_goal_start_value">Valor de partida (opcional, 0 si lo dejas vacío)</string>
+	<string name="hist_goal_target_plain">Meta</string>
+	<string name="hist_goal_custom_note">Tú apuntas el avance cuando quieras; cuenta el último valor.</string>
+	<string name="hist_goal_log">Apuntar avance</string>
+	<string name="hist_goal_log_named">Apuntar avance de %1$s</string>
+	<string name="hist_goal_log_field">Cuánto llevas hoy</string>
+	<string name="hist_goal_log_note">Si ya apuntaste hoy, se sustituye el valor de hoy.</string>
+	<string name="hist_goal_entries">Últimos registros</string>
+	<string name="hist_goal_remove_entry">Borrar el registro del %1$s</string>
+	<string name="hist_goal_complete">Marcar como cumplida</string>
+	<string name="hist_goal_complete_named">Marcar como cumplida %1$s</string>
+	<string name="hist_goal_reopen">Reabrir</string>
+	<string name="hist_goal_reopen_named">Reabrir %1$s</string>
+	<string name="hist_goals_completed">Metas cumplidas</string>
+	<string name="hist_goals_completed_body">Lo que ya has conseguido. Puedes reabrir una meta si quieres seguir con ella.</string>
+	<string name="hist_goal_completed_on">✓ Cumplida el %1$s</string>
+	<string name="hist_goals_summary">Activas: %1$d · Cumplidas: %2$d</string>
+	<string name="ff_ex_goal_name">Leer libros</string>
+	<string name="ff_ex_goal_unit">libros</string>
 </resources>
 

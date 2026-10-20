@@ -36,6 +36,8 @@ public final class GoalProgress {
 				return weekly(goal, stats, stats.distancePerWeek());
 			case TARGET_WEIGHT:
 				return weight(goal, weights);
+			case CUSTOM:
+				return custom(goal);
 			default:
 				double[] loads = stats.loadHistory(goal.exerciseId);
 				double best = 0;
@@ -74,7 +76,30 @@ public final class GoalProgress {
 		return new GoalProgress(goal, current, ratio, series, labels);
 	}
 
+	/**
+	 * Meta personal: cuenta el último valor apuntado, desde el de partida hacia la meta (sirve para subir, como
+	 * «leer 12 libros», y para bajar, como «correr 5 km en 25 min»).
+	 */
+	private static GoalProgress custom(Goal goal) {
+		List<LocalDate> days = new ArrayList<>(goal.entries.keySet());
+		double[] series = new double[days.size()];
+		String[] labels = new String[days.size()];
+		for (int i = 0; i < series.length; i++) {
+			series[i] = goal.entries.get(days.get(i));
+			labels[i] = days.get(i).getDayOfMonth() + "/" + days.get(i).getMonthValue();
+		}
+		if (series.length == 0)
+			return new GoalProgress(goal, goal.start, 0, series, labels);
+		double current = series[series.length - 1];
+		return new GoalProgress(goal, current, (current - goal.start) / (goal.target - goal.start), series, labels);
+	}
+
 	public String status() {
+		if (goal.type == Goal.Type.CUSTOM) {
+			String unit = goal.unit().isEmpty() ? "" : " " + goal.unit();
+			return series.length == 0 ? Txt.t(R.string.goal_status_custom_empty) :
+				Txt.t(R.string.goal_status_custom, Goal.fmt(round(current)) + unit, Goal.fmt(goal.target) + unit);
+		}
 		String unit = goal.type.unit();
 		if (goal.type == Goal.Type.TARGET_WEIGHT)
 			return series.length == 0 ? Txt.t(R.string.hist_goal_log_weight) :

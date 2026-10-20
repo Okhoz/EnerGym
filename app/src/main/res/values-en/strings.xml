@@ -193,7 +193,7 @@
 	<string name="hist_goals_signed_out">Sign in with your account to set goals.</string>
 	<string name="hist_new_goal">New goal</string>
 	<string name="hist_no_goals">You don\'t have any goals yet</string>
-	<string name="hist_no_goals_body">For example: 3 sessions a week, 150 minutes a week, reach 75 kg or squat 60 kg.</string>
+	<string name="hist_no_goals_body">For example: 3 sessions a week, 150 minutes a week, reach 75 kg, squat 60 kg or a personal goal such as reading 12 books.</string>
 	<string name="hist_goal_reached">✓ Goal reached!</string>
 	<string name="hist_per_week">%1$s per week</string>
 	<string name="hist_remove_goal">Remove goal</string>
@@ -1892,4 +1892,34 @@
 	<string name="an_speed_half">0.5×</string>
 	<string name="picker_results">Results</string>
 	<string name="picker_other">Other</string>
+	<!-- Personal goals and completed goals -->
+	<string name="goal_custom">Personal goal</string>
+	<string name="goal_custom_range">The goal must be between 0 and %1$s.</string>
+	<string name="goal_custom_name">Give the goal a name (maximum length: %1$d).</string>
+	<string name="goal_custom_unit">The unit is too long (maximum length: %1$d).</string>
+	<string name="goal_custom_same">The goal must be different from the starting value.</string>
+	<string name="goal_status_custom_empty">You haven\'t logged any progress yet.</string>
+	<string name="goal_status_custom">%1$s of %2$s so far</string>
+	<string name="goal_need_progress">Enter a number to log your progress.</string>
+	<string name="hist_goal_name">Goal name</string>
+	<string name="hist_goal_unit">Unit (optional: books, km, min…)</string>
+	<string name="hist_goal_start_value">Starting value (optional, 0 if empty)</string>
+	<string name="hist_goal_target_plain">Goal</string>
+	<string name="hist_goal_custom_note">You log progress whenever you like; the latest value counts.</string>
+	<string name="hist_goal_log">Log progress</string>
+	<string name="hist_goal_log_named">Log progress for %1$s</string>
+	<string name="hist_goal_log_field">Where you are today</string>
+	<string name="hist_goal_log_note">If you already logged today, today\'s value is replaced.</string>
+	<string name="hist_goal_entries">Latest entries</string>
+	<string name="hist_goal_remove_entry">Delete the entry from %1$s</string>
+	<string name="hist_goal_complete">Mark as achieved</string>
+	<string name="hist_goal_complete_named">Mark %1$s as achieved</string>
+	<string name="hist_goal_reopen">Reopen</string>
+	<string name="hist_goal_reopen_named">Reopen %1$s</string>
+	<string name="hist_goals_completed">Achieved goals</string>
+	<string name="hist_goals_completed_body">What you have already achieved. You can reopen a goal to keep working on it.</string>
+	<string name="hist_goal_completed_on">✓ Achieved on %1$s</string>
+	<string name="hist_goals_summary">Active: %1$d · Achieved: %2$d</string>
+	<string name="ff_ex_goal_name">Read books</string>
+	<string name="ff_ex_goal_unit">books</string>
 </resources>
