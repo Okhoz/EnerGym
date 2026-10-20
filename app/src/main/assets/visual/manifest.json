@@ -2,8 +2,8 @@
 	"version": 2,
 	"model": {
 		"assetPath": "visual/energym_motions.glb",
-		"sha256": "d54759e5ff47bd98f48c85380cfe1b283d61d335a70129556b91426ae17c9e50",
-		"bytes": 8676916,
+		"sha256": "fa174f4812040109ae6893807be9adf6fe834b3ff5ac467f1461ab1c2572ba6d",
+		"bytes": 9555592,
 		"license": "CC0-1.0",
 		"licenseFiles": [
 			"visual/licenses/Mesh2Motion-CC0.md",
@@ -55,7 +55,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.79,
 			"viewRadius": 0.889
 		},
 		{
@@ -64,7 +64,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.89,
 			"viewRadius": 0.883
 		},
 		{
@@ -73,8 +73,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.709
+			"middle": 1.53,
+			"viewRadius": 0.706
 		},
 		{
 			"exerciseId": "glute-bridge",
@@ -82,7 +82,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.3,
+			"middle": 1.05,
 			"viewRadius": 0.756
 		},
 		{
@@ -92,7 +92,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
 			"middle": 0.0,
-			"viewRadius": 0.916
+			"viewRadius": 0.918
 		},
 		{
 			"exerciseId": "standing-mobility",
@@ -101,7 +101,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
 			"middle": 1.2,
-			"viewRadius": 1.056
+			"viewRadius": 1.06
 		},
 		{
 			"exerciseId": "dumbbell-squat",
@@ -109,7 +109,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.79,
 			"viewRadius": 0.889
 		},
 		{
@@ -118,8 +118,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.696
+			"middle": 1.07,
+			"viewRadius": 0.701
 		},
 		{
 			"exerciseId": "dumbbell-floor-press",
@@ -127,8 +127,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
-			"viewRadius": 0.753
+			"middle": 1.65,
+			"viewRadius": 0.754
 		},
 		{
 			"exerciseId": "barbell-deadlift",
@@ -136,7 +136,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.94,
 			"viewRadius": 0.898
 		},
 		{
@@ -145,8 +145,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
-			"viewRadius": 0.693
+			"middle": 1.65,
+			"viewRadius": 0.694
 		},
 		{
 			"exerciseId": "chair-squat",
@@ -154,7 +154,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.79,
 			"viewRadius": 0.889
 		},
 		{
@@ -164,7 +164,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
 			"middle": 0.0,
-			"viewRadius": 0.682
+			"viewRadius": 0.683
 		},
 		{
 			"exerciseId": "supported-calf-raise",
@@ -172,7 +172,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.0,
+			"middle": 0.82,
 			"viewRadius": 0.938
 		},
 		{
@@ -181,8 +181,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.588
+			"middle": 1.07,
+			"viewRadius": 0.589
 		},
 		{
 			"exerciseId": "mat-mobility",
@@ -209,7 +209,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.2,
 			"middle": 0.6,
-			"viewRadius": 0.795
+			"viewRadius": 0.798
 		},
 		{
 			"exerciseId": "swimming-easy",
@@ -226,7 +226,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.79,
 			"viewRadius": 0.889
 		},
 		{
@@ -236,7 +236,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
 			"middle": 0.8,
-			"viewRadius": 1.048
+			"viewRadius": 1.053
 		},
 		{
 			"exerciseId": "standard-pushup",
@@ -253,7 +253,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.79,
 			"viewRadius": 0.889
 		},
 		{
@@ -262,7 +262,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.79,
 			"viewRadius": 0.889
 		},
 		{
@@ -271,8 +271,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
-			"viewRadius": 0.693
+			"middle": 1.65,
+			"viewRadius": 0.694
 		},
 		{
 			"exerciseId": "barbell-incline-press",
@@ -280,7 +280,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
+			"middle": 1.65,
 			"viewRadius": 0.866
 		},
 		{
@@ -289,7 +289,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.07,
 			"viewRadius": 1.057
 		},
 		{
@@ -298,8 +298,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.696
+			"middle": 1.07,
+			"viewRadius": 0.701
 		},
 		{
 			"exerciseId": "barbell-romanian-deadlift",
@@ -307,7 +307,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.94,
 			"viewRadius": 0.898
 		},
 		{
@@ -316,7 +316,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.3,
+			"middle": 1.05,
 			"viewRadius": 0.751
 		},
 		{
@@ -325,8 +325,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.898
+			"middle": 1.07,
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "barbell-close-grip-press",
@@ -334,8 +334,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
-			"viewRadius": 0.698
+			"middle": 1.65,
+			"viewRadius": 0.704
 		},
 		{
 			"exerciseId": "dumbbell-goblet-squat",
@@ -343,7 +343,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.79,
 			"viewRadius": 0.889
 		},
 		{
@@ -352,7 +352,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.07,
 			"viewRadius": 1.057
 		},
 		{
@@ -362,7 +362,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
 			"middle": 1.5,
-			"viewRadius": 1.056
+			"viewRadius": 1.06
 		},
 		{
 			"exerciseId": "dumbbell-lateral-raise",
@@ -370,8 +370,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.898
+			"middle": 1.07,
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "dumbbell-reverse-fly",
@@ -379,7 +379,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.07,
 			"viewRadius": 0.847
 		},
 		{
@@ -388,8 +388,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.898
+			"middle": 1.07,
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "dumbbell-hammer-curl",
@@ -397,8 +397,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.898
+			"middle": 1.07,
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "dumbbell-overhead-triceps",
@@ -406,7 +406,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.07,
 			"viewRadius": 1.057
 		},
 		{
@@ -415,8 +415,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
-			"middle": 1.2,
-			"viewRadius": 0.683
+			"middle": 0.99,
+			"viewRadius": 0.689
 		},
 		{
 			"exerciseId": "dumbbell-romanian-deadlift",
@@ -424,7 +424,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.94,
 			"viewRadius": 0.898
 		},
 		{
@@ -442,7 +442,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.89,
 			"viewRadius": 0.856
 		},
 		{
@@ -452,7 +452,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 2.0,
-			"viewRadius": 1.11
+			"viewRadius": 1.111
 		},
 		{
 			"exerciseId": "dumbbell-incline-press",
@@ -460,7 +460,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
+			"middle": 1.65,
 			"viewRadius": 0.868
 		},
 		{
@@ -469,8 +469,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
-			"viewRadius": 0.834
+			"middle": 1.65,
+			"viewRadius": 0.835
 		},
 		{
 			"exerciseId": "dumbbell-one-arm-row",
@@ -478,7 +478,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.07,
 			"viewRadius": 0.6
 		},
 		{
@@ -487,8 +487,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
-			"viewRadius": 0.828
+			"middle": 1.65,
+			"viewRadius": 0.834
 		},
 		{
 			"exerciseId": "dumbbell-shrug",
@@ -497,7 +497,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.0,
 			"middle": 1.0,
-			"viewRadius": 0.898
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "dumbbell-thruster",
@@ -514,7 +514,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.0,
+			"middle": 0.82,
 			"viewRadius": 0.938
 		},
 		{
@@ -523,8 +523,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.876
+			"middle": 1.07,
+			"viewRadius": 0.878
 		},
 		{
 			"exerciseId": "seated-cable-row",
@@ -532,8 +532,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.588
+			"middle": 1.07,
+			"viewRadius": 0.589
 		},
 		{
 			"exerciseId": "leg-press",
@@ -541,8 +541,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
-			"viewRadius": 0.713
+			"middle": 1.15,
+			"viewRadius": 0.717
 		},
 		{
 			"exerciseId": "leg-extension",
@@ -550,7 +550,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
-			"middle": 1.2,
+			"middle": 0.99,
 			"viewRadius": 0.697
 		},
 		{
@@ -559,8 +559,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
-			"middle": 1.2,
-			"viewRadius": 0.909
+			"middle": 0.99,
+			"viewRadius": 0.91
 		},
 		{
 			"exerciseId": "machine-chest-press",
@@ -569,7 +569,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
 			"middle": 1.3,
-			"viewRadius": 0.718
+			"viewRadius": 0.719
 		},
 		{
 			"exerciseId": "pec-deck",
@@ -586,8 +586,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
-			"middle": 1.2,
-			"viewRadius": 0.888
+			"middle": 0.99,
+			"viewRadius": 0.889
 		},
 		{
 			"exerciseId": "cable-biceps-curl",
@@ -595,8 +595,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.898
+			"middle": 1.07,
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "cable-face-pull",
@@ -604,8 +604,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.93
+			"middle": 1.07,
+			"viewRadius": 0.932
 		},
 		{
 			"exerciseId": "cable-woodchop",
@@ -613,8 +613,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.1,
-			"viewRadius": 1.005
+			"middle": 0.91,
+			"viewRadius": 1.012
 		},
 		{
 			"exerciseId": "machine-hip-abduction",
@@ -622,7 +622,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
-			"middle": 1.2,
+			"middle": 0.99,
 			"viewRadius": 0.726
 		},
 		{
@@ -631,7 +631,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.0,
+			"middle": 0.82,
 			"viewRadius": 0.938
 		},
 		{
@@ -640,7 +640,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.2,
 			"viewRadius": 0.983
 		},
 		{
@@ -650,7 +650,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
 			"middle": 0.8,
-			"viewRadius": 0.787
+			"viewRadius": 0.794
 		},
 		{
 			"exerciseId": "stationary-bike",
@@ -659,7 +659,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.2,
 			"middle": 0.6,
-			"viewRadius": 0.795
+			"viewRadius": 0.798
 		},
 		{
 			"exerciseId": "elliptical",
@@ -668,7 +668,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.2,
 			"middle": 0.6,
-			"viewRadius": 0.869
+			"viewRadius": 0.871
 		},
 		{
 			"exerciseId": "band-pull-apart",
@@ -677,7 +677,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
 			"middle": 1.2,
-			"viewRadius": 0.898
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "band-face-pull",
@@ -685,8 +685,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.93
+			"middle": 1.07,
+			"viewRadius": 0.932
 		},
 		{
 			"exerciseId": "band-biceps-curl",
@@ -694,8 +694,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.898
+			"middle": 1.07,
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "band-triceps-extension",
@@ -703,8 +703,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
-			"middle": 1.2,
-			"viewRadius": 0.888
+			"middle": 0.99,
+			"viewRadius": 0.889
 		},
 		{
 			"exerciseId": "band-lateral-raise",
@@ -712,8 +712,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.898
+			"middle": 1.07,
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "band-lateral-walk",
@@ -722,7 +722,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.2,
 			"middle": 0.6,
-			"viewRadius": 0.821
+			"viewRadius": 0.824
 		},
 		{
 			"exerciseId": "band-chest-press",
@@ -731,7 +731,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
 			"middle": 1.2,
-			"viewRadius": 0.892
+			"viewRadius": 0.894
 		},
 		{
 			"exerciseId": "pull-up",
@@ -739,7 +739,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.2,
 			"viewRadius": 1.159
 		},
 		{
@@ -748,7 +748,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.2,
 			"viewRadius": 1.156
 		},
 		{
@@ -757,7 +757,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.53,
 			"viewRadius": 0.793
 		},
 		{
@@ -766,7 +766,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.07,
 			"viewRadius": 0.889
 		},
 		{
@@ -775,7 +775,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.53,
 			"viewRadius": 0.694
 		},
 		{
@@ -784,8 +784,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.904
+			"middle": 1.53,
+			"viewRadius": 0.905
 		},
 		{
 			"exerciseId": "wall-pushup",
@@ -802,7 +802,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.53,
 			"viewRadius": 0.687
 		},
 		{
@@ -812,7 +812,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 2.0,
-			"viewRadius": 1.11
+			"viewRadius": 1.111
 		},
 		{
 			"exerciseId": "reverse-lunge",
@@ -829,7 +829,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.89,
 			"viewRadius": 0.883
 		},
 		{
@@ -839,7 +839,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 0.9,
-			"viewRadius": 0.873
+			"viewRadius": 0.874
 		},
 		{
 			"exerciseId": "single-leg-glute-bridge",
@@ -847,7 +847,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.3,
+			"middle": 1.05,
 			"viewRadius": 0.756
 		},
 		{
@@ -857,7 +857,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.3,
 			"middle": 0.7,
-			"viewRadius": 1.17
+			"viewRadius": 1.179
 		},
 		{
 			"exerciseId": "mountain-climbers",
@@ -866,7 +866,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 0.9,
 			"middle": 0.45,
-			"viewRadius": 0.887
+			"viewRadius": 0.889
 		},
 		{
 			"exerciseId": "burpee",
@@ -875,7 +875,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
 			"middle": 1.3,
-			"viewRadius": 1.285
+			"viewRadius": 1.286
 		},
 		{
 			"exerciseId": "superman",
@@ -883,8 +883,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 1.069
+			"middle": 0.96,
+			"viewRadius": 1.072
 		},
 		{
 			"exerciseId": "crunch",
@@ -892,7 +892,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
-			"middle": 1.2,
+			"middle": 0.99,
 			"viewRadius": 0.763
 		},
 		{
@@ -902,7 +902,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.6,
 			"middle": 0.8,
-			"viewRadius": 0.88
+			"viewRadius": 0.881
 		},
 		{
 			"exerciseId": "lying-leg-raise",
@@ -910,8 +910,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
-			"viewRadius": 0.895
+			"middle": 1.15,
+			"viewRadius": 0.896
 		},
 		{
 			"exerciseId": "dead-bug",
@@ -920,7 +920,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 0.9,
-			"viewRadius": 1.045
+			"viewRadius": 1.047
 		},
 		{
 			"exerciseId": "bird-dog",
@@ -929,7 +929,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 0.9,
-			"viewRadius": 1.066
+			"viewRadius": 1.069
 		},
 		{
 			"exerciseId": "glute-kickback",
@@ -937,8 +937,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.1,
-			"viewRadius": 0.897
+			"middle": 0.91,
+			"viewRadius": 0.898
 		},
 		{
 			"exerciseId": "side-plank",
@@ -956,7 +956,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
 			"middle": 0.0,
-			"viewRadius": 0.954
+			"viewRadius": 0.955
 		},
 		{
 			"exerciseId": "dead-hang",
@@ -1010,7 +1010,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.2,
 			"middle": 0.6,
-			"viewRadius": 0.795
+			"viewRadius": 0.798
 		},
 		{
 			"exerciseId": "swimming-intervals",
@@ -1028,7 +1028,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 0.7,
 			"middle": 0.35,
-			"viewRadius": 1.065
+			"viewRadius": 1.069
 		},
 		{
 			"exerciseId": "jumping-jacks",
@@ -1073,7 +1073,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 2.0,
-			"viewRadius": 0.855
+			"viewRadius": 0.856
 		},
 		{
 			"exerciseId": "worlds-greatest-stretch",
@@ -1082,7 +1082,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 1.5,
-			"viewRadius": 0.919
+			"viewRadius": 0.924
 		},
 		{
 			"exerciseId": "ankle-wall-mobility",
@@ -1091,7 +1091,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
 			"middle": 1.3,
-			"viewRadius": 0.758
+			"viewRadius": 0.753
 		},
 		{
 			"exerciseId": "calf-wall-stretch",
@@ -1118,7 +1118,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 2.0,
-			"viewRadius": 0.875
+			"viewRadius": 0.874
 		},
 		{
 			"exerciseId": "childs-pose",
@@ -1136,7 +1136,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 2.0,
-			"viewRadius": 1.029
+			"viewRadius": 1.032
 		},
 		{
 			"exerciseId": "neck-mobility",
@@ -1154,7 +1154,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 0.9,
-			"viewRadius": 0.873
+			"viewRadius": 0.874
 		},
 		{
 			"exerciseId": "prep-single-leg-rdl",
@@ -1162,7 +1162,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.68,
 			"viewRadius": 0.902
 		},
 		{
@@ -1181,7 +1181,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.3,
 			"middle": 0.7,
-			"viewRadius": 1.17
+			"viewRadius": 1.179
 		},
 		{
 			"exerciseId": "prep-single-leg-calf-raise",
@@ -1189,7 +1189,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.0,
+			"middle": 0.82,
 			"viewRadius": 0.938
 		},
 		{
@@ -1208,7 +1208,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 0.9,
-			"viewRadius": 1.045
+			"viewRadius": 1.047
 		},
 		{
 			"exerciseId": "prep-hip-flexor-stretch",
@@ -1226,7 +1226,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
 			"middle": 1.3,
-			"viewRadius": 0.758
+			"viewRadius": 0.753
 		},
 		{
 			"exerciseId": "prep-dynamic-warmup",
@@ -1235,7 +1235,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
 			"middle": 0.8,
-			"viewRadius": 1.048
+			"viewRadius": 1.053
 		},
 		{
 			"exerciseId": "smith-squat",
@@ -1243,7 +1243,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.79,
 			"viewRadius": 0.889
 		},
 		{
@@ -1252,8 +1252,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
-			"viewRadius": 0.693
+			"middle": 1.65,
+			"viewRadius": 0.694
 		},
 		{
 			"exerciseId": "hack-squat",
@@ -1261,7 +1261,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.79,
 			"viewRadius": 0.889
 		},
 		{
@@ -1270,7 +1270,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
-			"middle": 1.2,
+			"middle": 0.99,
 			"viewRadius": 0.697
 		},
 		{
@@ -1279,7 +1279,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
-			"middle": 1.2,
+			"middle": 0.99,
 			"viewRadius": 0.726
 		},
 		{
@@ -1288,7 +1288,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.3,
+			"middle": 1.05,
 			"viewRadius": 0.751
 		},
 		{
@@ -1297,8 +1297,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.1,
-			"viewRadius": 0.846
+			"middle": 0.91,
+			"viewRadius": 0.849
 		},
 		{
 			"exerciseId": "seated-calf-raise",
@@ -1307,7 +1307,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
 			"middle": 1.0,
-			"viewRadius": 0.695
+			"viewRadius": 0.696
 		},
 		{
 			"exerciseId": "machine-shoulder-press",
@@ -1315,7 +1315,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.07,
 			"viewRadius": 0.877
 		},
 		{
@@ -1324,8 +1324,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.718
+			"middle": 1.07,
+			"viewRadius": 0.719
 		},
 		{
 			"exerciseId": "reverse-pec-deck",
@@ -1333,7 +1333,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.07,
 			"viewRadius": 0.869
 		},
 		{
@@ -1342,8 +1342,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.712
+			"middle": 1.07,
+			"viewRadius": 0.714
 		},
 		{
 			"exerciseId": "cable-crossover",
@@ -1351,8 +1351,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.875
+			"middle": 1.07,
+			"viewRadius": 0.878
 		},
 		{
 			"exerciseId": "cable-low-fly",
@@ -1360,8 +1360,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.892
+			"middle": 1.07,
+			"viewRadius": 0.894
 		},
 		{
 			"exerciseId": "cable-lateral-raise",
@@ -1369,8 +1369,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.898
+			"middle": 1.07,
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "cable-overhead-triceps",
@@ -1378,7 +1378,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.07,
 			"viewRadius": 1.057
 		},
 		{
@@ -1387,7 +1387,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.07,
 			"viewRadius": 0.733
 		},
 		{
@@ -1396,7 +1396,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.94,
 			"viewRadius": 0.898
 		},
 		{
@@ -1405,8 +1405,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.1,
-			"viewRadius": 0.874
+			"middle": 0.91,
+			"viewRadius": 0.876
 		},
 		{
 			"exerciseId": "straight-arm-pulldown",
@@ -1414,8 +1414,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.817
+			"middle": 1.07,
+			"viewRadius": 0.821
 		},
 		{
 			"exerciseId": "close-grip-pulldown",
@@ -1423,8 +1423,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.88
+			"middle": 1.07,
+			"viewRadius": 0.882
 		},
 		{
 			"exerciseId": "machine-preacher-curl",
@@ -1432,8 +1432,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.704
+			"middle": 1.07,
+			"viewRadius": 0.706
 		},
 		{
 			"exerciseId": "machine-dip",
@@ -1441,8 +1441,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
-			"middle": 1.2,
-			"viewRadius": 0.718
+			"middle": 0.99,
+			"viewRadius": 0.719
 		},
 		{
 			"exerciseId": "back-extension",
@@ -1450,7 +1450,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.88,
 			"viewRadius": 0.924
 		},
 		{
@@ -1459,8 +1459,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
-			"middle": 1.2,
-			"viewRadius": 0.718
+			"middle": 0.99,
+			"viewRadius": 0.719
 		},
 		{
 			"exerciseId": "treadmill-incline-walk",
@@ -1478,7 +1478,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.6,
 			"middle": 0.8,
-			"viewRadius": 0.891
+			"viewRadius": 0.893
 		},
 		{
 			"exerciseId": "air-bike",
@@ -1487,7 +1487,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.2,
 			"middle": 0.6,
-			"viewRadius": 0.795
+			"viewRadius": 0.798
 		},
 		{
 			"exerciseId": "ski-erg",
@@ -1495,8 +1495,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 1.6,
-			"middle": 0.6,
-			"viewRadius": 1.046
+			"middle": 0.64,
+			"viewRadius": 1.051
 		},
 		{
 			"exerciseId": "barbell-sumo-deadlift",
@@ -1504,7 +1504,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.94,
 			"viewRadius": 0.898
 		},
 		{
@@ -1513,7 +1513,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.94,
 			"viewRadius": 0.898
 		},
 		{
@@ -1522,7 +1522,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.89,
 			"viewRadius": 0.883
 		},
 		{
@@ -1531,8 +1531,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.583
+			"middle": 1.07,
+			"viewRadius": 0.59
 		},
 		{
 			"exerciseId": "t-bar-row",
@@ -1540,8 +1540,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.696
+			"middle": 1.07,
+			"viewRadius": 0.701
 		},
 		{
 			"exerciseId": "barbell-upright-row",
@@ -1549,8 +1549,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.898
+			"middle": 1.07,
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "barbell-skull-crusher",
@@ -1558,8 +1558,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.768
+			"middle": 1.53,
+			"viewRadius": 0.772
 		},
 		{
 			"exerciseId": "barbell-shrug",
@@ -1568,7 +1568,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.0,
 			"middle": 1.0,
-			"viewRadius": 0.898
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "barbell-floor-press",
@@ -1576,8 +1576,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
-			"viewRadius": 0.753
+			"middle": 1.65,
+			"viewRadius": 0.754
 		},
 		{
 			"exerciseId": "barbell-push-press",
@@ -1586,7 +1586,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
 			"middle": 0.9,
-			"viewRadius": 1.057
+			"viewRadius": 1.06
 		},
 		{
 			"exerciseId": "power-clean",
@@ -1603,8 +1603,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.891
+			"middle": 1.07,
+			"viewRadius": 0.892
 		},
 		{
 			"exerciseId": "barbell-calf-raise",
@@ -1612,7 +1612,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.0,
+			"middle": 0.82,
 			"viewRadius": 0.938
 		},
 		{
@@ -1621,8 +1621,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.898
+			"middle": 1.07,
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "barbell-wrist-curl",
@@ -1631,7 +1631,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.8,
 			"middle": 0.9,
-			"viewRadius": 0.652
+			"viewRadius": 0.656
 		},
 		{
 			"exerciseId": "dumbbell-deadlift",
@@ -1639,7 +1639,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.94,
 			"viewRadius": 0.898
 		},
 		{
@@ -1648,7 +1648,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.79,
 			"viewRadius": 0.889
 		},
 		{
@@ -1657,7 +1657,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.89,
 			"viewRadius": 0.883
 		},
 		{
@@ -1667,7 +1667,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 0.9,
-			"viewRadius": 0.873
+			"viewRadius": 0.874
 		},
 		{
 			"exerciseId": "dumbbell-single-leg-rdl",
@@ -1675,7 +1675,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.68,
 			"viewRadius": 0.902
 		},
 		{
@@ -1684,7 +1684,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.3,
+			"middle": 1.05,
 			"viewRadius": 0.751
 		},
 		{
@@ -1693,8 +1693,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.695
+			"middle": 1.07,
+			"viewRadius": 0.7
 		},
 		{
 			"exerciseId": "renegade-row",
@@ -1703,7 +1703,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
 			"middle": 0.9,
-			"viewRadius": 0.882
+			"viewRadius": 0.884
 		},
 		{
 			"exerciseId": "dumbbell-upright-row",
@@ -1711,8 +1711,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.898
+			"middle": 1.07,
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "dumbbell-front-raise",
@@ -1720,8 +1720,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.898
+			"middle": 1.07,
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "dumbbell-concentration-curl",
@@ -1729,8 +1729,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.636
+			"middle": 1.07,
+			"viewRadius": 0.64
 		},
 		{
 			"exerciseId": "dumbbell-incline-curl",
@@ -1738,7 +1738,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
+			"middle": 1.15,
 			"viewRadius": 0.763
 		},
 		{
@@ -1748,7 +1748,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
 			"middle": 1.0,
-			"viewRadius": 0.898
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "dumbbell-skull-crusher",
@@ -1756,8 +1756,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.767
+			"middle": 1.53,
+			"viewRadius": 0.771
 		},
 		{
 			"exerciseId": "dumbbell-close-grip-press",
@@ -1765,8 +1765,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
-			"viewRadius": 0.696
+			"middle": 1.65,
+			"viewRadius": 0.702
 		},
 		{
 			"exerciseId": "dumbbell-snatch",
@@ -1775,7 +1775,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
 			"middle": 1.1,
-			"viewRadius": 1.058
+			"viewRadius": 1.062
 		},
 		{
 			"exerciseId": "dumbbell-clean-press",
@@ -1784,7 +1784,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 1.5,
-			"viewRadius": 1.056
+			"viewRadius": 1.061
 		},
 		{
 			"exerciseId": "farmers-walk",
@@ -1793,7 +1793,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.2,
 			"middle": 0.6,
-			"viewRadius": 0.895
+			"viewRadius": 0.896
 		},
 		{
 			"exerciseId": "suitcase-carry",
@@ -1802,7 +1802,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.2,
 			"middle": 0.6,
-			"viewRadius": 0.895
+			"viewRadius": 0.896
 		},
 		{
 			"exerciseId": "dumbbell-side-bend",
@@ -1811,7 +1811,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
 			"middle": 1.3,
-			"viewRadius": 0.947
+			"viewRadius": 0.948
 		},
 		{
 			"exerciseId": "dumbbell-russian-twist",
@@ -1820,7 +1820,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.6,
 			"middle": 0.8,
-			"viewRadius": 0.579
+			"viewRadius": 0.584
 		},
 		{
 			"exerciseId": "dumbbell-swing",
@@ -1829,7 +1829,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.5,
 			"middle": 0.7,
-			"viewRadius": 0.9
+			"viewRadius": 0.901
 		},
 		{
 			"exerciseId": "dumbbell-woodchop",
@@ -1838,7 +1838,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
 			"middle": 1.1,
-			"viewRadius": 1.005
+			"viewRadius": 1.006
 		},
 		{
 			"exerciseId": "band-squat",
@@ -1846,7 +1846,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.79,
 			"viewRadius": 0.889
 		},
 		{
@@ -1855,7 +1855,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.94,
 			"viewRadius": 0.898
 		},
 		{
@@ -1864,7 +1864,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.94,
 			"viewRadius": 0.898
 		},
 		{
@@ -1873,7 +1873,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.3,
+			"middle": 1.05,
 			"viewRadius": 0.756
 		},
 		{
@@ -1882,8 +1882,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.1,
-			"viewRadius": 0.897
+			"middle": 0.91,
+			"viewRadius": 0.898
 		},
 		{
 			"exerciseId": "band-lat-pulldown",
@@ -1891,8 +1891,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 1.056
+			"middle": 1.07,
+			"viewRadius": 1.06
 		},
 		{
 			"exerciseId": "band-overhead-press",
@@ -1900,7 +1900,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.07,
 			"viewRadius": 1.057
 		},
 		{
@@ -1910,7 +1910,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
 			"middle": 1.3,
-			"viewRadius": 0.862
+			"viewRadius": 0.864
 		},
 		{
 			"exerciseId": "band-hamstring-curl",
@@ -1918,8 +1918,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
-			"middle": 1.2,
-			"viewRadius": 0.909
+			"middle": 0.99,
+			"viewRadius": 0.91
 		},
 		{
 			"exerciseId": "band-clamshell",
@@ -1927,8 +1927,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.1,
-			"viewRadius": 0.931
+			"middle": 0.91,
+			"viewRadius": 0.934
 		},
 		{
 			"exerciseId": "bodyweight-sumo-squat",
@@ -1936,7 +1936,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
-			"middle": 1.5,
+			"middle": 1.79,
 			"viewRadius": 0.889
 		},
 		{
@@ -1955,7 +1955,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 0.9,
-			"viewRadius": 0.873
+			"viewRadius": 0.874
 		},
 		{
 			"exerciseId": "pistol-squat-assisted",
@@ -1963,7 +1963,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
-			"middle": 1.6,
+			"middle": 1.89,
 			"viewRadius": 1.045
 		},
 		{
@@ -1972,7 +1972,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
+			"middle": 1.56,
 			"viewRadius": 0.898
 		},
 		{
@@ -1981,7 +1981,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.0,
+			"middle": 0.82,
 			"viewRadius": 0.938
 		},
 		{
@@ -1991,7 +1991,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 1.4,
-			"viewRadius": 0.787
+			"viewRadius": 0.786
 		},
 		{
 			"exerciseId": "frog-pump",
@@ -1999,7 +1999,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.3,
+			"middle": 1.05,
 			"viewRadius": 0.706
 		},
 		{
@@ -2008,8 +2008,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.1,
-			"viewRadius": 0.782
+			"middle": 0.91,
+			"viewRadius": 0.783
 		},
 		{
 			"exerciseId": "fire-hydrant",
@@ -2017,7 +2017,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.1,
+			"middle": 0.91,
 			"viewRadius": 0.699
 		},
 		{
@@ -2026,8 +2026,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
-			"middle": 1.1,
-			"viewRadius": 0.931
+			"middle": 0.91,
+			"viewRadius": 0.934
 		},
 		{
 			"exerciseId": "jump-lunge",
@@ -2036,7 +2036,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.0,
 			"middle": 1.0,
-			"viewRadius": 1.004
+			"viewRadius": 1.008
 		},
 		{
 			"exerciseId": "tuck-jump",
@@ -2045,7 +2045,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.8,
 			"middle": 0.9,
-			"viewRadius": 1.112
+			"viewRadius": 1.117
 		},
 		{
 			"exerciseId": "box-jump-low",
@@ -2054,7 +2054,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
 			"middle": 1.2,
-			"viewRadius": 1.29
+			"viewRadius": 1.294
 		},
 		{
 			"exerciseId": "wide-pushup",
@@ -2062,8 +2062,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.904
+			"middle": 1.53,
+			"viewRadius": 0.905
 		},
 		{
 			"exerciseId": "decline-pushup",
@@ -2071,7 +2071,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
+			"middle": 1.53,
 			"viewRadius": 0.89
 		},
 		{
@@ -2080,8 +2080,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 0.903
+			"middle": 1.53,
+			"viewRadius": 0.904
 		},
 		{
 			"exerciseId": "archer-pushup",
@@ -2090,7 +2090,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 1.0,
-			"viewRadius": 0.902
+			"viewRadius": 0.901
 		},
 		{
 			"exerciseId": "hindu-pushup",
@@ -2099,7 +2099,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 1.8,
-			"viewRadius": 0.909
+			"viewRadius": 0.91
 		},
 		{
 			"exerciseId": "negative-pull-up",
@@ -2117,7 +2117,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.2,
 			"middle": 1.1,
-			"viewRadius": 1.067
+			"viewRadius": 1.071
 		},
 		{
 			"exerciseId": "hanging-knee-raise",
@@ -2125,8 +2125,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
-			"viewRadius": 1.053
+			"middle": 1.15,
+			"viewRadius": 1.054
 		},
 		{
 			"exerciseId": "hanging-leg-raise",
@@ -2134,8 +2134,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.8,
-			"middle": 1.4,
-			"viewRadius": 1.055
+			"middle": 1.15,
+			"viewRadius": 1.056
 		},
 		{
 			"exerciseId": "muscle-up",
@@ -2144,7 +2144,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 2.2,
-			"viewRadius": 1.498
+			"viewRadius": 1.499
 		},
 		{
 			"exerciseId": "wall-handstand-hold",
@@ -2171,7 +2171,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
 			"middle": 0.0,
-			"viewRadius": 0.85
+			"viewRadius": 0.853
 		},
 		{
 			"exerciseId": "plank-shoulder-taps",
@@ -2180,7 +2180,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 0.6,
-			"viewRadius": 0.882
+			"viewRadius": 0.884
 		},
 		{
 			"exerciseId": "plank-jacks",
@@ -2198,7 +2198,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.2,
 			"middle": 0.6,
-			"viewRadius": 0.697
+			"viewRadius": 0.701
 		},
 		{
 			"exerciseId": "inchworm",
@@ -2216,7 +2216,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.0,
 			"middle": 0.5,
-			"viewRadius": 0.875
+			"viewRadius": 0.877
 		},
 		{
 			"exerciseId": "scissor-kicks",
@@ -2225,7 +2225,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.0,
 			"middle": 0.5,
-			"viewRadius": 0.852
+			"viewRadius": 0.854
 		},
 		{
 			"exerciseId": "v-up",
@@ -2233,8 +2233,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
-			"middle": 1.3,
-			"viewRadius": 1.062
+			"middle": 1.07,
+			"viewRadius": 1.067
 		},
 		{
 			"exerciseId": "russian-twist",
@@ -2243,7 +2243,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.6,
 			"middle": 0.8,
-			"viewRadius": 0.579
+			"viewRadius": 0.584
 		},
 		{
 			"exerciseId": "heel-touches",
@@ -2252,7 +2252,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.4,
 			"middle": 0.7,
-			"viewRadius": 0.721
+			"viewRadius": 0.722
 		},
 		{
 			"exerciseId": "reverse-crunch",
@@ -2260,7 +2260,7 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
-			"middle": 1.2,
+			"middle": 0.99,
 			"viewRadius": 0.7
 		},
 		{
@@ -2269,8 +2269,8 @@
 			"kind": "SCHEMATIC",
 			"match": "PATTERN",
 			"durationSeconds": 2.0,
-			"middle": 1.0,
-			"viewRadius": 0.61
+			"middle": 0.83,
+			"viewRadius": 0.613
 		},
 		{
 			"exerciseId": "side-plank-dips",
@@ -2279,7 +2279,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
 			"middle": 1.2,
-			"viewRadius": 0.91
+			"viewRadius": 0.911
 		},
 		{
 			"exerciseId": "stir-the-pot",
@@ -2288,7 +2288,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 1.0,
-			"viewRadius": 0.934
+			"viewRadius": 0.935
 		},
 		{
 			"exerciseId": "high-knees",
@@ -2297,7 +2297,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 0.9,
 			"middle": 0.225,
-			"viewRadius": 0.899
+			"viewRadius": 0.9
 		},
 		{
 			"exerciseId": "butt-kicks",
@@ -2306,7 +2306,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 0.9,
 			"middle": 0.225,
-			"viewRadius": 0.904
+			"viewRadius": 0.905
 		},
 		{
 			"exerciseId": "shadow-boxing",
@@ -2342,7 +2342,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.4,
 			"middle": 0.35,
-			"viewRadius": 0.899
+			"viewRadius": 0.901
 		},
 		{
 			"exerciseId": "fartlek-run",
@@ -2378,7 +2378,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.2,
 			"middle": 0.6,
-			"viewRadius": 0.795
+			"viewRadius": 0.798
 		},
 		{
 			"exerciseId": "swimming-backstroke",
@@ -2387,7 +2387,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
 			"middle": 1.2,
-			"viewRadius": 1.066
+			"viewRadius": 1.07
 		},
 		{
 			"exerciseId": "aqua-jogging",
@@ -2396,7 +2396,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.4,
 			"middle": 0.35,
-			"viewRadius": 0.899
+			"viewRadius": 0.901
 		},
 		{
 			"exerciseId": "wall-angels",
@@ -2405,7 +2405,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.2,
 			"middle": 1.6,
-			"viewRadius": 1.044
+			"viewRadius": 1.049
 		},
 		{
 			"exerciseId": "doorway-chest-stretch",
@@ -2423,7 +2423,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 2.0,
-			"viewRadius": 0.898
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "figure-four-stretch",
@@ -2432,7 +2432,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 2.0,
-			"viewRadius": 0.696
+			"viewRadius": 0.697
 		},
 		{
 			"exerciseId": "cobra-stretch",
@@ -2441,7 +2441,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 1.8,
-			"viewRadius": 0.995
+			"viewRadius": 0.996
 		},
 		{
 			"exerciseId": "downward-dog",
@@ -2450,7 +2450,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.0,
 			"middle": 1.5,
-			"viewRadius": 0.632
+			"viewRadius": 0.634
 		},
 		{
 			"exerciseId": "thread-the-needle",
@@ -2477,7 +2477,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.8,
 			"middle": 0.9,
-			"viewRadius": 0.898
+			"viewRadius": 0.901
 		},
 		{
 			"exerciseId": "leg-swings",
@@ -2486,7 +2486,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.4,
 			"middle": 0.7,
-			"viewRadius": 0.91
+			"viewRadius": 0.911
 		},
 		{
 			"exerciseId": "shoulder-rolls",
@@ -2495,7 +2495,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.4,
 			"middle": 1.2,
-			"viewRadius": 0.898
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "wrist-mobility",
@@ -2504,7 +2504,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 1.2,
 			"middle": 0.6,
-			"viewRadius": 0.898
+			"viewRadius": 0.899
 		},
 		{
 			"exerciseId": "frog-stretch",
@@ -2513,7 +2513,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 2.0,
-			"viewRadius": 0.796
+			"viewRadius": 0.797
 		},
 		{
 			"exerciseId": "couch-stretch",
@@ -2549,7 +2549,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 2.0,
-			"viewRadius": 0.956
+			"viewRadius": 0.959
 		},
 		{
 			"exerciseId": "scorpion-stretch",
@@ -2558,7 +2558,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 1.8,
-			"viewRadius": 0.907
+			"viewRadius": 0.908
 		},
 		{
 			"exerciseId": "prep-lateral-shuffle",
@@ -2567,7 +2567,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 0.8,
 			"middle": 0.4,
-			"viewRadius": 0.826
+			"viewRadius": 0.829
 		},
 		{
 			"exerciseId": "prep-short-sprints",
@@ -2585,7 +2585,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 0.6,
 			"middle": 0.3,
-			"viewRadius": 0.974
+			"viewRadius": 0.977
 		},
 		{
 			"exerciseId": "prep-deceleration",
@@ -2594,7 +2594,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 2.6,
 			"middle": 0.8,
-			"viewRadius": 0.918
+			"viewRadius": 0.917
 		},
 		{
 			"exerciseId": "prep-copenhagen-plank",
@@ -2612,7 +2612,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 2.0,
-			"viewRadius": 0.868
+			"viewRadius": 0.873
 		},
 		{
 			"exerciseId": "prep-hip-airplane",
@@ -2621,7 +2621,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 4.0,
 			"middle": 1.0,
-			"viewRadius": 0.899
+			"viewRadius": 0.9
 		},
 		{
 			"exerciseId": "prep-bird-dog",
@@ -2630,7 +2630,7 @@
 			"match": "PATTERN",
 			"durationSeconds": 3.6,
 			"middle": 0.9,
-			"viewRadius": 1.066
+			"viewRadius": 1.069
 		}
 	]
 }

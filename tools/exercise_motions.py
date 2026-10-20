@@ -7,9 +7,17 @@ import math
 
 from glb_motion import q_axis, q_mul, q_norm, q_rotate, q_slerp, q_conj, q_between, v_add, v_sub, v_scale, v_unit
 from motion_rig import (BAR_HEIGHT, HIDDEN, NECK_W, SPINE_W, SIDES, limb_dir, limb_front, perp, q_euler)
+from exercise_tempo import ECCENTRIC_SHARE, first_phase
 
 FPS = 15
 REST_ANKLE = [0.198, 0.071, 0.015]
+# Grados de extensión del tronco y de elevación de las clavículas con el pecho lleno de aire.
+BREATH_SPINE, BREATH_CLAVICLE = 1.5, 2.0
+
+
+def minimum_jerk(u):
+	"""Perfil de velocidad de los movimientos humanos: arranca y frena sin tirones (Flash y Hogan, 1985)."""
+	return u * u * u * (10 - 15 * u + 6 * u * u)
 
 
 # --- Construcción de poses ---------------------------------------------------------------------------
@@ -185,34 +193,87 @@ class Clip:
 		self.name, self.duration, self.kind = name, float(duration), kind
 		self._keys_for_rig = keys if callable(keys) else None
 		self.keys = []
+		self._base_keys = None
 		if self._keys_for_rig is None:
 			self._set_keys(keys)
 		self.props = props or {}
 		self.middle = float(middle) if middle is not None else self._default_middle()
+		self._base_middle = self.middle
+		# Fase del tramo A → B ('eccentric', 'concentric' o None) y si el clip respira; ver prepare().
+		self.phase = None
+		self.breathing = False
 
 	def _set_keys(self, keys):
 		self.keys = [(float(t), full(p)) for t, p in keys]
 		assert self.keys[0][0] == 0 and all(a[0] < b[0] for a, b in zip(self.keys, self.keys[1:]))
 		assert self.keys[-1][0] < self.duration
+		self._base_keys = list(self.keys)
 
 	def prepare(self, rig):
-		"""Resuelve objetivos que dependen de la geometría del rig, antes de interpolar las poses."""
+		"""Resuelve objetivos que dependen de la geometría del rig y aplica el ritmo; se puede repetir."""
 		if self._keys_for_rig is not None:
 			self._set_keys(self._keys_for_rig(rig))
+		self.keys = list(self._base_keys)
+		self.middle = self._base_middle
+		self._tempo()
+
+	def _tempo(self):
+		"""
+		Bajar el peso lleva más tiempo que subirlo: en los clips de dos poses de exercise_tempo, la fase excéntrica
+		se lleva el 60 % del tiempo en movimiento y la concéntrica el 40 %, sin cambiar la duración ni las pausas.
+		"""
+		key = self.name[4:] if self.name.startswith("esq/") else self.name
+		self.phase = first_phase(key)
+		self.breathing = True
+		if self.phase is None or len(self.keys) != 2:
+			return
+		(_, a), (t1, b) = self.keys
+		moving = self.duration - a.get("hold", 0) - b.get("hold", 0)
+		share = ECCENTRIC_SHARE if self.phase == "eccentric" else 1 - ECCENTRIC_SHARE
+		bottom = a.get("hold", 0) + share * moving
+		self.keys[1] = (bottom, b)
+		if abs(self.middle - t1) < 1e-9:
+			self.middle = bottom
 
 	def _default_middle(self):
 		return self.keys[len(self.keys) // 2][0] if len(self.keys) > 1 else self.duration / 2
 
 	def at(self, t):
+		return self._breathe(self._pose_at(t), t)
+
+	def _pose_at(self, t):
 		keys = self.keys + [(self.duration, self.keys[0][1])]
 		for (t0, a), (t1, b) in zip(keys, keys[1:]):
 			if t0 <= t <= t1:
 				hold = a.get("hold", 0)
 				span = t1 - t0
 				u = 0 if span - hold <= 0 else max(0.0, (t - t0 - hold) / (span - hold))
-				u = .5 - .5 * math.cos(math.pi * min(1.0, u))
-				return blend(a, b, u)
-		return keys[-1][1]
+				return blend(a, b, minimum_jerk(min(1.0, u)))
+		return blend(keys[-1][1], keys[-1][1], 0)
+
+	def _breathe(self, p, t):
+		"""
+		Respiración leve (pecho y hombros), periódica dentro del clip para que el bucle cierre: se toma aire al
+		bajar el peso y se suelta al hacer fuerza; sin fase conocida, un ciclo cada ~4 s.
+		"""
+		if not self.breathing:
+			return p
+		if self.phase is not None and len(self.keys) == 2:
+			bottom = self.keys[1][0]
+			if t <= bottom:
+				u = minimum_jerk(t / bottom)
+				air = u if self.phase == "eccentric" else 1 - u
+			else:
+				u = minimum_jerk((t - bottom) / (self.duration - bottom))
+				air = 1 - u if self.phase == "eccentric" else u
+		else:
+			cycles = max(1, round(self.duration / 4.0))
+			air = .5 - .5 * math.cos(2 * math.pi * cycles * t / self.duration)
+		p = dict(p)
+		p["spine"] = [p["spine"][0] - BREATH_SPINE * air] + list(p["spine"][1:])
+		p["clavL"] = [p["clavL"][0] + BREATH_CLAVICLE * air] + list(p["clavL"][1:])
+		p["clavR"] = [p["clavR"][0] + BREATH_CLAVICLE * air] + list(p["clavR"][1:])
+		return p
 
 
 def grip(world, idx, side):

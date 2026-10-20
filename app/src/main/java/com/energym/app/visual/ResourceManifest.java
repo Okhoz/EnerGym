@@ -15,8 +15,8 @@ public final class ResourceManifest {
 	 * Huellas del manifiesto y del GLB generados por tools/build_exercise_motions.py. Cambiar cualquiera de los dos
 	 * archivos sin regenerar y revisar estas constantes deja el visor en su estado de indisponibilidad.
 	 */
-	public static final String MANIFEST_SHA256 = "1fff29b2b326749288228a5eb7fe14e1400eee80d158b99f5152216dfca9aeb3";
-	public static final String MODEL_SHA256 = "d54759e5ff47bd98f48c85380cfe1b283d61d335a70129556b91426ae17c9e50";
+	public static final String MANIFEST_SHA256 = "97c8515c4700dcfbee6d9dbe6fb15e8a9d734456a8723c4f0ab9ef45c73e35fd";
+	public static final String MODEL_SHA256 = "fa174f4812040109ae6893807be9adf6fe834b3ff5ac467f1461ab1c2572ba6d";
 	public static final String MODEL_PATH = "visual/energym_motions.glb";
 	static final int MAX_MANIFEST_BYTES = 256 * 1024;
 
