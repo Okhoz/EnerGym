@@ -71,6 +71,8 @@ public final class AppState extends AndroidViewModel {
 	private com.energym.app.nutrition.SyncedNutritionStore nutritionStore;
 	// Consultas a Open Food Facts: independientes del chat y de SQLite.
 	private final ExecutorService lookupWorker = Executors.newSingleThreadExecutor();
+	// El widget del escritorio se actualiza aparte, en orden, sin esperar a SQLite ni a la red.
+	private final ExecutorService widgetWorker = Executors.newSingleThreadExecutor();
 	private Consumer<VisualizationController.Request> viewerLaunch;
 
 	public void bindViewer(Consumer<VisualizationController.Request> launch) {
@@ -331,14 +333,8 @@ public final class AppState extends AndroidViewModel {
 				reminders.syncDays(app.profile.getDaysPerWeek());
 			if (reminders != null && water != null && nutrition != null && app.owner() != null) {
 				java.time.LocalDate today = java.time.LocalDate.now();
-				boolean trained = false;
-				for (com.energym.app.domain.Session s : app.history)
-					if (s.getStatus() == com.energym.app.domain.Session.Status.FINISHED && java.time.Instant
-						.ofEpochMilli(s.getCompletedAt()).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
-						.equals(today))
-						trained = true;
 				reminders.today(today, water.ml(today),
-					com.energym.app.nutrition.WaterLog.goal(nutrition.effectiveBody()), trained);
+					com.energym.app.nutrition.WaterLog.goal(nutrition.effectiveBody()), trainedOn(today));
 			}
 		}
 		if (app != null && nutrition != null && water != null)
@@ -373,19 +369,32 @@ public final class AppState extends AndroidViewModel {
 			drink = "";
 		} else {
 			String next = app.nextWorkoutTitle();
-			boolean trained = false;
-			for (com.energym.app.domain.Session s : app.history)
-				if (s.getStatus() == com.energym.app.domain.Session.Status.FINISHED && java.time.Instant
-					.ofEpochMilli(s.getCompletedAt()).atZone(java.time.ZoneId.systemDefault()).toLocalDate().equals(today))
-					trained = true;
-			training = trained ? Txt.t(R.string.st_widget_done) : next.isEmpty() ? Txt.t(R.string.st_widget_create) : "🏋️ " + next;
+			training = trainedOn(today) ? Txt.t(R.string.st_widget_done) : next.isEmpty() ? Txt.t(R.string.st_widget_create) : "🏋️ " + next;
 			double kcal = nutrition.totals(today)[0];
 			com.energym.app.nutrition.BodyProfile.Targets targets = nutrition.targets();
 			food = "🍽 " + Math.round(kcal) + (targets == null ? "" : " / " + Math.round(targets.kcal)) + " kcal";
 			drink = Txt.t(R.string.st_widget_water, com.energym.app.nutrition.WaterLog.liters(water.ml(today)),
 				com.energym.app.nutrition.WaterLog.liters(com.energym.app.nutrition.WaterLog.goal(nutrition.effectiveBody())));
 		}
-		com.energym.app.widget.TodayWidget.publish(getApplication(), training, food, drink);
+		// Escribir sus preferencias y avisar al escritorio (IPC) no tiene por qué ocupar el hilo de UI.
+		Application context = getApplication();
+		String t = training, f = food, d = drink;
+		widgetWorker.execute(() -> {
+			try {
+				com.energym.app.widget.TodayWidget.publish(context, t, f, d);
+			} catch (RuntimeException ignored) {
+				// El widget es un extra: nunca debe romper la app.
+			}
+		});
+	}
+
+	private boolean trainedOn(java.time.LocalDate day) {
+		java.time.ZoneId zone = java.time.ZoneId.systemDefault();
+		for (com.energym.app.domain.Session s : app.history)
+			if (s.getStatus() == com.energym.app.domain.Session.Status.FINISHED &&
+				java.time.Instant.ofEpochMilli(s.getCompletedAt()).atZone(zone).toLocalDate().equals(day))
+				return true;
+		return false;
 	}
 
 	public String accountText() {
@@ -494,6 +503,7 @@ public final class AppState extends AndroidViewModel {
 			assistant.disconnect();
 		chatWorker.shutdown();
 		lookupWorker.shutdown();
+		widgetWorker.shutdown();
 		if (app != null)
 			app.observe(null);
 		if (networkCallback != null)

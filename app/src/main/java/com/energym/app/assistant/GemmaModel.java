@@ -176,8 +176,12 @@ public final class GemmaModel implements OnDeviceModel {
 				while (true) {
 					long[] q = queryBytes(id);
 					int status = (int) q[0];
-					progress = (int) Math.min(99, q[1] * 100 / BYTES);
-					progressListener.run();
+					int percent = (int) Math.min(99, q[1] * 100 / BYTES);
+					// Solo se avisa si cambia la cifra: cada aviso repinta la pantalla abierta.
+					if (percent != progress) {
+						progress = percent;
+						progressListener.run();
+					}
 					if (status == DownloadManager.STATUS_SUCCESSFUL)
 						break;
 					if (status == DownloadManager.STATUS_FAILED || status == -1) {

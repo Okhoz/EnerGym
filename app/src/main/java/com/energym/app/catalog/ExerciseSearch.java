@@ -5,7 +5,6 @@ import com.energym.app.domain.TextMatch;
 import com.energym.app.domain.TrainingProfile.*;
 import com.energym.app.i18n.Txt;
 
-import java.text.Normalizer;
 import java.util.*;
 
 /** Consulta local de biblioteca: metadatos explícitos y relevancia, sin decidir la elegibilidad de rutinas. */
@@ -39,9 +38,9 @@ public final class ExerciseSearch {
 		this.catalog = new ArrayList<>(Objects.requireNonNull(catalog));
 	}
 
+	/** Misma normalización (y la misma memoria de textos ya normalizados) que el resto de buscadores. */
 	public static String normalize(String text) {
-		return Normalizer.normalize(text == null ? "" : text, Normalizer.Form.NFD).replaceAll("\\p{M}", "")
-			.toLowerCase(Locale.ROOT).replaceAll("[^\\p{L}\\p{N}]+", " ").trim();
+		return TextMatch.normalize(text);
 	}
 
 	public List<Exercise> find(String raw, Filters filters) {

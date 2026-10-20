@@ -44,9 +44,26 @@ public final class TextMatch {
 	private TextMatch() {
 	}
 
+	private static final java.util.regex.Pattern MARKS = java.util.regex.Pattern.compile("\\p{M}");
+	private static final java.util.regex.Pattern SEPARATORS = java.util.regex.Pattern.compile("[^\\p{L}\\p{N}]+");
+	/**
+	 * Los buscadores comparan en cada tecla cientos de nombres y descripciones, siempre los mismos: se normalizan
+	 * una vez. Con tope, para que lo escrito en los buscadores no crezca sin límite.
+	 */
+	private static final Map<String, String> NORMALIZED = new java.util.concurrent.ConcurrentHashMap<>();
+	private static final int NORMALIZED_MAX = 8000;
+
 	public static String normalize(String text) {
-		return Normalizer.normalize(text == null ? "" : text, Normalizer.Form.NFD).replaceAll("\\p{M}", "")
-			.toLowerCase(Locale.ROOT).replaceAll("[^\\p{L}\\p{N}]+", " ").trim();
+		String source = text == null ? "" : text;
+		String cached = NORMALIZED.get(source);
+		if (cached != null)
+			return cached;
+		String result = SEPARATORS.matcher(MARKS.matcher(Normalizer.normalize(source, Normalizer.Form.NFD))
+			.replaceAll("").toLowerCase(Locale.ROOT)).replaceAll(" ").trim();
+		if (NORMALIZED.size() >= NORMALIZED_MAX)
+			NORMALIZED.clear();
+		NORMALIZED.put(source, result);
+		return result;
 	}
 
 	/** «macarrones» → «macarron», «fresas» → «fresa»: plural y singular coinciden. */
