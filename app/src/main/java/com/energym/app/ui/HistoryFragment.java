@@ -572,7 +572,7 @@ public final class HistoryFragment extends ScreenFragment {
 		StringBuilder b = new StringBuilder();
 		for (int i = 0; i < sets.size(); i++)
 			b.append(i == 0 ? "" : "\n").append(i + 1).append(".  ")
-				.append(sets.get(i).kg > 0 ? SetLog.format(sets.get(i).kg) + " kg" : Txt.t(R.string.hist_body_weight))
+				.append(sets.get(i).kg > 0 ? SetLog.display(sets.get(i).kg) + " kg" : Txt.t(R.string.hist_body_weight))
 				.append(" × ").append(sets.get(i).reps);
 		return b.toString();
 	}

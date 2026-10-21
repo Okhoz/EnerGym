@@ -1,5 +1,8 @@
 package com.energym.app.domain;
 
+import com.energym.app.i18n.SourceStrings;
+
+import org.junit.After;
 import org.junit.Test;
 
 import java.util.*;
@@ -7,6 +10,30 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 public class SetLogTest {
+	@After
+	public void spanish() {
+		SourceStrings.use(Locale.forLanguageTag("es-ES"));
+	}
+
+	@Test
+	public void displayFollowsTheAppLanguageButWhatIsSavedKeepsTheDot() {
+		assertEquals("92,5", SetLog.display(92.5));
+		assertEquals("1,25", SetLog.display(1.25));
+		assertEquals("Sin decimales no hay coma", "100", SetLog.display(100));
+		assertEquals("92.5", SetLog.format(92.5));
+		SourceStrings.use(Locale.ENGLISH);
+		assertEquals("92.5", SetLog.display(92.5));
+		assertEquals("22.05", SetLog.display(22.05));
+		assertEquals("100", SetLog.display(100));
+		// Lo guardado no depende del idioma: así se sigue leyendo en cualquier móvil y en la copia CSV.
+		for (Locale l : Arrays.asList(Locale.ENGLISH, Locale.forLanguageTag("es-ES"))) {
+			SourceStrings.use(l);
+			List<SetLog.Entry> sets = Arrays.asList(new SetLog.Entry(92.5, 5, SetLog.Kind.NORMAL, 7.5));
+			assertEquals("92.5:5:N:7.5", SetLog.encode(sets));
+			assertEquals("92.5", SetLog.summary(sets, null, "90").get("loadKg"));
+		}
+	}
+
 	@Test
 	public void encodesParsesAndSummarizesSetsForProgression() {
 		List<SetLog.Entry> sets = Arrays.asList(new SetLog.Entry(60, 5), new SetLog.Entry(62.5, 5), new SetLog.Entry(62.5, 4));

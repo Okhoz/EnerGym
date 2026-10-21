@@ -160,15 +160,15 @@ public final class ShareCard {
 
 	private static String detail(Context c, ShareSummary.Line l) {
 		if (l.type == MetricType.STRENGTH && l.sets > 0)
-			return l.topKg > 0 ? c.getString(R.string.share_sets_kg, l.sets, l.topReps, SetLog.format(l.topKg)) :
+			return l.topKg > 0 ? c.getString(R.string.share_sets_kg, l.sets, l.topReps, SetLog.display(l.topKg)) :
 				c.getString(R.string.share_sets_bodyweight, l.sets, l.topReps);
 		if (l.distanceKm > 0)
-			return c.getString(R.string.share_km, SetLog.format(Math.round(l.distanceKm * 100) / 100.0));
+			return c.getString(R.string.share_km, SetLog.display(Math.round(l.distanceKm * 100) / 100.0));
 		return "✓";
 	}
 
 	private static String volume(double kg) {
-		return kg >= 1000 ? SetLog.format(Math.round(kg / 100) / 10.0) + " t" : Math.round(kg) + " kg";
+		return kg >= 1000 ? SetLog.display(Math.round(kg / 100) / 10.0) + " t" : Math.round(kg) + " kg";
 	}
 
 	/** Recorta con «…» lo que no cabe en el ancho dado. */

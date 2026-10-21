@@ -277,12 +277,12 @@ public final class SessionFragment extends ScreenFragment {
 		if (!editing && !sets.isEmpty()) {
 			Autoregulation.Advice advice = Autoregulation.next(sets.get(sets.size() - 1), lb ? Plates.toKg(5, true) : 2.5);
 			if (advice != null) {
-				String target = advice.kg > 0 ? SetLog.format(Plates.toUnit(advice.kg, lb)) : "";
-				boolean differs = advice.kg > 0 ? !target.equals(kgInput) : !Integer.toString(advice.reps).equals(repsInput);
+				String target = advice.kg > 0 ? SetLog.display(Plates.toUnit(advice.kg, lb)) : "";
+				boolean differs = advice.kg > 0 ? !same(target, kgInput) : !Integer.toString(advice.reps).equals(repsInput);
 				text(log, "🧠 " + (lb && advice.kg > 0 ? advice.text.replaceAll("[0-9]+([.,][0-9]+)? kg",
-					Txt.decimal(target) + " lb") : advice.text), R.style.EnerGym_Body, 12).setTag("track_advice");
+					target + " lb") : advice.text), R.style.EnerGym_Body, 12).setTag("track_advice");
 				if (differs)
-					action(log, advice.kg > 0 ? Txt.t(R.string.ses_use_weight, Txt.decimal(target), Plates.unit(lb)) :
+					action(log, advice.kg > 0 ? Txt.t(R.string.ses_use_weight, target, Plates.unit(lb)) :
 						Txt.t(R.string.ses_use_reps, advice.reps), true, () -> {
 						if (advice.kg > 0) {
 							kgInput = target;
@@ -369,13 +369,13 @@ public final class SessionFragment extends ScreenFragment {
 			int index = i;
 			row.setTag("track_set_" + i);
 			row.setContentDescription(Txt.t(R.string.ses_set_description, i + 1, weight(s.kg), s.reps) +
-				(s.kind != SetLog.Kind.NORMAL ? ", " + s.kind.display() : "") + (s.rpe > 0 ? ", RPE " + SetLog.format(s.rpe) : "") +
+				(s.kind != SetLog.Kind.NORMAL ? ", " + s.kind.display() : "") + (s.rpe > 0 ? ", RPE " + SetLog.display(s.rpe) : "") +
 				(pr ? ", " + Txt.t(R.string.ses_pr_lower) : "") + ". " + Txt.t(R.string.ses_tap_to_edit));
 			if (index == selectedSet)
 				row.setBackground(rounded(R.color.surface_selected, 12, R.color.gold, 1));
 			row.setOnClickListener(v -> {
 				selectedSet = index;
-				kgInput = SetLog.format(Plates.toUnit(s.kg, lb));
+				kgInput = SetLog.display(Plates.toUnit(s.kg, lb));
 				repsInput = Integer.toString(s.reps);
 				kindInput = Character.toString(s.kind.code);
 				rpeInput = s.rpe > 0 ? SetLog.format(s.rpe) : "";
@@ -408,8 +408,8 @@ public final class SessionFragment extends ScreenFragment {
 				weight(s.kg), s.reps);
 		}
 		text(log, text, R.style.EnerGym_Body, 12).setTag("track_overload");
-		String kg = SetLog.format(Plates.toUnit(s.kg, lb)), reps = Integer.toString(s.reps);
-		if (kg.equals(kgInput) && reps.equals(repsInput))
+		String kg = SetLog.display(Plates.toUnit(s.kg, lb)), reps = Integer.toString(s.reps);
+		if (same(kg, kgInput) && reps.equals(repsInput))
 			return;
 		action(log, s.kg > 0 ? getString(R.string.overload_use, weight(s.kg), s.reps) :
 			getString(R.string.overload_use_reps, s.reps), true, () -> {
@@ -462,7 +462,7 @@ public final class SessionFragment extends ScreenFragment {
 		if (s.kind != SetLog.Kind.NORMAL)
 			parts.add(s.kind.display());
 		if (s.rpe > 0)
-			parts.add("RPE " + Txt.decimal(SetLog.format(s.rpe)));
+			parts.add("RPE " + SetLog.display(s.rpe));
 		if (!detail.isEmpty())
 			parts.add(detail);
 		return String.join(" · ", parts);
@@ -556,7 +556,7 @@ public final class SessionFragment extends ScreenFragment {
 		String target = item.getPrescription().getOrDefault("loadKg", "0");
 		if (seed == null && number(target, 0) == 0 && !before.isEmpty() && before.get(0).kg > 0)
 			target = SetLog.format(before.get(0).kg);
-		kgInput = SetLog.format(Plates.toUnit(seed != null ? seed.kg : number(target, 0), lb));
+		kgInput = SetLog.display(Plates.toUnit(seed != null ? seed.kg : number(target, 0), lb));
 		repsInput = seed != null ? Integer.toString(seed.reps) : item.getPrescription().getOrDefault("repetitions", "8");
 	}
 
@@ -591,14 +591,14 @@ public final class SessionFragment extends ScreenFragment {
 		});
 		row.addView(stepButton("−", Txt.t(R.string.ses_less, label.toLowerCase(Locale.ROOT)), () -> {
 			double next = Math.max(0, number(field.getText().toString(), 0) - step);
-			field.setText(decimal ? SetLog.format(next) : Integer.toString((int) Math.max(1, next)));
+			field.setText(decimal ? SetLog.display(next) : Integer.toString((int) Math.max(1, next)));
 		}), new LinearLayout.LayoutParams(dp(64), dp(64)));
 		LinearLayout.LayoutParams middle = new LinearLayout.LayoutParams(0, dp(64), 1);
 		middle.setMargins(dp(10), 0, dp(10), 0);
 		row.addView(field, middle);
 		row.addView(stepButton("+", Txt.t(R.string.ses_more, label.toLowerCase(Locale.ROOT)), () -> {
 			double next = number(field.getText().toString(), 0) + step;
-			field.setText(decimal ? SetLog.format(next) : Integer.toString((int) next));
+			field.setText(decimal ? SetLog.display(next) : Integer.toString((int) next));
 		}), new LinearLayout.LayoutParams(dp(64), dp(64)));
 		add(target, row, 6);
 	}
@@ -677,7 +677,7 @@ public final class SessionFragment extends ScreenFragment {
 		LinearLayout card = card(metric, Txt.t(bodyweight ? R.string.ses_max_reps_body : R.string.ses_1rm_body));
 		add(card, new com.energym.app.ui.charts.LineChartView(requireContext()), 12).set(values, labels,
 			bodyweight ? "reps" : Plates.unit(lb), Txt.t(R.string.ses_metric_of, metric, e.getName()));
-		text(card, Txt.t(R.string.ses_best, SetLog.format(top) + " " + (bodyweight ? Txt.t(R.string.ses_reps_lower) : Plates.unit(lb))),
+		text(card, Txt.t(R.string.ses_best, SetLog.display(top) + " " + (bodyweight ? Txt.t(R.string.ses_reps_lower) : Plates.unit(lb))),
 			R.style.EnerGym_Body, 12);
 	}
 
@@ -753,7 +753,7 @@ public final class SessionFragment extends ScreenFragment {
 			return sets.size() + " × " + sets.get(0).reps + " · " + weight(sets.get(0).kg).toLowerCase(Locale.ROOT);
 		List<String> parts = new ArrayList<>();
 		for (SetLog.Entry x : sets)
-			parts.add((x.kg > 0 ? SetLog.format(Plates.toUnit(x.kg, lb)) : Txt.t(R.string.ses_bodyweight_short)) + "×" + x.reps);
+			parts.add((x.kg > 0 ? SetLog.display(Plates.toUnit(x.kg, lb)) : Txt.t(R.string.ses_bodyweight_short)) + "×" + x.reps);
 		return String.join(", ", parts);
 	}
 
@@ -767,6 +767,11 @@ public final class SessionFragment extends ScreenFragment {
 		} catch (RuntimeException e) {
 			return fallback;
 		}
+	}
+
+	/** El mismo peso aunque uno lleve coma y el otro punto («92,5» y «92.5»); vacío no coincide con nada. */
+	private static boolean same(String a, String b) {
+		return Math.abs(number(a, -1) - number(b, -2)) < 0.001;
 	}
 
 	private static String day(Session s) {

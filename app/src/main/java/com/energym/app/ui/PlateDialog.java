@@ -29,7 +29,7 @@ final class PlateDialog {
 			s.append(Txt.t(R.string.pl_type_weight));
 		else {
 			Plates.Load load = Plates.load(target, bar, lb ? Plates.LB_PLATES : Plates.KG_PLATES);
-			s.append(Txt.t(R.string.pl_bar, SetLog.format(bar) + " " + unit)).append('\n');
+			s.append(Txt.t(R.string.pl_bar, SetLog.display(bar) + " " + unit)).append('\n');
 			if (load.perSide.isEmpty())
 				s.append("  ").append(Txt.t(R.string.pl_no_plates));
 			else {
@@ -39,20 +39,20 @@ final class PlateDialog {
 					count.merge(p, 1, Integer::sum);
 				List<String> parts = new ArrayList<>();
 				for (Map.Entry<Double, Integer> e : count.entrySet())
-					parts.add((e.getValue() > 1 ? e.getValue() + " × " : "") + SetLog.format(e.getKey()));
+					parts.add((e.getValue() > 1 ? e.getValue() + " × " : "") + SetLog.display(e.getKey()));
 				s.append("  ").append(String.join("  +  ", parts)).append(' ').append(unit);
 			}
 			if (Math.abs(load.total - target) > 0.001)
-				s.append("\n\n").append(Txt.t(R.string.pl_closest, SetLog.format(load.total) + " " + unit));
+				s.append("\n\n").append(Txt.t(R.string.pl_closest, SetLog.display(load.total) + " " + unit));
 		}
-		add(box, c, Txt.t(R.string.pl_title, target > 0 ? SetLog.format(target) + " " + unit : Txt.t(R.string.pl_your_set)), R.style.EnerGym_CardTitle);
+		add(box, c, Txt.t(R.string.pl_title, target > 0 ? SetLog.display(target) + " " + unit : Txt.t(R.string.pl_your_set)), R.style.EnerGym_CardTitle);
 		add(box, c, s.toString(), R.style.EnerGym_Body);
 		if (oneRepMaxKg > 0) {
 			add(box, c, "\n" + Txt.t(R.string.pl_1rm, Plates.text(oneRepMaxKg, lb)), R.style.EnerGym_CardTitle);
 			StringBuilder table = new StringBuilder();
 			for (int p : Plates.PERCENTS)
 				table.append(String.format(Locale.ROOT, "%3d %%   %s %s   ~%d rep%s\n", p,
-					SetLog.format(Plates.atPercent(oneRepMaxKg, p, lb)), unit, Plates.repsAt(p), Plates.repsAt(p) == 1 ? "" : "s"));
+					SetLog.display(Plates.atPercent(oneRepMaxKg, p, lb)), unit, Plates.repsAt(p), Plates.repsAt(p) == 1 ? "" : "s"));
 			TextView t = add(box, c, table.toString().trim(), R.style.EnerGym_Body);
 			t.setTypeface(android.graphics.Typeface.MONOSPACE);
 		}

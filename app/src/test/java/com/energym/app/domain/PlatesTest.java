@@ -26,6 +26,7 @@ public class PlatesTest {
 		assertEquals(135, Plates.toUnit(kg, true), 0.001);
 		assertEquals("135 lb", Plates.text(kg, true));
 		assertEquals("60 kg", Plates.text(60, false));
+		assertEquals("92,5 kg", Plates.text(92.5, false));
 		assertEquals("Peso corporal", Plates.text(0, true));
 	}
 

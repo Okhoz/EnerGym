@@ -189,8 +189,14 @@ public final class SetLog {
 		return best;
 	}
 
+	/** Siempre con punto («92.5»): para guardar (setLog, loadKg, CSV); en pantalla, display(). */
 	public static String format(double kg) {
 		return kg == Math.rint(kg) ? Long.toString((long) kg) : String.format(Locale.ROOT, "%.2f", kg)
 			.replaceAll("0+$", "").replaceAll("\\.$", "");
+	}
+
+	/** El mismo número para mostrarlo en el idioma de la app: «92,5» en español, «92.5» en inglés. */
+	public static String display(double kg) {
+		return Txt.decimal(format(kg));
 	}
 }

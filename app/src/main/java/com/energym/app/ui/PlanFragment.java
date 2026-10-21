@@ -60,7 +60,7 @@ public final class PlanFragment extends ScreenFragment {
 					kg = 0;
 				}
 				return p.getOrDefault("sets", "?") + " × " + p.getOrDefault("repetitions", "?") + " · " +
-					(kg > 0 ? SetLog.format(kg) + " kg" : Txt.t(R.string.ses_bodyweight_lower));
+					(kg > 0 ? SetLog.display(kg) + " kg" : Txt.t(R.string.ses_bodyweight_lower));
 			}
 			case ISOMETRIC:
 				return p.getOrDefault("sets", "?") + " × " + p.getOrDefault("durationSeconds", "?") + " s";

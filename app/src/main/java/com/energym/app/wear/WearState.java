@@ -39,7 +39,7 @@ public final class WearState {
 		String last = "";
 		if (sets != null && !sets.isEmpty()) {
 			SetLog.Entry e = sets.get(sets.size() - 1);
-			last = (e.kg > 0 ? SetLog.format(Math.round(e.kg * factor * 100) / 100.0) + " " + unit + " × " : "") + e.reps;
+			last = (e.kg > 0 ? SetLog.display(Math.round(e.kg * factor * 100) / 100.0) + " " + unit + " × " : "") + e.reps;
 		}
 		long ends = restEndsElapsed > nowElapsed ? nowWall + (restEndsElapsed - nowElapsed) : 0;
 		return new WearState(true, exercise == null ? "" : exercise, (sets == null ? 0 : sets.size()) + 1, last, ends);

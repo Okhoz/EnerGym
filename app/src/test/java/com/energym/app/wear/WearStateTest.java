@@ -27,7 +27,7 @@ public class WearStateTest {
 		assertEquals(0, s.restEnds);
 		assertEquals("12", s.last);
 		WearState lb = WearState.of("Curl", Collections.singletonList(new SetLog.Entry(10, 10)), 2.20462, "lb", 0, 0, 0);
-		assertEquals("22.05 lb × 10", lb.last);
+		assertEquals("22,05 lb × 10", lb.last);
 		WearState first = WearState.of("Sentadilla", Collections.emptyList(), 1, "kg", 0, 0, 0);
 		assertEquals(1, first.set);
 		assertEquals("", first.last);

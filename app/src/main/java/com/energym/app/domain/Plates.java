@@ -61,7 +61,7 @@ public final class Plates {
 
 	/** «60 kg», «135 lb» o «Peso corporal». */
 	public static String text(double kg, boolean lb) {
-		return kg > 0 ? SetLog.format(toUnit(kg, lb)) + " " + unit(lb) : Txt.t(R.string.hist_body_weight);
+		return kg > 0 ? SetLog.display(toUnit(kg, lb)) + " " + unit(lb) : Txt.t(R.string.hist_body_weight);
 	}
 
 	/** Repeticiones aproximadas a un porcentaje del 1RM (inversa de Epley, la misma fórmula del 1RM estimado). */
