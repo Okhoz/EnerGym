@@ -59,7 +59,9 @@ Empieza hoy: elige tu objetivo, entrena y deja que EnerGym te ayude a progresar 
 **Gráficos** (en `docs/google-play/graficos/`):
 - Icono: `icono-512.png` (512 × 512)
 - Gráfico destacado: `destacado-1024x500.png` (1024 × 500)
-- Capturas de teléfono: `captura-1.png` … (1080 × 2160)
+- Capturas de teléfono: `captura-1.png` … `captura-8.png` (1080 × 1920), en este orden:
+  1. Apunta cada serie en segundos · 2. Mira cómo progresas · 3. Bate tus récords · 4. Calorías y macros ·
+  5. Ejercicios en 3D · 6. Tu asistente de entreno · 7. Tu constancia de un vistazo · 8. Ponte metas
 
 **Vídeo promocional** (en `docs/google-play/`): `video-promocional.mp4` (1080 × 1920, 40 s). Play Console no admite subir el archivo: pide la URL de un vídeo de YouTube público o no listado, sin anuncios y sin restricción de edad.
 
