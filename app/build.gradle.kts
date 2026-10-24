@@ -17,7 +17,10 @@ val releaseFirebasePath = providers.environmentVariable("ENERGYM_FIREBASE_CONFIG
 val releaseBackendUrl = providers.environmentVariable("ENERGYM_BACKEND_URL").orElse(providers.gradleProperty("ENERGYM_BACKEND_URL")).orElse("").get()
 val debugBackendUrl = releaseBackendUrl.trim().removeSuffix("/")
 val releaseSigningPath = providers.environmentVariable("ENERGYM_RELEASE_SIGNING_PROPERTIES").orElse(providers.gradleProperty("ENERGYM_RELEASE_SIGNING_PROPERTIES")).orElse("").get()
-val releaseFirebaseFile = releaseFirebasePath.takeIf { it.isNotBlank() }?.let { File(it) }
+// Si el JSON externo no existe, release usa app/google-services.json; la validación le aplica las mismas comprobaciones.
+val localFirebaseFile = file("google-services.json")
+val releaseFirebaseFile = releaseFirebasePath.takeIf { it.isNotBlank() }?.let { File(it) }?.takeIf { it.isFile }
+	?: localFirebaseFile.takeIf { it.isFile }
 val releaseSigningFile = releaseSigningPath.takeIf { it.isNotBlank() }?.let { File(it) }
 val releaseSigning = Properties().apply {
 	if (releaseSigningFile?.isFile == true)
@@ -27,7 +30,7 @@ val signingStore = releaseSigning.getProperty("storeFile")?.let {
 	File(it).let { candidate -> if (candidate.isAbsolute) candidate else File(releaseSigningFile!!.parentFile, it) }
 }
 
-// Debug conserva su configuración opcional; release jamás reutiliza el JSON local como atajo.
+// Debug prefiere el JSON local; release prefiere el externo.
 if (file("google-services.json").isFile || releaseFirebaseFile?.isFile == true) {
 	apply(plugin = "com.google.gms.google-services")
 	tasks.withType<GoogleServicesTask>().configureEach {
@@ -68,7 +71,10 @@ abstract class ValidateReleaseConfiguration : DefaultTask() {
 			}
 			return candidate
 		}
-		val firebase = externalFile(firebasePath, "ENERGYM_FIREBASE_CONFIG")
+		val firebase = if (firebasePath.isNotBlank() && File(firebasePath).canonicalFile == File(sourceRoot, "app/google-services.json").canonicalFile)
+			File(firebasePath)
+		else
+			externalFile(firebasePath, "ENERGYM_FIREBASE_CONFIG")
 		if (firebase != null) {
 			try {
 				val root = JsonSlurper().parse(firebase) as Map<*, *>
@@ -151,7 +157,7 @@ abstract class ValidateReleaseConfiguration : DefaultTask() {
 val validateReleaseConfiguration = tasks.register<ValidateReleaseConfiguration>("validateReleaseConfiguration") {
 	group = "verification"
 	description = "Bloquea release si faltan entradas privadas Firebase, HTTPS o firma. No realiza llamadas cloud."
-	firebasePath = releaseFirebasePath
+	firebasePath = releaseFirebaseFile?.absolutePath ?: releaseFirebasePath
 	backendUrl = releaseBackendUrl
 	signingPath = releaseSigningPath
 	sourceRoot = rootProject.projectDir.absolutePath
