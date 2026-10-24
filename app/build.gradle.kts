@@ -4,6 +4,7 @@ import java.net.URI
 import java.security.KeyStore
 import java.util.Properties
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 
@@ -46,6 +47,11 @@ abstract class ValidateReleaseConfiguration : DefaultTask() {
 	@get:Input var backendUrl = ""
 	@get:Input var signingPath = ""
 	@get:Input var sourceRoot = ""
+	@get:Input var injectedStoreFile = ""
+	@get:Internal var injectedStoreType = ""
+	@get:Internal var injectedStorePassword = ""
+	@get:Internal var injectedKeyAlias = ""
+	@get:Internal var injectedKeyPassword = ""
 
 	@TaskAction
 	fun validate() {
@@ -99,29 +105,41 @@ abstract class ValidateReleaseConfiguration : DefaultTask() {
 		if (backendUrl.isNotBlank() && (uri?.scheme != "https" || !dns || reserved || uri.userInfo != null || uri.rawQuery != null ||
 			uri.rawFragment != null || uri.port !in listOf(-1, 443) || uri.rawPath !in listOf("", "/")))
 			errors.add("ENERGYM_BACKEND_URL requiere origen HTTPS público con dominio, sin IP/localhost, credenciales, ruta, query ni fragmento.")
-		val signing = externalFile(signingPath, "ENERGYM_RELEASE_SIGNING_PROPERTIES")
-		if (signing != null) {
+		fun validateKey(store: File, storeType: String?, storePassword: String, alias: String, keyPassword: String) {
+			if (!store.isFile || store.canonicalFile.toPath().startsWith(File(sourceRoot).canonicalFile.toPath())) {
+				errors.add("El almacén de firma debe existir fuera del proyecto.")
+				return
+			}
 			try {
-				val properties = Properties().apply { signing.inputStream().use { load(it) } }
+				// Sin tipo indicado (asistente de Android Studio) se detecta solo: JKS o PKCS12.
+				val keyStore = if (storeType.isNullOrBlank()) KeyStore.getInstance(store, storePassword.toCharArray())
+					else KeyStore.getInstance(storeType).apply { store.inputStream().use { load(it, storePassword.toCharArray()) } }
+				val key = keyStore.getKey(alias, keyPassword.toCharArray())
+				if (key !is java.security.PrivateKey || keyStore.getCertificateChain(alias).isNullOrEmpty())
+					errors.add("La firma requiere una clave privada y su cadena de certificados para el alias configurado.")
+			} catch (_: Exception) {
+				errors.add("No se pudo validar la firma privada: revisa archivo, tipo, alias y contraseñas fuera de los logs.")
+			}
+		}
+		// «Generate Signed Bundle» de Android Studio inyecta su propia firma y tiene prioridad sobre el archivo privado.
+		if (injectedStoreFile.isNotBlank()) {
+			if (injectedStorePassword.isBlank() || injectedKeyAlias.isBlank() || injectedKeyPassword.isBlank())
+				errors.add("La firma de Android Studio está incompleta: requiere almacén, contraseñas y alias.")
+			else
+				validateKey(File(injectedStoreFile), injectedStoreType, injectedStorePassword, injectedKeyAlias, injectedKeyPassword)
+		} else {
+			val signing = externalFile(signingPath, "ENERGYM_RELEASE_SIGNING_PROPERTIES")
+			if (signing != null) {
+				val properties = Properties().apply { runCatching { signing.inputStream().use { load(it) } } }
 				val required = listOf("storeFile", "storePassword", "keyAlias", "keyPassword", "storeType")
 				if (required.any { properties.getProperty(it).isNullOrBlank() }) {
 					errors.add("Firma privada incompleta: requiere storeFile, storePassword, keyAlias, keyPassword y storeType.")
 				} else {
 					val path = properties.getProperty("storeFile")
 					val store = File(path).let { if (it.isAbsolute) it else File(signing.parentFile, path) }
-					if (!store.isFile || store.canonicalFile.toPath().startsWith(File(sourceRoot).canonicalFile.toPath())) {
-						errors.add("El almacén de firma debe existir fuera del proyecto.")
-					} else {
-						val keyStore = KeyStore.getInstance(properties.getProperty("storeType"))
-						store.inputStream().use { keyStore.load(it, properties.getProperty("storePassword").toCharArray()) }
-						val alias = properties.getProperty("keyAlias")
-						val key = keyStore.getKey(alias, properties.getProperty("keyPassword").toCharArray())
-						if (key !is java.security.PrivateKey || keyStore.getCertificateChain(alias).isNullOrEmpty())
-							errors.add("La firma requiere una clave privada y su cadena de certificados para el alias configurado.")
-					}
+					validateKey(store, properties.getProperty("storeType"), properties.getProperty("storePassword"),
+						properties.getProperty("keyAlias"), properties.getProperty("keyPassword"))
 				}
-			} catch (_: Exception) {
-				errors.add("No se pudo validar la firma privada: revisa archivo, tipo, alias y contraseñas fuera de los logs.")
 			}
 		}
 		if (errors.isNotEmpty())
@@ -137,6 +155,11 @@ val validateReleaseConfiguration = tasks.register<ValidateReleaseConfiguration>(
 	backendUrl = releaseBackendUrl
 	signingPath = releaseSigningPath
 	sourceRoot = rootProject.projectDir.absolutePath
+	injectedStoreFile = providers.gradleProperty("android.injected.signing.store.file").orElse("").get()
+	injectedStoreType = providers.gradleProperty("android.injected.signing.store.type").orElse("").get()
+	injectedStorePassword = providers.gradleProperty("android.injected.signing.store.password").orElse("").get()
+	injectedKeyAlias = providers.gradleProperty("android.injected.signing.key.alias").orElse("").get()
+	injectedKeyPassword = providers.gradleProperty("android.injected.signing.key.password").orElse("").get()
 }
 
 @DisableCachingByDefault(because = "Valida el origen online opcional de cada APK debug")
