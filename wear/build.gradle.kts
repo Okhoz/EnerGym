@@ -10,7 +10,7 @@ android {
 	}
 
 	defaultConfig {
-		applicationId = "com.energym.app"
+		applicationId = "com.energym.okoz.app"
 		minSdk = 30
 		targetSdk = 37
 		versionCode = 1
